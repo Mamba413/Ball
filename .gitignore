@@ -15,8 +15,6 @@ realdata/
 vignettes/bdExample.png
 BCovJASA/Code.zip
 newFeature/
-vignettes/regressionDemo.png
-vignettes/classificationDemo.png
 R/figureGenerator.R
 package/
 reference/statistical shape analysis with R.pdf
