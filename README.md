@@ -1,3 +1,5 @@
+[![Travis Build Status](https://travis-ci.org/Mamba413/Ball.svg?branch=master)](https://travis-ci.org/Mamba413-hl/Ball)
+
 ## Ball: Statistical Inference and Sure Independence Screening via Ball Statistics
 <!-- [Chinese version](https://gitlab.com/mamba413/Ball/blob/develop_KS_V1.1/README_CN.md) -->
 
