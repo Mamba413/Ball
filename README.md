@@ -34,7 +34,7 @@ To install the development version from GitHub, run:
 library(devtools)
 install_github("Mamba413/Ball", build_vignettes = TRUE)
 ```
-*Windows* user will need to install Rtools first.       
+*Windows* user will need to install [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first.       
 
 
 ### Usage         

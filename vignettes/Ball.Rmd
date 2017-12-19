@@ -1,7 +1,7 @@
 ---
 title: "Ball: Statistical Inference and Sure Independence Screening via Ball Statistics"
 author: "Jin Zhu, zhuj37@mail2.sysu.edu.cn"
-date: "`r Sys.Date()`"
+date: "December 18, 2017"
 # bibliography: reference.bib
 output: 
   rmarkdown::html_vignette:
@@ -47,20 +47,21 @@ are identical.
 - **bcorsis**: carry out sure independence screening procedure to pick out the variables potentially related to response.       
 
 ### Installation        
-#### Github version       
-To install the development version from GitHub, run:      
-```{r, eval=FALSE}
-library(devtools)
-install_github("Mamba413/Ball")
-```
-
 #### CRAN version         
 To install the Ball R package from CRAN, just run:        
 ```{r,eval=FALSE}
 install.packages("Ball")
 ```
 
-*Windows* user will need to install Rtools first.       
+#### Github version       
+To install the development version from GitHub, run:      
+```{r, eval=FALSE}
+library(devtools)
+install_github("Mamba413/Ball", build_vignettes = TRUE)
+```
+
+*Windows* user will need to install [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first.       
+
 ```{r, echo=FALSE}
 library(Ball)
 ```
