@@ -1,0 +1,145 @@
+\name{Ball-package}
+\alias{Ball-package}
+\alias{Ball}
+\docType{package}
+\title{Statistical Inference and Sure Independence Screening via Ball Statistics}
+\description{This R package implements the permutation test of independence between two random vectors of arbitrary dimensions, and equality of two or more multivariate distributions, as well as the dependence measurement ball covariance and ball correlation which are available in banach space. Furthermore, a generic non-parametric sure independence screening procedure based on ball correlation is implemented to tackle the challenge in the context of ultra high dimensional data.}
+\details{
+\tabular{ll}{
+Package: \tab Ball\cr
+Type: \tab Package\cr
+Version: \tab 1.0\cr
+Date: \tab 2017-12-25\cr
+License: \tab GPL-3 + file LICENSE\cr
+}
+
+The package contains five major functions:
+
+\code{\link{bd.test}} - The ball divergence based permutation test for equality of multivariate (or univariate) distributions.
+
+\code{\link{bcov.test}} - The ball covariance based permutation test for independence of multivariate (or univariate) random variable.
+
+\code{\link{bd}} - Computes ball divergence statistics.
+
+\code{\link{bcov}, \link{bcor}} - Computes ball covariance and ball correlation statistics, which are multivariate measures of dependence in banach space.
+
+\code{\link{bcorsis}} - The ball correlation non-parametric sure independence screening procedure for selecting the potenial significant variables in the context of ultra high dimensional data..
+
+See \code{vignette("Ball")} for additional information. 
+
+}
+
+\author{
+XueQin Wang, WenLiang Pan, HePing Zhang, Hongtu Zhu, Yuan Tian, WeiNan Xiao,
+ChengFeng Liu and Jin Zhu
+
+Maintainer: Jin Zhu<zhuj37@mail2.sysu.edu.cn>
+}
+
+\references{
+Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. (2017) Ball divergence: nonparametric two sample test, \emph{The Annals of Statistics}, to appear
+}
+
+\examples{
+
+\dontrun{
+
+################# Quick Start for bd.test function #################
+x <- rnorm(50)
+y <- rnorm(50, mean = 1)
+# plot(density(x))
+# lines(density(y), col = 'red')
+# ball divergence:
+bd.test(x = x, y = y)
+
+################# Quick Start for bcov.test function #################
+error <- runif(50, min = -0.3, max = 0.3)
+x <- runif(50, 0, 4*pi)
+y <- cos(x) + error
+# plot(x, y)
+bcov.test(x, y)
+
+################# Ball Divergence Test for Non-Hilbert Data #################
+# load data:
+data("macaques")
+# number of femala and male Macaca fascicularis:
+table(macaques[["group"]])
+# calculate Riemannian shape distance matrix:
+Dmat <- noneucliddist(macaques[["x"]], method = "riemann")
+# hypothesis test with BD:
+bd.test(x = Dmat, R = 99, size = c(9, 9), dst = TRUE)
+
+################# Ball Covariance Test for Non-Hilbert Data #################
+# load data:
+data("ArcticLake")
+# Distance matrix between y:
+Dy <- noneucliddist(ArcticLake[["x"]], method = "compositional")
+# Distance matrix between x:
+Dx <- dist(ArcticLake[["depth"]])
+# hypothesis test with BCov:
+bcov.test(x = Dx, y = Dy, R = 99, dst = TRUE)
+
+################  K-sample Test  #################
+n <- 150
+bd.test(rnorm(n), size = rep(50, 3))
+# alternative input method:
+x <- lapply(rep(50, 3), rnorm)
+bd.test(x)
+
+################  Weighted Ball Covariance Test  #################
+data("ArcticLake")
+Dy <- nhdist(ArcticLake[["x"]], method = "compositional")
+Dx <- dist(ArcticLake[["depth"]])
+# hypothesis test with weighted BCov:
+bcov.test(x = Dx, y = Dy, R = 99, dst = TRUE, weight = TRUE)
+
+################# Mutual Independence Test #################
+x <- rnorm(30)
+y <- (x > 0) * x + rnorm(30)
+z <- (x <= 0) * x + rnorm(30)
+data_list <- list(x, y, z)
+bcov.test(data_list)
+
+############### Quick Start for bcorsis function ###############
+set.seed(1)
+n <- 150
+p <- 3000
+x <- matrix(rnorm(n * p), nrow = n)
+error <- rnorm(n)
+y <- 3*x[, 1] + 5*(x[, 3])^2 + error
+res <- bcorsis(y = y, x = x)
+head(res[[1]])
+
+############### BCor-SIS: Censored Data Example ###############
+result <- bcorsis(x = genlung[["covariate"]], y = genlung[["survival"]], 
+                  method = "survival")$ix
+top_gene <- colnames(genlung[["covariate"]])[result]
+head(top_gene, n = 1)
+
+############### BCor-SIS: Interaction Pursuing ###############
+set.seed(1)
+n <- 150
+p <- 3000
+x <- matrix(rnorm(n * p), nrow = n)
+error <- rnorm(n)
+y <- 3*x[, 1]*x[, 5]*x[, 10] + error
+res <- bcorsis(y = y, x = x, method = "interaction")
+head(res[[1]])
+
+############### BCor-SIS: Iterative Method ###############
+library(mvtnorm)
+set.seed(1)
+n <- 150
+p <- 3000
+sigma_mat <- matrix(0.5, nrow = p, ncol = p)
+diag(sigma_mat) <- 1
+error <- rnorm(n)
+y <- 3*(x[, 1])^2 + 5*(x[, 2])^2 + 5*x[, 8] - 8*x[, 16] + error
+res <- bcorsis(y = y, x = x, method = "gam", d = 15)
+res[[1]]
+}
+
+}
+
+
+

@@ -1,0 +1,15 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^README_CN.md$
+^PLAN.md$
+^data-raw$
+.idea
+.Rhistory
+.gitignore
+newFeature
+reference
+BCovJASA
+BallJSS
+package
+simulation
+AcademicReport
