@@ -13,3 +13,4 @@ BallJSS
 package
 simulation
 AcademicReport
+^\.travis\.yml$
