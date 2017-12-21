@@ -10,7 +10,7 @@ The fundamental problems for data mining and statistical analysis are:
 
 - Whether two random variables are dependent?
 
-**Ball** package provides solution for these issues. Moreover, a variables (features) screening procedure also implemented to tackle ultra high dimensional data. The core functions in **Ball** package are: **bd.test**, **bcov.test**, and **bcorsis**.
+**Ball** package provides solutions for these issues. Moreover, a variables (features) screening procedure also implemented to tackle ultra high dimensional data. The core functions in **Ball** package are **bd.test**, **bcov.test**, and **bcorsis**.
 
 These functions based on ball statistic have several advantages:
 
@@ -18,9 +18,9 @@ These functions based on ball statistic have several advantages:
 
 - There is no need for moment assumption, which means that outliers and heavy-tail data are no longer a problem.
 
-- There is no need for complex adjustments for parameters.
+- They perform well in many setting without complex adjustments for parameters.
  
-Specially, for two-sample or K-sample test, **bd.test** has is proved to cope well for imbalanced data while **bcov.test** and **bcorsis** works well for complex responses and/or predictors, such as censored data and compositional data.     
+Particularly, for two-sample or K-sample problem, **bd.test** has been proved to cope well for imbalanced data and **bcov.test** and **bcorsis** work well for detecting the relationship between complex responses and/or predictors, such as shape, compositional as well as censored data.     
 
 
 ### Installation        
@@ -116,7 +116,7 @@ In this example, the result is :
 ```
           
 The **bcorsis** result shows that the first and the third variable are the two most 
-important variables in 3000 explanatory variables which is consistent to simulation settings.
+important variables in 3000 explanatory variables which is consistent with simulation settings.
 
 If you find any bugs, or if you experience any crashes, please report to us. If you have any questions just ask, we won't bite. 
 
