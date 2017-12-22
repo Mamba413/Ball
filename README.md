@@ -14,7 +14,7 @@ The fundamental problems for data mining and statistical analysis are:
 
 These functions based on ball statistic have several advantages:
 
-- It's applicable to univariate and multivariate data in banach space.
+- It's applicable to univariate and multivariate data in Banach space.
 
 - There is no need for moment assumption, which means that outliers and heavy-tail data are no longer a problem.
 

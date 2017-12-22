@@ -205,7 +205,7 @@ $$\frac{n}{m+n} \to \tau, \tau \in [0, 1].$$
 Investigate the dependence between variables is a fundamental step in statistical inference and data mining. Suppose, We are given pairs of independent observations $\{(x_1, y_1),\ldots,(x_n,y_n)\}$, where $x_i$ and $y_i$  can be of any dimension and the dimensionality of $x_i$ and $y_i$ need not be the same. Let $X = (x_1,\ldots,x_n)$ be the $X$ vector, and $Y=(y_1,\ldots,y_n)$ the 
 $Y$ vector and we want to determine whether $X$ and $Y$ are dependent.
 <!-- , which means whether $F_{XY}=F_{X}F_{Y}$ is valid or not. Where $F_{XY}$ is the joint distribution function of $X, Y$. -->
-To achieve the goal, we come up with **Ball Covariance** ($\mathbf{BCor}_{\omega, n}^{2}$), a generic measure of dependence in banach space. Moreover, the $\mathbf{BCor}_{\omega, n}^{2}$ based independence test utilized permutation technique to calculate *p*-value is also developed. Sample version of $\mathbf{BCor}_{\omega, n}^{2}$ is defined as follow:         
+To achieve the goal, we come up with **Ball Covariance** ($\mathbf{BCor}_{\omega, n}^{2}$), a generic measure of dependence in Banach space. Moreover, the $\mathbf{BCor}_{\omega, n}^{2}$ based independence test utilized permutation technique to calculate *p*-value is also developed. Sample version of $\mathbf{BCor}_{\omega, n}^{2}$ is defined as follow:         
 $$\mathbf{BCor}_{\omega, n}^{2}(X, Y)=\frac{1}{n^{2}}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{X,Y}-\Delta_{ij,n}^{X}\Delta_{ij,n}^{Y})^{2}}\hat{\omega}_1(X_i,X_j)\hat{\omega}_2(Y_i,Y_j)$$
 where:
 $$ \Delta_{ij,n}^{X,Y}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{X} \delta_{ij,k}^{Y}}$$
@@ -228,7 +228,7 @@ Consequently, if $\mathbf{BCor}_{\omega, n}^{2}$ is significantly larger than 0,
 
 As Pan's paper proved theoretically and demonstrated numerically, the independence test based on $\mathbf{BCor}_{\omega, n}^{2}$ has several advantages:
        
-- It is applicable to the univariate and multivariate data in banach space.      
+- It is applicable to the univariate and multivariate data in Banach space.      
 - Robust to heavy-tail data or outliers        
 
 - Works fine for most problems without tuning a variety of parameters.         
