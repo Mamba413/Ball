@@ -7,11 +7,11 @@
 bd(x, y = NULL, dst = FALSE, size = NULL)
 }
 \arguments{
-\item{x}{a numeric vector, matirx, data.frame, \code{dist} object or list contains vector, matrix or data.frame.}
+\item{x}{a numeric vector, matrix, data.frame, \code{dist} object or list contains vector, matrix or data.frame.}
 
-\item{y}{a numeric vector, matirx or data.frame.}
+\item{y}{a numeric vector, matrix or data.frame.}
 
-\item{dst}{if \code{dst = TRUE}, x will be considered as distance matrix. Default: \code{dst = FALSE}}
+\item{dst}{if \code{dst = TRUE}, x will be considered as a distance matrix. Default: \code{dst = FALSE}}
 
 \item{size}{a vector record sample size of each group.}
 }
@@ -23,12 +23,12 @@ Compute ball divergence statistic between two-sample or K-sample.
 }
 \details{
 Given the samples not containing missing values, \code{bd} returns sample version of ball divergence.
-If we set \code{dst = TRUE}, arguments \code{x}, \code{y} can be \code{dist} object or a
+If we set \code{dst = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
 symmetric numeric matrix recording distance between samples; 
-otherwise these arguments are treated as data.
+otherwise, these arguments are treated as data.
 
 Ball divergence, introduced by Pan et al(2017), is a new concept to measure the difference 
-between two probability distributions in separable banach space. 
+between two probability distributions in separable Banach space. 
 Ball divergence of two probability measures is proven to be zero if and only if they are identical.
 
 The definitions of the sample version ball divergence are as follows.

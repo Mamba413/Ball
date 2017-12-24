@@ -7,14 +7,14 @@
 bd.test(x, y = NULL, R = 99, dst = FALSE, size = NULL, seed = 4)
 }
 \arguments{
-\item{x}{a numeric vector, matirx, data.frame, \code{dist} object or list contains vector, matrix or data.frame.}
+\item{x}{a numeric vector, matrix, data.frame, \code{dist} object or list contains vector, matrix or data.frame.}
 
-\item{y}{a numeric vector, matirx or data.frame.}
+\item{y}{a numeric vector, matrix or data.frame.}
 
-\item{R}{the number of replication, when R equals to 0, the function return
+\item{R}{the number of replications, when R equals to 0, the function returns
 the sample version of ball divergence. Default: \code{R = 99}}
 
-\item{dst}{if \code{dst = TRUE}, x will be considered as distance matrix. Default: \code{dst = FALSE}}
+\item{dst}{if \code{dst = TRUE}, x will be considered as a distance matrix. Default: \code{dst = FALSE}}
 
 \item{size}{a vector record sample size of each group.}
 

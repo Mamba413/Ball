@@ -11,9 +11,9 @@ bcov.test(x, y = NULL, R = 99, dst = FALSE, weight = FALSE, seed = 4)
 
 \item{y}{a numeric vector, matirx, data.frame or \code{dist} object.}
 
-\item{R}{the number of replication. When \code{R = 0}, the function return ball covariance. Default: \code{R = 99}}
+\item{R}{the number of replications. When \code{R = 0}, the function return ball covariance. Default: \code{R = 99}}
 
-\item{dst}{if \code{dst = TRUE}, \code{x} and \code{y} will be considered as distance matrix. Default: \code{dst = FALSE}}
+\item{dst}{if \code{dst = TRUE}, \code{x} and \code{y} will be considered as a distance matrix. Default: \code{dst = FALSE}}
 
 \item{weight}{when \code{weight = TRUE}, weighted ball covariance or weighted ball correlation is used instead of ball covariance
 or ball correlation. Default: \code{weight = FALSE}}
@@ -32,22 +32,22 @@ bcov.test returns a list with class "htest" containing the following components:
 }
 \description{
 Ball covariance test of multivariate independence. 
-Ball covariance are generic multivariate measures of dependence in banach space.
+Ball covariance are generic multivariate measures of dependence in Banach space.
 }
 \details{
-\code{bcov.test} are non-parametric tests of multivariate independence in banach space. 
+\code{bcov.test} are non-parametric tests of multivariate independence in Banach space. 
 The test decision is obtained via permutation, with \code{R} replicates.
 
-If two samples are pass to arguments \code{x} and \code{y}, the sample sizes (i.e. number of rows or length of vector) 
-of the two variables must agree. If a \code{\link{list}} object is pass to \code{x}, 
+If two samples are pass to arguments \code{x} and \code{y}, the sample sizes (i.e. number of rows or length of the vector) 
+of the two variables must agree. If a \code{\link{list}} object is passed to \code{x}, 
 each element must with same sample sizes. Moreover, data pass to \code{x} or \code{y} 
 must not contain missing or infinite values. 
-If we set \code{dst = TRUE}, arguments \code{x}, \code{y} can be \code{dist} object or a
+If we set \code{dst = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
 symmetric numeric matrix recording distance between samples; 
-otherwise these arguments are treated as data.
+otherwise, these arguments are treated as data.
 
 The \code{bcov.test} statistic is \code{bcov} or \code{ bcor} which are dependence measure 
-in banach space. The \code{bcor} test statistic is based on the normalized 
+in Banach space. The \code{bcor} test statistic is based on the normalized 
 coefficient of ball covariance. (See the manual page for \code{\link{bcov}} or \code{\link{bcor}}.)
 
 For the general problem of testing independence when the distributions of \eqn{X} and 

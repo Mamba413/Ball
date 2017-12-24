@@ -3,27 +3,23 @@
 \alias{Ball}
 \docType{package}
 \title{Statistical Inference and Sure Independence Screening via Ball Statistics}
-\description{This R package implements the permutation test of independence between two random vectors of arbitrary dimensions, and equality of two or more multivariate distributions, as well as the dependence measurement ball covariance and ball correlation which are available in banach space. Furthermore, a generic non-parametric sure independence screening procedure based on ball correlation is implemented to tackle the challenge in the context of ultra high dimensional data.}
+\description{This R package implements the permutation test of independence between two random vectors of arbitrary dimensions, and equality of two or more multivariate distributions, as well as the dependence measurement ball covariance and ball correlation which are available in Banach space. Furthermore, a generic non-parametric sure independence screening procedure based on ball correlation is implemented to tackle the challenge in the context of ultra high dimensional data.}
 \details{
 \tabular{ll}{
 Package: \tab Ball\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
-Date: \tab 2017-12-25\cr
+Date: \tab 2017-12-28\cr
 License: \tab GPL-3 + file LICENSE\cr
 }
 
-The package contains five major functions:
+The package contains three major functions:
 
 \code{\link{bd.test}} - The ball divergence based permutation test for equality of multivariate (or univariate) distributions.
 
 \code{\link{bcov.test}} - The ball covariance based permutation test for independence of multivariate (or univariate) random variable.
 
-\code{\link{bd}} - Computes ball divergence statistics.
-
-\code{\link{bcov}, \link{bcor}} - Computes ball covariance and ball correlation statistics, which are multivariate measures of dependence in banach space.
-
-\code{\link{bcorsis}} - The ball correlation non-parametric sure independence screening procedure for selecting the potenial significant variables in the context of ultra high dimensional data..
+\code{\link{bcorsis}} - The ball correlation based non-parametric sure independence screening procedure for selecting the potential significant variables in the context of ultra-high dimensional data.
 
 See \code{vignette("Ball")} for additional information. 
 

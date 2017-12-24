@@ -21,12 +21,12 @@ Montsouris (Paris, France) between 30 January 2002 and 26 June 2006. The studied
 Patients were followed until the first relapse occurred or administrative censoring. In this genomic dataset, 
 the expression levels of Agilent miRNA probes (\eqn{p=939}) were included from the \eqn{n=123} cohort samples. 
 The miRNA data contains normalized expression levels. See below the paper by Lazar et al. (2013) and Array Express 
-data repository for complete description of the samples, tissue preparation, Agilent array technology, and data normalization. 
+data repository for the complete description of the samples, tissue preparation, Agilent array technology, and data normalization. 
 In addition to the genomic data, five clinical variables, also evaluated on the cohort samples, are included as 
 continuous variable ('Age') and nominal variables ('Type','KRAS.status','EGFR.status','P53.status'). 
 See Lazar et al. (2013) for more details. Moreover, we add 1056 standard gaussian variables 
-which are independent with censored response as noise covariates. This dataset represents a situation where the number of 
-covariates dominates the number of complete observations, or \eqn{p >> n} case.
+which are independent with the censored response as noise covariates. This dataset represents a situation where the number of 
+covariates dominates the number of complete observations or \eqn{p >> n} case.
 }
 \references{
 Lazar V. et al. (2013). Integrated molecular portrait of non-small cell lung cancers. BMC Medical Genomics 6:53-65.

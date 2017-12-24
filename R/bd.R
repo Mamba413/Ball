@@ -3,11 +3,11 @@
 #' equality of multivariate distributions
 #' @aliases bd.test
 #' @author XueQin Wang, WenLiang Pan, HePing Zhang, Yuan Tian
-#' @param x a numeric vector, matirx, data.frame, \code{dist} object or list contains vector, matrix or data.frame.
-#' @param y a numeric vector, matirx or data.frame.
-#' @param R the number of replication, when R equals to 0, the function return
+#' @param x a numeric vector, matrix, data.frame, \code{dist} object or list contains vector, matrix or data.frame.
+#' @param y a numeric vector, matrix or data.frame.
+#' @param R the number of replications, when R equals to 0, the function returns
 #' the sample version of ball divergence. Default: \code{R = 99}
-#' @param dst if \code{dst = TRUE}, x will be considered as distance matrix. Default: \code{dst = FALSE}
+#' @param dst if \code{dst = TRUE}, x will be considered as a distance matrix. Default: \code{dst = FALSE}
 #' @param size a vector record sample size of each group.
 #' @param seed the random seed. 
 ## @param weight not available now
@@ -202,12 +202,12 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
 #' 
 #' @details 
 #' Given the samples not containing missing values, \code{bd} returns sample version of ball divergence.
-#' If we set \code{dst = TRUE}, arguments \code{x}, \code{y} can be \code{dist} object or a
+#' If we set \code{dst = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
 #' symmetric numeric matrix recording distance between samples; 
-#' otherwise these arguments are treated as data.
+#' otherwise, these arguments are treated as data.
 #' 
 #' Ball divergence, introduced by Pan et al(2017), is a new concept to measure the difference 
-#' between two probability distributions in separable banach space. 
+#' between two probability distributions in separable Banach space. 
 #' Ball divergence of two probability measures is proven to be zero if and only if they are identical.
 #' 
 #' The definitions of the sample version ball divergence are as follows.

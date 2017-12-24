@@ -7,7 +7,7 @@
 \format{\itemize{
 \code{ArcticLake$depth}: water depth (in meters). 
 
-\code{ArcticLake$x}: compositions of three covariates: sand, silt and clay.
+\code{ArcticLake$x}: compositions of three covariates: sand, silt, and clay.
 }}
 \source{
 Aitchison: CODA microcomputer statistical package, 1986, the file name ARCTIC.DAT, here included under the GNU Public Library Licence Version 2 or newer.
@@ -20,8 +20,8 @@ depth in an Arctic lake.
 Sand, silt and clay compositions of 39 sediment samples at different water 
 depth (in meters) in an Arctic lake. The additional feature is a concomitant variable or 
 covariate, water depth, which may account for some of the variation in the compositions. 
-In statistical terminology we have a multivariate regression problem with sediment 
-composition as predictors and water depth as response. All row percentage sums to 100, 
+In statistical terminology, we have a multivariate regression problem with sediment 
+composition as predictors and water depth as a response. All row percentage sums to 100, 
 except for rounding errors.
 }
 \note{

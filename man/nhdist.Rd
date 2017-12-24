@@ -22,8 +22,8 @@ computed by using the specified distance measure to compute
 the distances between the rows of a data matrix.
 }
 \details{
-Available distance measures are: geodesic, compositional and riemann.
-Denoting any two sample in dataset as \eqn{x} and \eqn{y}, 
+Available distance measures are geodesic, compositional and riemann.
+Denoting any two sample in the dataset as \eqn{x} and \eqn{y}, 
 we give the definition of distance measures as follows.
 
 geodesic:
@@ -34,7 +34,7 @@ The shortest route between two points on the Earth's surface, namely, a segment 
 compositional:
 
 First, we apply scale transformation to it, i.e., \eqn{(x_{i1}/t, ..., x_{ip}/t_{i}), t_{i} = \sum_{d=1}^{p}{x_{d}}} 
-. Then, apply the square root transformation to data and calculate geodesic distance between samples.
+. Then, apply the square root transformation to data and calculate the geodesic distance between samples.
 
 riemann:
 

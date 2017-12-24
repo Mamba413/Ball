@@ -5,7 +5,7 @@
 \alias{bdvmf}
 \title{Simulated von Mises-Fisher Data}
 \format{\itemize{
-\code{bdvmf$x}: A \eqn{300 \times 3} numeric matrix containg simulated von Mises-Fisher data. 
+\code{bdvmf$x}: A \eqn{300 \times 3} numeric matrix containing simulated von Mises-Fisher data. 
 
 \code{bdvmf$group}: A group index vector.
 }}

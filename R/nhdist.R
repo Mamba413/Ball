@@ -9,8 +9,8 @@
 #' @param method the distance measure to be used. This must be one of "geodesic", "compositional", "riemann". 
 #' Any unambiguous substring can be given.
 #'
-#' @details Available distance measures are: geodesic, compositional and riemann.
-#' Denoting any two sample in dataset as \eqn{x} and \eqn{y}, 
+#' @details Available distance measures are geodesic, compositional and riemann.
+#' Denoting any two sample in the dataset as \eqn{x} and \eqn{y}, 
 #' we give the definition of distance measures as follows.
 #' 
 #' geodesic:
@@ -21,7 +21,7 @@
 #' compositional:
 #' 
 #' First, we apply scale transformation to it, i.e., \eqn{(x_{i1}/t, ..., x_{ip}/t_{i}), t_{i} = \sum_{d=1}^{p}{x_{d}}} 
-#' . Then, apply the square root transformation to data and calculate geodesic distance between samples.
+#' . Then, apply the square root transformation to data and calculate the geodesic distance between samples.
 #' 
 #' riemann:
 #' 

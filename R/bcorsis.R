@@ -1,7 +1,7 @@
 #' @title Ball Correlation Sure Independence Screening
 #' @author WenLiang Pan, WeiNan Xiao, XueQin Wang, HePing Zhang, HongTu Zhu
 #' @description Generic non-parametric sure independence screening procedure based on ball correlation.
-#' Ball correlation is a generic multivariate measure of dependence in banach space.
+#' Ball correlation is a generic multivariate measure of dependence in Banach space.
 #' @inheritParams bcov.test
 #' @param x a numeric matirx or data.frame included \eqn{n} rows and \eqn{p} columns. 
 #' Each row is an observation vector and each column corresponding to a explanatory variable, generally \eqn{p >> n}.
@@ -18,16 +18,16 @@
 #' linear regression and generalized additive models, respectively.
 #' Options \code{"interaction"} and \code{"survival"} are designed for detecting variables 
 #' with potential linear interaction or associated with censored responses. Default: \code{method = "standard"}
-#' @param dst if \code{dst = TRUE}, \code{y} will be considered as distance matrix. 
-#' \code{dst} is a argument only available when \code{ method = "standard"}, \code{method = "pvalue"} 
+#' @param dst if \code{dst = TRUE}, \code{y} will be considered as a distance matrix. 
+#' Arguments only available when \code{ method = "standard"}, \code{method = "pvalue"} 
 #' or \code{ method = "interaction"}. Default: \code{dst = FALSE}
-#' @param parms a parameters list only available when \code{method = "lm"} or \code{"gam"}. 
-#' It contains three parameters: \code{d1}, \code{d2} and \code{df}. \code{d1} is the
-#' number of initial selected variables, \code{d2} is the number of variables set size added in each iteration.
+#' @param parms parameters list only available when \code{method = "lm"} or \code{"gam"}. 
+#' It contains three parameters: \code{d1}, \code{d2}, and \code{df}. \code{d1} is the
+#' number of initially selected variables, \code{d2} is the number of variables collection size added in each iteration.
 #' \code{df} is degree freedom of basis in generalized additive models 
 #' playing a role only when \code{method = "gam"}. Default: \code{ parms = list(d1 = 5, d2 = 5, df = 3)}
-#' @param R the number of replication. A argument only available when \code{method = "pvalue"}. Default \code{ R = 99}
-#' @param seed the random seed. A argument only available when \code{method = "pvalue"}.
+#' @param R the number of replications. Arguments only available when \code{method = "pvalue"}. Default \code{ R = 99}
+#' @param seed the random seed. Arguments only available when \code{method = "pvalue"}.
 #' 
 #' @return 
 #' \item{\code{ix }}{ the vector of indices selected by ball correlation sure independence screening procedure.} 
@@ -35,13 +35,13 @@
 #' @details 
 #' \code{bcorsis} implements a model-free generic screening procedure, 
 #' BCor-SIS, with fewer and less restrictive assumptions. 
-#' The sample sizes (number of rows or length of vector) of the 
+#' The sample sizes (number of rows or length of the vector) of the 
 #' two variables \code{x} and \code{y} must agree, 
 #' and samples must not contain missing values. 
 #' 
 #' BCor-SIS procedure for censored response is carried out when \code{method = "survival"}. At that time, 
-#' the matrix or data.frame pass to argument \code{y} must have exact two columns and the first column is 
-#' event (failure) time while second column is censored status, a dichotomous variable. 
+#' the matrix or data.frame pass to argument \code{y} must have exactly two columns and the first column is 
+#' event (failure) time while the second column is censored status, a dichotomous variable. 
 #' 
 #' If we set \code{dst = TRUE}, arguments \code{y} is considered as distance matrix, 
 #' otherwise \code{y} is treated as data.
@@ -51,7 +51,7 @@
 #' 0 and 1, and 0 if and only if these two random vectors are independent under some mild conditions.
 #' (See the manual page for \code{\link{bcor}}.)
 #' 
-#' Theory and numerical result indicate that BCor-SIS has following advantage:
+#' Theory and numerical result indicate that BCor-SIS has following advantages:
 #' 
 #' (i) It has a strong screening consistency property without finite sub-exponential moments of the data.
 #' Consequently, even when the dimensionality is an exponential order of the sample size, BCor-SIS still 
@@ -59,7 +59,7 @@
 #' 
 #' (ii) It is nonparametric and has the property of robustness.
 #' 
-#' (iii) It works well for complex responses and/or predictors, such as shape, survival, and compositional data
+#' (iii) It works well for complex responses and/or predictors, such as shape or survival data
 #' 
 #' (iv) It can extract important features even when the underlying model is complicated.
 #' 

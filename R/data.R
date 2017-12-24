@@ -10,12 +10,12 @@
 #' Patients were followed until the first relapse occurred or administrative censoring. In this genomic dataset, 
 #' the expression levels of Agilent miRNA probes (\eqn{p=939}) were included from the \eqn{n=123} cohort samples. 
 #' The miRNA data contains normalized expression levels. See below the paper by Lazar et al. (2013) and Array Express 
-#' data repository for complete description of the samples, tissue preparation, Agilent array technology, and data normalization. 
+#' data repository for the complete description of the samples, tissue preparation, Agilent array technology, and data normalization. 
 #' In addition to the genomic data, five clinical variables, also evaluated on the cohort samples, are included as 
 #' continuous variable ('Age') and nominal variables ('Type','KRAS.status','EGFR.status','P53.status'). 
 #' See Lazar et al. (2013) for more details. Moreover, we add 1056 standard gaussian variables 
-#' which are independent with censored response as noise covariates. This dataset represents a situation where the number of 
-#' covariates dominates the number of complete observations, or \eqn{p >> n} case.
+#' which are independent with the censored response as noise covariates. This dataset represents a situation where the number of 
+#' covariates dominates the number of complete observations or \eqn{p >> n} case.
 #' 
 #' @format 
 #' \itemize{
@@ -38,15 +38,15 @@ NULL
 #' @details Sand, silt and clay compositions of 39 sediment samples at different water 
 #' depth (in meters) in an Arctic lake. The additional feature is a concomitant variable or 
 #' covariate, water depth, which may account for some of the variation in the compositions. 
-#' In statistical terminology we have a multivariate regression problem with sediment 
-#' composition as predictors and water depth as response. All row percentage sums to 100, 
+#' In statistical terminology, we have a multivariate regression problem with sediment 
+#' composition as predictors and water depth as a response. All row percentage sums to 100, 
 #' except for rounding errors.
 #' 
 #' @format 
 #' \itemize{
 #' \code{ArcticLake$depth}: water depth (in meters). 
 #' 
-#' \code{ArcticLake$x}: compositions of three covariates: sand, silt and clay.
+#' \code{ArcticLake$x}: compositions of three covariates: sand, silt, and clay.
 #' }
 #' 
 #' @references Aitchison: The Statistical Analysis of Compositional Data, 1986, Data 5, pp5.
@@ -99,7 +99,7 @@ NULL
 #' 
 #' @format 
 #' \itemize{
-#' \code{bdvmf$x}: A \eqn{300 \times 3} numeric matrix containg simulated von Mises-Fisher data. 
+#' \code{bdvmf$x}: A \eqn{300 \times 3} numeric matrix containing simulated von Mises-Fisher data. 
 #' 
 #' \code{bdvmf$group}: A group index vector.
 #' }
