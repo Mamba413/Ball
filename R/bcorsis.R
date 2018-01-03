@@ -70,6 +70,8 @@
 #' 
 #' @export
 #' @examples 
+#' \dontrun{
+#' 
 #' ############### Quick Start for bcorsis function ###############
 #' set.seed(1)
 #' n <- 150
@@ -87,7 +89,6 @@
 #' top_gene <- colnames(genlung[["covariate"]])[result]
 #' head(top_gene, n = 1)
 #' 
-#' \dontrun{
 #' 
 #' ############### BCor-SIS: Interaction Pursuing ###############
 #' set.seed(1)

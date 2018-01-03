@@ -49,6 +49,7 @@
 #' @export
 #' @seealso \code{\link{bcov}}, \code{\link{bcor}}
 #' @examples
+#' set.seed(1)
 #' 
 #' ################# Quick Start #################
 #' error <- runif(50, min = -0.3, max = 0.3)
@@ -85,11 +86,15 @@
 #' y <- (x > 0) * x + rnorm(30)
 #' z <- (x <= 0) * x + rnorm(30)
 #' data_list <- list(x, y, z)
+#' Sys.time()
 #' bcov.test(data_list)
+#' Sys.time()
 #' 
 #' ################# Mutual Independence Test for Meteorology data #################
+#' \dontrun{
 #' data("meteorology")
 #' bcov.test(meteorology)
+#' }
 #' 
 bcov.test <- function(x, y = NULL, R = 99, dst = FALSE, weight = FALSE, 
                       seed = 4)

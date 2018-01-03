@@ -56,6 +56,7 @@ For the general problem of testing independence when the distributions of \eqn{X
 See (Pan et al 2017) for theoretical properties of the test, including statistical consistency.
 }
 \examples{
+set.seed(1)
 
 ################# Quick Start #################
 error <- runif(50, min = -0.3, max = 0.3)
@@ -92,11 +93,15 @@ x <- rnorm(30)
 y <- (x > 0) * x + rnorm(30)
 z <- (x <= 0) * x + rnorm(30)
 data_list <- list(x, y, z)
+Sys.time()
 bcov.test(data_list)
+Sys.time()
 
 ################# Mutual Independence Test for Meteorology data #################
+\dontrun{
 data("meteorology")
 bcov.test(meteorology)
+}
 
 }
 \seealso{

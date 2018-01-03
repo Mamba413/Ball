@@ -84,6 +84,8 @@ almost surely able to retain the efficient variables.
 See (Pan 2017) for theoretical properties of the BCor-SIS, including statistical consistency.
 }
 \examples{
+\dontrun{
+
 ############### Quick Start for bcorsis function ###############
 set.seed(1)
 n <- 150
@@ -101,7 +103,6 @@ result <- bcorsis(x = genlung[["covariate"]], y = genlung[["survival"]],
 top_gene <- colnames(genlung[["covariate"]])[result]
 head(top_gene, n = 1)
 
-\dontrun{
 
 ############### BCor-SIS: Interaction Pursuing ###############
 set.seed(1)
