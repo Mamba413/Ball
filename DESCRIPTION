@@ -5,12 +5,18 @@ Version: 1.0.0
 Date: 2017-12-18
 Author: XueQin Wang, WenLiang Pan, HePing Zhang, Hongtu Zhu, Yuan Tian, WeiNan Xiao, ChengFeng Liu, Jin Zhu
 Maintainer: Jin Zhu <zhuj37@mail2.sysu.edu.cn>
-Description: This R package implements the permutation test of independence between two random vectors of arbitrary dimensions, and equality of two or more multivariate distributions, as well as the dependence measurement ball covariance and ball correlation which are available in Banach space. Furthermore, a generic non-parametric sure independence screening procedure based on ball correlation is implemented to tackle the challenge in the context of ultra high dimensional data.
-License: GPL-3 + file LICENSE
+Description: Ball statistics, including ball divergence, ball covariance, and ball correlation, 
+    are developed to make a statistical inference or sure independence screening(SIS) procedure 
+    for complex data. Among them, ball divergence and ball covariance are 
+    utilized to test equality of multivariate distributions and independence between random vectors 
+    of arbitrary dimensions without moment or distrition assumption. 
+    Furthermore, a generic non-parametric SIS procedure based on ball correlation and all
+    of its variants are implemented to tackle the challenge in the context of ultra high dimensional data.
+License: GPL-3
 Packaged: 2017-12-18 19:00:00 UTC; 
 RoxygenNote: 6.0.1
 Depends: R (>= 2.10), gam, survival
-Import: utils
+Imports: utils
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 NeedsCompilation: yes

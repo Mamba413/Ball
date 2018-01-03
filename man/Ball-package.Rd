@@ -3,14 +3,14 @@
 \alias{Ball}
 \docType{package}
 \title{Statistical Inference and Sure Independence Screening via Ball Statistics}
-\description{This R package implements the permutation test of independence between two random vectors of arbitrary dimensions, and equality of two or more multivariate distributions, as well as the dependence measurement ball covariance and ball correlation which are available in Banach space. Furthermore, a generic non-parametric sure independence screening procedure based on ball correlation is implemented to tackle the challenge in the context of ultra high dimensional data.}
+\description{Ball statistics, including ball divergence, ball covariance, and ball correlation, are developed to carry out statistical inference or sure independence screening (SIS) procedure for complex data. The ball divergence and ball covariance based distribution-free tests are implemented to examine equality of multivariate distributions and independence between random vectors of arbitrary dimensions. Furthermore, a generic non-parametric SIS procedure based on ball correlation and all of its variants are implemented to tackle the challenge in the context of ultra high dimensional data.}
 \details{
 \tabular{ll}{
 Package: \tab Ball\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
 Date: \tab 2017-12-28\cr
-License: \tab GPL-3 + file LICENSE\cr
+License: \tab GPL-3\cr
 }
 
 The package contains three major functions:
