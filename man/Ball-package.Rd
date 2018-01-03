@@ -96,6 +96,10 @@ z <- (x <= 0) * x + rnorm(30)
 data_list <- list(x, y, z)
 bcov.test(data_list)
 
+################# Mutual Independence Test for Meteorology data #################
+data("meteorology")
+bcov.test(meteorology)
+
 ############### Quick Start for bcorsis function ###############
 set.seed(1)
 n <- 150

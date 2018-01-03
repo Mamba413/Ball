@@ -18,9 +18,9 @@
 #' @return bd.test returns a list with class "htest" containing the following components:
 #' \item{\code{statistic}}{ball divergence statistic.}            
 #' \item{\code{permuted_stat}}{permuted ball divergence statistic.} 
-#' \item{\code{N}}{Number of observations.} 
 #' \item{\code{p.value}}{the p-value for the test.}
-#' \item{\code{size}}{group sizes.}
+#' \item{\code{replicates}}{replicates of the test statistic.}
+#' \item{\code{size}}{sample sizes.}
 #' \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 #' \item{\code{method}}{a character string indicating what type of test was performed.}
 #' \item{\code{data.name}}{description of data.}
@@ -86,9 +86,9 @@
 #' 
 #' ################  K-sample Test  #################
 #' n <- 150
-#' bd.test(rnorm(n), size = rep(50, 3))
+#' bd.test(rnorm(n), size = c(40, 50, 60))
 #' # alternative input method:
-#' x <- lapply(rep(50, 3), rnorm)
+#' x <- lapply(c(40, 50, 60), rnorm)
 #' bd.test(x)
 #' 
 bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
@@ -180,8 +180,8 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
   e <- list(
     statistic = result[["statistic"]],
     permuted_stat = result[["permuted_stat"]],
-    replicates = R,
     p.value = pvalue,
+    replicates = R,
     size = result[["info"]][["size"]],
     alternative = alternative_message,
     method = sprintf("Nonparametric %s-Samples Ball Divergence Test", result[["info"]][["K"]]),
@@ -236,7 +236,7 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
 #' 
 #' BD can be generalized to the \emph{K}-sample problem, i.e. if we 
 #' have \eqn{K} group samples, each group include \eqn{n^{(k)}, k=1,...,K} samples, 
-#' then we define sample version generalized ball divergence for \emph{K}-sample as:
+#' then we can define sample version of generalized ball divergence for \emph{K}-sample problem:
 #' \deqn{\sum_{1 \leq k < l \leq K}{D_{n^{(k)},n^{(l)}}}}
 #' 
 #' See \code{\link{bd.test}} for a test of multivariate independence based on the 

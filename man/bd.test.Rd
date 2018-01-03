@@ -24,9 +24,9 @@ the sample version of ball divergence. Default: \code{R = 99}}
 bd.test returns a list with class "htest" containing the following components:
 \item{\code{statistic}}{ball divergence statistic.}            
 \item{\code{permuted_stat}}{permuted ball divergence statistic.} 
-\item{\code{N}}{Number of observations.} 
 \item{\code{p.value}}{the p-value for the test.}
-\item{\code{size}}{group sizes.}
+\item{\code{replicates}}{replicates of the test statistic.}
+\item{\code{size}}{sample sizes.}
 \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 \item{\code{method}}{a character string indicating what type of test was performed.}
 \item{\code{data.name}}{description of data.}
@@ -88,9 +88,9 @@ bd.test(x = Dmat, R = 99, size = c(9, 9), dst = TRUE)
 
 ################  K-sample Test  #################
 n <- 150
-bd.test(rnorm(n), size = rep(50, 3))
+bd.test(rnorm(n), size = c(40, 50, 60))
 # alternative input method:
-x <- lapply(rep(50, 3), rnorm)
+x <- lapply(c(40, 50, 60), rnorm)
 bd.test(x)
 
 }

@@ -13,4 +13,5 @@ BallJSS
 package
 simulation
 AcademicReport
-^\.travis\.yml$
+github
+^cran-comments\.md$

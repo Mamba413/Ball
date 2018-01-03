@@ -12,6 +12,7 @@ src/*.dll
 .idea/workspace.xml
 /simulation/
 realdata/
+github/
 vignettes/bdExample.png
 BCovJASA/Code.zip
 newFeature/

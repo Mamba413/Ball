@@ -17,8 +17,9 @@
 #' @return bcov.test returns a list with class "htest" containing the following components:
 #' \item{\code{statistic}}{ball covariance or ball correlation statistic.}            
 #' \item{\code{permuted_stat}}{permuted ball covariance or ball correlation statistic.} 
-#' \item{\code{N}}{sample size.} 
 #' \item{\code{p.value}}{the p-value for the test.}  
+#' \item{\code{replicates}}{replicates of the test statistic.}
+#' \item{\code{size}}{sample size.} 
 #' \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 #' \item{\code{method}}{a character string indicating what type of test was performed.}
 #' \item{\code{data.name}}{description of data.}
@@ -86,6 +87,10 @@
 #' data_list <- list(x, y, z)
 #' bcov.test(data_list)
 #' 
+#' ################# Mutual Independence Test for Meteorology data #################
+#' data("meteorology")
+#' bcov.test(meteorology)
+#' 
 bcov.test <- function(x, y = NULL, R = 99, dst = FALSE, weight = FALSE, 
                       seed = 4)
 {
@@ -111,8 +116,9 @@ bcov.test <- function(x, y = NULL, R = 99, dst = FALSE, weight = FALSE,
   e <- list(
     statistic = result[["statistic"]],
     permuted_stat = result[["permuted_stat"]],
-    N = result[["N"]],
     p.value = result[["p.value"]],
+    replicates = R,
+    size = result[["N"]],
     alternative = alternative_message,
     method = test_method,
     data.name = data_name
@@ -331,7 +337,7 @@ bcov_test_internal_wrap <- function(x = x, y = y, R, dst, seed,
 #' only if \eqn{X} and \eqn{Y} are independent.
 #' 
 #' The definitions of the sample version ball covariance and ball correlation are as follows.
-#' Suppose, We are given pairs of independent observations 
+#' Suppose, we are given pairs of independent observations 
 #' \eqn{\{(x_1, y_1),...,(x_n,y_n)\}}, where \eqn{x_i} and \eqn{y_i} can be of any dimension 
 #' and the dimensionality of \eqn{x_i} and \eqn{y_i} need not be the same.
 #' Then, we define sample version ball covariance as:
@@ -355,16 +361,11 @@ bcov_test_internal_wrap <- function(x = x, y = y, R, dst, seed,
 #' \mathbf{BCov}_{\omega,n}^2(\mathbf{X},\mathbf{Y})/\sqrt{\mathbf{BCov}_{\omega,n}^2(\mathbf{X},\mathbf{X})\mathbf{BCov}_{\omega,n}^2(\mathbf{Y},\mathbf{Y})}
 #' }
 #' 
-#' Moreover, it is natural to extend \eqn{\mathbf{BCov}_{\omega,n}} to measure the mutual independence between random vectors. For example, we can redefine
+#' Moreover, it is natural to extend \eqn{\mathbf{BCov}_{\omega,n}} to measure the mutual independence between \eqn{K} random variables:
 #' 
-#' \deqn{\frac{1}{n^2}\sum_{i,j=1}^n(\Delta_{ij,n}^{XYZ}-\Delta_{ij,n}^X\Delta_{ij,n}^Y\Delta_{ij,n}^Z)^2\hat{\omega}_1(X_i,X_j)\hat{\omega}_2(Y_i,Y_j)\hat{\omega}_2(Z_i,Z_j)}
+#' \deqn{\frac{1}{n^{2}}\sum_{i,j=1}^{n}{\left[ (\Delta_{ij,n}^{R_{1}, ..., R_{K}}-\prod_{k=1}^{K}\Delta_{ij,n}^{R_{k}})^{2}\prod_{k=1}^{K}{\hat{\omega}_{k}(R_{ki},R_{kj})} \right]}}
 #' 
-#' to measure whether \eqn{P_{XYZ}=P_X P_Y P_Z} while the computational complexity of this
-#' extension remains the same. Similarly, we extend it to \eqn{K} random variables scenario:
-#' 
-#' \deqn{\frac{1}{n^{2}}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{R_{1}, ..., R_{K}}-\prod_{k=1}^{K}\Delta_{ij,n}^{R_{k}})^{2}\prod_{k=1}^{K}{\hat{\omega}_{k}(R_{ki},R_{kj})}}}
-#' 
-#' where \eqn{R_{k}, k=1,...K} indicate random variables and \eqn{R_{ki}, i=1,...,n} denote \eqn{n} random samples of \eqn{R_{k}}. 
+#' where \eqn{R_{k}, k=1,...K} indicate random variables and \eqn{R_{ki}, i=1,...,n} denote \eqn{i} th random samples of \eqn{R_{k}}. 
 #' 
 #' See \code{\link{bcov.test}} for a test of multivariate independence based on the 
 #' ball covariance and ball correlation statistic.

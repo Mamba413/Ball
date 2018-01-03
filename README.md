@@ -1,5 +1,3 @@
-[![Travis Build Status](https://travis-ci.org/Mamba413/Ball.svg?branch=master)](https://travis-ci.org/Mamba413/Ball)
-
 ## Ball: Statistical Inference and Sure Independence Screening via Ball Statistics
 <!-- [Chinese version](https://gitlab.com/mamba413/Ball/blob/develop_KS_V1.1/README_CN.md) -->
 
@@ -14,7 +12,7 @@ The fundamental problems for data mining and statistical analysis are:
 
 These functions based on ball statistic have several advantages:
 
-- It's applicable to univariate and multivariate data in Banach space.
+- It's applicable to univariate and multivariate data in banach space.
 
 - There is no need for moment assumption, which means that outliers and heavy-tail data are no longer a problem.
 
@@ -116,7 +114,7 @@ In this example, the result is :
 ```
           
 The **bcorsis** result shows that the first and the third variable are the two most 
-important variables in 3000 explanatory variables which is consistent with simulation settings.
+important variables in 3000 explanatory variables which is consistent to simulation settings.
 
 If you find any bugs, or if you experience any crashes, please report to us. If you have any questions just ask, we won't bite. 
 

@@ -24,8 +24,9 @@ or ball correlation. Default: \code{weight = FALSE}}
 bcov.test returns a list with class "htest" containing the following components:
 \item{\code{statistic}}{ball covariance or ball correlation statistic.}            
 \item{\code{permuted_stat}}{permuted ball covariance or ball correlation statistic.} 
-\item{\code{N}}{sample size.} 
 \item{\code{p.value}}{the p-value for the test.}  
+\item{\code{replicates}}{replicates of the test statistic.}
+\item{\code{size}}{sample size.} 
 \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 \item{\code{method}}{a character string indicating what type of test was performed.}
 \item{\code{data.name}}{description of data.}
@@ -92,6 +93,10 @@ y <- (x > 0) * x + rnorm(30)
 z <- (x <= 0) * x + rnorm(30)
 data_list <- list(x, y, z)
 bcov.test(data_list)
+
+################# Mutual Independence Test for Meteorology data #################
+data("meteorology")
+bcov.test(meteorology)
 
 }
 \seealso{

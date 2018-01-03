@@ -57,7 +57,7 @@ we can define sample version ball divergence as:
 
 BD can be generalized to the \emph{K}-sample problem, i.e. if we 
 have \eqn{K} group samples, each group include \eqn{n^{(k)}, k=1,...,K} samples, 
-then we define sample version generalized ball divergence for \emph{K}-sample as:
+then we can define sample version of generalized ball divergence for \emph{K}-sample problem:
 \deqn{\sum_{1 \leq k < l \leq K}{D_{n^{(k)},n^{(l)}}}}
 
 See \code{\link{bd.test}} for a test of multivariate independence based on the 

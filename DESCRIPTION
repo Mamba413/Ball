@@ -1,7 +1,7 @@
 Package: Ball
 Type: Package
 Title: Statistical Inference and Sure Independence Screening via Ball Statistics
-Version: 1.0
+Version: 1.0.0
 Date: 2017-12-18
 Author: XueQin Wang, WenLiang Pan, HePing Zhang, Hongtu Zhu, Yuan Tian, WeiNan Xiao, ChengFeng Liu, Jin Zhu
 Maintainer: Jin Zhu<zhuj37@mail2.sysu.edu.cn> 
