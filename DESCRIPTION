@@ -6,12 +6,12 @@ Date: 2017-12-18
 Author: XueQin Wang, WenLiang Pan, HePing Zhang, Hongtu Zhu, Yuan Tian, WeiNan Xiao, ChengFeng Liu, Jin Zhu
 Maintainer: Jin Zhu <zhuj37@mail2.sysu.edu.cn>
 Description: Ball statistics, including ball divergence, ball covariance, and ball correlation, 
-    are developed to make a statistical inference or sure independence screening(SIS) procedure 
-    for complex data. Among them, ball divergence and ball covariance are 
-    utilized to test equality of multivariate distributions and independence between random vectors 
-    of arbitrary dimensions without moment or distrition assumption. 
-    Furthermore, a generic non-parametric SIS procedure based on ball correlation and all
-    of its variants are implemented to tackle the challenge in the context of ultra high dimensional data.
+    are developed to carry out statistical inference or sure independence screening (SIS) 
+    procedure for complex data. The ball divergence and ball covariance based distribution-free 
+    tests are implemented to examine equality of multivariate distributions and independence 
+    between random vectors of arbitrary dimensions. Furthermore, a generic non-parametric SIS 
+    procedure based on ball correlation and all of its variants are implemented to tackle the 
+    challenge in the context of ultra high dimensional data.
 License: GPL-3
 Packaged: 2017-12-18 19:00:00 UTC; 
 RoxygenNote: 6.0.1
