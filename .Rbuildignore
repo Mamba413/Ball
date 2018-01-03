@@ -15,3 +15,4 @@ simulation
 AcademicReport
 github
 ^cran-comments\.md$
+^\.travis\.yml$
