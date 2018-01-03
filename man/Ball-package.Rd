@@ -3,7 +3,11 @@
 \alias{Ball}
 \docType{package}
 \title{Statistical Inference and Sure Independence Screening via Ball Statistics}
-\description{Ball statistics, including ball divergence, ball covariance, and ball correlation, are developed to carry out statistical inference or sure independence screening (SIS) procedure for complex data. The ball divergence and ball covariance based distribution-free tests are implemented to examine equality of multivariate distributions and independence between random vectors of arbitrary dimensions. Furthermore, a generic non-parametric SIS procedure based on ball correlation and all of its variants are implemented to tackle the challenge in the context of ultra high dimensional data.}
+\description{Hypothesis tests and sure independence screening (SIS) procedure based on ball 
+statistics, including ball divergence, ball covariance, and ball correlation, 
+are developed to analyze complex data. The ball divergence and ball covariance based distribution-free tests are implemented to examine equality of multivariate distributions and independence between random vectors of arbitrary dimensions. Furthermore, a generic non-parametric SIS 
+procedure based on ball correlation and all of its variants are implemented to tackle the 
+challenge in the context of ultra high dimensional data.}
 \details{
 \tabular{ll}{
 Package: \tab Ball\cr
