@@ -2,7 +2,7 @@
 
 This is a resubmission. In this version I have:
 
-* correct typo error and modify License and Description in the DESCRIPTION file. (However, we do not add the references to Description.)
+* Modify Description in the DESCRIPTION file. (However, we do not add the references to Description.)
 
 *TODO*: Once our proposed methods are [appeared](http://www.imstat.org/aos/future_papers.html) or accepted, we will add them to Description.
 
