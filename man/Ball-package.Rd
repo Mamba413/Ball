@@ -29,7 +29,7 @@ See \code{vignette("Ball")} for additional information.
 XueQin Wang, WenLiang Pan, HePing Zhang, Hongtu Zhu, Yuan Tian, WeiNan Xiao,
 ChengFeng Liu and Jin Zhu
 
-Maintainer: Jin Zhu <zhuj1jqx@gmail.com>
+Maintainer: Jin Zhu <zhuj37@mail2.sysu.edu.cn>
 }
 
 \references{
