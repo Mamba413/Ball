@@ -4,7 +4,7 @@ Title: Statistical Inference and Sure Independence Screening via Ball Statistics
 Version: 1.0.0
 Date: 2017-12-18
 Author: XueQin Wang, WenLiang Pan, HePing Zhang, Hongtu Zhu, Yuan Tian, WeiNan Xiao, ChengFeng Liu, Jin Zhu
-Maintainer: Jin Zhu <zhuj37@mail2.sysu.edu.cn> 
+Maintainer: Jin Zhu <zhuj1jqx@gmail.com>
 Description: This R package implements the permutation test of independence between two random vectors of arbitrary dimensions, and equality of two or more multivariate distributions, as well as the dependence measurement ball covariance and ball correlation which are available in Banach space. Furthermore, a generic non-parametric sure independence screening procedure based on ball correlation is implemented to tackle the challenge in the context of ultra high dimensional data.
 License: GPL-3 + file LICENSE
 Packaged: 2017-12-18 19:00:00 UTC; 
