@@ -1,30 +1,31 @@
+## Resubmission
+This is a resubmission. In this version I have:
+
+* remove time consuming examples
+
 ## Test environments
 * local OS X install, R 3.4.3
+* Ubuntu 14.04 (on travis-ci), R 3.4.2
 * win-builder (realease)
 
 ## R CMD check results
 * OS X enviorment:
 0 errors | 0 warnings | 0 note
 
+* Ubuntu 14.04 enviorment:
+0 errors | 0 warnings | 0 note
 
 * Win-builder:
-3 NOTEs
+There was 1 NOTE:
+
 ```
-...
 checking CRAN incoming feasibility ... NOTE
-Maintainer: 'Jin Zhu<zhuj37@mail2.sysu.edu.cn>'
-...
-** running examples for arch 'i386' ... [58s] NOTE
-Examples with CPU or elapsed time > 10s
-           user system elapsed
-bcov.test 39.45   0.02   39.80
-bcorsis   14.13   0.04   14.29
-** running examples for arch 'x64' ... [70s] NOTE
-Examples with CPU or elapsed time > 10s
-           user system elapsed
-bcov.test 53.45   0.02   53.41
-bcorsis   12.43   0.06   12.62
+Maintainer: 'Jin Zhu <zhuj37@mail2.sysu.edu.cn>'
+
+New submission
 ```
+
+I think [this NOTE](https://stackoverflow.com/questions/36701433/r-package-building-with-devtoolsbuild-win-version-contains-large-components) is ignorable. It occurs because it is my first submission of the package.
 
 ## Reverse dependencies
 
