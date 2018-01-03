@@ -1,7 +1,11 @@
-## Resubmission
+## Resubmission       
+
 This is a resubmission. In this version I have:
 
-* remove time consuming examples
+* correct typo error and modify License and Description in the DESCRIPTION file
+
+*TODO*: Once our proposed methods are [appeared](http://www.imstat.org/aos/future_papers.html) or accepted, we will add them to Description.
+
 
 ## Test environments
 * local OS X install, R 3.4.3
