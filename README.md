@@ -10,17 +10,17 @@ The fundamental problems for data mining and statistical analysis are:
 
 - Whether two random variables are dependent?
 
-**Ball** package provides solutions for these issues. Moreover, a variables (features) screening procedure also implemented to tackle ultra high dimensional data. The core functions in **Ball** package are **bd.test**, **bcov.test**, and **bcorsis**.
+**Ball** package provides solutions for these issues. Moreover, a variable screening (or feature screening) procedure is also implemented to tackle ultra high dimensional data. The core functions in **Ball** package are **bd.test**, **bcov.test**, and **bcorsis**.
 
 These functions based on ball statistic have several advantages:
 
-- It's applicable to univariate and multivariate data in banach space.
+- It's applicable to univariate and multivariate data in Banach space.
 
 - There is no need for moment assumption, which means that outliers and heavy-tail data are no longer a problem.
 
 - They perform well in many setting without complex adjustments for parameters.
  
-Particularly, for two-sample or K-sample problem, **bd.test** has been proved to cope well for imbalanced data and **bcov.test** and **bcorsis** work well for detecting the relationship between complex responses and/or predictors, such as shape, compositional as well as censored data.     
+Particularly, for two-sample or K-sample problem, **bd.test** has been proved to cope well for imbalanced data, and **bcov.test** and **bcorsis** work well for detecting the relationship between complex responses and/or predictors, such as shape, compositional as well as censored data.     
 
 
 ### Installation        
@@ -76,7 +76,7 @@ petal <- iris[, c("Petal.Width", "Petal.Length")]
 bcov.test(sepal, petal)
 ```
 
-In this example, **bcov.test** investigates whether width or length of petal is associated with width and length of sepal. If the dependence really exists, the *p*-value of the **bcov.test** will be under 0.05.
+In this example, **bcov.test** investigates whether width or length of petal is associated with width and length of sepal. If the dependency really exists, the *p*-value of the **bcov.test** will be under 0.05.
 
 In this example, the result is:
 
@@ -89,11 +89,11 @@ replicates = 99, Weighted Ball Covariance = FALSE
 bcov = 0.0081472, p-value = 0.01
 alternative hypothesis: random variables are dependent
 ```
-Therefore, the relationship between width and length of sepal and petal is exists.
+Therefore, the relationship between width and length of sepal and petal exists.
 
 #### **bcorsis**                   
 
-We simulate a dataset and demonstrate the usage of **bcorsis** function as follow.
+We generate a dataset and demonstrate the usage of **bcorsis** function as follow.
 
 ```{r}
 ## simulate a ultra high dimensional dataset:
@@ -116,7 +116,7 @@ In this example, the result is :
 ```
           
 The **bcorsis** result shows that the first and the third variable are the two most 
-important variables in 3000 explanatory variables which is consistent to simulation settings.
+important variables in 3000 explanatory variables which is consistent to the simulation settings.
 
 If you find any bugs, or if you experience any crashes, please report to us. If you have any questions just ask, we won't bite. 
 
