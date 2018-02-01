@@ -1,5 +1,6 @@
 library(Ball)
 
+set.seed(1)
 x1 <- rnorm(n = 50)
 x2 <- rt(n = 50, df = 3)
 x3 <- rnorm(n = 50, sd = 2)

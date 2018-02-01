@@ -1,6 +1,7 @@
 library(Ball)
 
 # simulation example
+set.seed(1)
 p <- 3000
 n <- 150
 x <- matrix(rnorm(n = n * p), nrow = n, ncol = p)
