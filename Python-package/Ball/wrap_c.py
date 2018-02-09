@@ -7,8 +7,11 @@
 
 
 from numpy import alen as npalen
-from cball import bd_stat, bd_test
-from cball import doubleArray
+
+from Ball.cball import bd_stat, bd_test
+from Ball.cball import doubleArray
+
+
 # BE CAUTIOUS!!! Init doubleArray for data with N element like this: doubleArray(N)
 # One more again:
 # doubleArray(N)   (Allow)
@@ -45,8 +48,6 @@ def bd_value_wrap_c(xy, size, weight, dst):
     num = npalen(xy)
     xy_copy = doubleArray(num)
     for i, xy_value in enumerate(xy):
-        if i == 58:
-            print(i)
         xy_copy[i] = xy_value
         pass
     #

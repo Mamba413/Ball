@@ -21,17 +21,24 @@ def get_matrixed_x(x, y):
 def examine_size_arguments(x, size):
     # self examine:
     if size is None:
-        raise ValueError("size arguments is needed")
+        raise ValueError("Size can't be None!")
 
-    size = [int(x) for x in size]
-    if np.any(np.isnan(size)) or np.any([x <= 0 for x in size]) or len(size) == 1:
-        raise ValueError("size arguments is invaild!")
+    b = []
+    for i in range(len(size)):
+        if type(size[i]) is int:
+            b.append(int(size[i]))
+        else:
+            b.append(0)
+        size[i] = b[i]
+
+    if np.any([x <= 0 for x in size]) or len(size) == 1:
+        raise ValueError("Size should be a list that length longer than 1, with all elements positive integer!")
 
     # examine the consistency between x and size:
     x_row = x.shape[0]
     n = np.sum(size)
     if x_row != n:
-        raise ValueError("size arguments is invaild!")
+        raise ValueError("Size arguments is invalid!")
 
 
 def get_vectorized_distance_matrix(x):
@@ -50,7 +57,7 @@ def examine_dimension(x, y):
 
 def examine_R_arguments(R):
     if R is None or R < 0:
-        raise ValueError("R arguments is invaild!")
+        raise ValueError("r should be a value >=0 !")
 
 
 def calculatePvalue(statValue, NullDistribution):

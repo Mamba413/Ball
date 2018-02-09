@@ -76,3 +76,13 @@ Python-package/build/temp.win-amd64-3.6/Release/cball.obj
 Python-package/build/temp.win-amd64-3.6/Release/_cball.cp36-win_amd64.lib
 Python-package/_cball.cp36-win_amd64.pyd
 Python-package/_cball.cp35-win_amd64.pyd
+*.pyc
+Python-package/.idea/markdown-navigator.xml
+*.obj
+*.lib
+*.exp
+*.gz
+*.egg
+Python-package/Ball.egg-info/
+Python-package/build/
+Python-package/test/

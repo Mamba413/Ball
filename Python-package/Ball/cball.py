@@ -135,8 +135,8 @@ def bd_stat(arg1, arg2, arg3, arg4, arg5):
     return _cball.bd_stat(arg1, arg2, arg3, arg4, arg5)
 bd_stat = _cball.bd_stat
 
-def bd_test(bd, permuted_bd, xy, n1, n2, p, dst, R, weight):
-    return _cball.bd_test(bd, permuted_bd, xy, n1, n2, p, dst, R, weight)
+def bd_test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9):
+    return _cball.bd_test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
 bd_test = _cball.bd_test
 # This file is compatible with both classic and new-style classes.
 

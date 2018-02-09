@@ -6,10 +6,13 @@ Created on Sat Feb  3 16:47:14 2018
 """
 
 from collections import namedtuple
-from utilize import *
-from wrap_c import *
+
+from Ball.wrap_c import *
+
+from Ball.utilize import *
 
 bd_testResult = namedtuple('bd_testResult', ('statistic', 'pvalue'))
+bd_Result = namedtuple('bd_Result', ('statistic', ))
 
 
 def bd_test(x, y=None, r=99, dst=False, size=[]):
@@ -35,8 +38,7 @@ def bd_test(x, y=None, r=99, dst=False, size=[]):
 
     Notes
     -----
-    If only x is given, the statistic is 
-    computed from the original pooled samples, stacked in 
+    If only x is given, the statistic is computed from the original pooled samples, stacked in
     matrix where each row is a multivariate observation, or from the distance matrix 
     when dst = TRUE. The first sizes[1] rows of x are the first sample, the next 
     sizes[2] rows of x are the second sample, etc.
@@ -54,28 +56,35 @@ def bd_test(x, y=None, r=99, dst=False, size=[]):
     >>> import numpy as np
     >>> np.random.seed(7654567)   # fix seed to get the same result
 
-    Example 1:
+    Test with ball divergence, when parameters x and y are one-dimensional array, and output its statistic and pvalue.
+
     >>> x = np.random.normal(0, 1, 50)
     >>> y = np.random.normal(1, 1, 50)
     >>> bd_test(x=x, y=y)
     bd_testResult(statistic=[2.0], pvalue=0.02)
 
-    Example 2:
+    Test with ball divergence, when parameters x and y are multi-dimensional array, and output its statistic and pvalue.
+
     >>> x = np.random.normal(0, 1, 100).reshape(50, 2)
     >>> y = np.random.normal(3, 1, 100).reshape(50, 2)
     >>> bd_test(x=x, y=y)
-    bd_testResult(statistic=[0.012760320000000097], pvalue=0.02)
+    bd_testResult(statistic=[0.016924160000000008], pvalue=0.02)
 
-    Example 3:
+    Parameter size could input as array in ball divergence test, only and only if parameter y is not given.
+
     >>> n = 90
-    >>> bd_test(np.random.normal(0, 1, n), size=np.array([40, 50]))
-    bd_testResult(statistic=[0.013917274999999955], pvalue=0.01)
+    >>> x = np.random.normal(0, 1, n)
+    >>> bd_test(x, size=np.array([40, 50]))
+    bd_testResult(statistic=[0.051558925000000075], pvalue=0.01)
 
-    Example 4:
+    Parameter x could input as list in ball divergence test.
+
     >>> x = [np.random.normal(0, 1, num) for num in [40, 50]]
     >>> bd_test(x)
+    bd_testResult(statistic=[0.051558925000000075], pvalue=0.01)
 
-    Example 5:
+    When parameter x is a distance matrix, ball divergence test could also work on it, with parameter dst=False.
+
     >>> from sklearn.metrics.pairwise import euclidean_distances
     >>> sigma = [[1, 0], [0, 1]]
     >>> x = np.random.multivariate_normal(mean=[0, 0], cov=sigma, size=50)
@@ -84,15 +93,18 @@ def bd_test(x, y=None, r=99, dst=False, size=[]):
     >>> dx = euclidean_distances(x, x)
     >>> data_size = [50, 50]
     >>> bd_test(x=dx, size=data_size, dst=True)
-    bd_testResult(statistic=[0.11696415999999976], pvalue=0.01)
+    bd_testResult(statistic=[0.14731215999999975], pvalue=0.01)
 
     """
+    x = x.copy()
+    size = size.copy()
     weight = False
     method = 'permute'
     R = r
+    if type(size) is np.ndarray:
+        size = size.tolist()
 
     if x is None or y is None:
-
         # examine input arguments x and y:
         if type(x) is list:
             for i in range(0, len(x)):
@@ -127,6 +139,8 @@ def bd_test(x, y=None, r=99, dst=False, size=[]):
                 dst = False
 
     else:
+        y = y.copy()
+        #
         x = np.matrix(x)
         y = np.matrix(y)
         # examine dimension:
@@ -178,3 +192,72 @@ def bd_test(x, y=None, r=99, dst=False, size=[]):
         pvalue = calculatePvalue(bd_value, bd_permuted_value)
         return bd_testResult(bd_value, pvalue)
 
+
+def bd(x, y=None, dst=False, size=[]):
+    '''
+
+    calculate sample version of ball divergence
+
+    Parameters
+    ----------
+    See bd_test.__doc__
+
+    Returns
+    -------
+    statistic : float
+       ball divergence statistic
+
+    References
+    ----------
+    .. [1]Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. (2017) Ball
+    divergence: nonparametric two sample test, \emph{The Annals of Statistics},
+    to appear
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> np.random.seed(7654567)   # fix seed to get the same result
+
+    Test with ball divergence, when parameters x and y are one-dimensional array, and output its statistic.
+
+    >>> x = np.random.normal(0, 1, 50)
+    >>> y = np.random.normal(1, 1, 50)
+    >>> bd(x=x, y=y)
+    bd_Result(statistic=[2.0])
+
+    Test with ball divergence, when parameters x and y are multi-dimensional array, and output its statistic.
+
+    >>> x = np.random.normal(0, 1, 100).reshape(50, 2)
+    >>> y = np.random.normal(3, 1, 100).reshape(50, 2)
+    >>> bd(x=x, y=y)
+    bd_Result(statistic=[0.016924160000000008])
+
+    Parameter size could input as array in ball divergence, only and only if parameter y is not given.
+
+    >>> n = 90
+    >>> x = np.random.normal(0, 1, n)
+    >>> bd(x, size=np.array([40, 50]))
+    bd_Result(statistic=[0.051558925000000075])
+
+    Parameter x could input as list when compute ball divergence.
+
+    >>> x = [np.random.normal(0, 1, num) for num in [40, 50]]
+    >>> bd(x)
+    bd_Result(statistic=[0.051558925000000075])
+
+    When parameter x is a distance matrix, ball divergence could also work on it, with parameter dst=False.
+
+    >>> from sklearn.metrics.pairwise import euclidean_distances
+    >>> sigma = [[1, 0], [0, 1]]
+    >>> x = np.random.multivariate_normal(mean=[0, 0], cov=sigma, size=50)
+    >>> y = np.random.multivariate_normal(mean=[1, 1], cov=sigma, size=50)
+    >>> x = np.row_stack((x, y))
+    >>> dx = euclidean_distances(x, x)
+    >>> data_size = [50, 50]
+    >>> bd(x=dx, size=data_size, dst=True)
+    bd_Result(statistic=[0.14731215999999975])
+
+    '''
+
+    bd_value = bd_test(x=x, y=y, r=0, dst=dst, size=size)
+    return bd_Result(bd_value)
