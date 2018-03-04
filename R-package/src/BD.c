@@ -15,13 +15,11 @@
  */
 #include "math.h"
 #include "stdlib.h" 
-#include "R.h"
 #include "Rmath.h"
 #include "stdio.h"
 #include "utilities.h"
 #include "BD.h"
-#include "Rinternals.h"
-
+#include "api_R.h"
 
 void ranksort2(int n, int **Rxy, double **Dxy, int **Ixy)
 {
@@ -164,9 +162,13 @@ void BD(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *p, i
   //  computes TST(x,y)  	
   int i, j, n;
   /*
-   i_perm_tmp: index of sample, value: 0, 1, 2, ..., n - 1;
-   i_perm: group index of sample, 0 or 1;
-   */
+  Dxy: distance matrix
+  Ixy: each row corresponding to sample index
+  Rxy: each row corresponding the rank in each row (all data)
+  Rx: each row corresponding the rank in each row (group 1)
+  i_perm: group indicator (value 1 corresponding to group 1, and value 0 corresponding to group 0)
+  i_perm_tmp: index of sample, value: 0, 1, 2, ..., n - 1;
+  */
   int    **Ixy, **Rxy, **Rx, *i_perm, *i_perm_tmp;
   double **Dxy;
   double ans;
@@ -211,7 +213,7 @@ void BD(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *p, i
     for(i = 0; i < *R; i++){ 
       // stop permutation if user stop it manually:
       if(pending_interrupt()) {
-        Rprintf("Process stop due to user interruption! \n");
+        print_stop_message();
         break;
       }
       resample3(i_perm, i_perm_tmp, n, n1);
@@ -317,7 +319,7 @@ void UBD(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *R, 
     for(i = 0; i < *R; i++){ 
       // stop permutation if user stop it manually:
       if(pending_interrupt()) {
-        Rprintf("Process stop due to user interruption! \n");
+        print_stop_message();
         break;
       }
       resample3(i_perm, i_perm_tmp, n, n1);
@@ -383,7 +385,7 @@ double bd_value(double *xy, int *n1, int *n2, int *weight)
   free_matrix(Dxy, n, n);
   Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
   ans = Ball_Divergence(Rxy, Rx, i_perm_tmp, n1, n2, weight);
-  // Rprintf("%f", ans);
+  // free matrix
   free_int_matrix(Ixy, n, n);
   free_int_matrix(Rxy, n, n);
   free_int_matrix(Rx, n, n);
@@ -520,8 +522,6 @@ void permute_dst(double *xy, double *new_xy, int *index, int *N)
       row_index = index[j];
       col_index = index[k];
       exchange_index2 = row_index*n + col_index;
-      // Rprintf("index1:%d;   ", exchange_index1);
-      // Rprintf("index2:%d \n", exchange_index2);
       new_xy[exchange_index1] = xy[exchange_index2];
       exchange_index1 = exchange_index1 + 1;
     }
@@ -560,7 +560,7 @@ void KBD(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *
     for(int j = 0; j < (*R); j++) {
       // stop permutation if user stop it manually:
       if(pending_interrupt()) {
-        Rprintf("Process stop due to user interruption! \n");
+        print_stop_message();
         break;
       }
       // permute data index:
@@ -695,7 +695,6 @@ double ukbd_value(double *xy, int *size, int *k, int *weight)
     }
   }
   free(cumulate_size);
-  // Rprintf("kbd value:%f \n", kbd_stat_value);
   return(kbd_stat_value);
 }
 
@@ -722,7 +721,7 @@ void UKBD(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int 
     for(int j = 0; j < (*R); j++) {
       // stop permutation loop:
       if(pending_interrupt()) {
-        Rprintf("Process stop due to user interruption! \n");
+        print_stop_message();
         break;
       }
       // permute data value:
