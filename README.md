@@ -31,4 +31,4 @@ GPL-3
 
 Reference
 ----------
-- [Ball Divergence: Multivariate Imbalance Test](https://www.e-publications.org/ims/submission/AOS/user/submissionFile/24632?confirm=9219c1d0) Wenliang Pan, Yuan Tian, Xueqin Wang, and Heping Zhang
+- [Ball Divergence: Multivariate Imbalance Test](https://www.e-publications.org/ims/submission/AOS/user/submissionFile/24632?confirm=9219c1d0). Wenliang Pan, Yuan Tian, Xueqin Wang, and Heping Zhang, The Annals of Statistics, Papers to Appear
