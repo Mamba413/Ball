@@ -202,7 +202,9 @@ double Ball_Divergence_parallel(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, i
       
       #pragma omp for
       for (i = 0; i < *n1; i++) {
-        //printf("i = %d, I am Thread %d\n", i, omp_get_thread_num());
+// #ifdef _OPENMP
+//         printf("i = %d, I am Thread %d\n", i, omp_get_thread_num());
+// #endif
         for (j = 0; j < *n1; j++) {
           p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
           p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;

@@ -155,7 +155,7 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
   
   ## main:
   if(R == 0) {
-    result <- bd_value_wrap_c(xy, size, weight, dst)
+    result <- bd_value_wrap_c(xy, size, weight, dst, num.threads)
     # approximately method:
     if(method == "approx") {
       if(result[["info"]][["K"]] == 2) {

@@ -6,22 +6,23 @@
 #' @return Ball Divergence statistic
 #' @useDynLib Ball, .registration = TRUE
 #' @noRd
-bd_value_wrap_c <- function(xy, size, weight, dst) {
+bd_value_wrap_c <- function(xy, size, weight, dst, num.threads) {
   xy <- as.double(xy)
   bd <- as.double(numeric(1))
   weight <- as.integer(weight)
   dst <- as.integer(dst)
+  num.threads <- as.integer(num.threads)
   #
   K <- as.integer(length(size))
   if(K == 2) {
     n1 <- as.integer(size[1])
     n2 <- as.integer(size[2])
-    res <- .C("bd_stat", bd, xy, n1, n2, weight, dst)
+    res <- .C("bd_stat", bd, xy, n1, n2, weight, dst, num.threads)
     N <- n1 + n2
   } else {
     size <- as.integer(size)
     N <- as.integer(sum(size))
-    res <- .C("kbd_stat", bd, xy, size, N, K, weight, dst)
+    res <- .C("kbd_stat", bd, xy, size, N, K, weight, dst, num.threads)
   }
   bd <- res[[1]]
   names(bd) <- ifelse(weight, "wbd", "bd")
