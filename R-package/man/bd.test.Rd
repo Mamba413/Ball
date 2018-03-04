@@ -4,7 +4,8 @@
 \alias{bd.test}
 \title{Ball Divergence based Equality of Distributions Test}
 \usage{
-bd.test(x, y = NULL, R = 99, dst = FALSE, size = NULL, seed = 4)
+bd.test(x, y = NULL, R = 99, dst = FALSE, size = NULL, seed = 4,
+  num.threads = 2)
 }
 \arguments{
 \item{x}{a numeric vector, matrix, data.frame, \code{dist} object or list contains vector, matrix or data.frame.}
@@ -19,6 +20,8 @@ the sample version of ball divergence. Default: \code{R = 99}}
 \item{size}{a vector record sample size of each group.}
 
 \item{seed}{the random seed.}
+
+\item{num.threads}{Number of threads. Default \code{num.threads = 2}.}
 }
 \value{
 bd.test returns a list with class "htest" containing the following components:

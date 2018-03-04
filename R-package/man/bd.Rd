@@ -4,7 +4,7 @@
 \alias{bd}
 \title{Ball Divergence}
 \usage{
-bd(x, y = NULL, dst = FALSE, size = NULL)
+bd(x, y = NULL, dst = FALSE, size = NULL, num.threads = 2)
 }
 \arguments{
 \item{x}{a numeric vector, matrix, data.frame, \code{dist} object or list contains vector, matrix or data.frame.}
@@ -14,6 +14,8 @@ bd(x, y = NULL, dst = FALSE, size = NULL)
 \item{dst}{if \code{dst = TRUE}, x will be considered as a distance matrix. Default: \code{dst = FALSE}}
 
 \item{size}{a vector record sample size of each group.}
+
+\item{num.threads}{Number of threads. Default \code{num.threads = 2}.}
 }
 \value{
 \item{\code{bd }}{ sample version of ball divergence}

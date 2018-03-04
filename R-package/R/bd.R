@@ -10,6 +10,7 @@
 #' @param dst if \code{dst = TRUE}, x will be considered as a distance matrix. Default: \code{dst = FALSE}
 #' @param size a vector record sample size of each group.
 #' @param seed the random seed. 
+#' @param num.threads Number of threads. Default \code{num.threads = 2}.
 ## @param weight not available now
 ## @param method if \code{method = 'permute'}, a permutation procedure will be carried out;
 ## if \code{ method = 'approx'}, the p-values based on approximate Ball Divergence
