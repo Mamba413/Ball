@@ -65,7 +65,7 @@ data("macaques")
 # number of femala and male Macaca fascicularis:
 table(macaques[["group"]])
 # calculate Riemannian shape distance matrix:
-Dmat <- noneucliddist(macaques[["x"]], method = "riemann")
+Dmat <- nhdist(macaques[["x"]], method = "riemann")
 # hypothesis test with BD:
 bd.test(x = Dmat, R = 99, size = c(9, 9), dst = TRUE)
 
@@ -73,7 +73,7 @@ bd.test(x = Dmat, R = 99, size = c(9, 9), dst = TRUE)
 # load data:
 data("ArcticLake")
 # Distance matrix between y:
-Dy <- noneucliddist(ArcticLake[["x"]], method = "compositional")
+Dy <- nhdist(ArcticLake[["x"]], method = "compositional")
 # Distance matrix between x:
 Dx <- dist(ArcticLake[["depth"]])
 # hypothesis test with BCov:
@@ -137,7 +137,9 @@ n <- 150
 p <- 3000
 sigma_mat <- matrix(0.5, nrow = p, ncol = p)
 diag(sigma_mat) <- 1
+x <- rmvnorm(n = n, sigma = sigma_mat)
 error <- rnorm(n)
+rm(sigma_mat); gc(reset = TRUE)
 y <- 3*(x[, 1])^2 + 5*(x[, 2])^2 + 5*x[, 8] - 8*x[, 16] + error
 res <- bcorsis(y = y, x = x, method = "gam", d = 15)
 res[[1]]

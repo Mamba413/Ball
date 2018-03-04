@@ -192,8 +192,8 @@ get_matrixed_x <- function(x, y) {
 #' @return size of candidate set
 #' @noRd
 #'
-examine_candiate_size <- function(n, candidate) {
-  if(candidate > n) {
+examine_candiate_size <- function(n, candidate, p) {
+  if(p > n) {
     if(is.numeric(candidate)) {
       if(candidate <= 0) {
         stop("candidate argument is invaild!")
@@ -209,7 +209,7 @@ examine_candiate_size <- function(n, candidate) {
       }
     }
   } else {
-    final_d <- n
+    final_d <- p
     message("the number of covariate not larger than sample sizes, and SIS procedure is not essential")
   }
   final_d
