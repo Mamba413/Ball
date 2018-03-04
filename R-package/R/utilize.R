@@ -120,6 +120,17 @@ examine_R_arguments <- function(R) {
 }
 
 
+#' Examine num.threads arguments in bcov.test, bd.test
+#' @param R A integer number
+#' @noRd
+#' 
+examine_threads_arguments <- function(num.threads) {
+  if(is.null(num.threads) | (num.threads < 1)) {
+    stop("num.threads arguments is invaild!")
+  }
+}
+
+
 #' Examine type arguments in bcov.test, bd.test
 #' @param type "bcor" or "bcov"
 #' @noRd

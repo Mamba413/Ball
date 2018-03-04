@@ -121,7 +121,9 @@ n <- 150
 p <- 3000
 sigma_mat <- matrix(0.5, nrow = p, ncol = p)
 diag(sigma_mat) <- 1
+x <- rmvnorm(n = n, sigma = sigma_mat)
 error <- rnorm(n)
+rm(sigma_mat); gc(reset = TRUE)
 y <- 3*(x[, 1])^2 + 5*(x[, 2])^2 + 5*x[, 8] - 8*x[, 16] + error
 res <- bcorsis(y = y, x = x, method = "gam", d = 15)
 res[[1]]

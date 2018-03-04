@@ -15,8 +15,7 @@
  */
 #include "math.h"
 #include "stdlib.h" 
-#include "R.h"
-#include "Rmath.h"
+#include "string.h"
 #include "stdio.h"
 #include "utilities.h"
 #include "BI.h"
@@ -74,6 +73,7 @@ void Merge(int *permutation, int *source, int *inversion_count, int dim, int n)
   free(right_source);
 }
 
+
 int Inversions(int *permutation, int *source, int *inversion_count,int dim, int n)
 {
   if (dim==1)
@@ -86,20 +86,6 @@ int Inversions(int *permutation, int *source, int *inversion_count,int dim, int 
   return 0;
 }
 
-void resample(int *i_perm, int *i_perm_inv, int *n)
-{
-  int i, j, temp;
-  for (i = *n - 1; i > 0; --i) {
-    // j = rand() % (i + 1);
-    j = r_available_rand() % (i + 1);
-    temp = i_perm[j];
-    i_perm[j] = i_perm[i];
-    i_perm[i] = temp;
-  }
-  for (i = 0; i < *n; ++i) {
-    i_perm_inv[i_perm[i]] = i;
-  }
-}
 
 double Ball_Information(int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *weight)
 {
@@ -258,8 +244,9 @@ void BI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *
   *bcov = RCTV0;
   for(i=0; i<*R; i++)
   {
+    // stop permutation if user stop it manually:
     if(pending_interrupt()) {
-      Rprintf("Process stop due to user interruption! \n");
+      print_stop_message();
       break;
     }
     resample(i_perm, i_perm_inv, n);
@@ -466,17 +453,6 @@ void createidx(int *n, int *zidx, double *z, int **lowzidx, int **higzidx)
 	}
 }
 
-void resample2(int *i_perm, int *n)
-{
-	int i, j, temp;
-	for (i = *n - 1; i > 0; --i) {
-		// j = rand() % (i + 1);
-		j = r_available_rand() % (i + 1);
-		temp = i_perm[j];
-		i_perm[j] = i_perm[i];
-		i_perm[i] = temp;
-	}
-}
 
 double U_Ball_Information(int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *weight)
 {
@@ -540,8 +516,9 @@ void UBI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int 
 	*bcov = U_Ball_Information(n, Rank, lowxidx, higxidx, lowyidx, higyidx, i_perm, weight);
 	for(j=0; j<*R; j++)
 	{
+	  // stop permutation if user stop it manually:
 	  if(pending_interrupt()) {
-	    Rprintf("Process stop due to user interruption! \n");
+	    print_stop_message();
 	    break;
 	  }
 		resample2(i_perm, n);

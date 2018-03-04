@@ -86,3 +86,4 @@ Python-package/.idea/markdown-navigator.xml
 Python-package/Ball.egg-info/
 Python-package/build/
 Python-package/test/
+*.dll

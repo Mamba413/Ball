@@ -92,7 +92,7 @@
 #' bd.test(x)
 #' 
 bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
-                    size = NULL, seed = 4) {
+                    size = NULL, seed = 4, num.threads = 2) {
   weight = FALSE
   method = 'permute'
   data_name <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
@@ -142,12 +142,17 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
   }
   ## memory protect step:
   memoryAvailable(n = sum(size), funs = 'BD.test')
+  
   ## examine R arguments:
   if(method == "approx") {
     R <- 0
   } else {
     examine_R_arguments(R)
   }
+  
+  ## examine num.thread arguments:
+  examine_threads_arguments(num.threads)
+  
   ## main:
   if(R == 0) {
     result <- bd_value_wrap_c(xy, size, weight, dst)
@@ -167,7 +172,7 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
     ## examine seed arguments:
     set.seed(examine_seed_arguments(seed))
     ## hypothesis test:
-    result <- bd_test_wrap_c(xy, size, R, weight, dst)
+    result <- bd_test_wrap_c(xy, size, R, weight, dst, num.threads)
     pvalue <- calculatePvalue(result[["statistic"]], result[["permuted_stat"]])
   }
   # output information:
@@ -253,7 +258,7 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
 #' x <- rnorm(50)
 #' y <- rnorm(50)
 #' bd(x, y)
-bd <- function(x, y = NULL, dst = FALSE, size = NULL) {
+bd <- function(x, y = NULL, dst = FALSE, size = NULL, num.threads = 2) {
   res <- bd.test(x = x, y = y, dst = dst, size = size, R = 0)
   res
 }

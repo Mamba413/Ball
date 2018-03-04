@@ -38,11 +38,12 @@ bd_value_wrap_c <- function(xy, size, weight, dst) {
 #' @return Ball Divergence statistic
 #' @useDynLib Ball, .registration = TRUE
 #' @noRd
-bd_test_wrap_c <- function(xy, size, R, weight, dst) {
+bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
   xy <- as.double(xy)
   dst <- as.integer(dst)
   R <- as.integer(R)
   weight <- as.integer(weight)
+  num.threads <- as.integer(num.threads)
   #
   bd <- as.double(numeric(1))
   permuted_bd <- as.double(rep(-1, R))
@@ -51,13 +52,13 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst) {
     p <- as.integer(1)
     n1 <- as.integer(size[1])
     n2 <- as.integer(size[2])
-    res <- .C("bd_test", bd, permuted_bd, xy, n1, n2, p, dst, R, weight)
+    res <- .C("bd_test", bd, permuted_bd, xy, n1, n2, p, dst, R, weight, num.threads)
     
     N <- n1 + n2
   } else {
     size <- as.integer(size)
     N <- as.integer(sum(size))
-    res <- .C("kbd_test", bd, permuted_bd, xy, size, N, K, dst, R, weight)
+    res <- .C("kbd_test", bd, permuted_bd, xy, size, N, K, dst, R, weight, num.threads)
   }
   bd <- res[[1]]
   names(bd) <- ifelse(weight, "wbd", "bd")
