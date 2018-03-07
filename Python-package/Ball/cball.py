@@ -130,9 +130,44 @@ def doubleArray_frompointer(t):
     return _cball.doubleArray_frompointer(t)
 doubleArray_frompointer = _cball.doubleArray_frompointer
 
+class intArray(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, intArray, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, intArray, name)
+    __repr__ = _swig_repr
 
-def bd_stat(arg1, arg2, arg3, arg4, arg5):
-    return _cball.bd_stat(arg1, arg2, arg3, arg4, arg5)
+    def __init__(self, nelements):
+        this = _cball.new_intArray(nelements)
+        try:
+            self.this.append(this)
+        except __builtin__.Exception:
+            self.this = this
+    __swig_destroy__ = _cball.delete_intArray
+    __del__ = lambda self: None
+
+    def __getitem__(self, index):
+        return _cball.intArray___getitem__(self, index)
+
+    def __setitem__(self, index, value):
+        return _cball.intArray___setitem__(self, index, value)
+
+    def cast(self):
+        return _cball.intArray_cast(self)
+    if _newclass:
+        frompointer = staticmethod(_cball.intArray_frompointer)
+    else:
+        frompointer = _cball.intArray_frompointer
+intArray_swigregister = _cball.intArray_swigregister
+intArray_swigregister(intArray)
+
+def intArray_frompointer(t):
+    return _cball.intArray_frompointer(t)
+intArray_frompointer = _cball.intArray_frompointer
+
+
+def bd_stat(arg1, arg2, arg3, arg4, arg5, arg6):
+    return _cball.bd_stat(arg1, arg2, arg3, arg4, arg5, arg6)
 bd_stat = _cball.bd_stat
 
 def bd_test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9):

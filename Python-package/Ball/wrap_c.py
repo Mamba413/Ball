@@ -9,7 +9,7 @@
 from numpy import alen as npalen
 
 from Ball.cball import bd_stat, bd_test
-from Ball.cball import doubleArray
+from Ball.cball import doubleArray, intArray
 
 
 # BE CAUTIOUS!!! Init doubleArray for data with N element like this: doubleArray(N)
@@ -36,33 +36,39 @@ def bd_value_wrap_c(xy, size, weight, dst):
 
     Examples
     ---
-    import numpy as np
-    x1 = np.random.normal(0, size=30)
-    x2 = np.random.normal(1, size=30)
-    x = np.append(x1, x2)
-    bd = bd_value_wrap_c(x, [30, 30], False, False)
+    >>> import numpy as np
+    >>> x1 = np.random.normal(0, size=30)
+    >>> x2 = np.random.normal(1, size=30)
+    >>> x = np.append(x1, x2)
+    >>> bd = bd_value_wrap_c(x, [30, 30], False, False)
 
     '''
 
-    # change the original data to doubleArray type
+    # initial C type structure
     num = npalen(xy)
     xy_copy = doubleArray(num)
+    weight_copy = intArray(1)
+    dst_copy = intArray(1)
+    bd = doubleArray(1)
+    # change the original data to doubleArray type
     for i, xy_value in enumerate(xy):
         xy_copy[i] = xy_value
         pass
+    weight_copy[0] = int(weight)
+    dst_copy[0] = int(dst)
+    bd[0] = 0.0
     #
-    bd = 0.0
-    weight = int(weight)
-    dst = int(dst)
     k = npalen(size)
     # calculate ball divergence statistic
     if k == 2:
-        n1 = int(size[0])
-        n2 = int(size[1])
-        bd = bd_stat(xy_copy, n1, n2, weight, dst)
+        n1 = intArray(1)
+        n2 = intArray(1)
+        n1[0] = int(size[0])
+        n2[0] = int(size[1])
+        bd_stat(bd, xy_copy, n1, n2, weight_copy, dst_copy)
     else:
         pass
-    bd_value = float(bd)
+    bd_value = float(bd[0])
     return bd_value
 
 
@@ -79,23 +85,32 @@ def bd_test_wrap_c(xy, size, R, weight, dst):
 
     '''
 
+    # initial C type structure
     num = npalen(xy)
     xy_copy = doubleArray(num)
+    weight_copy = intArray(1)
+    dst_copy = intArray(1)
+    R_copy = intArray(1)
+    bd = doubleArray(1)
+    permuted_bd = doubleArray(R)
+    # change the original data to doubleArray type
     for i, xy_value in enumerate(xy):
         xy_copy[i] = xy_value
         pass
-    dst = int(dst)
-    R = int(R)
-    weight = int(weight)
+    weight_copy[0] = int(weight)
+    dst_copy[0] = int(dst)
+    R_copy[0] = int(R)
+    bd[0] = 0.0
 
-    bd = doubleArray(1)
-    permuted_bd = doubleArray(R)
     K = npalen(size)
     if K == 2:
-        p = int(1)
-        n1 = int(size[0])
-        n2 = int(size[1])
-        bd_test(bd, permuted_bd, xy_copy, n1, n2, p, dst, R, weight)
+        p = intArray(1)
+        n1 = intArray(1)
+        n2 = intArray(1)
+        p[0] = int(1)
+        n1[0] = int(size[0])
+        n2[0] = int(size[1])
+        bd_test(bd, permuted_bd, xy_copy, n1, n2, p, dst_copy, R_copy, weight_copy)
         # N = n1 + n2
     else:
         # size = int(size)

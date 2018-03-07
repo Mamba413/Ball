@@ -36,9 +36,9 @@ extern void UBD(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, i
 void KBD(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *R, int *weight);
 void UKBD(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *R, int *weight);
 // R API function:
-//void bd_stat(double *bd, double *xy, int *n1, int *n2, int *weight, int *dst);
-void kbd_stat(double *bd, double *xy, int *size, int *n, int *k, int *weight, int *dst);
-//void bd_test(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *p, int *dst, int *R, int *weight);
-void kbd_test(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *dst, int *R, int *weight);
+extern void bd_stat(double *bd, double *xy, int *n1, int *n2, int *weight, int *dst);
+//void kbd_stat(double *bd, double *xy, int *size, int *n, int *k, int *weight, int *dst);
+extern void bd_test(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *p, int *dst, int *R, int *weight);
+//void kbd_test(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *dst, int *R, int *weight);
 
 #endif /* BD_H_ */
