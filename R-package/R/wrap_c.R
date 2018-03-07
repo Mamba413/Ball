@@ -12,18 +12,11 @@ bd_value_wrap_c <- function(xy, size, weight, dst, num.threads) {
   weight <- as.integer(weight)
   dst <- as.integer(dst)
   num.threads <- as.integer(num.threads)
-  #
   K <- as.integer(length(size))
-  if(K == 2) {
-    n1 <- as.integer(size[1])
-    n2 <- as.integer(size[2])
-    res <- .C("bd_stat", bd, xy, n1, n2, weight, dst, num.threads)
-    N <- n1 + n2
-  } else {
-    size <- as.integer(size)
-    N <- as.integer(sum(size))
-    res <- .C("kbd_stat", bd, xy, size, N, K, weight, dst, num.threads)
-  }
+  size <- as.integer(size)
+  N <- as.integer(sum(size))
+  res <- .C("bd_stat", bd, xy, size, N, K, weight, dst, num.threads)
+  #
   bd <- res[[1]]
   names(bd) <- ifelse(weight, "wbd", "bd")
   list("statistic" = bd, "permuted_stat" = NULL, 
@@ -49,18 +42,10 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
   bd <- as.double(numeric(1))
   permuted_bd <- as.double(rep(-1, R))
   K <- as.integer(length(size))
-  if(K == 2) {
-    p <- as.integer(1)
-    n1 <- as.integer(size[1])
-    n2 <- as.integer(size[2])
-    res <- .C("bd_test", bd, permuted_bd, xy, n1, n2, p, dst, R, weight, num.threads)
-    
-    N <- n1 + n2
-  } else {
-    size <- as.integer(size)
-    N <- as.integer(sum(size))
-    res <- .C("kbd_test", bd, permuted_bd, xy, size, N, K, dst, R, weight, num.threads)
-  }
+  size <- as.integer(size)
+  N <- as.integer(sum(size))
+  res <- .C("bd_test", bd, permuted_bd, xy, size, N, K, dst, R, weight, num.threads)
+  #
   bd <- res[[1]]
   names(bd) <- ifelse(weight, "wbd", "bd")
   permuted_bd <- res[[2]]

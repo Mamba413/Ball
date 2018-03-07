@@ -807,14 +807,26 @@ void UKBD(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int 
 
 /*
  * R function call this function to compute two sample ball divergence statistic
+ * if k = 2, then n1 = size[1] and n2 = size[2];
  */
-void bd_stat(double *bd, double *xy, int *n1, int *n2, int *weight, int *dst, int *nthread)
+void bd_stat(double *bd, double *xy, int *size, int *n, int *k, int *weight, int *dst, int *nthread)
 {
   double ans = 0.0;
-  if((*dst)) {
-    ans = bd_value(xy, n1, n2, weight, nthread);
+  int n1 = 0, n2 = 0;
+  if((*k) == 2) {
+    n1 = size[0];
+    n2 = size[1];
+    if((*dst)) {
+      ans = bd_value(xy, &n1, &n2, weight, nthread);
+    } else {
+      ans = ubd_value(xy, &n1, &n2, weight, nthread);
+    }
   } else {
-    ans = ubd_value(xy, n1, n2, weight, nthread);
+    if((*dst)) {
+      ans = kbd_value(xy, size, n, k, weight, nthread);
+    } else {
+      ans = ukbd_value(xy, size, k, weight, nthread);
+    }
   }
   *bd = ans;
   return;
@@ -824,6 +836,7 @@ void bd_stat(double *bd, double *xy, int *n1, int *n2, int *weight, int *dst, in
 /*
  * R function call this function to compute K sample ball divergence statistic
  */
+/*
 void kbd_stat(double *bd, double *xy, int *size, int *n, int *k, int *weight, int *dst, int *nthread)
 {
   double ans = 0.0;
@@ -835,17 +848,29 @@ void kbd_stat(double *bd, double *xy, int *size, int *n, int *k, int *weight, in
   *bd = ans;
   return;
 }
-
+*/
 
 /*
  * R function call this function to execute Two sample ball divergence test
  */
-void bd_test(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *p, int *dst, int *R, int *weight, int *nthread)
+void bd_test(double *bd, double *permuted_bd, double *xy, int *size, int *n, int *k, int *dst, int *R, int *weight, int *nthread)
 {
-  if(*dst) {
-    BD(bd, permuted_bd, xy, n1, n2, p, dst, R, weight, nthread);
+  int n1 = 0, n2 = 0;
+  int p = 1;
+  if((*k) == 2) {
+    n1 = size[0];
+    n2 = size[1];
+    if(*dst) {
+      BD(bd, permuted_bd, xy, &n1, &n2, &p, dst, R, weight, nthread);
+    } else {
+      UBD(bd, permuted_bd, xy, &n1, &n2, R, weight, nthread);
+    } 
   } else {
-    UBD(bd, permuted_bd, xy, n1, n2, R, weight, nthread);
+    if(*dst) {
+      KBD(bd, permuted_bd, xy, size, n, k, R, weight, nthread);
+    } else {
+      UKBD(bd, permuted_bd, xy, size, n, k, R, weight, nthread);
+    }
   }
   return;
 }
@@ -854,6 +879,7 @@ void bd_test(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int 
 /*
  * R function call this function to execute Two sample ball divergence test
  */
+/*
 void kbd_test(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *dst, int *R, int *weight, int *nthread)
 {
   if(*dst) {
@@ -863,3 +889,4 @@ void kbd_test(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, 
   }
   return;
 }
+*/
