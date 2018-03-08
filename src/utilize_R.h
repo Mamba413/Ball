@@ -13,8 +13,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef API_R_H_
-#define API_R_H_
+#ifndef UTILIZE_R_H_
+#define UTILIZE_R_H_
 
 
-#endif /* API_R_H_ */
+#endif /* UTILIZE_R_H_ */

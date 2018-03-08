@@ -92,3 +92,4 @@ Python-package/test/
 *.vcxproj
 *.db
 *.opendb
+src/cball/cball/Debug/
