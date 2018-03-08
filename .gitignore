@@ -94,3 +94,4 @@ Python-package/test/
 *.opendb
 src/cball/cball/Debug/
 Python-package/src/cball.py
+Python-package/.idea/
