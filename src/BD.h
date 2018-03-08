@@ -13,6 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #ifndef BD_H_
 #define BD_H_
 
@@ -21,24 +22,23 @@ void ranksort2(int n, int **Rxy, double **Dxy, int **Ixy);
 void Findx2(int *Rxy, int *Ixy, int *i_perm, int *n1, int *n2, int *Rx);
 void Findx(int **Rxy, int **Ixy, int *i_perm, int *n1, int *n2, int **Rx);
 double Ball_Divergence(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2, int *weight);
-void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1);
 void ranksort3(int n, int *xyidx, double *xy, int **Rxy, int **Ixy);
 void get_ij_dst(double *xy, double *ij_dst, int *cumulate_size, int *size, int *n, int *p, int *q);
 void compute_cumulate_size(int *cumulate_size, int *size, int *k);
 void permute_dst(double *xy, double *new_xy, int *index, int *N);
 void get_ij_value(double *xy, double *ij_value, int *cumulate_size, int *size, int *p, int *q);
-double bd_value(double *xy, int *n1, int *n2, int *weight);
-double ubd_value(double *xy, int *n1, int *n2, int *weight);
-double kbd_value(double *xy, int *size, int *n, int *k, int *weight);
-double ukbd_value(double *xy, int *size, int *k, int *weight);
-void BD(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *p, int *dst, int *R, int *weight);
-void UBD(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *R, int *weight);
-void KBD(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *R, int *weight);
-void UKBD(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *R, int *weight);
+double bd_value(double *xy, int *n1, int *n2, int *weight, int *nthread);
+double ubd_value(double *xy, int *n1, int *n2, int *weight, int *nthread);
+double kbd_value(double *xy, int *size, int *n, int *k, int *weight, int *nthread);
+double ukbd_value(double *xy, int *size, int *k, int *weight, int *nthread);
+void BD(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *p, int *dst, int *R, int *weight, int *nthread);
+void UBD(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *R, int *weight, int *nthread);
+void KBD(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *R, int *weight, int *nthread);
+void UKBD(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *R, int *weight, int *nthread);
 // R API function:
-void bd_stat(double *bd, double *xy, int *n1, int *n2, int *weight, int *dst);
-void kbd_stat(double *bd, double *xy, int *size, int *n, int *k, int *weight, int *dst);
-void bd_test(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *p, int *dst, int *R, int *weight);
-void kbd_test(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *dst, int *R, int *weight);
+void bd_stat(double *bd, double *xy, int *size, int *n, int *k, int *weight, int *dst, int *nthread);
+// void kbd_stat(double *bd, double *xy, int *size, int *n, int *k, int *weight, int *dst, int *nthread);
+void bd_test(double *bd, double *permuted_bd, double *xy, int *size, int *n, int *k, int *dst, int *R, int *weight, int *nthread);
+// void kbd_test(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *dst, int *R, int *weight, int *nthread);
 
 #endif /* BD_H_ */

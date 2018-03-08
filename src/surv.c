@@ -1,7 +1,5 @@
 #include "math.h"
 #include "stdlib.h"
-#include "R.h"
-#include "Rmath.h"
 #include "stdio.h"
 #include "surv.h"
 

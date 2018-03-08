@@ -20,7 +20,6 @@
 #define MAX(a,b) (((a)>(b))?(a):(b));
 void Merge(int *permutation, int *source, int *inversion_count, int dim, int n);
 int Inversions(int *permutation, int *source, int *inversion_count,int dim, int n);
-void resample(int *i_perm, int *i_perm_inv, int *n);
 double Ball_Information(int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *weight);
 void BI(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight);
 void computeRank(int n, int **Rank);
@@ -28,7 +27,6 @@ void initRank(int n, int **Rank, int *xrank, int *yrank, int *i_perm);
 void ranksort(int *n, int *zrank, double *z, int *zidx);
 void sort(int *n, int *zidx, double *z, int **dzidx);
 void createidx(int *n, int *zidx, double *z, int **lowzidx, int **higzidx);
-void resample2(int *i_perm, int *n);
 double U_Ball_Information(int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *weight);
 void UBI(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight);
 double ubcov_value(double *x, double *y, int *n, int *weight);

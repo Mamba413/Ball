@@ -87,3 +87,8 @@ Python-package/Ball.egg-info/
 Python-package/build/
 Python-package/test/
 *.dll
+*.filters
+*.sln
+*.vcxproj
+*.db
+*.opendb
