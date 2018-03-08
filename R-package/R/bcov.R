@@ -109,27 +109,31 @@ bcov.test <- function(x, y = NULL, R = 99, dst = FALSE, weight = FALSE,
   result <- bcov_test_internal_wrap(x = x, y = y, R = R, dst = dst, weight = weight, 
                                     seed = seed, method = method, type = type)
   # return result of hypothesis test:
-  data_name <- paste0(data_name,"\nnumber of observations = ", result[["N"]])
-  data_name <- paste0(data_name, "\nreplicates = ", R, 
-                      ", Weighted Ball Covariance = ", weight)
-  test_method <- "Ball Covariance test of independence"
-  if(type == "bcor") {
-    test_method <- gsub(pattern = "Covariance", replacement = "Correlation", x = test_method)
-    data_name <- gsub(pattern = "Covariance", replacement = "Correlation", x = data_name)
+  if(R == 0) {
+    return(result)
+  } else {
+    data_name <- paste0(data_name,"\nnumber of observations = ", result[["N"]])
+    data_name <- paste0(data_name, "\nreplicates = ", R, 
+                        ", Weighted Ball Covariance = ", weight)
+    test_method <- "Ball Covariance test of independence"
+    if(type == "bcor") {
+      test_method <- gsub(pattern = "Covariance", replacement = "Correlation", x = test_method)
+      data_name <- gsub(pattern = "Covariance", replacement = "Correlation", x = data_name)
+    }
+    alternative_message <- "random variables are dependent"
+    e <- list(
+      statistic = result[["statistic"]],
+      permuted_stat = result[["permuted_stat"]],
+      p.value = result[["p.value"]],
+      replicates = R,
+      size = result[["N"]],
+      alternative = alternative_message,
+      method = test_method,
+      data.name = data_name
+    )
+    class(e) <- "htest"
+    return(e)
   }
-  alternative_message <- "random variables are dependent"
-  e <- list(
-    statistic = result[["statistic"]],
-    permuted_stat = result[["permuted_stat"]],
-    p.value = result[["p.value"]],
-    replicates = R,
-    size = result[["N"]],
-    alternative = alternative_message,
-    method = test_method,
-    data.name = data_name
-  )
-  class(e) <- "htest"
-  return(e)
 }
 
 
