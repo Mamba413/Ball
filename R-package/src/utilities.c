@@ -17,7 +17,7 @@
 #include "utilities.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "api_R.h"
+#include "utilize_R.h"
 
 
 void quicksort(double *a, int *idx, int l, int u)
