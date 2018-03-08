@@ -8,6 +8,8 @@
 
 from numpy import alen as npalen
 from numpy import sum as npsum
+from numpy import array as nparray
+from numpy import double
 
 from Ball.cball import bd_stat, bd_test
 from Ball.cball import doubleArray, intArray
@@ -46,6 +48,7 @@ def bd_value_wrap_c(xy, size, weight, dst, num_thread=1):
     '''
 
     # initial C type structure
+    xy = nparray(xy, dtype=double)
     num = npalen(xy)
     xy_copy = doubleArray(num)
     num = npalen(size)
@@ -61,7 +64,7 @@ def bd_value_wrap_c(xy, size, weight, dst, num_thread=1):
         xy_copy[i] = xy_value
         pass
     for i, size_value in enumerate(size):
-        size_copy[i] = size_value
+        size_copy[i] = int(size_value)
         pass
     n[0] = int(npsum(size))
     k[0] = int(npalen(size))
@@ -91,6 +94,7 @@ def bd_test_wrap_c(xy, size, R, weight, dst, num_thread=1):
     # initial C type structure
     bd = doubleArray(1)
     permuted_bd = doubleArray(R)
+    xy = nparray(xy, dtype=double)
     num = npalen(xy)
     xy_copy = doubleArray(num)
     num = npalen(size)
