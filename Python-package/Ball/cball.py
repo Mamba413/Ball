@@ -166,12 +166,12 @@ def intArray_frompointer(t):
 intArray_frompointer = _cball.intArray_frompointer
 
 
-def bd_stat(arg1, arg2, arg3, arg4, arg5, arg6):
-    return _cball.bd_stat(arg1, arg2, arg3, arg4, arg5, arg6)
+def bd_stat(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8):
+    return _cball.bd_stat(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
 bd_stat = _cball.bd_stat
 
-def bd_test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9):
-    return _cball.bd_test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+def bd_test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10):
+    return _cball.bd_test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)
 bd_test = _cball.bd_test
 # This file is compatible with both classic and new-style classes.
 

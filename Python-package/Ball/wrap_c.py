@@ -7,6 +7,7 @@
 
 
 from numpy import alen as npalen
+from numpy import sum as npsum
 
 from Ball.cball import bd_stat, bd_test
 from Ball.cball import doubleArray, intArray
@@ -18,7 +19,7 @@ from Ball.cball import doubleArray, intArray
 # doubleArray(N-1)  (Impermissible)
 
 
-def bd_value_wrap_c(xy, size, weight, dst):
+def bd_value_wrap_c(xy, size, weight, dst, num_thread=1):
     '''
     wrapper C function which compute Ball Divergence
 
@@ -47,32 +48,34 @@ def bd_value_wrap_c(xy, size, weight, dst):
     # initial C type structure
     num = npalen(xy)
     xy_copy = doubleArray(num)
+    num = npalen(size)
+    size_copy = intArray(num)
     weight_copy = intArray(1)
     dst_copy = intArray(1)
     bd = doubleArray(1)
+    n = intArray(1)
+    k = intArray(1)
+    nthread = intArray(1)
     # change the original data to doubleArray type
     for i, xy_value in enumerate(xy):
         xy_copy[i] = xy_value
         pass
+    for i, size_value in enumerate(size):
+        size_copy[i] = size_value
+        pass
+    n[0] = int(npsum(size))
+    k[0] = int(npalen(size))
     weight_copy[0] = int(weight)
     dst_copy[0] = int(dst)
     bd[0] = 0.0
-    #
-    k = npalen(size)
-    # calculate ball divergence statistic
-    if k == 2:
-        n1 = intArray(1)
-        n2 = intArray(1)
-        n1[0] = int(size[0])
-        n2[0] = int(size[1])
-        bd_stat(bd, xy_copy, n1, n2, weight_copy, dst_copy)
-    else:
-        pass
+    nthread[0] = int(num_thread)
+    # calculate ball divergence statistics:
+    bd_stat(bd, xy_copy, size_copy, n, k, weight_copy, dst_copy, nthread)
     bd_value = float(bd[0])
     return bd_value
 
 
-def bd_test_wrap_c(xy, size, R, weight, dst):
+def bd_test_wrap_c(xy, size, R, weight, dst, num_thread=1):
     '''
 
     Examples
@@ -86,37 +89,34 @@ def bd_test_wrap_c(xy, size, R, weight, dst):
     '''
 
     # initial C type structure
-    num = npalen(xy)
-    xy_copy = doubleArray(num)
-    weight_copy = intArray(1)
-    dst_copy = intArray(1)
-    R_copy = intArray(1)
     bd = doubleArray(1)
     permuted_bd = doubleArray(R)
+    num = npalen(xy)
+    xy_copy = doubleArray(num)
+    num = npalen(size)
+    size_copy = intArray(num)
+    weight_copy = intArray(1)
+    dst_copy = intArray(1)
+    n = intArray(1)
+    k = intArray(1)
+    r = intArray(1)
+    nthread = intArray(1)
     # change the original data to doubleArray type
+    bd[0] = 0.0
     for i, xy_value in enumerate(xy):
         xy_copy[i] = xy_value
         pass
+    for i, size_value in enumerate(size):
+        size_copy[i] = int(size_value)
+        pass
+    n[0] = int(npsum(size))
+    k[0] = int(npalen(size))
     weight_copy[0] = int(weight)
     dst_copy[0] = int(dst)
-    R_copy[0] = int(R)
-    bd[0] = 0.0
-
-    K = npalen(size)
-    if K == 2:
-        p = intArray(1)
-        n1 = intArray(1)
-        n2 = intArray(1)
-        p[0] = int(1)
-        n1[0] = int(size[0])
-        n2[0] = int(size[1])
-        bd_test(bd, permuted_bd, xy_copy, n1, n2, p, dst_copy, R_copy, weight_copy)
-        # N = n1 + n2
-    else:
-        # size = int(size)
-        # N = int(np.sum(size))
-        # res <- .C("kbd_test", bd, permuted_bd, xy, size, N, K, dst, R, weight)
-        pass
+    r[0] = int(R)
+    nthread[0] = num_thread
+    # ball divergence based test
+    bd_test(bd, permuted_bd, xy_copy, size_copy, n, k, dst_copy, r, weight_copy, nthread)
 
     # convert doubleArray to list:
     permuted_bd_list = []

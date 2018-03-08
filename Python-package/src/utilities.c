@@ -13,11 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-#include <stdlib.h>
 #include "math.h"
 #include "utilities.h"
-
+#include "stdio.h"
+#include "stdlib.h"
+#include "utilize_R.h"
+#include "utilize_cross.h"
 
 void quicksort(double *a, int *idx, int l, int u)
 {
@@ -198,22 +199,78 @@ void distance(double *x, double *Dx, int *n, int *d)
 }
 
 
+void resample(int *i_perm, int *i_perm_inv, int *n)
+{
+  int i, j, temp;
+  for (i = *n - 1; i > 0; --i) {
+    j = random_index2(i);
+    temp = i_perm[j];
+    i_perm[j] = i_perm[i];
+    i_perm[i] = temp;
+  }
+  for (i = 0; i < *n; ++i) {
+    i_perm_inv[i_perm[i]] = i;
+  }
+}
+
+
+void resample2(int *i_perm, int *n)
+{
+  int i, j, temp;
+  for (i = *n - 1; i > 0; --i) {
+    // j = rand() % (i + 1);
+    j = random_index2(i);
+    temp = i_perm[j];
+    i_perm[j] = i_perm[i];
+    i_perm[i] = temp;
+  }
+}
+
+
+/*
+ * permute group index: i_perm
+ */
+void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1)
+{
+  int i, j, temp, tmp0, tmp1;
+  
+  // permute step:
+  for (i = n - 1; i > 0; --i) {
+    // j = rand() % (i + 1);
+    j = random_index2(i);
+    temp = i_perm[j];
+    i_perm[j] = i_perm[i];
+    i_perm[i] = temp;
+  }
+  
+  tmp0 = 0;
+  tmp1 = 0;
+  for(i = 0; i < n; i++)
+    if(i_perm[i]==1){
+      i_perm_tmp[tmp0++] = i;
+    }
+    else{
+      i_perm_tmp[*n1 + tmp1] = i;
+      tmp1++;
+    }
+}
+
+
 /* Arrange the N elements of ARRAY in random order.
  Only effective if N is much smaller than RAND_MAX;
  if this may not be the case, use a better random
  number generator. */
 void shuffle(int *array, int *N)
-{ //int RAND_MAX = 32767;
-  //printf("%d", RAND_MAX);  
+{
+  // Rprintf("%d", RAND_MAX);  RAND_MAX = 32767;
   int n = *N;
   if (n > 1) 
   {
-    int i;
+    int i, j, t;
     for (i = 0; i < n - 1; i++) 
     {
-      int j = i + rand() / (RAND_MAX / (n - i) + 1);
-      //int j = i + r_available_rand() / (RAND_MAX / (n - i) + 1);
-      int t = array[j];
+      j = random_index(n, i);
+      t = array[j];
       array[j] = array[i];
       array[i] = t;
     }
@@ -222,17 +279,17 @@ void shuffle(int *array, int *N)
 
 
 void shuffle_value(double *array, int *N)
-{ //int RAND_MAX = 32767;
-  //printf("%d", RAND_MAX); 
+{
+  // Rprintf("%d", RAND_MAX);  RAND_MAX = 32767;
   int n = *N;
   if (n > 1) 
   {
-    int i;
+    int i, j;
+    double tmp;
     for (i = 0; i < n - 1; i++) 
     {
-      int j = i + rand() / (RAND_MAX / (n - i) + 1);
-      //int j = i + r_available_rand() / (RAND_MAX / (n - i) + 1);
-      double tmp = array[j];
+      j = random_index(n, i);
+      tmp = array[j];
       array[j] = array[i];
       array[i] = tmp;
     }
@@ -240,29 +297,15 @@ void shuffle_value(double *array, int *N)
 }
 
 
-/* check_interrupt_fn and pending_interrupt 
- * are used to check for interrupt without long jumping 
- */
-//void check_interrupt_fn(void *dummy) {
-//  R_CheckUserInterrupt();
-//}
+int pending_interrupt() {
+  int interrupt_status = 0;
+  interrupt_status = pending_interrupt_status();
+  return interrupt_status;
+}
 
 
-//int pending_interrupt() {
-//  return !(R_ToplevelExec(check_interrupt_fn, NULL));
-//}
-
-
-/*
- * A random integer generator available for R-package building.
- * Following the rule in "Writing R Extension"[https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Random-numbers]!
- * output:
- * A random integer
- */
-//int r_available_rand()
-//{
-//  GetRNGstate();
-//  int random_value = round(RAND_MAX*unif_rand());
-//  PutRNGstate();
-//  return random_value;
-//}
+void print_stop_message()
+{
+  print_stop_message_internal();
+  return;
+}
