@@ -9,7 +9,7 @@ Check these declarations against the C/Fortran source code.
 extern void bcov_stat(double *, double *, double *, int *, int *, int *, int *);
 extern void bcov_test(double *, double *, double *, double *, int *, int *, int *, int *, int *);
 extern void bd_stat(double *, double *, int *, int *, int *, int *, int *, int *);
-extern void bd_test(double *, double *, int *, int *, int *, int *, int *, int *, int *, int *);
+extern void bd_test(double *, double *, double *, int *, int *, int *, int *, int *, int *, int *);
 extern void SRCT(double *, double *, double *, double *, int *, double *);
 
 static const R_CMethodDef CEntries[] = {
