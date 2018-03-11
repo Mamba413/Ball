@@ -13,6 +13,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifdef _OPENMP
+# include "omp.h"
+#endif
+
 #include "math.h"
 #include "stdlib.h" 
 #include "string.h"
@@ -200,6 +204,140 @@ double Ball_Information(int *n, double **Dx, double **Dy, int **xidx, int **yidx
   return(rct0);
 }
 
+
+double Ball_Information_parallel(int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *weight, int *nthread)
+{
+	double rct0_value = 0.0;
+	int i, jjjj, **xyidx;
+	double *xx_cpy, *yy_cpy;
+	xyidx = alloc_int_matrix(*n, *n);
+	for (i = 0; i<*n; i++)
+		for (jjjj = 0; jjjj<*n; jjjj++)
+			xyidx[i][jjjj] = jjjj;
+
+	xx_cpy = (double *) malloc(*n * sizeof(double));
+	yy_cpy = (double *) malloc(*n * sizeof(double));
+
+	for (i = 0; i<(*n); i++) {
+		memcpy(xx_cpy, Dx[i], *n * sizeof(double));
+		for (jjjj = 0; jjjj<*n; jjjj++)
+			yy_cpy[jjjj] = Dy[i_perm[i]][i_perm[jjjj]];
+		quicksort2(xx_cpy, yy_cpy, xyidx[i], 0, *n - 1);
+	}
+	free(xx_cpy);
+	free(yy_cpy);
+
+#ifdef _OPENMP
+	omp_set_num_threads(*nthread);
+#endif
+	#pragma omp parallel
+	{
+		int j, k, pi, src, lastpos, *yrank, *isource, *icount, *xy_index, *xy_temp;
+		double pxy, px, py, lastval, rct0 = 0;
+		yrank = (int *)malloc(*n * sizeof(int));
+		isource = (int *)malloc(*n * sizeof(int));
+		icount = (int *)malloc(*n * sizeof(int));
+		xy_index = (int *)malloc(*n * sizeof(int));
+		xy_temp = (int *)malloc(*n * sizeof(int));
+
+		#pragma omp for
+		for (i = 0; i<(*n); i++)
+		{
+			pi = i_perm[i];
+			lastval = 0;
+			lastpos = -1;
+			for (j = *n - 1, k = *n - 1; j >= 1; --j, --k)
+			{
+				k -= (yidx[pi][k] == pi);
+				if (lastpos == -1 || Dy[pi][yidx[pi][k]] != lastval)
+				{
+					lastval = Dy[pi][yidx[pi][k]];
+					lastpos = j;
+				}
+				src = i_perm_inv[yidx[pi][k]];
+				src -= (src > i);
+				yrank[src] = lastpos;
+			}
+
+			for (j = 0, k = 0; j < *n - 1; ++j, ++k)
+			{
+				k += (xyidx[i][k] == i);
+				src = xyidx[i][k]; // NOTE: k may be different than from the line above
+				src -= (src > i);
+				xy_index[j] = yrank[src];
+				isource[j] = j;
+				icount[j] = 0;
+				xy_temp[j] = xy_index[j];
+			}
+			Inversions(xy_temp, isource, icount, *n - 1, *n);
+			lastval = 0;
+			lastpos = -1;
+
+			for (j = *n - 2, k = *n - 1; j >= 0; --j, --k)
+			{
+				k -= (xidx[i][k] == i);
+				if (lastpos == -1 || Dx[i][xidx[i][k]] != lastval) {
+					lastval = Dx[i][xidx[i][k]];
+					lastpos = j;
+				}
+
+				pxy = lastpos - icount[j] + 2;
+				px = lastpos + 2;
+				py = xy_index[j] + 1;
+				px /= (*n);
+				py /= (*n);
+				pxy /= (*n);
+				if (*weight == 0)
+					rct0 += pow(pxy - px*py, 2);
+				else
+					rct0 += pow(pxy - px*py, 2) / (px*py);
+			}
+
+			pxy = 0;
+			px = 0;
+			py = 0;
+
+			for (j = 0; j<*n; j++)
+			{
+				if (Dx[i][xidx[i][j]] == 0)
+				{
+					px += 1;
+					if (Dy[pi][i_perm[xidx[i][j]]] == 0)
+					{
+						pxy += 1;
+						py += 1;
+					}
+				}
+				else if (Dy[pi][i_perm[xidx[i][j]]] == 0)
+					py += 1;
+			}
+
+			px /= (*n);
+			py /= (*n);
+			pxy /= (*n);
+			if (*weight == 0)
+				rct0 += pow(pxy - px*py, 2);
+			else
+				rct0 += pow(pxy - px*py, 2) / (px*py);
+		}
+		#pragma omp critical
+		{
+			rct0_value += rct0;
+		}
+
+		free(isource);
+		free(icount);
+		free(xy_index);
+		free(yrank);
+		free(xy_temp);
+		free_int_matrix(xyidx, *n, *n);
+	}
+
+	rct0_value = rct0_value / (1.0*(*n)*(*n));
+	return(rct0_value);
+}
+
+
 void BI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *R, int *weight)
 {
   /*  computes RCT(x,y)  */	
@@ -240,7 +378,9 @@ void BI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *
   free(x_cpy);
   free(y_cpy);
   
-  RCTV0 = Ball_Information( n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, weight);
+  //RCTV0 = Ball_Information( n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, weight);
+  int nth = 4;
+  RCTV0 = Ball_Information_parallel(n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, weight, &nth);
   *bcov = RCTV0;
   for(i=0; i<*R; i++)
   {
@@ -250,7 +390,8 @@ void BI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *
       break;
     }
     resample(i_perm, i_perm_inv, n);
-    permuted_bcov[i] = Ball_Information(n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, weight);
+    //permuted_bcov[i] = Ball_Information(n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, weight);
+	permuted_bcov[i] = Ball_Information_parallel(n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, weight, &nth);
   }
   
   free_matrix(Dx, *n, *n);
@@ -481,6 +622,48 @@ double U_Ball_Information(int *n, int **Rank, int **lowxidx, int **higxidx, int 
 }
 
 
+double U_Ball_Information_parallel(int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *weight, int *nthread)
+{
+	double BI_value = 0.0;
+#ifdef _OPENMP
+		omp_set_num_threads(*nthread);
+#endif
+	#pragma omp parallel
+	{
+		int i, j, pi, pj;
+		double px, py, pxy, ans = 0;
+
+		#pragma omp for
+		for (i = 0; i < *n; i++) {
+			for (j = 0; j < *n; j++) {
+				pi = i_perm[i];
+				pj = i_perm[j];
+				px = higxidx[i][j] - lowxidx[i][j] + 1;
+				py = higyidx[pi][pj] - lowyidx[pi][pj] + 1;
+				pxy = Rank[higxidx[i][j]][higyidx[pi][pj]] + Rank[lowxidx[i][j] - 1][lowyidx[pi][pj] - 1];
+				pxy -= (Rank[higxidx[i][j]][lowyidx[pi][pj] - 1] + Rank[lowxidx[i][j] - 1][higyidx[pi][pj]]);
+
+				pxy /= (*n);
+				px /= (*n);
+				py /= (*n);
+				if (*weight == 0)
+					ans += pow(pxy - px*py, 2);
+				else
+					ans += pow(pxy - px*py, 2) / (px*py);
+			}
+		}
+
+		#pragma omp critical
+		{
+			BI_value += ans;
+		}
+	}
+
+	BI_value /= (1.0*(*n)*(*n));
+	return(BI_value);
+}
+
+
 void UBI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *R, int *weight) 
 {
 	int i, j, *xidx, *yidx, *xrank, *yrank, *i_perm, **Rank, **lowxidx, **higxidx, **lowyidx, **higyidx;
@@ -513,7 +696,9 @@ void UBI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int 
 	
 	
 	initRank(*n, Rank, xrank, yrank, i_perm);
-	*bcov = U_Ball_Information(n, Rank, lowxidx, higxidx, lowyidx, higyidx, i_perm, weight);
+	//*bcov = U_Ball_Information(n, Rank, lowxidx, higxidx, lowyidx, higyidx, i_perm, weight);
+	int nth = 4;
+	*bcov = U_Ball_Information_parallel(n, Rank, lowxidx, higxidx, lowyidx, higyidx, i_perm, weight, &nth);
 	for(j=0; j<*R; j++)
 	{
 	  // stop permutation if user stop it manually:
@@ -523,7 +708,8 @@ void UBI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int 
 	  }
 		resample2(i_perm, n);
 		initRank(*n, Rank, xrank, yrank, i_perm);
-		permuted_bcov[j] = U_Ball_Information(n, Rank, lowxidx, higxidx, lowyidx, higyidx, i_perm, weight);
+		//permuted_bcov[j] = U_Ball_Information(n, Rank, lowxidx, higxidx, lowyidx, higyidx, i_perm, weight);
+		permuted_bcov[j] = U_Ball_Information_parallel(n, Rank, lowxidx, higxidx, lowyidx, higyidx, i_perm, weight, &nth);
 	}
 
 	free_int_matrix(Rank, (*n) + 1, (*n) + 1);
