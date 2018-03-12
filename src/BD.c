@@ -1048,7 +1048,12 @@ void bd_test(double *bd, double *permuted_bd, double *xy, int *size, int *n, int
     n1 = size[0];
     n2 = size[1];
     if(*dst) {
-      BD(bd, permuted_bd, xy, &n1, &n2, &p, dst, R, weight, nthread);
+		if ((parallel_type) == 2) {
+			BD_parallel(bd, permuted_bd, xy, &n1, &n2, &p, dst, R, weight, nthread);
+		}
+		else {
+			BD(bd, permuted_bd, xy, &n1, &n2, &p, dst, R, weight, nthread); 
+		}
     } else {
 		if ((parallel_type) == 2) {
 			UBD_parallel(bd, permuted_bd, xy, &n1, &n2, R, weight, nthread);

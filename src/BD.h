@@ -22,6 +22,8 @@ void ranksort2(int n, int **Rxy, double **Dxy, int **Ixy);
 void Findx2(int *Rxy, int *Ixy, int *i_perm, int *n1, int *n2, int *Rx);
 void Findx(int **Rxy, int **Ixy, int *i_perm, int *n1, int *n2, int **Rx);
 double Ball_Divergence(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2, int *weight);
+double Ball_Divergence_parallel(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2, int *weight, int *nthread);
+double Ball_Divergence_wrapper(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2, int *weight, int *nthread);
 void ranksort3(int n, int *xyidx, double *xy, int **Rxy, int **Ixy);
 void get_ij_dst(double *xy, double *ij_dst, int *cumulate_size, int *size, int *n, int *p, int *q);
 void compute_cumulate_size(int *cumulate_size, int *size, int *k);
@@ -32,7 +34,9 @@ double ubd_value(double *xy, int *n1, int *n2, int *weight, int *nthread);
 double kbd_value(double *xy, int *size, int *n, int *k, int *weight, int *nthread);
 double ukbd_value(double *xy, int *size, int *k, int *weight, int *nthread);
 void BD(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *p, int *dst, int *R, int *weight, int *nthread);
+void BD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *p, int *dst, int *R, int *weight, int *nthread);
 void UBD(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *R, int *weight, int *nthread);
+void UBD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *R, int *weight, int *nthread);
 void KBD(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *R, int *weight, int *nthread);
 void UKBD(double *kbd, double *permuted_kbd, double *xy, int *size, int *n, int *k, int *R, int *weight, int *nthread);
 // R API function:
