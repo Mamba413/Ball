@@ -16,6 +16,38 @@ void test_value(double *computed_value, double true_value)
 	return;
 }
 
+
+double pvalue(double ball_stat_value, double *permuted_ball, int R)
+{
+	double larger_num = 0.0;
+	for (int i = 0; i < R; i++)
+	{
+		if (permuted_ball[i] < ball_stat_value)
+		{
+			larger_num += 1.0;
+		}
+	}
+	double p_value = 1.0 / (1.0 + larger_num);
+	return(p_value);
+}
+
+void test_multithread_permutation()
+{
+	double ball_stat_value = 0.0;
+	double permuted_ball[100];
+	double x[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	int size[2] = { 5, 5 };
+	int n = 10, k = 2, dst = 0, R = 100, weight = 0, nth = 4;
+	int parallel_type = 2;
+	bd_test(&ball_stat_value, permuted_ball, x, size, &n, &k, &dst, &R, &weight, &nth, &parallel_type);
+	double p_value = 0.0;
+	p_value = pvalue(ball_stat_value, permuted_ball, R);
+	printf("Ball statistics: %f; ", ball_stat_value);
+	printf("p-value: %f \n", p_value);
+	return;
+}
+
+
 void main()
 {
 	double tmp = 0.0;
@@ -76,6 +108,9 @@ void main()
 	//type = 1;
 	//dst = 0;
 	//bcov_test(bd_stat_value, permuted_bcov, m1, m2, &n, &R, &weight, &dst, &type);
+
+	test_multithread_permutation();
 	system("pause");
 	return;
 }
+
