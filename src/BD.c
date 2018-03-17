@@ -388,7 +388,7 @@ void BD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, 
 		omp_set_num_threads(*nthread);
 #endif
 		// Init parallel
-#pragma omp parallel
+		#pragma omp parallel
 		{
 			int **Rx_thread, *i_perm_thread, *i_perm_tmp_thread;
 			int k, i_thread;
@@ -396,7 +396,7 @@ void BD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, 
 			Rx_thread = alloc_int_matrix(n, n);
 			i_perm_thread = (int *)malloc(n * sizeof(int));
 			i_perm_tmp_thread = (int *)malloc(n * sizeof(int));
-#pragma omp critical
+			#pragma omp critical
 			{
 				for (k = 0; k < n; k++) {
 					//printf("In thread: %d\n", omp_get_thread_num());
@@ -410,13 +410,13 @@ void BD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, 
 					//printf("End assign\n");
 				}
 			}
-#pragma omp for
+			#pragma omp for
 			for (i_thread = 0; i_thread < (*R); i_thread++) {
 				// stop permutation if user stop it manually:
-				if (pending_interrupt()) {
-					print_stop_message();
-					break;
-				}
+				//if (pending_interrupt()) {
+				//	print_stop_message();
+				//	break;
+				//}
 				resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
 				Findx(Rxy, Ixy, i_perm_thread, n1, n2, Rx_thread);
 				ans = Ball_Divergence(Rxy, Rx_thread, i_perm_tmp_thread, n1, n2, weight);
@@ -546,7 +546,7 @@ void UBD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2,
 		{
 			int **Rx_thread, *i_perm_thread, *i_perm_tmp_thread;
 			int k, i_thread;
-			double ans = 0.0;
+			double ans_thread = 0.0;
 			Rx_thread = alloc_int_matrix(n, n);
 			i_perm_thread = (int *) malloc(n * sizeof(int));
 			i_perm_tmp_thread = (int *) malloc(n * sizeof(int));
@@ -567,14 +567,14 @@ void UBD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2,
 			#pragma omp for
 			for (i_thread = 0; i_thread < (*R); i_thread++) {
 				// stop permutation if user stop it manually:
-				if (pending_interrupt()) {
-					print_stop_message();
-					break;
-				}
+				//if (pending_interrupt()) {
+				//	print_stop_message();
+				//	break;
+				//}
 				resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
 				Findx(Rxy, Ixy, i_perm_thread, n1, n2, Rx_thread);
-				ans = Ball_Divergence(Rxy, Rx_thread, i_perm_tmp_thread, n1, n2, weight);
-				permuted_bd[i_thread] = ans;
+				ans_thread = Ball_Divergence(Rxy, Rx_thread, i_perm_tmp_thread, n1, n2, weight);
+				permuted_bd[i_thread] = ans_thread;
 			}
 		}
 	}

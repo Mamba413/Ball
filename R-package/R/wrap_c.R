@@ -68,16 +68,17 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
 #' @useDynLib Ball, .registration = TRUE
 #' @noRd
 #' 
-bcov_value_wrap_c <- function(x, y, n, weight, dst, type) {
+bcov_value_wrap_c <- function(x, y, n, weight, dst, type, num.threads) {
   bcov <- as.double(numeric(1))
   dst <- as.integer(dst)
   x <- as.double(x)
   y <- as.double(y)
   n <- as.integer(n)
   weight <- as.integer(weight)
+  num.threads <- as.integer(num.threads)
   type <- ifelse(type == "bcov", 1, 2)
   type <- as.integer(type)
-  res <- .C("bcov_stat", bcov, x, y, n, weight, dst, type)
+  res <- .C("bcov_stat", bcov, x, y, n, weight, dst, type, num.threads)
   bcov <- res[[1]]
   names(bcov) <- ifelse(weight, "wbcov", "bcov")
   if(type == 2) {
@@ -99,19 +100,20 @@ bcov_value_wrap_c <- function(x, y, n, weight, dst, type) {
 #' @useDynLib Ball, .registration = TRUE
 #' @noRd
 #' 
-bcov_test_wrap_c <- function(x, y, n, R, weight, dst, type) {
+bcov_test_wrap_c <- function(x, y, n, R, weight, dst, type, num.threads) {
   dst <- as.integer(dst)
   x <- as.double(x)
   y <- as.double(y)
   n <- as.integer(n)
   weight <- as.integer(weight)
+  num.threads <- as.integer(num.threads)
   R <- as.integer(R)
   type <- ifelse(type == "bcov", 1, 2)
   type <- as.integer(type)
   #
   bcov <- as.double(numeric(1))
   permuted_bcov <- as.double(numeric(R))
-  res <- .C("bcov_test", bcov, permuted_bcov, x, y, n, R, weight, dst, type)
+  res <- .C("bcov_test", bcov, permuted_bcov, x, y, n, R, weight, dst, type, num.threads)
   bcov <- res[[1]]
   names(bcov) <- ifelse(weight, "wbcov", "bcov")
   list("statistic" = bcov, "permuted_stat" = res[[2]], 

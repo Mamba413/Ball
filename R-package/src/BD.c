@@ -57,7 +57,7 @@ void Findx2(int *Rxy, int *Ixy, int *i_perm, int *n1, int *n2, int *Rx)
   Rx[Ixy[n-1]] = lastpos;
   
   for(j = n - 2; j>= 0; j--){
-    if(i_perm[Ixy[j]]==1){
+    if(i_perm[Ixy[j]] == 1){
       if(lastval != Rxy[Ixy[j]]){
         lastpos -= tmp;
         tmp = 0;
@@ -342,6 +342,99 @@ void BD(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *p, i
 }	 
 
 
+void BD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *p, int *dst, int *R, int *weight, int *nthread)
+{
+	int i, j, n;
+	int    **Ixy, **Rxy, **Rx, *i_perm, *i_perm_tmp;
+	double **Dxy;
+	double ans;
+
+	n = *n1 + *n2;
+	Dxy = alloc_matrix(n, n);
+	Ixy = alloc_int_matrix(n, n);
+	Rx = alloc_int_matrix(n, n);
+	Rxy = alloc_int_matrix(n, n);
+	i_perm = (int *)malloc(n * sizeof(int));
+	i_perm_tmp = (int *)malloc(n * sizeof(int));
+
+	// get vectorize distance matrix Dxy:
+	if (*dst == 1) {
+		vector2matrix(xy, Dxy, n, n, 1);
+	}
+
+	for (i = 0; i < n; i++)
+		for (j = 0; j < n; j++)
+			Ixy[i][j] = j;
+
+	for (i = 0; i < n; i++) {
+		if (i<(*n1)) {
+			i_perm[i] = 1;
+		}
+		else {
+			i_perm[i] = 0;
+		}
+		i_perm_tmp[i] = i;
+	}
+	for (i = 0; i < n; i++) {
+		quicksort(Dxy[i], Ixy[i], 0, n - 1);
+	}
+	ranksort2(n, Rxy, Dxy, Ixy);
+	free_matrix(Dxy, n, n);
+	Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
+	ans = Ball_Divergence(Rxy, Rx, i_perm_tmp, n1, n2, weight);
+	*bd = ans;
+	if (*R > 0) {
+#ifdef _OPENMP
+		omp_set_num_threads(*nthread);
+#endif
+		// Init parallel
+		#pragma omp parallel
+		{
+			int **Rx_thread, *i_perm_thread, *i_perm_tmp_thread;
+			int k, i_thread;
+			double ans = 0.0;
+			Rx_thread = alloc_int_matrix(n, n);
+			i_perm_thread = (int *)malloc(n * sizeof(int));
+			i_perm_tmp_thread = (int *)malloc(n * sizeof(int));
+			#pragma omp critical
+			{
+				for (k = 0; k < n; k++) {
+					//printf("In thread: %d\n", omp_get_thread_num());
+					if (k < (*n1)) {
+						i_perm_thread[k] = 1;
+					}
+					else {
+						i_perm_thread[k] = 0;
+					}
+					i_perm_tmp_thread[k] = k;
+					//printf("End assign\n");
+				}
+			}
+			#pragma omp for
+			for (i_thread = 0; i_thread < (*R); i_thread++) {
+				// stop permutation if user stop it manually:
+				//if (pending_interrupt()) {
+				//	print_stop_message();
+				//	break;
+				//}
+				resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
+				Findx(Rxy, Ixy, i_perm_thread, n1, n2, Rx_thread);
+				ans = Ball_Divergence(Rxy, Rx_thread, i_perm_tmp_thread, n1, n2, weight);
+				permuted_bd[i_thread] = ans;
+			}
+		}
+
+	}
+	// free matrix:
+	free_int_matrix(Ixy, n, n);
+	free_int_matrix(Rxy, n, n);
+	free_int_matrix(Rx, n, n);
+	free(i_perm);
+	free(i_perm_tmp);
+	return;
+}
+
+
 /*
  * Two sample ball divergence test, based on permutation technique (for univariate data)
  * input:
@@ -409,6 +502,91 @@ void UBD(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *R, 
   free(i_perm_tmp);
   free(xyidx);
   return;
+}
+
+
+void UBD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, int *R, int *weight, int *nthread)
+{
+	//  computes TST(x,y)  	
+	int i, j, n;
+	int **Ixy, **Rxy, **Rx, *i_perm, *i_perm_tmp, *xyidx;
+	double ans;
+
+	n = *n1 + *n2;
+	Ixy = alloc_int_matrix(n, n);
+	Rx = alloc_int_matrix(n, n);
+	Rxy = alloc_int_matrix(n, n);
+	i_perm = (int *) malloc(n * sizeof(int));
+	i_perm_tmp = (int *) malloc(n * sizeof(int));
+	xyidx = (int *) malloc(n * sizeof(int));
+	for (i = 0; i < n; i++) {
+		xyidx[i] = i;
+		for (j = 0; j < n; j++)
+			Ixy[i][j] = j;
+	}
+
+	for (i = 0; i < n; i++) {
+		if (i<(*n1))
+			i_perm[i] = 1;
+		else
+			i_perm[i] = 0;
+		i_perm_tmp[i] = i;
+	}
+
+	quicksort(xy, xyidx, 0, n - 1);
+	ranksort3(n, xyidx, xy, Rxy, Ixy);
+	Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
+	ans = Ball_Divergence(Rxy, Rx, i_perm_tmp, n1, n2, weight);	
+	*bd = ans;
+	free(i_perm);
+	free(i_perm_tmp);
+	// 
+	if (*R > 0) {
+#ifdef _OPENMP
+		omp_set_num_threads(*nthread);
+#endif
+		#pragma omp parallel
+		{
+			int **Rx_thread, *i_perm_thread, *i_perm_tmp_thread;
+			int k, i_thread;
+			double ans_thread = 0.0;
+			Rx_thread = alloc_int_matrix(n, n);
+			i_perm_thread = (int *) malloc(n * sizeof(int));
+			i_perm_tmp_thread = (int *) malloc(n * sizeof(int));
+			#pragma omp critical
+			{
+				for (k = 0; k < n; k++) {
+//#ifdef _OPENMP
+//					printf("In thread: %d\n", omp_get_thread_num());
+//#endif
+					if (k < (*n1)) {
+						i_perm_thread[k] = 1;
+					}
+					else {
+						i_perm_thread[k] = 0;
+					}
+					i_perm_tmp_thread[k] = k;
+					//printf("End assign\n");
+				}
+			}
+			#pragma omp for
+			for (i_thread = 0; i_thread < (*R); i_thread++) {
+				resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
+				Findx(Rxy, Ixy, i_perm_thread, n1, n2, Rx_thread);
+				ans_thread = Ball_Divergence(Rxy, Rx_thread, i_perm_tmp_thread, n1, n2, weight);
+				permuted_bd[i_thread] = ans_thread;
+#ifdef _OPENMP
+				printf("ball value: %f; Thread number: %d\n", ans_thread, omp_get_thread_num());
+#endif
+			}
+			printf("End\n");
+		}
+	}
+	free_int_matrix(Ixy, n, n);
+	free_int_matrix(Rxy, n, n);
+	free_int_matrix(Rx, n, n);
+	free(xyidx);
+	return;
 }
 
 
@@ -857,13 +1035,37 @@ void bd_test(double *bd, double *permuted_bd, double *xy, int *size, int *n, int
 {
   int n1 = 0, n2 = 0;
   int p = 1;
+  //parallel method
+  // if parallel_type == 1, we parallel the computation through statistics.
+  // if parallel_type == 2, we parallel the computation through permutation.
+  int parallel_type = 1;
+  /*
+   int parallel_type = 2;
+   if (((*n) > 500)) {
+   parallel_type = 1;
+   }
+   if ((*R) < 300) {
+   *nthread = 1;
+   }
+   */
+  //
   if((*k) == 2) {
     n1 = size[0];
     n2 = size[1];
     if(*dst) {
-      BD(bd, permuted_bd, xy, &n1, &n2, &p, dst, R, weight, nthread);
+		if ((parallel_type) == 2) {
+			BD_parallel(bd, permuted_bd, xy, &n1, &n2, &p, dst, R, weight, nthread);
+		}
+		else {
+			BD(bd, permuted_bd, xy, &n1, &n2, &p, dst, R, weight, nthread); 
+		}
     } else {
-      UBD(bd, permuted_bd, xy, &n1, &n2, R, weight, nthread);
+		if ((parallel_type) == 2) {
+			UBD_parallel(bd, permuted_bd, xy, &n1, &n2, R, weight, nthread);
+		}
+		else {
+			UBD(bd, permuted_bd, xy, &n1, &n2, R, weight, nthread);
+		}
     } 
   } else {
     if(*dst) {

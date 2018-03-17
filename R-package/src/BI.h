@@ -21,19 +21,21 @@
 void Merge(int *permutation, int *source, int *inversion_count, int dim, int n);
 int Inversions(int *permutation, int *source, int *inversion_count,int dim, int n);
 double Ball_Information(int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *weight);
-void BI(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight);
+void BI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *R, int *weight, int *thread);
 void computeRank(int n, int **Rank);
 void initRank(int n, int **Rank, int *xrank, int *yrank, int *i_perm);
 void ranksort(int *n, int *zrank, double *z, int *zidx);
 void sort(int *n, int *zidx, double *z, int **dzidx);
 void createidx(int *n, int *zidx, double *z, int **lowzidx, int **higzidx);
 double U_Ball_Information(int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *weight);
-void UBI(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight);
-double ubcov_value(double *x, double *y, int *n, int *weight);
-double bcov_value(double *x, double *y, int *n, int *weight);
+double U_Ball_Information_parallel(int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *weight, int *nthread);
+double U_Ball_Information_wrapper(int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *weight, int *nthread);
+void UBI(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight, int *thread);
+double ubcov_value(double *x, double *y, int *n, int *weight, int *thread);
+double bcov_value(double *x, double *y, int *n, int *weight, int *thread);
 // R API function:
-void bcov_stat(double *bcor, double *x, double *y, int *n, int *weight, int *dst, int *type);
-void bcov_test(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight, int *dst, int *type);
+void bcov_stat(double *bcor, double *x, double *y, int *n, int *weight, int *dst, int *type, int *thread);
+void bcov_test(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight, int *dst, int *type, int *thread);
 
 
 #endif /* BI_H_ */

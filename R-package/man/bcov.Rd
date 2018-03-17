@@ -5,9 +5,9 @@
 \alias{bcor}
 \title{Ball Correlation and Covariance Statistics}
 \usage{
-bcov(x, y, dst = FALSE, weight = FALSE)
+bcov(x, y, dst = FALSE, weight = FALSE, num.threads = 2)
 
-bcor(x, y, dst = FALSE, weight = FALSE)
+bcor(x, y, dst = FALSE, weight = FALSE, num.threads = 2)
 }
 \arguments{
 \item{x}{a numeric vector, matirx, data.frame or \code{dist} object or list contains numeric vector, matrix or data.frame.}
@@ -18,6 +18,8 @@ bcor(x, y, dst = FALSE, weight = FALSE)
 
 \item{weight}{when \code{weight = TRUE}, weighted ball covariance or weighted ball correlation is used instead of ball covariance
 or ball correlation. Default: \code{weight = FALSE}}
+
+\item{num.threads}{Number of threads. Default \code{num.threads = 2}.}
 }
 \value{
 \item{\code{bcov }}{ sample version of ball covariance.}

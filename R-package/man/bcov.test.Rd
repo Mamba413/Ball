@@ -4,7 +4,8 @@
 \alias{bcov.test}
 \title{Ball Covariance Test}
 \usage{
-bcov.test(x, y = NULL, R = 99, dst = FALSE, weight = FALSE, seed = 4)
+bcov.test(x, y = NULL, R = 99, dst = FALSE, weight = FALSE, seed = 4,
+  num.threads = 2)
 }
 \arguments{
 \item{x}{a numeric vector, matirx, data.frame or \code{dist} object or list contains numeric vector, matrix or data.frame.}
@@ -19,6 +20,8 @@ bcov.test(x, y = NULL, R = 99, dst = FALSE, weight = FALSE, seed = 4)
 or ball correlation. Default: \code{weight = FALSE}}
 
 \item{seed}{the random seed.}
+
+\item{num.threads}{Number of threads. Default \code{num.threads = 2}.}
 }
 \value{
 bcov.test returns a list with class "htest" containing the following components:
