@@ -139,6 +139,7 @@ apply_bcor_wrap <- function(x, y, n, R, weight, dst) {
   R <- as.integer(R)
   y <- as.double(y)
   type <- as.integer(2)
+  nthread <- integer(1)
   #
   bcov_stat_list <- apply(x, 2, function(z) {
     # data prepare:
@@ -150,10 +151,10 @@ apply_bcor_wrap <- function(x, y, n, R, weight, dst) {
     # calculate statistic or pvalue:
     bcov <- as.double(numeric(1))
     if(R == 0) {
-      res <- .C("bcov_stat", bcov, z, y, n, weight, dst, type)
+      res <- .C("bcov_stat", bcov, z, y, n, weight, dst, type, nthread)
     } else {
       permuted_bcov <- as.double(numeric(R))
-      res <- .C("bcov_test", bcov, permuted_bcov, z, y, n, R, weight, dst, type)
+      res <- .C("bcov_test", bcov, permuted_bcov, z, y, n, R, weight, dst, type, nthread)
       res[[1]] <- calculatePvalue(res[[1]], res[[2]])
     }
     # return result:

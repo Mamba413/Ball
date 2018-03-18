@@ -95,3 +95,6 @@ Python-package/test/
 src/cball/cball/Debug/
 Python-package/src/cball.py
 Python-package/.idea/
+R-package/src-i386/
+R-package/src-x64/
+Ball_1.0.0.zip
