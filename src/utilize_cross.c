@@ -53,7 +53,7 @@ int pending_interrupt_status()
 */
 int r_available_rand()
 {
-	int random_value = (int)(RAND_MAX*rand() + 0.5);
+	int random_value = (int) (rand());
 	return random_value;
 }
 
@@ -63,6 +63,7 @@ int r_available_rand()
 */
 int random_index(int n, int i)
 {
+	// RAND_MAX == 32767
 	int index = i + r_available_rand() / (RAND_MAX / (n - i) + 1);
 	return index;
 }
