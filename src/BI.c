@@ -345,7 +345,7 @@ double Ball_Information_parallel(int *n, double **Dx, double **Dy, int **xidx, i
 
 double Ball_Information_wrapper(int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *weight, int *nthread)
 {
-	if (*nthread <= 32) {
+	if (*nthread == 1) {
 		return Ball_Information(n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, weight);
 	}
 	else {
