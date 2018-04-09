@@ -335,9 +335,8 @@ double Ball_Information_parallel(int *n, double **Dx, double **Dy, int **xidx, i
 		free(xy_index);
 		free(yrank);
 		free(xy_temp);
-		free_int_matrix(xyidx, *n, *n);
 	}
-
+	free_int_matrix(xyidx, *n, *n);
 	rct0_value = rct0_value / (1.0*(*n)*(*n));
 	return(rct0_value);
 }
@@ -345,7 +344,7 @@ double Ball_Information_parallel(int *n, double **Dx, double **Dy, int **xidx, i
 
 double Ball_Information_wrapper(int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *weight, int *nthread)
 {
-	if (*nthread <= 32) {
+	if (*nthread == 1) {
 		return Ball_Information(n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, weight);
 	}
 	else {
