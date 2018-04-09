@@ -335,9 +335,8 @@ double Ball_Information_parallel(int *n, double **Dx, double **Dy, int **xidx, i
 		free(xy_index);
 		free(yrank);
 		free(xy_temp);
-		free_int_matrix(xyidx, *n, *n);
 	}
-
+	free_int_matrix(xyidx, *n, *n);
 	rct0_value = rct0_value / (1.0*(*n)*(*n));
 	return(rct0_value);
 }
