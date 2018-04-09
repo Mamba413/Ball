@@ -21,3 +21,24 @@ test_that("Error if input data contain abnormal values", {
   expect_error(bd.test(x1, x2))
 })
 
+
+test_that("Multi-thread support is valid!", {
+  cat("Multi-thread computation via permutation.\n")
+  x <- c(rnorm(100, mean = 0.1), rnorm(100, mean = 0))
+  x1 <- matrix(rnorm(100 * 2), ncol = 2)
+  x2 <- matrix(rnorm(100 * 2), ncol = 2)
+  #
+  res <- bd.test(x, size = c(100, 100), R = 1999, num.threads = 2)
+  expect_length(res$permuted_stat, 1999)
+  res <- bd.test(x1, x2, R = 1999, num.threads = 2)
+  expect_length(res$permuted_stat, 1999)
+  cat("Multi-thread computation via statistics.\n")
+  x <- c(rnorm(500, mean = 0.1), rnorm(500, mean = 0))
+  x1 <- matrix(rnorm(500 * 2), ncol = 2)
+  x2 <- matrix(rnorm(500 * 2), ncol = 2)
+  #
+  res <- bd.test(x, size = c(500, 500), R = 199, num.threads = 2)
+  expect_length(res$permuted_stat, 199)
+  res <- bd.test(x1, x2, R = 199, num.threads = 2)
+  expect_length(res$permuted_stat, 199)
+})

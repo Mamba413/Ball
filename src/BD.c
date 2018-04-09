@@ -417,7 +417,10 @@ void BD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, 
 				//	print_stop_message();
 				//	break;
 				//}
-				resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
+#pragma omp critical
+				{
+					resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
+				}
 				Findx(Rxy, Ixy, i_perm_thread, n1, n2, Rx_thread);
 				ans = Ball_Divergence(Rxy, Rx_thread, i_perm_tmp_thread, n1, n2, weight);
 				permuted_bd[i_thread] = ans;
@@ -574,7 +577,11 @@ void UBD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2,
 				//	print_stop_message();
 				//	break;
 				//}
-				resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
+#pragma omp critical
+				{
+					// TODO: I don't know why this command can only be runned in a single thread. But it makes R console temporarily available and seems to be correct.
+					resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
+				}
 				Findx(Rxy, Ixy, i_perm_thread, n1, n2, Rx_thread);
 				ans_thread = Ball_Divergence(Rxy, Rx_thread, i_perm_tmp_thread, n1, n2, weight);
 				permuted_bd[i_thread] = ans_thread;
@@ -1043,10 +1050,10 @@ void bd_test(double *bd, double *permuted_bd, double *xy, int *size, int *n, int
   // if parallel_type == 1, we parallel the computation through statistics.
   // if parallel_type == 2, we parallel the computation through permutation.
   int parallel_type = 2;
-  if (((*n) > 500)) {
+  if (((*n) >= 500)) {
 	  parallel_type = 1;
   }
-  if ((*R) < 300) {
+  if ((*R) <= 100) {
 	  *nthread = 1;
   }
   //

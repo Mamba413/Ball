@@ -206,10 +206,7 @@ double Ball_Information(int *n, double **Dx, double **Dy, int **xidx, int **yidx
 	return(rct0);
 }
 
-/*
-Ball_Information_parallel have some error (ShiYun Lin should modify it!)
-The error occurs when we set nthread = 33;
-*/
+
 double Ball_Information_parallel(int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *weight, int *nthread)
 {
 	double rct0_value = 0.0;

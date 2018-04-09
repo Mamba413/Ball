@@ -417,11 +417,17 @@ void BD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, 
 				//	print_stop_message();
 				//	break;
 				//}
-				resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
+#pragma omp critical
+				{
+					resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
+				}
 				Findx(Rxy, Ixy, i_perm_thread, n1, n2, Rx_thread);
 				ans = Ball_Divergence(Rxy, Rx_thread, i_perm_tmp_thread, n1, n2, weight);
 				permuted_bd[i_thread] = ans;
 			}
+			free(i_perm_thread);
+			free(i_perm_tmp_thread);
+			free_int_matrix(Rx_thread, n, n);
 		}
 
 	}
@@ -538,9 +544,6 @@ void UBD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2,
 	Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
 	ans = Ball_Divergence(Rxy, Rx, i_perm_tmp, n1, n2, weight);	
 	*bd = ans;
-	free(i_perm);
-	free(i_perm_tmp);
-	// 
 	if (*R > 0) {
 #ifdef _OPENMP
 		omp_set_num_threads(*nthread);
@@ -556,9 +559,7 @@ void UBD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2,
 			#pragma omp critical
 			{
 				for (k = 0; k < n; k++) {
-//#ifdef _OPENMP
-//					printf("In thread: %d\n", omp_get_thread_num());
-//#endif
+					//printf("In thread: %d\n", omp_get_thread_num());
 					if (k < (*n1)) {
 						i_perm_thread[k] = 1;
 					}
@@ -571,20 +572,30 @@ void UBD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2,
 			}
 			#pragma omp for
 			for (i_thread = 0; i_thread < (*R); i_thread++) {
-				resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
+				// stop permutation if user stop it manually:
+				//if (pending_interrupt()) {
+				//	print_stop_message();
+				//	break;
+				//}
+#pragma omp critical
+				{
+					// TODO: I don't know why this command can only be runned in a single thread. But it makes R console temporarily available and seems to be correct.
+					resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
+				}
 				Findx(Rxy, Ixy, i_perm_thread, n1, n2, Rx_thread);
 				ans_thread = Ball_Divergence(Rxy, Rx_thread, i_perm_tmp_thread, n1, n2, weight);
 				permuted_bd[i_thread] = ans_thread;
-#ifdef _OPENMP
-				printf("ball value: %f; Thread number: %d\n", ans_thread, omp_get_thread_num());
-#endif
 			}
-			printf("End\n");
+			free(i_perm_thread);
+			free(i_perm_tmp_thread);
+			free_int_matrix(Rx_thread, n, n);
 		}
 	}
 	free_int_matrix(Ixy, n, n);
 	free_int_matrix(Rxy, n, n);
 	free_int_matrix(Rx, n, n);
+	free(i_perm);
+	free(i_perm_tmp);
 	free(xyidx);
 	return;
 }
@@ -1038,16 +1049,13 @@ void bd_test(double *bd, double *permuted_bd, double *xy, int *size, int *n, int
   //parallel method
   // if parallel_type == 1, we parallel the computation through statistics.
   // if parallel_type == 2, we parallel the computation through permutation.
-  int parallel_type = 1;
-  /*
-   int parallel_type = 2;
-   if (((*n) > 500)) {
-   parallel_type = 1;
-   }
-   if ((*R) < 300) {
-   *nthread = 1;
-   }
-   */
+  int parallel_type = 2;
+  if (((*n) >= 500)) {
+	  parallel_type = 1;
+  }
+  if ((*R) <= 100) {
+	  *nthread = 1;
+  }
   //
   if((*k) == 2) {
     n1 = size[0];

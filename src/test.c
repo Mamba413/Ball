@@ -44,7 +44,7 @@ void test_multithread_permutation()
 	//int size[5] = { 5, 5, 5 };
 	//int k = 3;
 	//int n = 15;
-	int dst = 0, R = 200, weight = 0, nth = 4;
+	int dst = 0, R = 500, weight = 0, nth = 4;
 	int parallel_type = 2;
 	bd_test(&ball_stat_value, permuted_ball, x, size, &n, &k, &dst, &R, &weight, &nth, &parallel_type);
 	double p_value = 0.0;
