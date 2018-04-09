@@ -422,6 +422,9 @@ void BD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, 
 				ans = Ball_Divergence(Rxy, Rx_thread, i_perm_tmp_thread, n1, n2, weight);
 				permuted_bd[i_thread] = ans;
 			}
+			free(i_perm_thread);
+			free(i_perm_tmp_thread);
+			free_int_matrix(Rx_thread, n, n);
 		}
 
 	}
@@ -576,6 +579,9 @@ void UBD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2,
 				ans_thread = Ball_Divergence(Rxy, Rx_thread, i_perm_tmp_thread, n1, n2, weight);
 				permuted_bd[i_thread] = ans_thread;
 			}
+			free(i_perm_thread);
+			free(i_perm_tmp_thread);
+			free_int_matrix(Rx_thread, n, n);
 		}
 	}
 	free_int_matrix(Ixy, n, n);
