@@ -101,26 +101,45 @@ def bd_test(x, y=None, r=99, dst=False, size=[]):
     weight = False
     method = 'permute'
     R = r
-    if type(size) is np.ndarray:
+
+    if type(x) == list:
+        if np.array(x, dtype=np.double).ndim == 1:
+            x = np.array(x, dtype=np.double)
+
+    if type(size) == np.ndarray:
         size = size.tolist()
+
 
     if x is None or y is None:
         # examine input arguments x and y:
-        if type(x) is list:
+        if type(x) == pd.core.frame.DataFrame:
+            x = np.array(x)
+            x = np.transpose(x)
+            if len(size) != len(x):
+                for i in range(0, x.shape[0]):
+                    size.append(x[i].shape[0])
+
+        if type(x) == list:
             for i in range(0, len(x)):
-                size.append(x[i].shape[0])
-                x[i] = np.matrix(x[i])
+                x[i] = np.array(x[i], dtype=np.double)
+                if len(size)!=len(x):
+                    size.append(x[i].shape[0])
+                #x[i] = np.matrix(x[i])
                 x[i] = np.transpose(x[i])
             a = x[0]
             for i in range(1, len(x)):
                 a = np.row_stack((a, x[i]))
             x = a
+            examine_None(x, y)
 
         else:
             x = get_matrixed_x(x, y)
+            examine_None(x, y)
+
 
         # examine input arguments size:
         examine_size_arguments(x, size)
+        size = np.array(size)
 
         if dst > 0:
             xy = np.array(x.flatten())
@@ -133,12 +152,23 @@ def bd_test(x, y=None, r=99, dst=False, size=[]):
                 dst = True
             else:
                 xy = x
-                xy = np.asarray(xy)
-                if xy.ndim != 1:
-                    xy = xy[:, 0]
-                dst = False
+                if len(np.array(xy.flatten()).shape) == 1:
+                    xy = np.array(xy.flatten())
+                else:
+                    xy = np.array(xy.flatten())[0,:]
+                #xy = np.asarray(xy)
+                #if xy.ndim != 1:
+                   # xy = xy[:, 0]
+                #dst = False
 
     else:
+        if type(x) == pd.core.frame.DataFrame:
+            x = np.array(x)
+            x = np.transpose(x)
+        if type(y) == pd.core.frame.DataFrame:
+            y = np.array(y)
+            y = np.transpose(y)
+        examine_None(x, y)
         y = y.copy()
         #
         x = np.matrix(x)
