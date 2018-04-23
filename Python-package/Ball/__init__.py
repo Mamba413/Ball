@@ -7,3 +7,4 @@
 
 
 from Ball.bd_test import bd_test, bd
+from Ball.bcov import bcov_test, bcov, bcor

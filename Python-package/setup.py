@@ -8,7 +8,7 @@ Created on Thu Feb  1 16:57:31 2018
 from setuptools import setup, find_packages, Extension
 
 cball_module = Extension('_cball',
-                         sources=['src/cball_wrap.c', 'src/BD.c', 'src/utilities.c',
+                         sources=['src/cball_wrap.c', 'src/BD.c', 'src/utilities.c', 'src/BI.c',
                                   'src/utilize_R.c', 'src/utilize_cross.c', 'src/cball.i'],
                          )
 

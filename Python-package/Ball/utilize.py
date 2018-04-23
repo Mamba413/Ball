@@ -7,6 +7,9 @@
 
 
 import numpy as np
+import random
+import math
+import pandas as pd
 from sklearn.metrics.pairwise import euclidean_distances
 
 
@@ -16,6 +19,16 @@ def get_matrixed_x(x, y):
     if x is None:
         x = y
     return np.array(x)
+
+def examine_None(x, y):
+    if x is not None:
+        x = np.array(x.flatten())
+        if np.any([np.isnan(i) for i in x]):
+            raise ValueError("There is None in x!")
+    if y is not None:
+        y = np.array(y.flatten())
+        if np.any([np.isnan(i) for i in y]):
+            raise ValueError("There is None in y!")
 
 
 def examine_size_arguments(x, size):
@@ -35,7 +48,13 @@ def examine_size_arguments(x, size):
         raise ValueError("Size should be a list that length longer than 1, with all elements positive integer!")
 
     # examine the consistency between x and size:
-    x_row = x.shape[0]
+    if len(x.shape) == 1:
+        x_row = x.shape[0]
+    else:
+        x_row = 1
+        for i in range(len(x.shape)):
+            x_row = x_row*x.shape[i]
+
     n = np.sum(size)
     if x_row != n:
         raise ValueError("Size arguments is invalid!")
@@ -43,7 +62,8 @@ def examine_size_arguments(x, size):
 
 def get_vectorized_distance_matrix(x):
     Dxy = euclidean_distances(x, x)
-    Dxy = np.array(Dxy.flatten())[0, :]
+    #Dxy = np.array(Dxy.flatten())[0]
+    Dxy = np.array(Dxy.flatten())
     return Dxy
 
 
@@ -86,4 +106,51 @@ def calculatePvalue(statValue, NullDistribution):
 #     else :
 #         if n > 8000 :
 #             raise Warning("You may suffer from memory insufficient!")
+
+def examine_x_y(x, y):
+    dim_x = [x.shape[0], x.shape[1]]
+    dim_y = [y.shape[0], y.shape[1]]
+
+    if dim_x[0] == 1 and dim_x[1] == 1:
+        if np.array(x).flatten()[0] is None:
+            raise ValueError("x is None!")
+    if dim_y[0] == 1 and dim_y[1] == 1:
+        if np.array(y).flatten()[0] is None:
+            raise ValueError("y is None!")
+
+    n = dim_x[0]
+
+    if n != dim_y[0]:
+        raise ValueError("x and y have different sample sizes!")
+    a = np.array(y).flatten()
+    for i in range(0, len(a)):
+        a[i] = (a[i]==None)
+    if np.any(a):
+        raise ValueError("Missing data in y!")
+    a = np.array(x).flatten()
+    for i in range(0, len(a)):
+        a[i] = (a[i] == None)
+    if np.any(a):
+        raise ValueError("Missing data in x!")
+    if dim_x[1] == 1 and dim_y[1] == 1:
+        p = 1
+    else :
+        p = -1
+
+    return np.array([n, p])
+
+def examine_type_arguments(type_copy):
+    if type_copy is not 'bcov' and type_copy is not 'bcor':
+        type_copy = 'bcov'
+    return type_copy
+
+# def examine_seed_arguments(seed):
+#   if seed is None:
+#     seed = runif(1 , 0, .Machine$integer.max)???
+#   return seed
+
+
+
+
+
 

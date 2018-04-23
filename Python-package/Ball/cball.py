@@ -173,6 +173,14 @@ bd_stat = _cball.bd_stat
 def bd_test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10):
     return _cball.bd_test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)
 bd_test = _cball.bd_test
+
+def bcov_stat(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8):
+    return _cball.bcov_stat(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+bcov_stat = _cball.bcov_stat
+
+def bcov_test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10):
+    return _cball.bcov_test(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)
+bcov_test = _cball.bcov_test
 # This file is compatible with both classic and new-style classes.
 
 

@@ -5,13 +5,14 @@
 # @Mail    : zhuj37@mail2.sysu.edu.cn
 # @File    : wrap_c.py
 
-
+import numpy as np
 from numpy import alen as npalen
 from numpy import sum as npsum
 from numpy import array as nparray
 from numpy import double
 
 from Ball.cball import bd_stat, bd_test
+from Ball.cball import bcov_stat, bcov_test
 from Ball.cball import doubleArray, intArray
 
 
@@ -131,3 +132,87 @@ def bd_test_wrap_c(xy, size, R, weight, dst, num_thread=1):
     bd_list = [bd[0]]
     return bd_list, permuted_bd_list
 
+
+def bcov_value_wrap_c(x, y, n, weight, dst, type_copy, num_threads=1):
+    bcov = doubleArray(1)
+    x = nparray(x, dtype=double)
+    y = nparray(y, dtype=double)
+    num = npalen(x)
+    x_copy = doubleArray(num)
+    for i, x_value in enumerate(x):
+        x_copy[i] = x_value[0]
+        pass
+    num = npalen(y)
+    y_copy = doubleArray(num)
+    for i, y_value in enumerate(y):
+        y_copy[i] = y_value[0]
+        pass
+
+    dst_copy = intArray(1)
+    n_copy = intArray(1)
+    weight_copy = intArray(1)
+    num_threads_copy = intArray(1)
+
+    dst_copy[0] = int(dst)
+    n_copy[0] = int(n)
+    weight_copy[0] = int(weight)
+    num_threads_copy[0] = int(num_threads)
+
+
+    if type_copy == "bcov":
+        type1 = 1
+    else:
+        type1 = 2
+    type_copy = intArray(1)
+    type_copy[0] = int(type1)
+
+    bcov_stat(bcov, x_copy, y_copy, n_copy, weight_copy, dst_copy, type_copy, num_threads_copy)
+    bcov_value = float(bcov[0])
+    return bcov_value
+
+
+def bcov_test_wrap_c(x, y, n, R, weight, dst, type_copy, num_threads=1):
+    bcov = doubleArray(1)
+    permuted_bcov = doubleArray(R)
+    x = nparray(x, dtype=double)
+    y = nparray(y, dtype=double)
+    num = npalen(x)
+    x_copy = doubleArray(num)
+    for i, x_value in enumerate(x):
+        x_copy[i] = x_value
+        pass
+    num = npalen(y)
+    y_copy = doubleArray(num)
+    for i, y_value in enumerate(y):
+        y_copy[i] = y_value
+        pass
+
+
+    n_copy = intArray(1)
+    weight_copy = intArray(1)
+    dst_copy = intArray(1)
+    nthreads = intArray(1)
+    r = intArray(1)
+
+    n_copy[0] = int(n)
+    weight_copy[0] = int(weight)
+    dst_copy[0] = int(dst)
+    nthreads[0] = int(num_threads)
+    r[0] = int(R)
+    if type_copy == "bcov":
+        type1 = 1
+    else:
+        type1 = 2
+    type_copy = intArray(1)
+    type_copy[0] = int(type1)
+
+
+    bcov_test(bcov, permuted_bcov, x_copy, y_copy, n_copy, r, weight_copy, dst_copy, type_copy, nthreads)
+
+    permuted_bcov_list = []
+    for i in range(R):
+        permuted_bcov_list.append(permuted_bcov[i])
+        pass
+
+    bcov_list = [bcov[0]]
+    return bcov_list, permuted_bcov_list

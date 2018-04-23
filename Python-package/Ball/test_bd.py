@@ -31,8 +31,6 @@ class Test_bd(TestCase):
         bd_value = bd_test(x=x, size=np.array([5, 5]))
         bd_value = bd_value[0][0]
 
-        x = [[1,2,3],[4,5,6],[7,8,9]]
-        bd_test(x=x,size=[3,3,3])
 
 
 
