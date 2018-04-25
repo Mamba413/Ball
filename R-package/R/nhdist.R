@@ -45,7 +45,7 @@
 #' Dmat <- nhdist(macaques[["x"]], method = "rie")
 #' 
 nhdist <- function(x, method = 'geodesic') {
-  METHODS <- c("geodesic", "compositional", "riemann")
+  METHODS <- c("geodesic", "compositional", "riemann", "bhattacharyya", "angular")
   methodIndex <- pmatch(method, METHODS)
   if (is.na(method)) 
     stop("invalid distance method")
@@ -56,13 +56,17 @@ nhdist <- function(x, method = 'geodesic') {
   if(method %in% c('geodesic')) {
     return(distsurface(x))
   } else if(method %in% c('compositional')) {
-    return(distcompositional(x))
+    return(dist_Bhattacharyya(x))
+  } else if(method == "bhattacharyya") {
+    return(dist_Bhattacharyya(x))
+  } else if(method == "angular") {
+    return(dist_Angular(x))
   } else if(method %in% c('riemann')) {
     return(distrieman(x))
   }
 }
 
-#' Distance for compositional data
+#' Distance for compositional data (Bhattacharyya distance)
 #'
 #' @param x Matrix object.
 #'
@@ -72,15 +76,39 @@ nhdist <- function(x, method = 'geodesic') {
 #' data("ArcticLake")
 #' head(ArcticLake)
 #' distcompositional(ArcticLake[, 1:3])
-distcompositional <- function(x) {
+dist_bhattacharyya <- function(x) {
   xRowSum <- rowSums(x)
   x <- apply(x, 2, function(z) {
     z/xRowSum
   })
-  x <- apply(x, 2, sqrt)
+  x <- sqrt(x)
   #
   distsurface(x)
 }
+
+
+#' Distance for compositional data (Angular distance)
+#'
+#' @param x Matrix object.
+#'
+#' @return Distance matrix
+#' @noRd
+#' @examples
+#' data("ArcticLake")
+#' head(ArcticLake)
+#' distcompositional(ArcticLake[, 1:3])
+dist_angular <- function(x) {
+  x <- x^2
+  xRowSum <- rowSums(x)
+  x <- apply(x, 2, function(z) {
+    z/xRowSum
+  })
+  x <- sqrt(x)
+  #
+  distsurface(x)
+}
+
+
 
 #' @title Geodesic Distance in Unit Ball
 #'
