@@ -56,11 +56,11 @@ nhdist <- function(x, method = 'geodesic') {
   if(method %in% c('geodesic')) {
     return(distsurface(x))
   } else if(method %in% c('compositional')) {
-    return(dist_Bhattacharyya(x))
+    return(dist_bhattacharyya(x))
   } else if(method == "bhattacharyya") {
-    return(dist_Bhattacharyya(x))
+    return(dist_bhattacharyya(x))
   } else if(method == "angular") {
-    return(dist_Angular(x))
+    return(dist_angular(x))
   } else if(method %in% c('riemann')) {
     return(distrieman(x))
   }
