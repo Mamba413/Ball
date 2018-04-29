@@ -383,6 +383,11 @@ void BD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, 
 	Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
 	ans = Ball_Divergence(Rxy, Rx, i_perm_tmp, n1, n2, weight);
 	*bd = ans;
+
+	free_int_matrix(Rx, n, n);
+	free(i_perm);
+	free(i_perm_tmp);
+
 	if (*R > 0) {
 #ifdef _OPENMP
 		omp_set_num_threads(*nthread);
@@ -412,11 +417,6 @@ void BD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, 
 			}
 			#pragma omp for
 			for (i_thread = 0; i_thread < (*R); i_thread++) {
-				// stop permutation if user stop it manually:
-				//if (pending_interrupt()) {
-				//	print_stop_message();
-				//	break;
-				//}
 #pragma omp critical
 				{
 					resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
@@ -434,9 +434,6 @@ void BD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2, 
 	// free matrix:
 	free_int_matrix(Ixy, n, n);
 	free_int_matrix(Rxy, n, n);
-	free_int_matrix(Rx, n, n);
-	free(i_perm);
-	free(i_perm_tmp);
 	return;
 }
 
@@ -544,6 +541,12 @@ void UBD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2,
 	Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
 	ans = Ball_Divergence(Rxy, Rx, i_perm_tmp, n1, n2, weight);	
 	*bd = ans;
+
+	free_int_matrix(Rx, n, n);
+	free(i_perm);
+	free(i_perm_tmp);
+	free(xyidx);
+
 	if (*R > 0) {
 #ifdef _OPENMP
 		omp_set_num_threads(*nthread);
@@ -572,11 +575,6 @@ void UBD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2,
 			}
 			#pragma omp for
 			for (i_thread = 0; i_thread < (*R); i_thread++) {
-				// stop permutation if user stop it manually:
-				//if (pending_interrupt()) {
-				//	print_stop_message();
-				//	break;
-				//}
 #pragma omp critical
 				{
 					// TODO: I don't know why this command can only be runned in a single thread. But it makes R console temporarily available and seems to be correct.
@@ -593,10 +591,7 @@ void UBD_parallel(double *bd, double *permuted_bd, double *xy, int *n1, int *n2,
 	}
 	free_int_matrix(Ixy, n, n);
 	free_int_matrix(Rxy, n, n);
-	free_int_matrix(Rx, n, n);
-	free(i_perm);
-	free(i_perm_tmp);
-	free(xyidx);
+
 	return;
 }
 
@@ -1050,7 +1045,7 @@ void bd_test(double *bd, double *permuted_bd, double *xy, int *size, int *n, int
   // if parallel_type == 1, we parallel the computation through statistics.
   // if parallel_type == 2, we parallel the computation through permutation.
   int parallel_type = 2;
-  if (((*n) >= 500)) {
+  if (((*n) > 1000)) {
 	  parallel_type = 1;
   }
   if ((*R) <= 100) {

@@ -412,6 +412,101 @@ void BI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *
 	return;
 }
 
+
+void BI_parallel(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *R, int *weight, int *thread)
+{
+	int    i, j, **xidx, **yidx, *i_perm, *i_perm_inv;
+	double **Dx, **Dy, *x_cpy, *y_cpy, RCTV0;
+
+	Dx = alloc_matrix(*n, *n);
+	Dy = alloc_matrix(*n, *n);
+	xidx = alloc_int_matrix(*n, *n);
+	yidx = alloc_int_matrix(*n, *n);
+	i_perm = (int *)malloc(*n * sizeof(int));
+	i_perm_inv = (int *)malloc(*n * sizeof(int));
+	x_cpy = (double *)malloc(*n * sizeof(double));
+	y_cpy = (double *)malloc(*n * sizeof(double));
+
+	vector2matrix(x, Dx, *n, *n, 1);
+	vector2matrix(y, Dy, *n, *n, 1);
+
+	for (i = 0; i<*n; i++)
+	{
+		for (j = 0; j<*n; j++)
+		{
+			xidx[i][j] = j;
+			yidx[i][j] = j;
+		}
+		i_perm[i] = i;
+		i_perm_inv[i] = i;
+	}
+
+	for (i = 0; i<(*n); i++)
+	{
+		// copy site to x_cpy and y_cpy
+		memcpy(x_cpy, Dx[i], *n * sizeof(double));
+		memcpy(y_cpy, Dy[i], *n * sizeof(double));
+		quicksort(x_cpy, xidx[i], 0, *n - 1);
+		quicksort(y_cpy, yidx[i], 0, *n - 1);
+	}
+	free(x_cpy);
+	free(y_cpy);
+
+	RCTV0 = Ball_Information(n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, weight);
+	*bcov = RCTV0;
+
+	free_int_matrix(xidx, *n, *n);
+	free_int_matrix(yidx, *n, *n);
+	free(i_perm);
+	free(i_perm_inv);
+
+#ifdef _OPENMP
+	omp_set_num_threads(*thread);
+#endif
+#pragma omp parallel
+	{
+		int **xidx_thread, **yidx_thread, *i_perm_thread, *i_perm_inv_thread;
+		int k, kk, i_thread;
+		double ans = 0.0;
+		xidx_thread = alloc_int_matrix(*n, *n);
+		yidx_thread = alloc_int_matrix(*n, *n);
+		i_perm_thread = (int *)malloc(*n * sizeof(int));
+		i_perm_inv_thread = (int *)malloc(*n * sizeof(int));
+#pragma omp critical
+		{
+			for (k = 0; k < *n; k++)
+			{
+				for (kk = 0; kk < *n; kk++)
+				{
+					xidx_thread[k][kk] = kk;
+					yidx_thread[k][kk] = kk;
+				}
+				i_perm_thread[k] = k;
+				i_perm_inv_thread[k] = k;
+			}
+		}
+#pragma omp for
+		for (i_thread = 0; i_thread < (*R); i_thread++)
+		{
+#pragma omp critical
+			{
+				resample(i_perm_thread, i_perm_inv_thread, n);
+			}
+			ans = Ball_Information(n, Dx, Dy, xidx_thread, yidx_thread, i_perm_thread, i_perm_inv_thread, weight);
+			permuted_bcov[i_thread] = ans;
+		}
+		free(i_perm_thread);
+		free(i_perm_inv_thread);
+		free_int_matrix(xidx_thread, *n, *n);
+		free_int_matrix(yidx_thread, *n, *n);
+	}
+
+	free_matrix(Dx, *n, *n);
+	free_matrix(Dy, *n, *n);
+	return;
+}
+
+
 void computeRank(int n, int **Rank)
 {
 	int i, j;
@@ -746,6 +841,88 @@ void UBI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int 
 }
 
 
+void UBI_parallel(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *R, int *weight, int *thread)
+{
+	int i, *xidx, *yidx, *xrank, *yrank, *i_perm, **Rank, **lowxidx, **higxidx, **lowyidx, **higyidx;
+
+	xidx = (int *)malloc(*n * sizeof(int));
+	yidx = (int *)malloc(*n * sizeof(int));
+	xrank = (int *)malloc(*n * sizeof(int));
+	yrank = (int *)malloc(*n * sizeof(int));
+	i_perm = (int *)malloc(*n * sizeof(int));
+	Rank = alloc_int_matrix((*n) + 1, (*n) + 1);
+	lowxidx = alloc_int_matrix(*n, *n);
+	higxidx = alloc_int_matrix(*n, *n);
+	lowyidx = alloc_int_matrix(*n, *n);
+	higyidx = alloc_int_matrix(*n, *n);
+
+	for (i = 0; i<*n; i++)
+	{
+		xidx[i] = i;
+		yidx[i] = i;
+		i_perm[i] = i;
+	}
+
+	// first step: sort the x
+	quicksort(x, xidx, 0, *n - 1);
+	quicksort(y, yidx, 0, *n - 1);
+	ranksort(n, xrank, x, xidx);
+	ranksort(n, yrank, y, yidx);
+	createidx(n, xidx, x, lowxidx, higxidx);
+	createidx(n, yidx, y, lowyidx, higyidx);
+
+
+	initRank(*n, Rank, xrank, yrank, i_perm);
+	*bcov = U_Ball_Information(n, Rank, lowxidx, higxidx, lowyidx, higyidx, i_perm, weight);
+
+	free_int_matrix(Rank, (*n) + 1, (*n) + 1);
+	free(i_perm);
+	free(xidx);
+	free(yidx);
+
+#ifdef _OPENMP
+	omp_set_num_threads(*thread);
+#endif
+#pragma omp parallel
+	{
+		int **Rank_thread, *i_perm_thread;
+		int k, j_thread;
+		double ans_thread = 0.0;
+		i_perm_thread = (int *)malloc(*n * sizeof(int));
+		Rank_thread = alloc_int_matrix((*n) + 1, (*n) + 1);
+#pragma omp critical
+		{
+			for (k = 0; k < *n; k++)
+			{
+				i_perm_thread[k] = k;
+			}
+		}
+#pragma omp for
+		for (j_thread = 0; j_thread < (*R); j_thread++) {
+#pragma omp critical
+			{
+				// TODO: I don't know why this command can only be runned in a single thread. But it makes R console temporarily available and seems to be correct.
+				resample2(i_perm_thread, n);
+			}
+			initRank(*n, Rank_thread, xrank, yrank, i_perm_thread);
+			ans_thread = U_Ball_Information(n, Rank_thread, lowxidx, higxidx, lowyidx, higyidx, i_perm_thread, weight);
+			permuted_bcov[j_thread] = ans_thread;
+		}
+		free(i_perm_thread);
+		free_int_matrix(Rank_thread, (*n) + 1, (*n) + 1);
+	}
+
+	free_int_matrix(lowxidx, *n, *n);
+	free_int_matrix(higxidx, *n, *n);
+	free_int_matrix(lowyidx, *n, *n);
+	free_int_matrix(higyidx, *n, *n);
+	free(xrank);
+	free(yrank);
+	
+	return;
+}
+
+
 double ubcov_value(double *x, double *y, int *n, int *weight, int *thread)
 {
 	int    i, *xidx, *yidx, *xrank, *yrank, *i_perm, **Rank, **lowxidx, **higxidx, **lowyidx, **higyidx;
@@ -921,12 +1098,37 @@ void bcov_stat(double *bcov, double *x, double *y, int *n, int *weight, int *dst
 
 void bcov_test(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *R, int *weight, int *dst, int *type, int *thread)
 {
+	//parallel method
+	// if parallel_type == 1, we parallel the computation through statistics.
+	// if parallel_type == 2, we parallel the computation through permutation.
+	int parallel_type = 2;
+	if ((*n) >= 500)
+	{
+		parallel_type = 1;
+	}
+	if ((*R) <= 100)
+	{
+		*thread = 1;
+	}
 	if ((*type) == 1) {
 		if ((*dst)) {
-			BI(bcov, permuted_bcov, x, y, n, R, weight, thread);
+			if (parallel_type == 2)
+			{
+				BI_parallel(bcov, permuted_bcov, x, y, n, R, weight, thread);
+			}
+			else {
+				BI(bcov, permuted_bcov, x, y, n, R, weight, thread);
+			}
 		}
 		else {
-			UBI(bcov, permuted_bcov, x, y, n, R, weight, thread);
+			if (parallel_type == 2)
+			{
+				UBI_parallel(bcov, permuted_bcov, x, y, n, R, weight, thread);
+			}
+			else
+			{
+				UBI(bcov, permuted_bcov, x, y, n, R, weight, thread);
+			}
 		}
 	}
 	else {
@@ -939,4 +1141,3 @@ void bcov_test(double *bcov, double *permuted_bcov, double *x, double *y, int *n
 	}
 	return;
 }
-

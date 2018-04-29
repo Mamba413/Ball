@@ -454,6 +454,12 @@ void BI_parallel(double *bcov, double *permuted_bcov, double *x, double *y, int 
 
 	RCTV0 = Ball_Information(n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, weight);
 	*bcov = RCTV0;
+
+	free_int_matrix(xidx, *n, *n);
+	free_int_matrix(yidx, *n, *n);
+	free(i_perm);
+	free(i_perm_inv);
+
 #ifdef _OPENMP
 	omp_set_num_threads(*thread);
 #endif
@@ -497,10 +503,6 @@ void BI_parallel(double *bcov, double *permuted_bcov, double *x, double *y, int 
 
 	free_matrix(Dx, *n, *n);
 	free_matrix(Dy, *n, *n);
-	free_int_matrix(xidx, *n, *n);
-	free_int_matrix(yidx, *n, *n);
-	free(i_perm);
-	free(i_perm_inv);
 	return;
 }
 
@@ -841,7 +843,7 @@ void UBI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int 
 
 void UBI_parallel(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *R, int *weight, int *thread)
 {
-	int i, j, *xidx, *yidx, *xrank, *yrank, *i_perm, **Rank, **lowxidx, **higxidx, **lowyidx, **higyidx;
+	int i, *xidx, *yidx, *xrank, *yrank, *i_perm, **Rank, **lowxidx, **higxidx, **lowyidx, **higyidx;
 
 	xidx = (int *)malloc(*n * sizeof(int));
 	yidx = (int *)malloc(*n * sizeof(int));
@@ -872,6 +874,12 @@ void UBI_parallel(double *bcov, double *permuted_bcov, double *x, double *y, int
 
 	initRank(*n, Rank, xrank, yrank, i_perm);
 	*bcov = U_Ball_Information(n, Rank, lowxidx, higxidx, lowyidx, higyidx, i_perm, weight);
+
+	free_int_matrix(Rank, (*n) + 1, (*n) + 1);
+	free(i_perm);
+	free(xidx);
+	free(yidx);
+
 #ifdef _OPENMP
 	omp_set_num_threads(*thread);
 #endif
@@ -904,16 +912,13 @@ void UBI_parallel(double *bcov, double *permuted_bcov, double *x, double *y, int
 		free_int_matrix(Rank_thread, (*n) + 1, (*n) + 1);
 	}
 
-	free_int_matrix(Rank, (*n) + 1, (*n) + 1);
 	free_int_matrix(lowxidx, *n, *n);
 	free_int_matrix(higxidx, *n, *n);
 	free_int_matrix(lowyidx, *n, *n);
 	free_int_matrix(higyidx, *n, *n);
-	free(xidx);
-	free(yidx);
 	free(xrank);
 	free(yrank);
-	free(i_perm);
+	
 	return;
 }
 

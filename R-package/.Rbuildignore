@@ -2,6 +2,7 @@
 ^\.Rproj\.user$
 ^README_CN.md$
 ^PLAN.md$
+^TODO.md$
 ^data-raw$
 .idea
 .Rhistory

@@ -160,7 +160,7 @@ void main()
 	type = 1;
 	bcov_test(bd_stat_value, permuted_bcov, x_dst1, y_dst1, &n, &R, &weight, &dst, &type, &nth);
 
-	//bd_test_multithread_permutation();
+	bd_test_multithread_permutation();
 	bcov_test_multithread_permutaion();
 	system("pause");
 	return;
