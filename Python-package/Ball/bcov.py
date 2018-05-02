@@ -112,7 +112,7 @@ def bcov_test_internal(x, y=None, R=99, dst=False, weight=False, seed=4, method=
             x = np.asarray(x).flatten()
             y = np.asarray(y).flatten()
         bcov_value, bcov_permuted_value = bcov_test_wrap_c(x=x, y=y, n=num, R=R, weight=weight, dst=dst,
-                                                           type_copy=type_copy)
+                                                           type_copy=type_copy, num_threads=num_threads)
         pvalue = calculatePvalue(bcov_value, bcov_permuted_value)
         return bcov_value, pvalue
 

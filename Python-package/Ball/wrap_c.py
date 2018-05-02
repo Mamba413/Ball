@@ -5,7 +5,6 @@
 # @Mail    : zhuj37@mail2.sysu.edu.cn
 # @File    : wrap_c.py
 
-import numpy as np
 from numpy import alen as npalen
 from numpy import sum as npsum
 from numpy import array as nparray
