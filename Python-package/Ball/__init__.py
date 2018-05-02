@@ -6,5 +6,5 @@
 # @File    : __init__.py.py
 
 
-from Ball.bd_test import bd_test, bd
+from Ball.bd import bd_test, bd
 from Ball.bcov import bcov_test, bcov, bcor

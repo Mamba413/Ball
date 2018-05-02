@@ -158,7 +158,6 @@ def bcov_value_wrap_c(x, y, n, weight, dst, type_copy, num_threads=1):
     weight_copy[0] = int(weight)
     num_threads_copy[0] = int(num_threads)
 
-
     if type_copy == "bcov":
         type1 = 1
     else:
@@ -187,7 +186,6 @@ def bcov_test_wrap_c(x, y, n, R, weight, dst, type_copy, num_threads=1):
         y_copy[i] = y_value
         pass
 
-
     n_copy = intArray(1)
     weight_copy = intArray(1)
     dst_copy = intArray(1)
@@ -205,7 +203,6 @@ def bcov_test_wrap_c(x, y, n, R, weight, dst, type_copy, num_threads=1):
         type1 = 2
     type_copy = intArray(1)
     type_copy[0] = int(type1)
-
 
     bcov_test(bcov, permuted_bcov, x_copy, y_copy, n_copy, r, weight_copy, dst_copy, type_copy, nthreads)
 

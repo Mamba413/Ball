@@ -15,7 +15,8 @@ bcov_testResult = namedtuple('bcov_testResult', ('statistic', 'pvalue'))
 bcov_Result = namedtuple('bcov_Result', ('statistic',))
 bcor_Result = namedtuple('bcor_Result', ('statistic',))
 
-def bcov_test(x, y = None, R = 99, dst = False, weight = False, seed = 4, num_threads = 2):
+
+def bcov_test(x, y=None, R=99, dst=False, weight=False, seed=4, num_threads=2):
     """
         bcov_test are non-parametric tests of multivariate independence in Banach space.
         The test decision is obtained via permutation, with replicates.
@@ -66,10 +67,13 @@ def bcov_test(x, y = None, R = 99, dst = False, weight = False, seed = 4, num_th
         """
     method = 'permute'
     type_copy = "bcov"
-    result = bcov_test_internal_wrap(x=x, y=y, R=R, dst=dst, weight=weight, seed=seed, method=method, type_copy=type_copy, num_threads = num_threads)
+    result = bcov_test_internal_wrap(x=x, y=y, R=R, dst=dst, weight=weight, seed=seed, method=method,
+                                     type_copy=type_copy, num_threads=num_threads)
     return bcov_testResult(result[0], result[1])
 
-def bcov_test_internal(x, y=None, R=99, dst=False, weight=False, seed = 4, method='permute', type_copy='bcov', num_threads = 1):
+
+def bcov_test_internal(x, y=None, R=99, dst=False, weight=False, seed=4, method='permute', type_copy='bcov',
+                       num_threads=1):
     x = np.asmatrix(x)
     y = np.asmatrix(y)
     if x.shape[0] == 1:
@@ -107,7 +111,8 @@ def bcov_test_internal(x, y=None, R=99, dst=False, weight=False, seed = 4, metho
         if len(x.shape) != 1 or len(y.shape) != 1:
             x = np.asarray(x).flatten()
             y = np.asarray(y).flatten()
-        bcov_value, bcov_permuted_value = bcov_test_wrap_c(x=x, y=y, n=num, R=R, weight=weight, dst=dst, type_copy=type_copy)
+        bcov_value, bcov_permuted_value = bcov_test_wrap_c(x=x, y=y, n=num, R=R, weight=weight, dst=dst,
+                                                           type_copy=type_copy)
         pvalue = calculatePvalue(bcov_value, bcov_permuted_value)
         return bcov_value, pvalue
 
@@ -122,11 +127,10 @@ def kbcov_test_internal(x, R=99, dst=False, weight=False, seed=4, method='permut
     if dst:
         pass
     else:
-        a = [0 for i in range(0,x.shape[0])]
+        a = [0 for i in range(0, x.shape[0])]
         for i in range(0, x.shape[0]):
             a[i] = euclidean_distances(x[i].T, x[i].T)
         x = np.array(a)
-
 
     var_num = x.shape[0]
 
@@ -192,7 +196,8 @@ def bcov_test_internal_wrap(x, y, R, dst, seed, weight, method, type_copy, num_t
     if type(x) is list:
         result = kbcov_test_internal(x=x, R=R, dst=dst, weight=weight, seed=seed, method=method, type_copy=type_copy)
     else:
-        result = bcov_test_internal(x=x, y=y, R=R, dst=dst, weight=weight, seed=seed, method=method, type_copy=type_copy, num_threads=num_threads)
+        result = bcov_test_internal(x=x, y=y, R=R, dst=dst, weight=weight, seed=seed, method=method,
+                                    type_copy=type_copy, num_threads=num_threads)
     return result
 
 
@@ -235,7 +240,8 @@ def bcov(x, y, dst=False, weight=False, num_threads=2):
     >>>bcov(x, y)
 
     """
-    bcov_value = bcov_test_internal_wrap(x=x, y=y, R=0, dst=dst, seed=0, weight=weight, method="permute", type_copy="bcov",
+    bcov_value = bcov_test_internal_wrap(x=x, y=y, R=0, dst=dst, seed=0, weight=weight, method="permute",
+                                         type_copy="bcov",
                                          num_threads=num_threads)
     return bcov_Result(bcov_value)
 
@@ -279,6 +285,7 @@ def bcor(x, y, dst=False, weight=False, num_threads=2):
     >>>bcor(x, y)
 
     """
-    bcor_value = bcov_test_internal_wrap(x=x, y=y, R=0, dst=dst, seed=0, weight=weight, method="permute", type_copy="bcor",
+    bcor_value = bcov_test_internal_wrap(x=x, y=y, R=0, dst=dst, seed=0, weight=weight, method="permute",
+                                         type_copy="bcor",
                                          num_threads=num_threads)
     return bcor_Result(bcor_value)

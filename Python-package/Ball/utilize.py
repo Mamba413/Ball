@@ -20,6 +20,7 @@ def get_matrixed_x(x, y):
         x = y
     return np.array(x)
 
+
 def examine_None(x, y):
     if x is not None:
         x = np.array(x.flatten())
@@ -53,7 +54,7 @@ def examine_size_arguments(x, size):
     else:
         x_row = 1
         for i in range(len(x.shape)):
-            x_row = x_row*x.shape[i]
+            x_row = x_row * x.shape[i]
 
     n = np.sum(size)
     if x_row != n:
@@ -62,7 +63,7 @@ def examine_size_arguments(x, size):
 
 def get_vectorized_distance_matrix(x):
     Dxy = euclidean_distances(x, x)
-    #Dxy = np.array(Dxy.flatten())[0]
+    # Dxy = np.array(Dxy.flatten())[0]
     Dxy = np.array(Dxy.flatten())
     return Dxy
 
@@ -124,7 +125,7 @@ def examine_x_y(x, y):
         raise ValueError("x and y have different sample sizes!")
     a = np.array(y).flatten()
     for i in range(0, len(a)):
-        a[i] = (a[i]==None)
+        a[i] = (a[i] == None)
     if np.any(a):
         raise ValueError("Missing data in y!")
     a = np.array(x).flatten()
@@ -134,10 +135,11 @@ def examine_x_y(x, y):
         raise ValueError("Missing data in x!")
     if dim_x[1] == 1 and dim_y[1] == 1:
         p = 1
-    else :
+    else:
         p = -1
 
     return np.array([n, p])
+
 
 def examine_type_arguments(type_copy):
     if type_copy is not 'bcov' and type_copy is not 'bcor':
@@ -148,9 +150,3 @@ def examine_type_arguments(type_copy):
 #   if seed is None:
 #     seed = runif(1 , 0, .Machine$integer.max)???
 #   return seed
-
-
-
-
-
-
