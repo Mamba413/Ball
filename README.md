@@ -31,4 +31,5 @@ GPL-3
 
 Reference
 ----------
-- [Ball Divergence: Multivariate Imbalance Test](https://www.e-publications.org/ims/submission/AOS/user/submissionFile/24632?confirm=9219c1d0). Wenliang Pan, Yuan Tian, Xueqin Wang, and Heping Zhang, The Annals of Statistics, Papers to Appear
+- Wenliang Pan, Yuan Tian, Xueqin Wang, and Heping Zhang (2018) [Ball Divergence: Multivariate Imbalance Test](https://www.e-publications.org/ims/submission/AOS/user/submissionFile/24632?confirm=9219c1d0), The Annals of Statistics, Papers to Appear
+- Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) [A Generic Sure Independence Screening Procedure](https://amstat.tandfonline.com/doi/full/10.1080/01621459.2018.1462709#.WupWaoiFM2x), Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709
