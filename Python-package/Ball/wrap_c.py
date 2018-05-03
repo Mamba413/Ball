@@ -169,7 +169,7 @@ def bcov_value_wrap_c(x, y, n, weight, dst, type_copy, num_threads=1):
     return bcov_value
 
 
-def bcov_test_wrap_c(x, y, n, R, weight, dst, type_copy, num_threads=1):
+def bcov_test_wrap_c(x, y, n, R, weight, dst, type_copy, num_threads):
     bcov = doubleArray(1)
     permuted_bcov = doubleArray(R)
     x = nparray(x, dtype=double)

@@ -192,7 +192,7 @@ def kbcov_stat(x, num, var_num, weight, type_copy):
     return stat_value[0]
 
 
-def bcov_test_internal_wrap(x, y, R, dst, seed, weight, method, type_copy, num_threads=1):
+def bcov_test_internal_wrap(x, y, R, dst, seed, weight, method, type_copy, num_threads):
     if type(x) is list:
         result = kbcov_test_internal(x=x, R=R, dst=dst, weight=weight, seed=seed, method=method, type_copy=type_copy)
     else:
