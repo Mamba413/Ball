@@ -526,6 +526,10 @@ void initRank(int n, int **Rank, int *xrank, int *yrank, int *i_perm)
 	computeRank(n + 1, Rank);
 }
 
+/*
+Input: n=6, zrank = []; z = [1, 2, 3, 4, 5, 5], zidx = [3, 1, 5, 2, 6, 4];
+Output: zrank = [2, 4, 1, 5, 3, 5];
+*/
 void ranksort(int *n, int *zrank, double *z, int *zidx)
 {
 	int i, lastpos = 0;
@@ -597,6 +601,22 @@ void sort(int *n, int *zidx, double *z, int **dzidx)
 	}
 }
 
+
+/*
+The algorithm like the quick-sort. It finds the upper and lower in turn. 
+For each i, the computation complexity is O(n); 
+Thus, this function take O(n^2) times.
+
+Algorithm detail:
+For i=1, ..., n, carry out:
+init the low and upper index: l=1, u=N
+while (l <= u):
+if (z[u] - z[i]) >= (z[i] - z[l]) ==> for pair (i, u), upper index: u, lower index: l ==> update upper index: u = u - 1
+if (z[u] - z[i]) < (z[i] - z[l]) ==> for pair (i, l), upper index: u, lower index: l ==> update lower index: l = l - 1
+
+Input: n=6, z = [1, 2, 3, 4, 5, 5], zidx = [3, 1, 5, 2, 6, 4], lowzidx = [], higzidx = [];
+Output: lowzidx, higzidx;
+*/
 void createidx(int *n, int *zidx, double *z, int **lowzidx, int **higzidx)
 {
 	int i, zi, ileft, iright, jleft, jright, lowpos, higpos;
@@ -804,7 +824,7 @@ void UBI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int 
 		i_perm[i] = i;
 	}
 
-	// first step: sort the x
+	// first step: sort the x, y and obtain index of x, y (after the x, y have been sorted)
 	quicksort(x, xidx, 0, *n - 1);
 	quicksort(y, yidx, 0, *n - 1);
 	ranksort(n, xrank, x, xidx);
