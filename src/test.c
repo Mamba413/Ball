@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "BI.h"
 #include "BD.h"
+#include "surv.h"
 
 void test_value(double *computed_value, double true_value)
 {
@@ -141,6 +142,25 @@ void main()
 	printf("Computation result: %f; ", *bcov_stat_value);
 	printf("True value: %f\nTest result: ", 1.0000);
 	test_value(bcov_stat_value, 1.0000);
+	
+	printf("----------- Test Computation for ball correlation (survival) -----------\n");
+	double surv_x[30] = { 0.40542, 2.14187, -0.71706, 0.73307, -1.09226, -1.86642, 0.55529, -0.61887, -0.49071, -1.20182, -0.70259, 0.61007, -0.63128, 0.41266, 0.8385, -0.43179, -0.74084, -1.07779, 1.41215, 1.3739, 0.3186, -0.592, 0.61007, 1.52067, -0.70776, -0.50311, 1.869, -0.70569, 0.68139, 1.95582 };
+	double surv_t[30] = { 0, 0.2, 0.2, 0.3, 0.3, 0.4, 0.5, 0.5, 0.5, 0.6, 0.6, 0.6, 0.7, 0.7, 0.7, 0.8, 0.8, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 1, 1, 1, 1, 1.1, 1.1, 1.1 };
+	int surv_delta[30] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1 };
+	double surv_sc[30] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308 };
+	int *surv_num = 30;
+	double *surv_bcor = &tmp;
+	SRCT(surv_x, surv_t, surv_delta, surv_sc, &surv_num, surv_bcor);
+	printf("Computation result: %f; ", *surv_bcor);
+	printf("True value: %f\nTest result: ", 0.001264425);
+	test_value(surv_bcor, 0.001264425);
+	
+	int surv_x_rank[30] = { 16, 29, 5, 22, 2, 0, 18, 10, 13, 1, 8, 20, 9, 17, 23, 14, 4, 3, 25, 24, 15, 11, 20, 26, 6, 12, 27, 7, 21, 28 };
+	int surv_t_rank[30] = { 0, 2, 2, 4, 4, 5, 8, 8, 8, 11, 11, 11, 14, 14, 14, 16, 16, 22, 22, 22, 22, 22, 22, 26, 26, 26, 26, 29, 29, 29 };
+	SRCT_new(surv_x_rank, surv_t_rank, surv_delta, surv_sc, &surv_num, surv_bcor);
+	printf("Computation result: %f; ", *surv_bcor);
+	printf("True value: %f\nTest result: ", 0.001264425);
+	test_value(surv_bcor, 0.001264425);
 
 	//printf("----------- Test Multi-thread (Univariate BCov)-----------\n");
 	//double permuted_bcov[10000];
@@ -160,8 +180,8 @@ void main()
 	type = 1;
 	bcov_test(bd_stat_value, permuted_bcov, x_dst1, y_dst1, &n, &R, &weight, &dst, &type, &nth);
 
-	bd_test_multithread_permutation();
-	bcov_test_multithread_permutaion();
+	//bd_test_multithread_permutation();
+	//bcov_test_multithread_permutaion();
 	system("pause");
 	return;
 }

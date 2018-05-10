@@ -44,6 +44,36 @@ void initRank(int n, int **Rank, int *xrank, int *yrank, int *i_perm)
 }
 
 
+//void initRank_surv(int n, int **Rank, int *xrank, int *yrank, int *i_perm)
+//{
+//	int i, j, old_x_rank = -1, old_t_rank = -1;
+//	for (i = 0; i < n + 1; i++)
+//		for (j = 0; j < n + 1; j++)
+//			Rank[i][j] = 0;
+//	//
+//	for (i = 0; i < n; i++)
+//	{
+//		if (old_x_rank != (xrank[i] + 1) & old_t_rank != (yrank[i_perm[i]] + 1))
+//		{
+//			Rank[xrank[i] + 1][yrank[i_perm[i]] + 1] += 1;
+//			old_x_rank = xrank[i] + 1;
+//			old_t_rank = yrank[i_perm[i]] + 1;
+//		}
+//		else {
+//			Rank[old_x_rank][old_t_rank] += 1;
+//		}
+//	}
+//	printf("\n");
+//	for (i = n - 1; i >= 0; i--)
+//	{
+//		for (int j = 0; j < (n); j++)
+//			printf("%d ", Rank[i][j]);
+//		printf("\n");
+//	}
+//	printf("\n");
+//	computeRank(n + 1, Rank);
+//}
+
 void quicksort(double *a, int *idx, int l, int u)
 {
   int i, m, idx_temp;
