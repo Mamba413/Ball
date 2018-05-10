@@ -20,6 +20,30 @@
 #include "utilize_R.h"
 #include "utilize_cross.h"
 
+
+ /*
+ The rank computation (initRank, computeRank) is refer to: http://www.jmlr.org/papers/volume17/14-441/14-441.pdf [section 3.1.2]
+ */
+void computeRank(int n, int **Rank)
+{
+	int i, j;
+	for (i = 1; i < n; i++)
+		for (j = 1; j < n; j++)
+			Rank[i][j] += (Rank[i][j - 1] + Rank[i - 1][j] - Rank[i - 1][j - 1]);
+}
+
+void initRank(int n, int **Rank, int *xrank, int *yrank, int *i_perm)
+{
+	int i, j;
+	for (i = 0; i < n + 1; i++)
+		for (j = 0; j < n + 1; j++)
+			Rank[i][j] = 0;
+	for (i = 0; i < n; i++)
+		Rank[xrank[i] + 1][yrank[i_perm[i]] + 1] += 1;
+	computeRank(n + 1, Rank);
+}
+
+
 void quicksort(double *a, int *idx, int l, int u)
 {
   int i, m, idx_temp;

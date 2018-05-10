@@ -17,6 +17,8 @@
 #define UTILITIES_H_
 
 
+void computeRank(int n, int **Rank);
+void initRank(int n, int **Rank, int *xrank, int *yrank, int *i_perm);
 void quicksort(double *a, int *idx, int l, int u);
 void quicksort2(double *a, double *b, int *idx, int l, int u);
 double **alloc_matrix(int r, int c);
