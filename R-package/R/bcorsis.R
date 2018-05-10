@@ -274,11 +274,13 @@ bcorsis.surv <- function(y, x, final_d, n, p, ids, standized = TRUE){
     }, Sc, rep_num, SIMPLIFY = FALSE)
     Sc <- unlist(Sc)
   }
-  rcory_result <- apply(x, 2, function(x){
-    bcor_surv(x = x, t = ord.t, delta = ord.delta, Sc = Sc, n = n)
-  })
-  Xhavepickout <- get_screened_vars(ids, rcory_result, final_d)
   
+  t_rank <- rank(ord.t, ties.method = "max") - 1
+  rcory_result <- apply(x, 2, function(x){
+    bcor_surv(x = x, t = t_rank, delta = ord.delta, Sc = Sc, n = n)
+  })
+  
+  Xhavepickout <- get_screened_vars(ids, rcory_result, final_d)
   Xhavepickout
 }
 

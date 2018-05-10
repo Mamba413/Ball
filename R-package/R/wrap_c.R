@@ -178,10 +178,10 @@ apply_bcor_wrap <- function(x, y, n, R, weight, dst) {
 #' @noRd
 #' 
 #'
-bcor_surv <- function(x, t, delta, Sc, n){
+bcor_surv <- function(x, time_value, delta, Sc, n){
   # R function name should not the same as C(C++) function names
   RCT <- numeric(1)
-  RCT <- .C("SRCT", as.double(t(x)), as.double(t(t)), as.double(t(delta)),
+  RCT <- .C("SRCT_new", as.double(t(x)), as.integer(t(time_value)), as.integer(t(delta)),
             as.double(t(Sc)), as.integer(n), RC = as.double(RCT))
   RCT[["RC"]]
 }
