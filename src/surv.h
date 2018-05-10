@@ -18,7 +18,8 @@
 #define SURV_H_
 
 
-void SRCT(double *x, double *t, double *delta, double *Sc, int *n, double *RCTV);
+void SRCT(double *x, double *t, int *delta, double *Sc, int *n, double *RCTV);
+void SRCT_new(int *x, int *t, int *delta, double *Sc, int *n, double *RCTV);
 
 
 #endif /* SURV_H_ */

@@ -22,7 +22,7 @@ void SRCT(double *x, double *t, int *delta, double *Sc, int *n, double *RCTV)
   double jp = 0.0, p1 = 0.0, p2 = 0.0;
   *RCTV = 0;
 
-  printf("------- Oringinal Algorithm --------\n");
+  //printf("------- Oringinal Algorithm --------\n");
   for(i = 0; i < (*n); i++){
 	  if (delta[i] == 1) {
 		for(j=0;j<(*n);j++){
