@@ -507,23 +507,6 @@ void BI_parallel(double *bcov, double *permuted_bcov, double *x, double *y, int 
 }
 
 
-/*
-Input: n=6, zrank = []; z = [1, 2, 3, 4, 5, 5], zidx = [3, 1, 5, 2, 6, 4];
-Output: zrank = [2, 4, 1, 5, 3, 5];
-*/
-void ranksort(int *n, int *zrank, double *z, int *zidx)
-{
-	int i, lastpos = 0;
-	double lastval = -1.0;
-
-	for (i = *n - 1; i >= 0; i--) {
-		if (lastval != z[i])
-			lastpos = i;
-		lastval = z[i];
-		zrank[zidx[i]] = lastpos;
-	}
-}
-
 void sort(int *n, int *zidx, double *z, int **dzidx)
 {
 	// the z[i] is the center

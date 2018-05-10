@@ -35,6 +35,7 @@ void print_stop_message();
 void resample(int *i_perm, int *i_perm_inv, int *n);
 void resample2(int *i_perm, int *n);
 void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1);
+void ranksort(int *n, int *zrank, double *z, int *zidx);
 
 
 #endif /* UTILITIES_H_ */

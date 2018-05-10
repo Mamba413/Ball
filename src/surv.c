@@ -25,7 +25,7 @@ void SRCT(double *x, double *t, int *delta, double *Sc, int *n, double *RCTV)
   //printf("------- Oringinal Algorithm --------\n");
   for(i = 0; i < (*n); i++){
 	  if (delta[i] == 1) {
-		for(j=0;j<(*n);j++){
+		for(j = 0; j<(*n); j++){
             if((x[j]>x[i]) && (t[j]>t[i]))
 			    jp += 1.0;
             if(x[j]>x[i])
@@ -63,16 +63,32 @@ printf("True value: %f\nTest result: ", 0.001264425);
 test_value(surv_bcor, 0.001264425);
 
 */
-void SRCT_new(int *x, int *t, int *delta, double *Sc, int *n, double *RCTV)
+void SRCT_new(double *x, int *t, int *delta, double *Sc, int *n, double *RCTV)
 {
-	int i, j;
+	int i, j, *xidx, *xrank;
+	double *xcopy;
 	double jp = 0.0, p1 = 0.0, p2 = 0.0;
 	*RCTV = 0.0;
+
+	xidx = (int *)malloc(*n * sizeof(int));
+	xrank = (int *)malloc(*n * sizeof(int));
+	xcopy = (double *)malloc(*n * sizeof(double));
+
+	for (i = 0; i < (*n); i++)
+	{
+		xidx[i] = i;
+		xcopy[i] = x[i];
+	}
+
+	quicksort(xcopy, xidx, 0, *n - 1);
+	ranksort(n, xrank, xcopy, xidx);
+	free(xidx);
+	free(xcopy);
 
 	//printf("------- Speedup Algorithm --------\n");
 	for (i = 0; i < (*n); i++) {
 		if (delta[i] == 1) {
-			p1 = *n - x[i] - 1;
+			p1 = *n - xrank[i] - 1;
 			p2 = *n - t[i] - 1;
 			for (j = i + 1; j<(*n); j++) {
 				if ( (x[j] > x[i]) & (t[j] > t[i]) )
@@ -85,6 +101,8 @@ void SRCT_new(int *x, int *t, int *delta, double *Sc, int *n, double *RCTV)
 		p2 = 0.0;
 	}
 	*RCTV = *RCTV / (1.0*(*n));
+
+	free(xrank);
 	return;
 }
 
