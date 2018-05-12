@@ -277,7 +277,7 @@ bcorsis.surv <- function(y, x, final_d, n, p, ids, standized = TRUE){
   
   t_rank <- rank(ord.t, ties.method = "max") - 1
   rcory_result <- apply(x, 2, function(x){
-    bcor_surv(x = x, t = t_rank, delta = ord.delta, Sc = Sc, n = n)
+    bcor_surv(x = x, time_value = t_rank, delta = ord.delta, Sc = Sc, n = n)
   })
   
   Xhavepickout <- get_screened_vars(ids, rcory_result, final_d)
