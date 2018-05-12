@@ -1,6 +1,8 @@
 # Ball 1.1.0
 * Bug fix
-* Multi-thread support
+* OPENMP based Multi-thread support for *bd.test* and *bcov.test*
+* Speed up feature screening for survival data
+* Implement Angular metric for compostional data 
 
 # Ball 1.0.0
 

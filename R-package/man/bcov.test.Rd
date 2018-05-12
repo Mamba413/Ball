@@ -82,26 +82,24 @@ Dy <- nhdist(ArcticLake[["x"]], method = "compositional")
 # Distance matrix between x:
 Dx <- dist(ArcticLake[["depth"]])
 # hypothesis test with BCov:
-bcov.test(x = Dx, y = Dy, R = 99, dst = TRUE)
+bcov.test(x = Dx, y = Dy, dst = TRUE)
 
 ################  Weighted Ball Covariance Test  #################
 data("ArcticLake")
 Dy <- nhdist(ArcticLake[["x"]], method = "compositional")
 Dx <- dist(ArcticLake[["depth"]])
 # hypothesis test with weighted BCov:
-bcov.test(x = Dx, y = Dy, R = 99, dst = TRUE, weight = TRUE)
+bcov.test(x = Dx, y = Dy, dst = TRUE, weight = TRUE)
 
 ################# Mutual Independence Test #################
+\dontrun{
 x <- rnorm(30)
 y <- (x > 0) * x + rnorm(30)
 z <- (x <= 0) * x + rnorm(30)
 data_list <- list(x, y, z)
-Sys.time()
 bcov.test(data_list)
-Sys.time()
 
 ################# Mutual Independence Test for Meteorology data #################
-\dontrun{
 data("meteorology")
 bcov.test(meteorology)
 }
