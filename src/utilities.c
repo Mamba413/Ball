@@ -92,6 +92,9 @@ void ranksort(int *n, int *zrank, double *z, int *zidx)
 	}
 }
 
+/*
+Apply quicksort algorithm to a, and the index exchange result is recorded in idx.
+*/
 void quicksort(double *a, int *idx, int l, int u)
 {
   int i, m, idx_temp;
@@ -125,6 +128,19 @@ void quicksort(double *a, int *idx, int l, int u)
   quicksort(a, idx, m+1, u);
 }
 
+/*
+Apply quicksort algorithm to a and b
+After sorted, a is increasing while b is decreasing, and idx recode the index exchange result
+Example:
+Input:
+a = [2, 2, 1, 3]
+b = [1, 2, 3, 4]
+idex = [1, 2, 3, 4]
+Output:
+a = [1, 2, 2, 3]
+b = [3, 1, 2, 4]
+c = [3, 1, 2, 4]
+*/
 void quicksort2(double *a, double *b, int *idx, int l, int u)
 {
   int i, m, idx_temp;
@@ -270,7 +286,10 @@ void distance(double *x, double *Dx, int *n, int *d)
   }
 }
 
-
+/*
+i_perm takes value 1 to n, i.e., index of sample
+This function permute i_perm array to achieve permutation
+*/
 void resample(int *i_perm, int *i_perm_inv, int *n)
 {
   int i, j, temp;

@@ -197,6 +197,8 @@ double Ball_Information(int *n, double **Dx, double **Dy, int **xidx, int **yidx
 			rct0 += pow(pxy - px*py, 2) / (px*py);
 	}
 	rct0 = rct0 / (1.0*(*n)*(*n));
+
+	// free memory
 	free(isource);
 	free(icount);
 	free(xy_index);
@@ -365,6 +367,7 @@ void BI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *
 	x_cpy = (double *)malloc(*n * sizeof(double));
 	y_cpy = (double *)malloc(*n * sizeof(double));
 
+	// convert distance vector to distance matrix:
 	vector2matrix(x, Dx, *n, *n, 1);
 	vector2matrix(y, Dy, *n, *n, 1);
 
@@ -379,6 +382,9 @@ void BI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *
 		i_perm_inv[i] = i;
 	}
 
+	// sort each row of Dx and Dy
+	// computational complexity: O(n^2 * logn)
+	// xidx, yidx is index of each row after sorted
 	for (i = 0; i<(*n); i++)
 	{
 		// copy site to x_cpy and y_cpy
