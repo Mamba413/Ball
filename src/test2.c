@@ -15,21 +15,6 @@ void test_value(double computed_value, double true_value)
 	return;
 }
 
-double pvalue(double ball_stat_value, double *permuted_ball, int R)
-{
-	double larger_num = 0.0;
-	for (int i = 0; i < R; i++)
-	{
-		if (permuted_ball[i] > ball_stat_value)
-		{
-			larger_num += 1.0;
-		}
-	}
-	double R_double = R;
-	double p_value = (1.0 + larger_num) / (1.0 + R_double);
-	return(p_value);
-}
-
 
 void bd_test_2sample_multithread_permutation()
 {

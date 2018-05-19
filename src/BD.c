@@ -30,7 +30,7 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
   double TS_weight0 = 0, SS_weight0 = 0, TS_weight1 = 0.0, SS_weight1 = 0.0;
   double p1, p2, p3, ans;
   n = *n1 + *n2;
-  double Dn1 = (*n1), Dn2 = (*n2);
+
   // Calculate A_{ij}^{X} and A_{ij}^{Y}:
   for(i = 0; i < *n1; i++) {
     for(j = 0; j < *n1; j++) {
@@ -43,7 +43,8 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
       //TS += pow(fabs(p1/(*n1)-p2/(*n2)),*gamma)/(pow(p3,*alpha)*pow(1-p3,*beta));
       ans = p1/(*n1) - p2/(*n2);
 	  TS_weight0 += (ans * ans);
-	  TS_weight1 += (ans * ans) * Dn1 / (p1 + p2);
+	  // TODO: Weight Ball Divergence: 
+	  TS_weight1 += (ans * ans) * 1.0;
     }
   }
   // Calculate C_{kl}^{X} and C_{kl}^{Y}:
@@ -58,7 +59,8 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
       //SS += pow(fabs(p1/(*n1)-p2/(*n2)),*gamma)/(pow(p3,*alpha)*pow(1-p3,*beta));
       ans = p1/(*n1)-p2/(*n2);
 	  SS_weight0 += (ans * ans);
-	  SS_weight1 += (ans * ans) * Dn2 / (p1 + p2);
+	  // TODO: Weight Ball Divergence: 
+	  SS_weight1 += (ans * ans) * 1.0;
     }
   }
   bd_stat[0] = TS_weight0 / (1.0*(*n1)*(*n1)) + SS_weight0 / (1.0*(*n2)*(*n2));
@@ -71,7 +73,6 @@ void Ball_Divergence_parallel(double *bd_stat, int **Rxy, int **Rx, int *i_perm_
 {
   int n;
   n = *n1 + *n2;
-  double Dn1 = (*n1), Dn2 = (*n2);
   double TS_weight0 = 0, SS_weight0 = 0, TS_weight1 = 0.0, SS_weight1 = 0.0;
 #ifdef _OPENMP
   omp_set_num_threads(*nthread);
@@ -94,7 +95,7 @@ void Ball_Divergence_parallel(double *bd_stat, int **Rxy, int **Rx, int *i_perm_
 				  continue;
 			  ans = p1 / (*n1) - p2 / (*n2);
 			  TS_value_w0 += (ans * ans);
-			  TS_value_w1 += (ans * ans) * Dn1 / (p1 + p2);
+			  TS_value_w1 += (ans * ans) * 1.0;
 		  }
 	  }
 #pragma omp critical
@@ -114,7 +115,7 @@ void Ball_Divergence_parallel(double *bd_stat, int **Rxy, int **Rx, int *i_perm_
 				  continue;
 			  ans = p1 / (*n1) - p2 / (*n2);
 			  SS_value_w0 += (ans * ans);
-			  SS_value_w1 += (ans * ans) * Dn1 / (p1 + p2);
+			  SS_value_w1 += (ans * ans) * 1.0;
 		  }
 	  }
 #pragma omp critical
@@ -223,7 +224,6 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *p, int *R
   free_int_matrix(Rx, n, n);
   free(i_perm);
   free(i_perm_tmp);
-  free(bd_tmp);
   return;
 }	 
 
@@ -288,7 +288,6 @@ void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *
 		{
 			int **Rx_thread, *i_perm_thread, *i_perm_tmp_thread;
 			int k, i_thread;
-			double ans = 0.0;
 			double *bd_tmp;
 			Rx_thread = alloc_int_matrix(n, n);
 			i_perm_thread = (int *)malloc(n * sizeof(int));
@@ -453,7 +452,6 @@ void UBD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int 
 		{
 			int **Rx_thread, *i_perm_thread, *i_perm_tmp_thread;
 			int k, i_thread;
-			double ans_thread = 0.0;
 			double *bd_tmp;
 			Rx_thread = alloc_int_matrix(n, n);
 			i_perm_thread = (int *) malloc(n * sizeof(int));
@@ -749,8 +747,8 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
       permute_dst(xy, new_xy, index, n);
       // K-sample BD after permutation:
       kbd_value(kbd_tmp, new_xy, size, n, k);
-	  permuted_kbd_sum_w0[j] = kbd_tmp[0]; permuted_kbd_sum_w0[j] = kbd_tmp[1];
-	  permuted_kbd_max_w0[j] = kbd_tmp[2]; permuted_kbd_max_w0[j] = kbd_tmp[3];
+	  permuted_kbd_sum_w0[j] = kbd_tmp[0]; permuted_kbd_sum_w1[j] = kbd_tmp[1];
+	  permuted_kbd_max_w0[j] = kbd_tmp[2]; permuted_kbd_max_w1[j] = kbd_tmp[3];
     }
 	pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, j);
 	pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, j);
@@ -923,7 +921,6 @@ void ukbd_value(double *kbd_stat, double *xy, int *size, int *k)
 // weight: if weight == TRUE, weight BD will be returned
 void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R)
 {
-  double ans = 0.0;
   ukbd_value(kbd, xy, size, k);
   if ((*R) > 0) {
 	  int j;
@@ -947,8 +944,8 @@ void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, in
 		  shuffle_value(xy, n);
 		  // K-sample UBD after permutation:
 		  ukbd_value(kbd_tmp, xy, size, k);
-		  permuted_kbd_sum_w0[j] = kbd_tmp[0]; permuted_kbd_sum_w0[j] = kbd_tmp[1];
-		  permuted_kbd_max_w0[j] = kbd_tmp[2]; permuted_kbd_max_w0[j] = kbd_tmp[3];
+		  permuted_kbd_sum_w0[j] = kbd_tmp[0]; permuted_kbd_sum_w1[j] = kbd_tmp[1];
+		  permuted_kbd_max_w0[j] = kbd_tmp[2]; permuted_kbd_max_w1[j] = kbd_tmp[3];
 	  }
 
 	  // compute p-value
@@ -956,6 +953,7 @@ void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, in
 	  pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, j);
 	  pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, j);
 	  pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, j);
+	  //printf("pvalue: %f, %f, %f, %f\n", pvalue[0], pvalue[1], pvalue[2], pvalue[3]);
 	  free(permuted_kbd_sum_w0); free(permuted_kbd_sum_w1);
 	  free(permuted_kbd_max_w0); free(permuted_kbd_max_w1);
   }
