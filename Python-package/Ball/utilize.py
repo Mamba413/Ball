@@ -39,22 +39,22 @@ def examine_size_arguments(x, size):
 
     b = []
     for i in range(len(size)):
-        if type(size[i]) is int:
+        if int(size[i]) == size[i]:
             b.append(int(size[i]))
         else:
             b.append(0)
         size[i] = b[i]
-
     if np.any([x <= 0 for x in size]) or len(size) == 1:
         raise ValueError("Size should be a list that length longer than 1, with all elements positive integer!")
 
     # examine the consistency between x and size:
-    if len(x.shape) == 1:
-        x_row = x.shape[0]
-    else:
-        x_row = 1
-        for i in range(len(x.shape)):
-            x_row = x_row * x.shape[i]
+    x_row = x.shape[0]
+    # if len(x.shape) == 1:
+    #     x_row = x.shape[0]
+    # else:
+    #     x_row = 1
+    #     for i in range(len(x.shape)):
+    #         x_row = x_row * x.shape[i]
 
     n = np.sum(size)
     if x_row != n:
@@ -82,8 +82,7 @@ def examine_R_arguments(R):
 
 
 def calculatePvalue(statValue, NullDistribution):
-    return (np.sum(statValue < NullDistribution) + 1) / (len(NullDistribution) + 1)
-
+    return (np.sum(statValue[0] < NullDistribution[i] for i in range(0, len(NullDistribution)))+1)/(len(NullDistribution)+1)
 
 # def memoryAvailable(n = np.sum(size), funs = 'BD.test'):
 #     sysname = Sys.info()[1]

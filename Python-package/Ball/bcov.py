@@ -5,6 +5,7 @@
 # @Site    : 
 # @File    : bcov.py
 
+
 from collections import namedtuple
 
 from Ball.wrap_c import *
@@ -193,7 +194,7 @@ def kbcov_stat(x, num, var_num, weight, type_copy):
 
 
 def bcov_test_internal_wrap(x, y, R, dst, seed, weight, method, type_copy, num_threads):
-    if type(x) is list:
+    if type(x) is list and y is None:
         result = kbcov_test_internal(x=x, R=R, dst=dst, weight=weight, seed=seed, method=method, type_copy=type_copy)
     else:
         result = bcov_test_internal(x=x, y=y, R=R, dst=dst, weight=weight, seed=seed, method=method,
