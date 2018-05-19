@@ -21,6 +21,412 @@
 #include "utilize_cross.h"
 
 
+void swap(double *x, double *y) {
+	double t = *x;
+	*x = *y;
+	*y = t;
+}
+
+void quick_sort_recursive(double *arr, int start, int end) {
+	if (start >= end)
+		return;
+	double mid = arr[end];
+	int left = start, right = end - 1;
+	while (left < right) {
+		while (arr[left] < mid && left < right)
+			left++;
+		while (arr[right] >= mid && left < right)
+			right--;
+		swap(&arr[left], &arr[right]);
+	}
+	if (arr[left] >= arr[end])
+		swap(&arr[left], &arr[end]);
+	else
+		left++;
+	if (left)
+		quick_sort_recursive(arr, start, left - 1);
+	quick_sort_recursive(arr, left + 1, end);
+}
+
+/*
+quick sort function for finding Max K-1 two sample ball divergence value
+*/
+void quick_sort(double *arr, int len) {
+	quick_sort_recursive(arr, 0, len - 1);
+}
+
+
+double compute_pvalue(double ball_stat_value, double *permuted_stat, int R)
+{
+	double larger_num = 0.0;
+	for (int i = 0; i < R; i++)
+	{
+		//printf("lastest permute value: %f\n", permuted_stat[i]);
+		if (permuted_stat[i] > ball_stat_value)
+		{
+			larger_num += 1.0;
+		}
+	}
+	double R_double = R;
+	double p_value = (1.0 + larger_num) / (1.0 + R_double);
+	return(p_value);
+}
+
+void Merge(int *permutation, int *source, int *inversion_count, int dim, int n)
+{
+	int *left = (int *)malloc(n * sizeof(int));
+	int *right = (int *)malloc(n * sizeof(int));
+	int *left_source = (int *)malloc(n * sizeof(int));
+	int *right_source = (int *)malloc(n * sizeof(int));
+	int left_index = 0, right_index = 0;
+	int i, half_dim = dim / 2, nleft = half_dim, nright = dim - half_dim;
+	for (i = 0; i < half_dim; i++) {
+		left[i] = permutation[i];
+		left_source[i] = source[i];
+		right[i] = permutation[i + half_dim];
+		right_source[i] = source[i + half_dim];
+	}
+
+	if (nleft < nright) {
+		right[i] = permutation[i + half_dim];
+		right_source[i] = source[i + half_dim];
+	}
+
+	for (i = 0; i < dim; i++) {
+		if ((left_index < half_dim) && (right_index < dim - half_dim)) {
+			if (left[left_index] <= right[right_index]) { // I added "=" in order to support ties
+				permutation[i] = left[left_index];
+				source[i] = left_source[left_index];
+				left_index++;
+			}
+			else {
+				permutation[i] = right[right_index];
+				source[i] = right_source[right_index];
+				inversion_count[source[i]] += (half_dim - left_index);
+				right_index++;
+			}
+		}
+		else {
+			if (left_index < half_dim) {
+				permutation[i] = left[left_index];
+				source[i] = left_source[left_index];
+				left_index++;
+			}
+
+			if (right_index < dim - half_dim) {
+				permutation[i] = right[right_index];
+				source[i] = right_source[right_index];
+				right_index++;
+			}
+		}
+	}
+	free(left);
+	free(right);
+	free(left_source);
+	free(right_source);
+}
+
+
+int Inversions(int *permutation, int *source, int *inversion_count, int dim, int n)
+{
+	if (dim == 1)
+		return 0;
+	else {
+		Inversions(permutation, source, inversion_count, dim / 2, n);
+		Inversions(&permutation[dim / 2], &source[dim / 2], inversion_count, dim - dim / 2, n);
+		Merge(permutation, source, inversion_count, dim, n);
+	}
+	return 0;
+}
+
+
+ /*
+ The algorithm like the quick-sort. It finds the upper and lower in turn.
+ For each i, the computation complexity is O(n);
+ Thus, this function take O(n^2) times.
+
+ Algorithm detail:
+ For i=1, ..., n, carry out:
+ init the low and upper index: l=1, u=N
+ while (l <= u):
+ if (z[u] - z[i]) >= (z[i] - z[l]) ==> for pair (i, u), upper index: u, lower index: l ==> update upper index: u = u - 1
+ if (z[u] - z[i]) < (z[i] - z[l]) ==> for pair (i, l), upper index: u, lower index: l ==> update lower index: l = l - 1
+
+ Input: n=6, z = [1, 2, 3, 4, 5, 5], zidx = [3, 1, 5, 2, 6, 4], lowzidx = [], higzidx = [];
+ Output: lowzidx, higzidx;
+ */
+void createidx(int *n, int *zidx, double *z, int **lowzidx, int **higzidx)
+{
+	int i, zi, ileft, iright, jleft, jright, lowpos, higpos;
+	double lastval, tmp1, tmp2, tmp;
+	for (i = 0; i < *n; i++) {
+		zi = zidx[i];
+		lowpos = 1;
+		higpos = *n;
+		ileft = 0;
+		iright = *n - 1;
+		jleft = 0;
+		jright = 0;
+
+		tmp1 = z[iright] - z[i];
+		tmp2 = z[i] - z[ileft];
+		if (tmp1 > tmp2) {
+			lastval = tmp1;
+			lowzidx[zi][zidx[iright]] = lowpos;
+			higzidx[zi][zidx[iright]] = higpos;
+			iright--;
+			jright++;
+		}
+		else {
+			lastval = tmp2;
+			if (ileft == i) {
+				lowzidx[zi][zidx[iright]] = lowpos;
+				higzidx[zi][zidx[iright]] = higpos;
+				iright--;
+				jright++;
+			}
+			else {
+				lowzidx[zi][zidx[ileft]] = lowpos;
+				higzidx[zi][zidx[ileft]] = higpos;
+				ileft++;
+				jleft++;
+			}
+		}
+
+		while (ileft <= iright) {
+			tmp1 = z[iright] - z[i];
+			tmp2 = z[i] - z[ileft];
+			tmp = MAX(tmp1, tmp2);
+			while (lastval == tmp) {
+				if (tmp1 > tmp2) {
+					lowzidx[zi][zidx[iright]] = lowpos;
+					higzidx[zi][zidx[iright]] = higpos;
+					iright--;
+					jright++;
+				}
+				else {
+					if (ileft == i) {
+						lowzidx[zi][zidx[iright]] = lowpos;
+						higzidx[zi][zidx[iright]] = higpos;
+						iright--;
+						jright++;
+					}
+					else {
+						lowzidx[zi][zidx[ileft]] = lowpos;
+						higzidx[zi][zidx[ileft]] = higpos;
+						ileft++;
+						jleft++;
+					}
+				}
+				if (iright < ileft)
+					break;
+				tmp1 = z[iright] - z[i];
+				tmp2 = z[i] - z[ileft];
+				tmp = MAX(tmp1, tmp2);
+			}
+			if (iright < ileft)
+				break;
+			lowpos += jleft;
+			higpos -= jright;
+			jleft = 0;
+			jright = 0;
+			if (tmp1 > tmp2) {
+				lastval = tmp1;
+				lowzidx[zi][zidx[iright]] = lowpos;
+				higzidx[zi][zidx[iright]] = higpos;
+				iright--;
+				jright++;
+			}
+			else {
+				lastval = tmp2;
+				if (ileft == i) {
+					lowzidx[zi][zidx[iright]] = lowpos;
+					higzidx[zi][zidx[iright]] = higpos;
+					iright--;
+					jright++;
+				}
+				else {
+					lowzidx[zi][zidx[ileft]] = lowpos;
+					higzidx[zi][zidx[ileft]] = higpos;
+					ileft++;
+					jleft++;
+				}
+			}
+		}
+	}
+}
+
+
+void sort(int *n, int *zidx, double *z, int **dzidx)
+{
+	// the z[i] is the center
+	int i, j, zi, ileft, iright, lastpos;
+	double lastval, tmp;
+	for (i = 0; i < *n; i++) {
+		zi = zidx[i];
+		j = *n - 1;
+		lastpos = *n - 1;
+		ileft = 0;
+		iright = *n - 1;
+		lastval = -1.0;
+
+		while ((ileft != i) || (iright != i)) {
+			if (i == ileft) {
+				tmp = z[iright] - z[i];
+				if (lastval != tmp)
+					lastpos = j;
+				dzidx[zi][zidx[iright]] = lastpos;
+				lastval = tmp;
+				iright--;
+			}
+			else if (i == iright) {
+				tmp = z[i] - z[ileft];
+				if (lastval != tmp)
+					lastpos = j;
+				dzidx[zi][zidx[ileft]] = lastpos;
+				lastval = tmp;
+				ileft++;
+			}
+			else {
+				if (z[i] - z[ileft]>z[iright] - z[i]) {
+					tmp = z[i] - z[ileft];
+					if (lastval != tmp)
+						lastpos = j;
+					dzidx[zi][zidx[ileft]] = lastpos;
+					lastval = tmp;
+					ileft++;
+				}
+				else {
+					tmp = z[iright] - z[i];
+					if (lastval != tmp)
+						lastpos = j;
+					dzidx[zi][zidx[iright]] = lastpos;
+					lastval = tmp;
+					iright--;
+				}
+			}
+			j--;
+		}
+
+		if (lastval == 0)
+			dzidx[zi][zi] = lastpos;
+		else
+			dzidx[zi][zi] = 0;
+	}
+}
+
+
+void ranksort2(int n, int **Rxy, double **Dxy, int **Ixy)
+{
+	int i, j, lastpos = n - 1;
+	double lastval;
+	for (i = 0; i < n; i++) {
+		lastval = -1;
+		for (j = n - 1; j >= 0; j--) {
+			if (lastval != Dxy[i][j])
+				lastpos = j;
+			lastval = Dxy[i][j];
+			Rxy[i][Ixy[i][j]] = lastpos;
+		}
+	}
+}
+
+
+void Findx2(int *Rxy, int *Ixy, int *i_perm, int *n1, int *n2, int *Rx)
+{
+	int j, lastpos, lastval, n, tmp;
+	n = *n1 + *n2;
+
+	lastpos = *n1 - 1;
+	if (i_perm[Ixy[n - 1]] == 1) {
+		tmp = 1;
+		lastval = Rxy[Ixy[n - 1]];
+	}
+	else {
+		tmp = 0;
+		lastval = -1;
+	}
+	Rx[Ixy[n - 1]] = lastpos;
+
+	for (j = n - 2; j >= 0; j--) {
+		if (i_perm[Ixy[j]] == 1) {
+			if (lastval != Rxy[Ixy[j]]) {
+				lastpos -= tmp;
+				tmp = 0;
+			}
+			tmp++;
+			lastval = Rxy[Ixy[j]];
+			Rx[Ixy[j]] = lastpos;
+		}
+		else {
+			if (Rxy[Ixy[j]] == Rxy[Ixy[j + 1]])
+				Rx[Ixy[j]] = Rx[Ixy[j + 1]];
+			else
+				Rx[Ixy[j]] = lastpos - tmp;
+		}
+	}
+}
+
+
+void Findx(int **Rxy, int **Ixy, int *i_perm, int *n1, int *n2, int **Rx)
+{
+	int i, n;
+	n = *n1 + *n2;
+	for (i = 0; i < n; i++)
+		Findx2(Rxy[i], Ixy[i], i_perm, n1, n2, Rx[i]);
+}
+
+
+void ranksort3(int n, int *xyidx, double *xy, int **Rxy, int **Ixy)
+{
+	int i, j, ileft, iright, lastpos;
+	double lastval;
+	for (i = 0; i < n; i++) {
+		lastval = -1;
+		ileft = 0;
+		iright = n - 1;
+		j = n - 1;
+		lastpos = n - 1;
+		while (ileft<iright) {
+			if ((lastval != xy[i] - xy[ileft]) && (lastval != xy[iright] - xy[i]))
+				lastpos = j;
+			if (ileft == i) {
+				lastval = xy[iright] - xy[i];
+				Ixy[xyidx[i]][j] = xyidx[iright];
+				Rxy[xyidx[i]][xyidx[iright]] = lastpos;
+				iright--;
+			}
+			else if (iright == i) {
+				lastval = xy[i] - xy[ileft];
+				Ixy[xyidx[i]][j] = xyidx[ileft];
+				Rxy[xyidx[i]][xyidx[ileft]] = lastpos;
+				ileft++;
+			}
+			else {
+				if (xy[i] - xy[ileft] > xy[iright] - xy[i]) {
+					lastval = xy[i] - xy[ileft];
+					Ixy[xyidx[i]][j] = xyidx[ileft];
+					Rxy[xyidx[i]][xyidx[ileft]] = lastpos;
+					ileft++;
+				}
+				else {
+					lastval = xy[iright] - xy[i];
+					Ixy[xyidx[i]][j] = xyidx[iright];
+					Rxy[xyidx[i]][xyidx[iright]] = lastpos;
+					iright--;
+				}
+			}
+			j--;
+		}
+		Ixy[xyidx[i]][0] = xyidx[i];
+		if (lastval == 0)
+			Rxy[xyidx[i]][xyidx[i]] = lastpos;
+		else
+			Rxy[xyidx[i]][xyidx[i]] = 0;
+	}
+}
+
+
  /*
  The rank computation (initRank, computeRank) is refer to: http://www.jmlr.org/papers/volume17/14-441/14-441.pdf [section 3.1.2]
  */

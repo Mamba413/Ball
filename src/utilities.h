@@ -16,7 +16,19 @@
 #ifndef UTILITIES_H_
 #define UTILITIES_H_
 
-
+#define MAX(a,b) (((a)>(b))?(a):(b));
+void swap(double *x, double *y);
+void quick_sort_recursive(double *arr, int start, int end);
+void quick_sort(double *arr, int len);
+double compute_pvalue(double ball_stat_value, double *permuted_stat, int R);
+void Merge(int *permutation, int *source, int *inversion_count, int dim, int n);
+int Inversions(int *permutation, int *source, int *inversion_count, int dim, int n);
+void sort(int *n, int *zidx, double *z, int **dzidx);
+void createidx(int *n, int *zidx, double *z, int **lowzidx, int **higzidx);
+void ranksort2(int n, int **Rxy, double **Dxy, int **Ixy);
+void Findx2(int *Rxy, int *Ixy, int *i_perm, int *n1, int *n2, int *Rx);
+void Findx(int **Rxy, int **Ixy, int *i_perm, int *n1, int *n2, int **Rx);
+void ranksort3(int n, int *xyidx, double *xy, int **Rxy, int **Ixy);
 void computeRank(int n, int **Rank);
 void initRank(int n, int **Rank, int *xrank, int *yrank, int *i_perm);
 void quicksort(double *a, int *idx, int l, int u);
