@@ -5,7 +5,7 @@
 \title{Ball Divergence based Equality of Distributions Test}
 \usage{
 bd.test(x, y = NULL, R = 99, dst = FALSE, size = NULL, seed = 4,
-  num.threads = 2)
+  num.threads = 2, kbd.type = "sum")
 }
 \arguments{
 \item{x}{a numeric vector, matrix, data.frame, \code{dist} object or list contains vector, matrix or data.frame.}
@@ -22,6 +22,10 @@ the sample version of ball divergence. Default: \code{R = 99}}
 \item{seed}{the random seed.}
 
 \item{num.threads}{Number of threads. Default \code{num.threads = 2}.}
+
+\item{kbd.type}{the type of K-sample test statistics. Setting \code{kbd.type = "sum"} print the statistic 
+and \eqn{p}-value of the summation version of \eqn{K} sample ball divergence while setting \code{kbd.type = "max"} print
+the maximum version. Further, you can obtain the information of both summation and maximum by \code{summary} function.}
 }
 \value{
 bd.test returns a list with class "htest" containing the following components:
@@ -50,7 +54,7 @@ and hence have to be numeric data vectors, matrix or data.frame.
 
 Based on sample version ball divergence (see \code{\link{bd}}), the test is implemented by 
 permutation with R replicates. The function simply returns the test statistic 
-when R = 0.
+when \code{R = 0}.
 }
 \examples{
 ################# Quick Start #################

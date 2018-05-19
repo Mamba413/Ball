@@ -11,6 +11,10 @@
 #' @param size a vector record sample size of each group.
 #' @param seed the random seed. 
 #' @param num.threads Number of threads. Default \code{num.threads = 2}.
+#' @param kbd.type the type of K-sample test statistics. Setting \code{kbd.type = "sum"} print the statistic 
+#' and \eqn{p}-value of the summation version of \eqn{K} sample ball divergence while setting \code{kbd.type = "max"} print
+#' the maximum version. Further, you can obtain the information of both summation and maximum by \code{summary} function.
+#' 
 ## @param weight not available now
 ## @param method if \code{method = 'permute'}, a permutation procedure will be carried out;
 ## if \code{ method = 'approx'}, the p-values based on approximate Ball Divergence
@@ -40,7 +44,7 @@
 #' 
 #' Based on sample version ball divergence (see \code{\link{bd}}), the test is implemented by 
 #' permutation with R replicates. The function simply returns the test statistic 
-#' when R = 0.
+#' when \code{R = 0}.
 #' 
 #' @seealso
 #' \code{\link{bd}}
@@ -93,7 +97,8 @@
 #' bd.test(x)
 #' 
 bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
-                    size = NULL, seed = 4, num.threads = 2) {
+                    size = NULL, seed = 4, num.threads = 2, 
+                    kbd.type = "sum") {
   weight = FALSE
   method = 'permute'
   data_name <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
@@ -156,7 +161,7 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
   
   ## main:
   if(R == 0) {
-    result <- bd_value_wrap_c(xy, size, weight, dst, num.threads)
+    result <- bd_test_wrap_c(xy, size, R = 0, weight, dst, num.threads)
     # approximately method:
     if(method == "approx") {
       if(result[["info"]][["K"]] == 2) {
@@ -165,8 +170,23 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
       } else {
         return(result[["statistic"]])
       }
-    } else {
-      return(result[["statistic"]])
+    } 
+    # return statistic when R = 0:
+    else {
+      if (result[["info"]][["K"]] == 2) {
+        if (weight) {
+          return_stat <- result[["statistic"]][2]
+        } else {
+          return_stat <- result[["statistic"]][1] 
+        }
+      } else {
+        if (kbd.type == "sum") {
+          return_stat <- result[["statistic"]][1]
+        } else {
+          return_stat <- result[["statistic"]][3] 
+        }
+      }
+      return(return_stat)
     }
   } else {
     # permutation method:
@@ -174,23 +194,37 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
     set.seed(examine_seed_arguments(seed))
     ## hypothesis test:
     result <- bd_test_wrap_c(xy, size, R, weight, dst, num.threads)
-    pvalue <- calculatePvalue(result[["statistic"]], result[["permuted_stat"]])
+    # pvalue <- calculatePvalue(result[["statistic"]], result[["permuted_stat"]])
   }
   # output information:
+  if (result[["info"]][["K"]] == 2) {
+    stat <- result[["statistic"]][1]
+    pvalue <- result[["p.value"]][1]
+    stat_message <- ""
+  } else if (kbd.type == "sum") {
+    stat <- result[["statistic"]][1]
+    pvalue <- result[["p.value"]][1]
+    stat_message <- " (Summation Version)"
+  } else {
+    stat <- result[["statistic"]][3]
+    pvalue <- result[["p.value"]][3]
+    stat_message <- " (Maximum Version)"
+  }
   data_name <- paste(data_name, sprintf("\nnumber of observations = %s,", result[["info"]][["N"]]))
   data_name <- paste(data_name, "group sizes:", paste0(result[["info"]][["size"]], collapse = " "))
   data_name <- paste0(data_name, "\nreplicates = ", R)
   # data_name <- paste0(data_name, ", Weighted Ball Divergence = ", result[["info"]][["weight"]])
   alternative_message <- "distributions of samples are distinct"
+  
   # return:
   e <- list(
-    statistic = result[["statistic"]],
-    permuted_stat = result[["permuted_stat"]],
+    statistic = stat,
     p.value = pvalue,
     replicates = R,
     size = result[["info"]][["size"]],
+    complete.test.info = result,
     alternative = alternative_message,
-    method = sprintf("Nonparametric %s-Samples Ball Divergence Test", result[["info"]][["K"]]),
+    method = sprintf("Nonparametric %s-Samples Ball Divergence Test%s", result[["info"]][["K"]], stat_message),
     data.name = data_name
   )
   class(e) <- "htest"
@@ -259,7 +293,7 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
 #' x <- rnorm(50)
 #' y <- rnorm(50)
 #' bd(x, y)
-bd <- function(x, y = NULL, dst = FALSE, size = NULL, num.threads = 2) {
+bd <- function(x, y = NULL, dst = FALSE, size = NULL, num.threads = 2, kbd.type = "sum") {
   res <- bd.test(x = x, y = y, dst = dst, size = size, R = 0)
   res
 }

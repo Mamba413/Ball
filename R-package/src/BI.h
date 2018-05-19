@@ -17,14 +17,9 @@
 #define BI_H_
 
 
-#define MAX(a,b) (((a)>(b))?(a):(b));
-void Merge(int *permutation, int *source, int *inversion_count, int dim, int n);
-int Inversions(int *permutation, int *source, int *inversion_count, int dim, int n);
 double Ball_Information(int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *weight);
 void BI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *R, int *weight, int *thread);
 void ranksort(int *n, int *zrank, double *z, int *zidx);
-void sort(int *n, int *zidx, double *z, int **dzidx);
-void createidx(int *n, int *zidx, double *z, int **lowzidx, int **higzidx);
 double U_Ball_Information(int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *weight);
 double U_Ball_Information_parallel(int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *weight, int *nthread);
 double U_Ball_Information_wrapper(int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *weight, int *nthread);

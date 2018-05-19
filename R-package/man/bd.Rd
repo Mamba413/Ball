@@ -4,7 +4,8 @@
 \alias{bd}
 \title{Ball Divergence}
 \usage{
-bd(x, y = NULL, dst = FALSE, size = NULL, num.threads = 2)
+bd(x, y = NULL, dst = FALSE, size = NULL, num.threads = 2,
+  kbd.type = "sum")
 }
 \arguments{
 \item{x}{a numeric vector, matrix, data.frame, \code{dist} object or list contains vector, matrix or data.frame.}
@@ -16,6 +17,10 @@ bd(x, y = NULL, dst = FALSE, size = NULL, num.threads = 2)
 \item{size}{a vector record sample size of each group.}
 
 \item{num.threads}{Number of threads. Default \code{num.threads = 2}.}
+
+\item{kbd.type}{the type of K-sample test statistics. Setting \code{kbd.type = "sum"} print the statistic 
+and \eqn{p}-value of the summation version of \eqn{K} sample ball divergence while setting \code{kbd.type = "max"} print
+the maximum version. Further, you can obtain the information of both summation and maximum by \code{summary} function.}
 }
 \value{
 \item{\code{bd }}{ sample version of ball divergence}

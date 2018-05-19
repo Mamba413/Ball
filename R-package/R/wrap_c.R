@@ -36,21 +36,27 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
   xy <- as.double(xy)
   dst <- as.integer(dst)
   R <- as.integer(R)
-  weight <- as.integer(weight)
   num.threads <- as.integer(num.threads)
   #
-  bd <- as.double(numeric(1))
-  permuted_bd <- as.double(rep(-1, R))
   K <- as.integer(length(size))
+  stat_num <- ifelse(K == 2, 2, 4)
+  bd <- as.double(numeric(stat_num))
+  p_value <- as.double(numeric(stat_num))
   size <- as.integer(size)
   N <- as.integer(sum(size))
-  res <- .C("bd_test", bd, permuted_bd, xy, size, N, K, dst, R, weight, num.threads)
+  res <- .C("bd_test", bd, p_value, xy, size, N, K, dst, R, num.threads)
   #
+  stat_name_bd <- c("bd", "wbd")
+  stat_name_kbd <- c("kbd.sum", "wkbd.sum", "kbd.max", "wkbd.max")
   bd <- res[[1]]
-  names(bd) <- ifelse(weight, "wbd", "bd")
-  permuted_bd <- res[[2]]
-  permuted_bd <- permuted_bd[permuted_bd != (-1)]
-  list('statistic' = bd, 'permuted_stat' = permuted_bd, 
+  p_value <- res[[2]]
+  if (K == 2) {
+    names(bd) <- stat_name_bd
+  } else {
+    names(bd) <- stat_name_kbd
+  }
+  names(p_value) <- paste0(names(bd), ".pvalue")
+  list('statistic' = bd, 'p.value' = p_value, 
        'info' = list('N' = N, 'K' = K, 'size' = size, 
                      'weight' = as.logical(weight), 'R' = R))
 }
