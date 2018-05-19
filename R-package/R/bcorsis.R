@@ -63,10 +63,11 @@
 #' 
 #' (iv) It can extract important features even when the underlying model is complicated.
 #' 
-#' See (Pan 2017) for theoretical properties of the BCor-SIS, including statistical consistency.
 #'   
 #' @seealso 
 #' \code{\link{bcor}}
+#' 
+#' @references Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) A Generic Sure Independence Screening Procedure, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709
 #' 
 #' @export
 #' @examples 

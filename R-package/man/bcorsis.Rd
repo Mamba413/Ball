@@ -80,8 +80,6 @@ almost surely able to retain the efficient variables.
 (iii) It works well for complex responses and/or predictors, such as shape or survival data
 
 (iv) It can extract important features even when the underlying model is complicated.
-
-See (Pan 2017) for theoretical properties of the BCor-SIS, including statistical consistency.
 }
 \examples{
 \dontrun{
@@ -128,6 +126,9 @@ y <- 3*(x[, 1])^2 + 5*(x[, 2])^2 + 5*x[, 8] - 8*x[, 16] + error
 res <- bcorsis(y = y, x = x, method = "gam", d = 15)
 res[[1]]
 }
+}
+\references{
+Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) A Generic Sure Independence Screening Procedure, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709
 }
 \seealso{
 \code{\link{bcor}}
