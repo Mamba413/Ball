@@ -14,8 +14,15 @@ cache:
   - C:\RLibrary
 
 # Adapt as necessary starting from here
+environment:
+  matrix:
+  - TEST_DIR: R-package
+
 before_build:
-  ps: cd R-package
+  - cp ..\travis-tool.sh .\travis-tool.sh
+  - cp travis-tool.sh.cmd %TEST_DIR%\travis-tool.sh.cmd
+  - cd %TEST_DIR%
+  - bash -c "echo '^travis-tool\.sh\.cmd$' >> .Rbuildignore"
 
 build_script:
   - travis-tool.sh install_deps
