@@ -25,13 +25,14 @@ test_that("Error if input data contain abnormal values", {
 test_that("Multi-thread support is valid!", {
   cat("Multi-thread computation via permutation.\n")
   set.seed(4)
-  x <- c(rnorm(100, mean = 0.1), rnorm(100, mean = 0))
-  x1 <- matrix(rnorm(100 * 2), ncol = 2)
-  x2 <- matrix(rnorm(100 * 2), ncol = 2)
+  num <- 150
+  x <- c(rnorm(num, mean = 0.1), rnorm(num, mean = 0))
+  x1 <- matrix(rnorm(num * 2), ncol = 2)
+  x2 <- matrix(rnorm(num * 2), ncol = 2)
   #
   cat("Univariate case: \n")
-  t1 <- system.time(res1 <- bd.test(x, size = c(100, 100), R = 1999, num.threads = 1))
-  t2 <- system.time(res2 <- bd.test(x, size = c(100, 100), R = 1999, num.threads = 2))
+  t1 <- system.time(res1 <- bd.test(x, size = c(num, num), R = 1999, num.threads = 1))
+  t2 <- system.time(res2 <- bd.test(x, size = c(num, num), R = 1999, num.threads = 2))
   expect_equal(res1$statistic, res2$statistic)
   expect_equal(res1$p.value < 0.05, res2$p.value < 0.05)
   expect_true(t1[3]/t2[3] > 1.1)
