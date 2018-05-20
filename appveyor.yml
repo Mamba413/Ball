@@ -9,12 +9,13 @@ init:
 
 install:
   ps: Bootstrap
-  - cmd: cd R-package
 
 cache:
   - C:\RLibrary
 
 # Adapt as necessary starting from here
+before_build:
+  - cd R-package
 
 build_script:
   - travis-tool.sh install_deps
