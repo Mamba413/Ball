@@ -769,7 +769,7 @@ double ubcov_value(double *x, double *y, int *n, int *weight, int *thread)
 {
 	int    i, *xidx, *yidx, *xrank, *yrank, *i_perm, **Rank, **lowxidx, **higxidx, **lowyidx, **higyidx;
 	double RCTV0;
-	double bcov[2];
+	double bcov[3];
 
 	xidx = (int *)malloc(*n * sizeof(int));
 	yidx = (int *)malloc(*n * sizeof(int));
@@ -828,7 +828,7 @@ double bcov_value(double *x, double *y, int *n, int *weight, int *thread)
 	/*  computes RCT(x,y)  */
 	int    i, j, **xidx, **yidx, *i_perm, *i_perm_inv;
 	double **Dx, **Dy, *x_cpy, *y_cpy, RCTV0;
-	double bcov[2];
+	double bcov[3];
 
 	Dx = alloc_matrix(*n, *n);
 	Dy = alloc_matrix(*n, *n);

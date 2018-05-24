@@ -28,6 +28,7 @@ void U_Ball_Information_wrapper(double *, int *n, int **Rank, int **lowxidx, int
 void UBI(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *thread);
 double ubcov_value(double *x, double *y, int *n, int *weight, int *thread);
 double bcov_value(double *x, double *y, int *n, int *weight, int *thread);
+double bcor_value(double *x, double *y, int *n, int *weight, int *thread);
 // R API function:
 void bcov_stat(double *bcor, double *x, double *y, int *n, int *weight, int *dst, int *type, int *thread);
 void bcov_test(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight, int *dst, int *type, int *thread);
