@@ -20,7 +20,7 @@
 
 void Ball_Divergence(double *bd, int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2);
 void Ball_Divergence_parallel(double *bd, int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2, int *nthread);
-void Ball_Divergence_wrapper(double *bd, int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2, int *nthread);
+void Ball_Information_wrapper(double *bcov_stat, int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *nthread);
 void get_ij_dst(double *xy, double *ij_dst, int *cumulate_size, int *size, int *n, int *p, int *q);
 void compute_cumulate_size(int *cumulate_size, int *size, int *k);
 void permute_dst(double *xy, double *new_xy, int *index, int *N);

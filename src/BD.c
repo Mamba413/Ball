@@ -161,7 +161,6 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *p, int *R
   */
   int    **Ixy, **Rxy, **Rx, *i_perm, *i_perm_tmp;
   double **Dxy;
-  double bd_tmp[2], *permuted_bd_w0, *permuted_bd_w1;
   
   n = *n1 + *n2;
   Dxy = alloc_matrix(n, n);
@@ -170,8 +169,6 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *p, int *R
   Rxy = alloc_int_matrix(n, n);
   i_perm = (int *) malloc(n * sizeof(int));
   i_perm_tmp = (int *) malloc(n * sizeof(int));
-  permuted_bd_w0 = (double *)malloc(*R * sizeof(double));
-  permuted_bd_w1 = (double *)malloc(*R * sizeof(double));
   
   // get vectorize distance matrix Dxy:
   vector2matrix(xy, Dxy, n, n, 1);
@@ -204,19 +201,26 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *p, int *R
 
   // permutation test
   if(*R > 0){
-    for(i = 0; i < *R; i++){ 
-      // stop permutation if user stop it manually:
-      if(pending_interrupt()) {
-        print_stop_message();
-        break;
-      }
-      resample3(i_perm, i_perm_tmp, n, n1);
-      Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
-      Ball_Divergence_wrapper(bd_tmp, Rxy, Rx, i_perm_tmp, n1, n2, nthread);
-	  permuted_bd_w0[i] = bd_tmp[0]; permuted_bd_w1[i] = bd_tmp[1];
-    }
-	pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, i);
-	pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, i);
+	  double bd_tmp[2], *permuted_bd_w0, *permuted_bd_w1;
+	  permuted_bd_w0 = (double *)malloc(*R * sizeof(double));
+	  permuted_bd_w1 = (double *)malloc(*R * sizeof(double));
+
+	  for (i = 0; i < *R; i++) {
+		  // stop permutation if user stop it manually:
+		  if (pending_interrupt()) {
+			  print_stop_message();
+			  break;
+		  }
+		  resample3(i_perm, i_perm_tmp, n, n1);
+		  Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
+		  Ball_Divergence_wrapper(bd_tmp, Rxy, Rx, i_perm_tmp, n1, n2, nthread);
+		  permuted_bd_w0[i] = bd_tmp[0]; permuted_bd_w1[i] = bd_tmp[1];
+	  }
+	  pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, i);
+	  pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, i);
+
+	  free(permuted_bd_w0);
+	  free(permuted_bd_w1);
   }
   // free matrix:
   free_int_matrix(Ixy, n, n);
@@ -233,7 +237,6 @@ void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *
 	int i, j, n;
 	int    **Ixy, **Rxy, **Rx, *i_perm, *i_perm_tmp;
 	double **Dxy;
-	double *permuted_bd_w0, *permuted_bd_w1;
 
 	n = *n1 + *n2;
 	Dxy = alloc_matrix(n, n);
@@ -242,8 +245,6 @@ void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *
 	Rxy = alloc_int_matrix(n, n);
 	i_perm = (int *)malloc(n * sizeof(int));
 	i_perm_tmp = (int *)malloc(n * sizeof(int));
-	permuted_bd_w0 = (double *)malloc(*R * sizeof(double));
-	permuted_bd_w1 = (double *)malloc(*R * sizeof(double));
 
 	// get vectorize distance matrix Dxy:
 	vector2matrix(xy, Dxy, n, n, 1);
@@ -280,6 +281,10 @@ void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *
 	free(i_perm_tmp);
 
 	if (*R > 0) {
+		double *permuted_bd_w0, *permuted_bd_w1;
+		permuted_bd_w0 = (double *)malloc(*R * sizeof(double));
+		permuted_bd_w1 = (double *)malloc(*R * sizeof(double));
+
 #ifdef _OPENMP
 		omp_set_num_threads(*nthread);
 #endif
@@ -322,12 +327,14 @@ void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *
 			free(i_perm_thread); free(i_perm_tmp_thread);
 			free_int_matrix(Rx_thread, n, n);
 		}
+
+		pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, *R);
+		pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, *R);
+
+		free(permuted_bd_w0);
+		free(permuted_bd_w1);
 	}
-	pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, *R);
-	pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, *R);
 	// free matrix:
-	free(permuted_bd_w0); 
-	free(permuted_bd_w1);
 	free_int_matrix(Ixy, n, n);
 	free_int_matrix(Rxy, n, n);
 	return;
@@ -408,7 +415,6 @@ void UBD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int 
 	//  computes TST(x,y)  	
 	int i, j, n;
 	int **Ixy, **Rxy, **Rx, *i_perm, *i_perm_tmp, *xyidx;
-	double *permuted_bd_w0, *permuted_bd_w1;
 
 	n = *n1 + *n2;
 	Ixy = alloc_int_matrix(n, n);
@@ -417,8 +423,6 @@ void UBD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int 
 	i_perm = (int *) malloc(n * sizeof(int));
 	i_perm_tmp = (int *) malloc(n * sizeof(int));
 	xyidx = (int *) malloc(n * sizeof(int));
-	permuted_bd_w0 = (double *)malloc(*R * sizeof(double));
-	permuted_bd_w1 = (double *)malloc(*R * sizeof(double));
 
 	for (i = 0; i < n; i++) {
 		xyidx[i] = i;
@@ -445,6 +449,10 @@ void UBD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int 
 	free(xyidx);
 
 	if (*R > 0) {
+		double *permuted_bd_w0, *permuted_bd_w1;
+		permuted_bd_w0 = (double *)malloc(*R * sizeof(double));
+		permuted_bd_w1 = (double *)malloc(*R * sizeof(double));
+
 #ifdef _OPENMP
 		omp_set_num_threads(*nthread);
 #endif
@@ -486,10 +494,10 @@ void UBD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int 
 			free(i_perm_tmp_thread);
 			free_int_matrix(Rx_thread, n, n);
 		}
+		pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, *R);
+		pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, *R);
+		free(permuted_bd_w0); free(permuted_bd_w1);
 	}
-	//
-	pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, *R);
-	pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, *R);
 	//
 	free_int_matrix(Ixy, n, n);
 	free_int_matrix(Rxy, n, n);
