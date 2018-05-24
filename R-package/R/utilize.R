@@ -87,6 +87,29 @@ examine_seed_arguments <- function(seed) {
 }
 
 
+#' Examine weight arguments in bcov.test, bd.test
+#' @param weight A bool or character value
+#' @param fun "bd.test" or "bcov.test"
+#' @return A integer number
+#' @noRd
+#'
+examine_weight_arguments <- function(weight, fun) {
+  if (fun == "bcov.test") {
+    WEIGHT_METHODS <- c(TRUE, FALSE, "none", "hhg", "prob")
+    method <- pmatch(weight, WEIGHT_METHODS)
+    if (is.na(method)) 
+      stop("invalid weight method")
+    if (weight == TRUE) {
+      weight <- "prob"
+    } else if (is.logical(weight)) {
+      weight <- "none"
+    }
+    return(weight)
+  }
+}
+
+
+
 #' Examine size arguments in bcov.test, bd.test
 #' @param size A integer vector
 #' @noRd

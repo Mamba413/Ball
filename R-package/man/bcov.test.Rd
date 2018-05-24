@@ -26,7 +26,6 @@ or ball correlation. Default: \code{weight = FALSE}}
 \value{
 bcov.test returns a list with class "htest" containing the following components:
 \item{\code{statistic}}{ball covariance or ball correlation statistic.}            
-\item{\code{permuted_stat}}{permuted ball covariance or ball correlation statistic.} 
 \item{\code{p.value}}{the p-value for the test.}  
 \item{\code{replicates}}{replicates of the test statistic.}
 \item{\code{size}}{sample size.} 

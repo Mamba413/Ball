@@ -17,15 +17,18 @@
 #define BI_H_
 
 
-double Ball_Information(int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *weight);
-void BI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *R, int *weight, int *thread);
+void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv);
+void Ball_Information_parallel(double *bcov_stat, int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *nthread);
+void Ball_Information_wrapper(double *bcov_stat, int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *nthread);
+void BI(double *bcov, double *permuted_bcov, double *x, double *y, int *n, int *R, int *thread);
 void ranksort(int *n, int *zrank, double *z, int *zidx);
-double U_Ball_Information(int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *weight);
-double U_Ball_Information_parallel(int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *weight, int *nthread);
-double U_Ball_Information_wrapper(int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *weight, int *nthread);
-void UBI(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight, int *thread);
+void U_Ball_Information(double *, int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm);
+void U_Ball_Information_parallel(double *, int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *nthread);
+void U_Ball_Information_wrapper(double *, int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *nthread);
+void UBI(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *thread);
 double ubcov_value(double *x, double *y, int *n, int *weight, int *thread);
 double bcov_value(double *x, double *y, int *n, int *weight, int *thread);
+double bcor_value(double *x, double *y, int *n, int *weight, int *dst, int *thread);
 // R API function:
 void bcov_stat(double *bcor, double *x, double *y, int *n, int *weight, int *dst, int *type, int *thread);
 void bcov_test(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight, int *dst, int *type, int *thread);

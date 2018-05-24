@@ -17,7 +17,6 @@
 #' 
 #' @return bcov.test returns a list with class "htest" containing the following components:
 #' \item{\code{statistic}}{ball covariance or ball correlation statistic.}            
-#' \item{\code{permuted_stat}}{permuted ball covariance or ball correlation statistic.} 
 #' \item{\code{p.value}}{the p-value for the test.}  
 #' \item{\code{replicates}}{replicates of the test statistic.}
 #' \item{\code{size}}{sample size.} 
@@ -111,9 +110,25 @@ bcov.test <- function(x, y = NULL, R = 99, dst = FALSE, weight = FALSE,
   if(R == 0) {
     return(result)
   } else {
+    if (class(x) == "list") {
+      stat <- result[["statistic"]][1]
+      pvalue <- result[["p.value"]][1]
+    } else {
+      if (weight == "none") {
+        stat <- result[["statistic"]][1]
+        pvalue <- result[["p.value"]][1]
+      } else if (weight == "prob") {
+        stat <- result[["statistic"]][2]
+        pvalue <- result[["p.value"]][2]
+      } else {
+        stat <- result[["statistic"]][3]
+        pvalue <- result[["p.value"]][3]
+      } 
+    }
+    
     data_name <- paste0(data_name,"\nnumber of observations = ", result[["N"]])
     data_name <- paste0(data_name, "\nreplicates = ", R, 
-                        ", Weighted Ball Covariance = ", weight)
+                        ", weight: ", weight)
     test_method <- "Ball Covariance test of independence"
     if(type == "bcor") {
       test_method <- gsub(pattern = "Covariance", replacement = "Correlation", x = test_method)
@@ -121,11 +136,11 @@ bcov.test <- function(x, y = NULL, R = 99, dst = FALSE, weight = FALSE,
     }
     alternative_message <- "random variables are dependent"
     e <- list(
-      statistic = result[["statistic"]],
-      permuted_stat = result[["permuted_stat"]],
-      p.value = result[["p.value"]],
+      statistic = stat,
+      p.value = pvalue,
       replicates = R,
       size = result[["N"]],
+      complete.test.info = result,
       alternative = alternative_message,
       method = test_method,
       data.name = data_name
@@ -177,17 +192,21 @@ bcov_test_internal <- function(x, y, R = 99, dst = FALSE, weight = FALSE,
       pvalue <- calculatePvalue(result[["statistic"]] * result[["info"]][["N"]], 
                                 BITestNullDistribution)
     } else {
+      # if (weight == "none") {
+      #   return(result[[1]][1])
+      # } else if (weight == "prob") {
+      #   return(result[[1]][1])
+      # } else {
+      #   return(result[[1]][2])
+      # }
       return(result[["statistic"]])
     }
   } else {
     set.seed(seed = examine_seed_arguments(seed))
+    weight <- examine_weight_arguments(weight, "bcov.test")
     result <- bcov_test_wrap_c(x = x, y = y, n = num, R = R, weight = weight, dst =  dst, type = type, num.threads = num.threads)
-    pvalue <- calculatePvalue(result[["statistic"]], result[["permuted_stat"]])
+    return(result)
   }
-  list(statistic = result[["statistic"]],
-       permuted_stat = result[["permuted_stat"]],
-       N = num,
-       p.value = pvalue)
 }
 
 
@@ -239,7 +258,6 @@ kbcov_test_internal <- function(x, R = 99, dst = FALSE, weight = FALSE,
   }
   # return result:
   list("statistic" = stat_value, 
-       "permuted_stat" = permuted_stat, 
        "N" = num, 
        "p.value" = pvalue)
 }

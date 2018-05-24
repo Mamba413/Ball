@@ -30,7 +30,6 @@ the maximum version. Further, you can obtain the information of both summation a
 \value{
 bd.test returns a list with class "htest" containing the following components:
 \item{\code{statistic}}{ball divergence statistic.}            
-\item{\code{permuted_stat}}{permuted ball divergence statistic.} 
 \item{\code{p.value}}{the p-value for the test.}
 \item{\code{replicates}}{replicates of the test statistic.}
 \item{\code{size}}{sample sizes.}
