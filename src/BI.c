@@ -155,7 +155,7 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
 void Ball_Information_parallel(double *bcov_stat, int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *nthread)
 {
 	double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0;
-	double rct0_value = 0.0, minor_ball_prop = 2 / (*n);
+	double minor_ball_prop = 2 / (*n);
 	int i, jjjj, **xyidx;
 	double *xx_cpy, *yy_cpy;
 	xyidx = alloc_int_matrix(*n, *n);
@@ -181,7 +181,7 @@ void Ball_Information_parallel(double *bcov_stat, int *n, double **Dx, double **
 #pragma omp parallel
 	{
 		int j, k, pi, src, lastpos, *yrank, *isource, *icount, *xy_index, *xy_temp;
-		double pxy, px, py, lastval, rct0 = 0.0;
+		double pxy, px, py, lastval;
 		double bcov_weight0_thread = 0.0, bcov_weight_prob_thread = 0.0, bcov_weight_hhg_thread = 0.0, bcov_fixed_ball = 0.0;
 		yrank = (int *)malloc(*n * sizeof(int));
 		isource = (int *)malloc(*n * sizeof(int));
@@ -391,7 +391,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
 void BI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *thread)
 {
 	int    i, j, **xidx, **yidx, *i_perm, *i_perm_inv;
-	double **Dx, **Dy, *x_cpy, *y_cpy, RCTV0;
+	double **Dx, **Dy, *x_cpy, *y_cpy;
 
 	Dx = alloc_matrix(*n, *n);
 	Dy = alloc_matrix(*n, *n);
@@ -447,7 +447,6 @@ void BI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, int
 		{
 			int **xidx_thread, **yidx_thread, *i_perm_thread, *i_perm_inv_thread;
 			int k, kk, i_thread;
-			double ans = 0.0;
 			double bcov_tmp[3];
 			xidx_thread = alloc_int_matrix(*n, *n);
 			yidx_thread = alloc_int_matrix(*n, *n);
@@ -533,7 +532,6 @@ void U_Ball_Information(double *bcov_stat, int *n, int **Rank, int **lowxidx, in
 
 void U_Ball_Information_parallel(double *bcov_stat, int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *nthread)
 {
-	double BI_value = 0.0;
 	double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0;
 	double minor_ball_prop = 2 / (*n);
 #ifdef _OPENMP
@@ -542,7 +540,7 @@ void U_Ball_Information_parallel(double *bcov_stat, int *n, int **Rank, int **lo
 #pragma omp parallel
 	{
 		int i, j, pi, pj;
-		double px, py, pxy, ans = 0;
+		double px, py, pxy;
 		double bcov_weight0_thread = 0.0, bcov_weight_prob_thread = 0.0, bcov_weight_hhg_thread = 0.0, bcov_fixed_ball = 0.0;
 
 #pragma omp for
@@ -585,7 +583,6 @@ void U_Ball_Information_parallel(double *bcov_stat, int *n, int **Rank, int **lo
 
 void U_Ball_Information_wrapper(double *bcov_stat, int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *nthread)
 {
-	double ans = 0.0;
 	if ((*nthread) == 1)
 	{
 		U_Ball_Information(bcov_stat, n, Rank, lowxidx, higxidx, lowyidx, higyidx, i_perm);
@@ -722,7 +719,6 @@ void UBI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, in
 		{
 			int **Rank_thread, *i_perm_thread;
 			int k, j_thread;
-			double ans_thread = 0.0;
 			double bcov_tmp[3];
 			i_perm_thread = (int *)malloc(*n * sizeof(int));
 			Rank_thread = alloc_int_matrix((*n) + 1, (*n) + 1);
@@ -911,7 +907,7 @@ void UBCOR(double *bcor, double *permuted_bcor, double *x, double *y, int *n, in
 {
 	int i;
 	double bcov_stat_xx, bcov_stat_yy;
-	UBI(bcor, permuted_bcor, x, y, n, R, weight, thread);
+	UBI(bcor, permuted_bcor, x, y, n, R, thread);
 	bcov_stat_xx = ubcov_value(x, x, n, weight, thread);
 	bcov_stat_yy = ubcov_value(y, y, n, weight, thread);
 	(*bcor) = (*bcor) / bcov_stat_xx / bcov_stat_yy;
@@ -925,7 +921,7 @@ void BCOR(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int
 {
 	int i;
 	double bcov_stat_xx, bcov_stat_yy;
-	BI(bcor, permuted_bcor, x, y, n, R, weight, thread);
+	BI(bcor, permuted_bcor, x, y, n, R, thread);
 	bcov_stat_xx = bcov_value(x, x, n, weight, thread);
 	bcov_stat_yy = bcov_value(y, y, n, weight, thread);
 	(*bcor) = (*bcor) / bcov_stat_xx / bcov_stat_yy;
