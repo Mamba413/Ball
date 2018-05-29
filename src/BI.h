@@ -26,11 +26,8 @@ void U_Ball_Information(double *, int *n, int **Rank, int **lowxidx, int **higxi
 void U_Ball_Information_parallel(double *, int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *nthread);
 void U_Ball_Information_wrapper(double *, int *n, int **Rank, int **lowxidx, int **higxidx, int **lowyidx, int **higyidx, int *i_perm, int *nthread);
 void UBI(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *thread);
-double ubcov_value(double *x, double *y, int *n, int *weight, int *thread);
-double bcov_value(double *x, double *y, int *n, int *weight, int *thread);
-double bcor_value(double *x, double *y, int *n, int *weight, int *thread);
+void UBI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *thread);
 // R API function:
-void bcov_stat(double *bcor, double *x, double *y, int *n, int *weight, int *dst, int *type, int *thread);
 void bcov_test(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight, int *dst, int *type, int *thread);
 
 
