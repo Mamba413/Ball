@@ -62,57 +62,57 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
 }
 
 
-#' compute Ball Covariance statistic
-#' @inheritParams bcov.test
-#' @param x numeric vector.
-#' @param y numeric vector.
-#' @param n sample size. it must be integer value.
-#' @param type if type == 1, function return bcov, otherwise, bcor insteaded.
-#'
-#' @return A list contain: Ball Covariance statistic, sample size, weight
-#' @useDynLib Ball, .registration = TRUE
-#' @noRd
-#' 
-bcov_value_wrap_c <- function(x, y, n, weight, dst, type, num.threads) {
-  bcov <- as.double(numeric(1))
-  dst <- as.integer(dst)
-  x <- as.double(x)
-  y <- as.double(y)
-  n <- as.integer(n)
-  weight_cp <- weight
-  weight <- as.integer(weight)
-  num.threads <- as.integer(num.threads)
-  type <- ifelse(type == "bcov", 1, 2)
-  type <- as.integer(type)
-  if (type == 2) {
-    res <- .C("bcov_stat", bcov, x, y, n, weight, dst, type, num.threads)
-    bcov <- res[[1]]
-  } else {
-    bcov <- as.double(numeric(3))
-    p_value <- as.double(numeric(3))
-    R <- as.integer(numeric(1))
-    weight <- as.integer(numeric(1))
-    weight_cp <- examine_weight_arguments(weight_cp, "bcov.test")
-    res <- .C("bcov_test", bcov, p_value, x, y, n, R, weight, dst, type, num.threads)
-    bcov <- res[[1]]
-  }
-  if (type == 1) {
-    if (weight_cp == "none") {
-      bcov <- bcov[1]
-      names(bcov) <- "bcov"
-    } else if(weight_cp == "prob") {
-      bcov <- bcov[2]
-      names(bcov) <- "bcov.prob"
-    } else {
-      bcov <- bcov[3]
-      names(bcov) <- "bcov.hhg"
-    } 
-  } else {
-    names(bcov) <- ifelse(weight, "wbcor", "bcor")
-  }
-  list('statistic' = bcov, "permuted_stat" = NULL,
-       "info" = list("N" = res[[4]], "weight" = as.logical(weight)))
-}
+#' #' compute Ball Covariance statistic
+#' #' @inheritParams bcov.test
+#' #' @param x numeric vector.
+#' #' @param y numeric vector.
+#' #' @param n sample size. it must be integer value.
+#' #' @param type if type == 1, function return bcov, otherwise, bcor insteaded.
+#' #'
+#' #' @return A list contain: Ball Covariance statistic, sample size, weight
+#' #' @useDynLib Ball, .registration = TRUE
+#' #' @noRd
+#' #' 
+#' bcov_value_wrap_c <- function(x, y, n, weight, dst, type, num.threads) {
+#'   bcov <- as.double(numeric(1))
+#'   dst <- as.integer(dst)
+#'   x <- as.double(x)
+#'   y <- as.double(y)
+#'   n <- as.integer(n)
+#'   weight_cp <- weight
+#'   weight <- as.integer(weight)
+#'   num.threads <- as.integer(num.threads)
+#'   type <- ifelse(type == "bcov", 1, 2)
+#'   type <- as.integer(type)
+#'   if (type == 2) {
+#'     res <- .C("bcov_stat", bcov, x, y, n, weight, dst, type, num.threads)
+#'     bcov <- res[[1]]
+#'   } else {
+#'     bcov <- as.double(numeric(3))
+#'     p_value <- as.double(numeric(3))
+#'     R <- as.integer(numeric(1))
+#'     weight <- as.integer(numeric(1))
+#'     weight_cp <- examine_weight_arguments(weight_cp, "bcov.test")
+#'     res <- .C("bcov_test", bcov, p_value, x, y, n, R, dst, num.threads)
+#'     bcov <- res[[1]]
+#'   }
+#'   if (type == 1) {
+#'     if (weight_cp == "none") {
+#'       bcov <- bcov[1]
+#'       names(bcov) <- "bcov"
+#'     } else if(weight_cp == "prob") {
+#'       bcov <- bcov[2]
+#'       names(bcov) <- "bcov.prob"
+#'     } else {
+#'       bcov <- bcov[3]
+#'       names(bcov) <- "bcov.hhg"
+#'     } 
+#'   } else {
+#'     names(bcov) <- ifelse(weight, "wbcor", "bcor")
+#'   }
+#'   list('statistic' = bcov, "permuted_stat" = NULL,
+#'        "info" = list("N" = res[[4]], "weight" = as.logical(weight)))
+#' }
 
 
 #' compute Ball Covariance statistic and Ball Covariance statistic after permutation
@@ -126,25 +126,22 @@ bcov_value_wrap_c <- function(x, y, n, weight, dst, type, num.threads) {
 #' @useDynLib Ball, .registration = TRUE
 #' @noRd
 #' 
-bcov_test_wrap_c <- function(x, y, n, R, weight, dst, type, num.threads) {
+bcov_test_wrap_c <- function(x, y, n, R, dst, num.threads) {
   dst <- as.integer(dst)
   x <- as.double(x)
   y <- as.double(y)
   n <- as.integer(n)
-  t_weight <- 0
   num.threads <- as.integer(num.threads)
   R <- as.integer(R)
-  type <- ifelse(type == "bcov", 1, 2)
-  type <- as.integer(type)
   #
   bcov <- as.double(numeric(3))
   p_value <- as.double(numeric(3))
-  res <- .C("bcov_test", bcov, p_value, x, y, n, R, t_weight, dst, type, num.threads)
+  res <- .C("bcov_test", bcov, p_value, x, y, n, R, dst, num.threads)
   bcov <- res[[1]]
   p_value <- res[[2]]
   names(bcov) <- c("bcov", "bcov.prob", "bcov.hhg")
   names(p_value) <- paste0(names(bcov), ".pvalue")
-  list('statistic' = bcov, 'p.value' = p_value, "N" = res[[5]],
+  list('statistic' = bcov, 'p.value' = p_value,
        'info' = list("N" = res[[5]], "R" = res[[6]]))
 }
 
@@ -160,39 +157,31 @@ bcov_test_wrap_c <- function(x, y, n, R, weight, dst, type, num.threads) {
 #' @useDynLib Ball, .registration = TRUE
 #' @noRd
 #' 
-apply_bcor_wrap <- function(x, y, n, R, weight, dst) {
-  dst <- as.integer(dst)
-  n <- as.integer(n)
-  weight <- as.integer(weight)
-  R <- as.integer(R)
+apply_bcor_wrap <- function(x, y, n, p, dst, weight, method, num.threads) {
+  bcor_stat <- as.double(numeric(3*p))
   y <- as.double(y)
-  type <- as.integer(2)
+  x <- as.vector(x)
+  x_number <- rep(1, p)
+  f_number <- as.integer(p)
+  size_num <- 2
+  num <- as.integer(n)
   nthread <- integer(1)
+  p <- as.integer(1)
+  k <- as.integer(1)
+  dst_y <- as.integer(dst)
+  dst_x <- as.integer(0)
+  nth <- as.integer(num.threads)
   #
-  bcov_stat_list <- apply(x, 2, function(z) {
-    # data prepare:
-    if(dst) {
-      z <- as.double(as.vector(as.matrix(dist(z, diag = TRUE))))
-    } else {
-      z <- as.double(z)
-    }
-    # calculate statistic or pvalue:
-    bcov <- as.double(numeric(1))
-    if(R == 0) {
-      res <- .C("bcov_stat", bcov, z, y, n, weight, dst, type, nthread)
-    } else {
-      p_value <- as.double(numeric(3))
-      permuted_bcov <- as.double(numeric(R))
-      res <- .C("bcov_test", bcov, permuted_bcov, z, y, n, R, weight, dst, type, nthread)
-      res[[1]] <- ifelse(weight == TRUE, p_value[2], p_value[1])
-    }
-    # return result:
-    res[[1]]
-  })
-  if(R > 0) {
-    bcov_stat_list <- 1 - bcov_stat_list
+  res <- .C("bcor_test", bcor_stat, y, x, x_number, f_number, size_num, num, p, k, dst_y, dst_x, nth)[[1]]
+  bcor_stat <- matrix(res, ncol = 3, byrow = TRUE)
+  colnames(bcor_stat) <- c("bcor", "bcor.prob", "bcor.hhg")
+  screening_bcor_stat <- select_ball_stat(bcor_stat, weight = weight, fun_name = "bcorsis")
+  if (method %in% c("interaction", "standard"))
+  {
+    return(list(bcor_stat, screening_bcor_stat))
+  } else {
+    return(screening_bcor_stat)
   }
-  bcov_stat_list
 }
 
 

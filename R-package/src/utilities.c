@@ -331,12 +331,42 @@ void ranksort2(int n, int **Rxy, double **Dxy, int **Ixy)
 }
 
 
+/*
+This function try to derive the rank of Rx belong to group 1.
+tmp, lastpos, lastval are introduced to resolve the situtation when ties appear
+*/
 void Findx2(int *Rxy, int *Ixy, int *i_perm, int *n1, int *n2, int *Rx)
 {
 	int j, lastpos, lastval, n, tmp;
 	n = *n1 + *n2;
 
+	//printf("---------------\n");
+	//for (int i = 0; i < n; i++)
+	//{
+	//	printf("%d ", Rxy[i]);
+	//}
+	//printf("\n");
+
+	//for (int i = 0; i < n; i++)
+	//{
+	//	printf("%d ", Ixy[i]);
+	//}
+	//printf("\n");
+
+	//for (int i = 0; i < n; i++)
+	//{
+	//	printf("%d ", i_perm[i]);
+	//}
+	//printf("\n");
+
+	//for (int i = 0; i < n; i++)
+	//{
+	//	printf("%d ", Rx[i]);
+	//}
+	//printf("\n");
+
 	lastpos = *n1 - 1;
+	Rx[Ixy[n - 1]] = lastpos;
 	if (i_perm[Ixy[n - 1]] == 1) {
 		tmp = 1;
 		lastval = Rxy[Ixy[n - 1]];
@@ -345,9 +375,13 @@ void Findx2(int *Rxy, int *Ixy, int *i_perm, int *n1, int *n2, int *Rx)
 		tmp = 0;
 		lastval = -1;
 	}
-	Rx[Ixy[n - 1]] = lastpos;
 
 	for (j = n - 2; j >= 0; j--) {
+		//for (int i = 0; i < n; i++)
+		//{
+		//	printf("%d ", Rx[i]);
+		//}
+		//printf("\n");
 		if (i_perm[Ixy[j]] == 1) {
 			if (lastval != Rxy[Ixy[j]]) {
 				lastpos -= tmp;
@@ -448,6 +482,16 @@ void initRank(int n, int **Rank, int *xrank, int *yrank, int *i_perm)
 	computeRank(n + 1, Rank);
 }
 
+void initRank_bcor(int n, int **Rank, int *xrank, int *yrank)
+{
+	int i, j;
+	for (i = 0; i < n + 1; i++)
+		for (j = 0; j < n + 1; j++)
+			Rank[i][j] = 0;
+	for (i = 0; i < n; i++)
+		Rank[xrank[i] + 1][yrank[i] + 1] += 1;
+	computeRank(n + 1, Rank);
+}
 
 //void initRank_surv(int n, int **Rank, int *xrank, int *yrank, int *i_perm)
 //{

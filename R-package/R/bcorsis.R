@@ -1,3 +1,60 @@
+#' @inheritParams bcov.test
+#' @rdname bcov
+#' @return 
+#' \item{\code{bcor }}{ sample version of ball correlation.}
+#' @export
+#' @examples
+#' ############# Ball Correlation #############
+#' num <- 50
+#' x <- 1:num
+#' y <- 1:num
+#' bcor(x, y)
+#' bcor(x, y, weight = TRUE)
+#' bcor(x, y, weight = "prob")
+#' bcor(x, y, weight = "hhg")
+bcor <- function(x, y, dst = FALSE, weight = FALSE) {
+  x <- as.matrix(x)
+  y <- as.matrix(y)
+  x_y_info <- examine_x_y(x, y)
+  p <- x_y_info[2]
+  #
+  weight <- examine_weight_arguments(weight)
+  #
+  if(dst == FALSE) {
+    if(p != 1) {
+      x <- as.double(as.vector(as.matrix(dist(x, diag = TRUE))))
+      y <- as.double(as.vector(as.matrix(dist(y, diag = TRUE))))
+      dst_y <- as.integer(1)
+      dst_x <- as.integer(1)
+    } else {
+      x <- as.double(x)
+      y <- as.double(y)
+      dst_y <- as.integer(0)
+      dst_x <- as.integer(0)
+    }
+  } else {
+    x <- as.double(as.vector(x))
+    y <- as.double(as.vector(y))
+    dst_y <- as.integer(1)
+    dst_x <- as.integer(1)
+  }
+  #
+  bcor_stat <- as.double(numeric(3))
+  x_number <- as.integer(1)
+  f_number <- as.integer(1)
+  size_number <- as.integer(1)
+  num <- as.integer(x_y_info[1])
+  p <- as.integer(1)
+  k <- as.integer(1)
+  nth <- as.integer(1)
+  #
+  res <- .C("bcor_test", bcor_stat, y, x, x_number, f_number, size_number, num, p, k, dst_y, dst_x, nth)
+  bcor_stat <- res[[1]]
+  bcor_stat <- select_ball_stat(bcor_stat, weight, type = "bcor")
+  return(bcor_stat)
+}
+
+
 #' @title Ball Correlation Sure Independence Screening
 #' @author WenLiang Pan, WeiNan Xiao, XueQin Wang, HePing Zhang, HongTu Zhu
 #' @description Generic non-parametric sure independence screening procedure based on ball correlation.
@@ -10,24 +67,21 @@
 #' variables are selected. If \code{d} is a integer, 
 #' \code{d} variables are selected. Default: \code{d = "small"}
 #' @param weight when \code{weight = TRUE}, weighted ball correlation is used instead of ball correlation. Default: \code{ weight = FALSE}  
-#' @param method method for sure independence screening procedure, include: \code{"standard"}, \code{"pvalue"},
+#' @param method method for sure independence screening procedure, include: \code{"standard"},
 #' \code{"lm"}, \code{"gam"}, \code{"interaction"} and \code{"survival"}.
-#' Setting \code{method = "standard"} or \code{"pvalue"} means standard sure independence screening procedure 
-#' based on ball correlation or \emph{p}-value of ball correlation test while options
+#' Setting \code{method = "standard"} means standard sure independence screening procedure 
+#' based on ball correlation while options
 #' \code{"lm"} and \code{"gam"} carry out iterative BCor-SIS procedure with ordinary 
 #' linear regression and generalized additive models, respectively.
 #' Options \code{"interaction"} and \code{"survival"} are designed for detecting variables 
 #' with potential linear interaction or associated with censored responses. Default: \code{method = "standard"}
 #' @param dst if \code{dst = TRUE}, \code{y} will be considered as a distance matrix. 
-#' Arguments only available when \code{ method = "standard"}, \code{method = "pvalue"} 
-#' or \code{ method = "interaction"}. Default: \code{dst = FALSE}
+#' Arguments only available when \code{ method = "standard"} and \code{ method = "interaction"}. Default: \code{dst = FALSE}
 #' @param parms parameters list only available when \code{method = "lm"} or \code{"gam"}. 
 #' It contains three parameters: \code{d1}, \code{d2}, and \code{df}. \code{d1} is the
 #' number of initially selected variables, \code{d2} is the number of variables collection size added in each iteration.
 #' \code{df} is degree freedom of basis in generalized additive models 
 #' playing a role only when \code{method = "gam"}. Default: \code{ parms = list(d1 = 5, d2 = 5, df = 3)}
-#' @param R the number of replications. Arguments only available when \code{method = "pvalue"}. Default \code{ R = 99}
-#' @param seed the random seed. Arguments only available when \code{method = "pvalue"}.
 #' 
 #' @return 
 #' \item{\code{ix }}{ the vector of indices selected by ball correlation sure independence screening procedure.} 
@@ -81,13 +135,14 @@
 #' error <- rnorm(n)
 #' y <- 3*x[, 1] + 5*(x[, 3])^2 + error
 #' res <- bcorsis(y = y, x = x)
-#' head(res[[1]])
+#' head(res[["ix"]])
 #' 
 #' ############### BCor-SIS: Censored Data Example ###############
 #' data("genlung")
 #' result <- bcorsis(x = genlung[["covariate"]], y = genlung[["survival"]], 
-#'                   method = "survival")$ix
-#' top_gene <- colnames(genlung[["covariate"]])[result]
+#'                   method = "survival")
+#' index <- result[["ix"]]
+#' top_gene <- colnames(genlung[["covariate"]])[index]
 #' head(top_gene, n = 1)
 #' 
 #' 
@@ -99,7 +154,7 @@
 #' error <- rnorm(n)
 #' y <- 3*x[, 1]*x[, 5]*x[, 10] + error
 #' res <- bcorsis(y = y, x = x, method = "interaction")
-#' head(res[[1]])
+#' head(res[["ix"]])
 #' 
 #' ############### BCor-SIS: Iterative Method ###############
 #' library(mvtnorm)
@@ -113,13 +168,27 @@
 #' rm(sigma_mat); gc(reset = TRUE)
 #' y <- 3*(x[, 1])^2 + 5*(x[, 2])^2 + 5*x[, 8] - 8*x[, 16] + error
 #' res <- bcorsis(y = y, x = x, method = "gam", d = 15)
-#' res[[1]]
+#' res[["ix"]]
+#' 
+#' ############### Weighted BCor-SIS: Probability weight ###############
+#' set.seed(1)
+#' n <- 150
+#' p <- 3000
+#' x <- matrix(rnorm(n * p), nrow = n)
+#' error <- rnorm(n)
+#' y <- 3*x[, 1] + 5*(x[, 3])^2 + error
+#' res <- bcorsis(y = y, x = x, weight = "prob")
+#' head(res[["ix"]])
+#' # Alternative, chisq weight:
+#' res <- bcorsis(y = y, x = x, weight = "hhg")
+#' head(res[["ix"]])
 #' }
 bcorsis <- function(x, y, d = "small", weight = FALSE, 
                     method = "standard", dst = FALSE,
                     parms = list(d1 = 5, d2 = 5, df = 3),
-                    R = 99, seed = 4)
+                    num.threads = 2)
 {
+  seed <- 4
   y <- as.matrix(y)
   x <- as.matrix(x)
   n <- examine_x_y(x, y)[1]
@@ -128,6 +197,11 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
   colnames(x) <- paste0("x", 1:p)
   colnames(y) <- paste0("y", 1:y_p)
   ids <- 1:p
+  
+  complete_info <- list()
+    
+  # check weight
+  weight <- examine_weight_arguments(weight)
   
   # decide candicate size
   final_d <- examine_candiate_size(n, d, p)
@@ -145,14 +219,15 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
   if(method == "survival") {
     Xhavepickout <- bcorsis.surv(y = y, x = x, final_d = final_d, 
                                  n = n, p = p, ids = ids)
+    complete_info[[1]] <- Xhavepickout[[2]]
+    Xhavepickout <- Xhavepickout[[1]]
   }
   if(method %in% c("standard", "pvalue", "interaction")) {
     if(method == "pvalue") {
-      examine_R_arguments(R)
-      seed <- examine_seed_arguments(seed = seed)
-      set.seed(seed = seed)
-    } else {
-      R <- 0
+      # examine_R_arguments(R)
+      # seed <- examine_seed_arguments(seed = seed)
+      # set.seed(seed = seed)
+      stop("After version 1.2.0, 'pvalue' method is no longer supported due to its low efficiency.")
     }
     # data prepare for screening:
     if(dst == FALSE) {
@@ -164,15 +239,19 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
       y <- as.vector(y)
     }
     # BCor-SIS:
-    rcory_result <- apply_bcor_wrap(x = x, y = y, n = n, R = R, 
-                                    weight = weight, dst = dst)
-    Xhavepickout <- get_screened_vars(ids, rcory_result, final_d)
+    rcory_result <- apply_bcor_wrap(x = x, y = y, n = n, p = p, 
+                                    dst = dst, weight = weight, 
+                                    method = method, num.threads = num.threads)
+    Xhavepickout <- get_screened_vars(ids, rcory_result[[2]], final_d)
+    complete_info[[1]] <- rcory_result[[1]]
     # extra method for interaction:
     Xhavepickout2 <- c()
     if(method == "interaction") {
-      rcory2_result <- apply_bcor_wrap(x = (x)^2, y = y, n = n, R = R, 
-                                       weight = weight, dst = dst)
-      Xhavepickout2 <- get_screened_vars(ids, rcory_result, final_d)
+      rcory2_result <- apply_bcor_wrap(x = (x)^2, y = y, n = n, p = p, 
+                                       dst = dst, weight = weight, 
+                                       method = method, num.threads = num.threads)
+      Xhavepickout2 <- get_screened_vars(ids, rcory2_result[[2]], final_d)
+      complete_info[[2]] <- rcory_result[[2]]
     }
     Xhavepickout <- unique(c(Xhavepickout, Xhavepickout2))
   }
@@ -183,8 +262,9 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
     y_copy <- y_copy[[1]]
     R <- 0
     # Initial screening:
-    rcory_result <- apply_bcor_wrap(x = x, y = y_copy, n = n, R = R, 
-                                    weight = weight, dst = dst)
+    rcory_result <- apply_bcor_wrap(x = x, y = y_copy, n = n, p = p, 
+                                    dst = dst, weight = weight, 
+                                    method = method, num.threads = num.threads)
     # get d1 variables as initial variables set:
     Xhavepickout <- get_screened_vars(ids, rcory_result, d1)
     Xlastpickout <- Xhavepickout
@@ -200,8 +280,9 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
         
         # BCor-screening
         y_copy <- preprocess_bcorsis_y(y, y_p)[[1]]
-        rcory_result <- apply_bcor_wrap(x = Xnew, y = y_copy, n = n, R = R, 
-                                        weight = weight, dst = dst)
+        rcory_result <- apply_bcor_wrap(x = Xnew, y = y_copy, n = n, p = p, 
+                                        dst = dst, weight = weight, 
+                                        method = method, num.threads = num.threads)
         # get d2 variables for each iteration:
         Xlastpickout <- get_screened_vars(ids, rcory_result, d2)
         Xhavepickout <- c(Xhavepickout, Xlastpickout)
@@ -231,8 +312,9 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
         
         # BCor-screening
         y_copy <- preprocess_bcorsis_y(y, y_p)[[1]]
-        rcory_result <- apply_bcor_wrap(x = Xnew, y = y_copy, n = n, R = R, 
-                                        weight = weight, dst = dst)
+        rcory_result <- apply_bcor_wrap(x = Xnew, y = y_copy, n = n, p = p, 
+                                        dst = dst, weight = weight, 
+                                        method = method, num.threads = num.threads)
         # get d2 variables for each iteration:
         Xlastpickout <- get_screened_vars(ids, rcory_result, d2)
         Xhavepickout <- c(Xhavepickout, Xlastpickout)
@@ -241,7 +323,8 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
     }
   }
   # return:
-  list("ix" = Xhavepickout)
+  list("ix" = Xhavepickout, "method" = method, 
+       "weight" = weight, "complete.info" = complete_info)
 }
 
 
@@ -282,6 +365,6 @@ bcorsis.surv <- function(y, x, final_d, n, p, ids, standized = TRUE){
   })
   
   Xhavepickout <- get_screened_vars(ids, rcory_result, final_d)
-  Xhavepickout
+  list(Xhavepickout, rcory_result)
 }
 

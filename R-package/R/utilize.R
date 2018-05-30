@@ -93,21 +93,45 @@ examine_seed_arguments <- function(seed) {
 #' @return A integer number
 #' @noRd
 #'
-examine_weight_arguments <- function(weight, fun) {
-  if (fun == "bcov.test") {
-    WEIGHT_METHODS <- c(TRUE, FALSE, "none", "hhg", "prob")
-    method <- pmatch(weight, WEIGHT_METHODS)
-    if (is.na(method)) 
-      stop("invalid weight method")
-    if (weight == TRUE) {
-      weight <- "prob"
-    } else if (is.logical(weight)) {
-      weight <- "none"
-    }
-    return(weight)
+examine_weight_arguments <- function(weight) {
+  WEIGHT_METHODS <- c(TRUE, FALSE, "none", "hhg", "prob")
+  method <- pmatch(weight, WEIGHT_METHODS)
+  if (is.na(method)) 
+    stop("invalid weight method")
+  if (weight == TRUE) {
+    weight <- "prob"
+  } else if (weight == FALSE) {
+    weight <- "none"
   }
+  return(weight)
 }
 
+
+select_ball_stat <- function(ball_stat, weight, type = "bcov", fun_name = "bcov") {
+  if (fun_name == "bcorsis") 
+  {
+    if (weight == "none") {
+      ball_stat <- ball_stat[, 1]
+    } else if (weight == "bcov") {
+      ball_stat <- ball_stat[, 2]
+    } else {
+      ball_stat <- ball_stat[, 3]
+    }
+  } else {
+    if (weight == "none")
+    {
+      ball_stat <- ball_stat[1]
+      names(ball_stat) <- ifelse(type == "bcov", "bcov", "bcor")
+    } else if (weight == "prob") {
+      ball_stat <- ball_stat[2]
+      names(ball_stat) <- ifelse(type == "bcov", "bcov.prob", "bcor.prob")
+    } else {
+      ball_stat <- ball_stat[3]
+      names(ball_stat) <- ifelse(type == "bcov", "bcov.hhg", "bcor.hhg")
+    }
+  }
+  return(ball_stat)
+}
 
 
 #' Examine size arguments in bcov.test, bd.test

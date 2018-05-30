@@ -765,198 +765,13 @@ void UBI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, in
 }
 
 
-double ubcov_value(double *x, double *y, int *n, int *weight, int *thread)
-{
-	int    i, *xidx, *yidx, *xrank, *yrank, *i_perm, **Rank, **lowxidx, **higxidx, **lowyidx, **higyidx;
-	double RCTV0;
-	double bcov[3];
-
-	xidx = (int *)malloc(*n * sizeof(int));
-	yidx = (int *)malloc(*n * sizeof(int));
-	xrank = (int *)malloc(*n * sizeof(int));
-	yrank = (int *)malloc(*n * sizeof(int));
-	i_perm = (int *)malloc(*n * sizeof(int));
-	Rank = alloc_int_matrix((*n) + 1, (*n) + 1);
-	lowxidx = alloc_int_matrix(*n, *n);
-	higxidx = alloc_int_matrix(*n, *n);
-	lowyidx = alloc_int_matrix(*n, *n);
-	higyidx = alloc_int_matrix(*n, *n);
-
-	for (i = 0; i<*n; i++)
-	{
-		xidx[i] = i;
-		yidx[i] = i;
-		i_perm[i] = i;
-	}
-
-	// first step: sort the x
-	quicksort(x, xidx, 0, *n - 1);
-	quicksort(y, yidx, 0, *n - 1);
-	ranksort(n, xrank, x, xidx);
-	ranksort(n, yrank, y, yidx);
-	createidx(n, xidx, x, lowxidx, higxidx);
-	createidx(n, yidx, y, lowyidx, higyidx);
-
-
-	initRank(*n, Rank, xrank, yrank, i_perm);
-	U_Ball_Information_wrapper(bcov, n, Rank, lowxidx, higxidx, lowyidx, higyidx, i_perm, thread);
-
-	if (*weight == 0)
-	{
-		RCTV0 = bcov[0];
-	}
-	else {
-		RCTV0 = bcov[1];
-	}
-
-	free_int_matrix(Rank, (*n) + 1, (*n) + 1);
-	free_int_matrix(lowxidx, *n, *n);
-	free_int_matrix(higxidx, *n, *n);
-	free_int_matrix(lowyidx, *n, *n);
-	free_int_matrix(higyidx, *n, *n);
-	free(xidx);
-	free(yidx);
-	free(xrank);
-	free(yrank);
-	free(i_perm);
-	return(RCTV0);
-}
-
-
-double bcov_value(double *x, double *y, int *n, int *weight, int *thread)
-{
-	/*  computes RCT(x,y)  */
-	int    i, j, **xidx, **yidx, *i_perm, *i_perm_inv;
-	double **Dx, **Dy, *x_cpy, *y_cpy, RCTV0;
-	double bcov[3];
-
-	Dx = alloc_matrix(*n, *n);
-	Dy = alloc_matrix(*n, *n);
-	xidx = alloc_int_matrix(*n, *n);
-	yidx = alloc_int_matrix(*n, *n);
-	i_perm = (int *)malloc(*n * sizeof(int));
-	i_perm_inv = (int *)malloc(*n * sizeof(int));
-	x_cpy = (double *)malloc(*n * sizeof(double));
-	y_cpy = (double *)malloc(*n * sizeof(double));
-
-	vector2matrix(x, Dx, *n, *n, 1);
-	vector2matrix(y, Dy, *n, *n, 1);
-
-	for (i = 0; i<*n; i++)
-	{
-		for (j = 0; j<*n; j++)
-		{
-			xidx[i][j] = j;
-			yidx[i][j] = j;
-		}
-		i_perm[i] = i;
-		i_perm_inv[i] = i;
-	}
-
-	for (i = 0; i<(*n); i++)
-	{
-		// copy site to x_cpy and y_cpy
-		memcpy(x_cpy, Dx[i], *n * sizeof(double));
-		memcpy(y_cpy, Dy[i], *n * sizeof(double));
-		quicksort(x_cpy, xidx[i], 0, *n - 1);
-		quicksort(y_cpy, yidx[i], 0, *n - 1);
-	}
-	free(x_cpy);
-	free(y_cpy);
-
-	Ball_Information_wrapper(bcov, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, thread);
-	
-	if (*weight == 0)
-	{
-		RCTV0 = bcov[0];
-	}
-	else {
-		RCTV0 = bcov[1];
-	}
-
-	free_matrix(Dx, *n, *n);
-	free_matrix(Dy, *n, *n);
-	free_int_matrix(xidx, *n, *n);
-	free_int_matrix(yidx, *n, *n);
-	free(i_perm);
-	free(i_perm_inv);
-	return(RCTV0);
-}
-
-
-double bcor_value(double *x, double *y, int *n, int *weight, int *dst, int *thread)
-{
-	double bcov_stat_xy, bcov_stat_xx, bcov_stat_yy;
-	double bcor_stat;
-	if ((*dst)) {
-		bcov_stat_xy = bcov_value(x, y, n, weight, thread);
-		bcov_stat_xx = bcov_value(x, x, n, weight, thread);
-		bcov_stat_yy = bcov_value(x, x, n, weight, thread);
-	}
-	else {
-		bcov_stat_xy = ubcov_value(x, y, n, weight, thread);
-		bcov_stat_xx = ubcov_value(x, x, n, weight, thread);
-		bcov_stat_yy = ubcov_value(x, y, n, weight, thread);
-	}
-	bcor_stat = bcov_stat_xy / sqrt(bcov_stat_xx*bcov_stat_yy);
-	return(bcor_stat);
-}
-
-
-void UBCOR(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight, int *thread)
-{
-	int i;
-	double bcov_stat_xx, bcov_stat_yy;
-	UBI(bcor, permuted_bcor, x, y, n, R, thread);
-	bcov_stat_xx = ubcov_value(x, x, n, weight, thread);
-	bcov_stat_yy = ubcov_value(y, y, n, weight, thread);
-	(*bcor) = (*bcor) / bcov_stat_xx / bcov_stat_yy;
-	for (i = 0; i < (*R); i++) {
-		permuted_bcor[i] = permuted_bcor[i] / bcov_stat_xx / bcov_stat_yy;
-	}
-}
-
-
-void BCOR(double *bcor, double *permuted_bcor, double *x, double *y, int *n, int *R, int *weight, int *thread)
-{
-	int i;
-	double bcov_stat_xx, bcov_stat_yy;
-	BI(bcor, permuted_bcor, x, y, n, R, thread);
-	bcov_stat_xx = bcov_value(x, x, n, weight, thread);
-	bcov_stat_yy = bcov_value(y, y, n, weight, thread);
-	(*bcor) = (*bcor) / bcov_stat_xx / bcov_stat_yy;
-	for (i = 0; i < (*R); i++) {
-		permuted_bcor[i] = permuted_bcor[i] / bcov_stat_xx / bcov_stat_yy;
-	}
-}
-
-
 /////////////////////////////////////////////////////////////////
 //////////// two functions below wrap key function //////////////
 // bcov_stat return ball covariance statistic 
 // bcov_test execute ball covariance statistic based test
 /////////////////////////////////////////////////////////////////
 
-void bcov_stat(double *bcov, double *x, double *y, int *n, int *weight, int *dst, int *type, int *thread)
-{
-	double bcov_stat;
-	if ((*type) == 1) {
-		if ((*dst)) {
-			bcov_stat = bcov_value(x, y, n, weight, thread);
-		}
-		else {
-			bcov_stat = ubcov_value(x, y, n, weight, thread);
-		}
-		*bcov = bcov_stat;
-	}
-	else {
-		*bcov = bcor_value(x, y, n, weight, dst, thread);
-	}
-	return;
-}
-
-
-void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *weight, int *dst, int *type, int *thread)
+void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *dst, int *thread)
 {
 	//parallel method
 	// if parallel_type == 1, we parallel the computation through statistics.
@@ -970,35 +785,23 @@ void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *
 	{
 		*thread = 1;
 	}
-	if ((*type) == 1) {
-		if ((*dst)) {
-			if (parallel_type == 2)
-			{
-				BI_parallel(bcov, pvalue, x, y, n, R, thread);
-			}
-			else {
-				BI(bcov, pvalue, x, y, n, R, thread);
-			}
+	if ((*dst)) {
+		if (parallel_type == 2)
+		{
+			BI_parallel(bcov, pvalue, x, y, n, R, thread);
 		}
 		else {
-			if (parallel_type == 2)
-			{
-				UBI_parallel(bcov, pvalue, x, y, n, R, thread);
-			}
-			else
-			{
-				UBI(bcov, pvalue, x, y, n, R, thread);
-			}
+			BI(bcov, pvalue, x, y, n, R, thread);
 		}
 	}
 	else {
-		// BCOR will be modify later:
-		// pvalue stills means permute_bcov
-		if ((*dst)) {
-			BCOR(bcov, pvalue, x, y, n, R, weight, thread);
+		if (parallel_type == 2)
+		{
+			UBI_parallel(bcov, pvalue, x, y, n, R, thread);
 		}
-		else {
-			UBCOR(bcov, pvalue, x, y, n, R, weight, thread);
+		else
+		{
+			UBI(bcov, pvalue, x, y, n, R, thread);
 		}
 	}
 	return;
