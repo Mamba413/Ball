@@ -771,7 +771,7 @@ void UBI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, in
 // bcov_test execute ball covariance statistic based test
 /////////////////////////////////////////////////////////////////
 
-void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *weight, int *dst, int *type, int *thread)
+void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *dst, int *thread)
 {
 	//parallel method
 	// if parallel_type == 1, we parallel the computation through statistics.
@@ -785,36 +785,24 @@ void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *
 	{
 		*thread = 1;
 	}
-	if ((*type) == 1) {
-		if ((*dst)) {
-			if (parallel_type == 2)
-			{
-				BI_parallel(bcov, pvalue, x, y, n, R, thread);
-			}
-			else {
-				BI(bcov, pvalue, x, y, n, R, thread);
-			}
+	if ((*dst)) {
+		if (parallel_type == 2)
+		{
+			BI_parallel(bcov, pvalue, x, y, n, R, thread);
 		}
 		else {
-			if (parallel_type == 2)
-			{
-				UBI_parallel(bcov, pvalue, x, y, n, R, thread);
-			}
-			else
-			{
-				UBI(bcov, pvalue, x, y, n, R, thread);
-			}
+			BI(bcov, pvalue, x, y, n, R, thread);
 		}
 	}
 	else {
-		// BCOR will be modify later:
-		// pvalue stills means permute_bcov
-		//if ((*dst)) {
-		//	BCOR(bcov, pvalue, x, y, n, R, weight, thread);
-		//}
-		//else {
-		//	UBCOR(bcov, pvalue, x, y, n, R, weight, thread);
-		//}
+		if (parallel_type == 2)
+		{
+			UBI_parallel(bcov, pvalue, x, y, n, R, thread);
+		}
+		else
+		{
+			UBI(bcov, pvalue, x, y, n, R, thread);
+		}
 	}
 	return;
 }

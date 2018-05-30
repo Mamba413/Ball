@@ -55,13 +55,13 @@ void test_bcov_value()
 
 	// Software of ChengFeng Liu output result (golden standard): 0.034214
 	// univariate case:
-	bcov_test(ball_stat_value, p_value, x, y, &n, &R, &weight, &dst, &type, &nth);
+	bcov_test(ball_stat_value, p_value, x, y, &n, &R, &dst, &nth);
 	printf("Univariate Ball Covariance: %f; \n", ball_stat_value[0]);
 	test_value(ball_stat_value[0], 0.034214);
 
 	// multivariate case:
 	dst = 1;
-	bcov_test(ball_stat_value, p_value, x_dst, y_dst, &n, &R, &weight, &dst, &type, &nth);
+	bcov_test(ball_stat_value, p_value, x_dst, y_dst, &n, &R, &dst, &nth);
 	printf("Multivariate Ball Covariance: %f; \n", ball_stat_value[0]);
 	test_value(ball_stat_value[0], 0.034214);
 }
@@ -71,13 +71,14 @@ void test_bcor_value() {
 	printf("\n");
 	double ball_stat_value[6];
 	double x[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
+	//double x[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 	double y[10] = { 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
 	int x_number[2] = { 1, 1 };
-	int f_number = 2, n = 10, weight = 0, dst_y = 0, dst_x = 0, k = 0, p = 1, nth = 2, size = 2;
+	int f_number = 2, n = 10, dst_y = 0, dst_x = 0, k = 0, p = 1, nth = 2, size = 2;
 
 	// univariate case:
 	printf("----- First Covariance ----- \n");
-	bcor_test(ball_stat_value, y, x, &x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
+	bcor_test(ball_stat_value, y, x, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
 	printf("Univariate Ball Correlation: %f; \n", ball_stat_value[0]);
 	test_value(ball_stat_value[0], 1);
 	printf("Univariate Weight Ball Correlation: %f; \n", ball_stat_value[1]);
@@ -98,7 +99,7 @@ void test_bcor_value() {
 	dst_y = 1;
 	p = 0;
 	printf("----- First Covariance ----- \n");
-	bcor_test(ball_stat_value, y_dst, x, &x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
+	bcor_test(ball_stat_value, y_dst, x, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
 	printf("Multivariate Ball Correlation: %f; \n", ball_stat_value[0]);
 	test_value(ball_stat_value[0], 1);
 	printf("Multivariate Weight Ball Correlation: %f; \n", ball_stat_value[1]);
@@ -117,7 +118,7 @@ void test_bcor_value() {
 	// distance matrix case:
 	double x_dst[100] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 8, 7, 6, 5, 4, 3, 2, 1, 0, 1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
 	dst_x = 1;
-	bcor_test(ball_stat_value, y_dst, x_dst, &x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
+	bcor_test(ball_stat_value, y_dst, x_dst, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
 	printf("Distance Based Ball Correlation: %f; \n", ball_stat_value[0]);
 	test_value(ball_stat_value[0], 1);
 	printf("Distance Based Weight Ball Correlation: %f; \n", ball_stat_value[1]);
@@ -187,7 +188,7 @@ void bcov_test_multithread_permutaion()
 	int R = 1000, weight = 0, dst = 0, type = 1, nth = 2;
 	
 	// univariate case:
-	bcov_test(ball_stat_value, p_value, x, y, &n, &R, &weight, &dst, &type, &nth);
+	bcov_test(ball_stat_value, p_value, x, y, &n, &R, &dst, &nth);
 	printf("Ball statistics: %f; ", ball_stat_value[0]);
 	printf("p-value: %f \n", p_value[0]);
 	printf("Ball statistics: %f; ", ball_stat_value[1]);
@@ -198,7 +199,7 @@ void bcov_test_multithread_permutaion()
 
 	// multivariate case:
 	dst = 1;
-	bcov_test(ball_stat_value, p_value, x_dst, y_dst, &n, &R, &weight, &dst, &type, &nth);
+	bcov_test(ball_stat_value, p_value, x_dst, y_dst, &n, &R, &dst, &nth);
 	printf("Ball statistics: %f; ", ball_stat_value[0]);
 	printf("p-value: %f \n", p_value[0]);
 	printf("Ball statistics: %f; ", ball_stat_value[1]);

@@ -31,6 +31,7 @@ void Findx(int **Rxy, int **Ixy, int *i_perm, int *n1, int *n2, int **Rx);
 void ranksort3(int n, int *xyidx, double *xy, int **Rxy, int **Ixy);
 void computeRank(int n, int **Rank);
 void initRank(int n, int **Rank, int *xrank, int *yrank, int *i_perm);
+void initRank_bcor(int n, int **Rank, int *xrank, int *yrank);
 void quicksort(double *a, int *idx, int l, int u);
 void quicksort2(double *a, double *b, int *idx, int l, int u);
 double **alloc_matrix(int r, int c);

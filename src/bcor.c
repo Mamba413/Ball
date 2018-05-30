@@ -19,6 +19,7 @@
 #endif
 
 #include "math.h"
+#include "string.h" 
 #include "stdlib.h" 
 #include "stdio.h"
 #include "utilities.h"
@@ -363,7 +364,7 @@ void _fast_bcor_test(double *bcorsis_stat, double *y, double *x, int *f_number, 
 #endif
 	}
 
-	int i, j, *yidx, *yrank, **lowyidx, **higyidx;
+	int i, *yidx, *yrank, **lowyidx, **higyidx;
 
 	yidx = (int *)malloc(*n * sizeof(int));
 	yrank = (int *)malloc(*n * sizeof(int));
@@ -609,8 +610,8 @@ void _bcor_stat(double *bcorsis_stat, double *y, double *x, int *n)
 	// free memory
 	free_int_matrix(xidx, *n, *n);
 	free_int_matrix(yidx, *n, *n);
-	free_int_matrix(Dx, *n, *n);
-	free_int_matrix(Dy, *n, *n);
+	free_matrix(Dx, *n, *n);
+	free_matrix(Dy, *n, *n);
 	free(isource);
 	free(icount);
 	free(xy_index);
@@ -665,6 +666,7 @@ void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f
 			_fast_bcor_test(bcorsis_stat, y, x, f_number, n, nthread);
 		}
 	}
+	return;
 }
 
 
