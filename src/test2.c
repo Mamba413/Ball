@@ -73,10 +73,10 @@ void test_bcor_value() {
 	double x[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
 	double y[10] = { 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
 	int x_number[2] = { 1, 1 };
-	int f_number = 2, n = 10, weight = 0, dst = 0, k = 0, nth = 2, size = 2;
+	int f_number = 2, n = 10, weight = 0, dst = 0, k = 0, p = 1, nth = 2, size = 2;
 
 	// univariate case:
-	bcor_test(ball_stat_value, y, x, &x_number, &f_number, &size, &n, &k, &dst, &nth);
+	bcor_test(ball_stat_value, y, x, &x_number, &f_number, &size, &n, &p, &k, &dst, &nth);
 	printf("Univariate Ball Correlation: %f; \n", ball_stat_value[0]);
 	test_value(ball_stat_value[0], 1);
 	printf("Univariate Weight Ball Correlation: %f; \n", ball_stat_value[1]);
@@ -86,11 +86,17 @@ void test_bcor_value() {
 	printf("Univariate Weight Ball Correlation: %f; \n", ball_stat_value[1]);
 	test_value(ball_stat_value[4], 1);
 
-	// univariate case:
-	//type = 1;
-	//bcov_stat(ball_stat_value, x, y, &n, &weight, &dst, &type, &nth);
-	//printf("Univariate Ball Covariance: %f; \n", ball_stat_value[0]);
-	//test_value(ball_stat_value[0], 0.034214);
+	// multivariate case:
+	dst = 1;
+	bcor_test(ball_stat_value, y, x, &x_number, &f_number, &size, &n, &p, &k, &dst, &nth);
+	printf("Multivariate Ball Correlation: %f; \n", ball_stat_value[0]);
+	test_value(ball_stat_value[0], 1);
+	printf("Multivariate Weight Ball Correlation: %f; \n", ball_stat_value[1]);
+	test_value(ball_stat_value[1], 1);
+	printf("Multivariate Ball Correlation: %f; \n", ball_stat_value[0]);
+	test_value(ball_stat_value[3], 1);
+	printf("Multivariate Weight Ball Correlation: %f; \n", ball_stat_value[1]);
+	test_value(ball_stat_value[4], 1);
 	return;
 }
 
