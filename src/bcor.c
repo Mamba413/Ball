@@ -283,8 +283,8 @@ void _bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *
 	yidx = alloc_int_matrix(*n, *n);
 	y_cpy = (double *)malloc(*n * sizeof(double));
 
-	//vector2matrix(y, Dy, *n, *n, 1);
-	Euclidean_distance(y, Dy, *n, *p);
+	vector2matrix(y, Dy, *n, *n, 1);
+	//Euclidean_distance(y, Dy, *n, *p);
 
 	for (i = 0; i<*n; i++)
 	{
