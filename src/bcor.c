@@ -33,7 +33,7 @@ void Ball_Correlation(double *bcor_stat, int *n, int *p, double *x, double **Dy,
 	double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, bcov_fixed_ball = 0.0;
 	double bcov_weight0_x = 0.0, bcov_weight_prob_x = 0.0;
 	double bcov_weight0_y = 0.0, bcov_weight_prob_y = 0.0;
-	double minor_ball_prop = 2 / (*n);
+	double hhg_ball_num = 0.0, minor_ball_prop = 2 / (*n);
 
 	double **Dx, *x_cpy;
 	int **xidx;
@@ -132,6 +132,7 @@ void Ball_Correlation(double *bcor_stat, int *n, int *p, double *x, double **Dy,
 			if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1)
 			{
 				bcov_weight_hhg += bcov_fixed_ball / ((px - minor_ball_prop)*(1.0 - px + minor_ball_prop)*(py - minor_ball_prop)*(1.0 - py + minor_ball_prop));
+				hhg_ball_num += 1;
 			}
 			// compute BCov(X, X)
 			bcov_weight_prob_x += (1.0 - px)*(1.0 - px);
@@ -168,6 +169,7 @@ void Ball_Correlation(double *bcor_stat, int *n, int *p, double *x, double **Dy,
 		if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1)
 		{
 			bcov_weight_hhg += bcov_fixed_ball / ((px - minor_ball_prop)*(1.0 - px + minor_ball_prop)*(py - minor_ball_prop)*(1.0 - py + minor_ball_prop));
+			hhg_ball_num += 1;
 		}
 		// compute BCov(X, X)
 		bcov_weight_prob_x += (1.0 - px)*(1.0 - px);
@@ -179,7 +181,7 @@ void Ball_Correlation(double *bcor_stat, int *n, int *p, double *x, double **Dy,
 	}
 	bcor_stat[0] = bcov_weight0 / (sqrt(bcov_weight0_x) * sqrt(bcov_weight0_y));
 	bcor_stat[1] = bcov_weight_prob / (sqrt(bcov_weight_prob_x) * sqrt(bcov_weight_prob_y));
-	bcor_stat[2] = bcov_weight_hhg / (1.0*(*n)*(*n));
+	bcor_stat[2] = bcov_weight_hhg / (hhg_ball_num);
 
 	// free memory
 	free_matrix(Dx, *n, *n);
@@ -220,7 +222,7 @@ void U_Ball_Correlation(double *bcor_stat, int *n, double *x, int *yrank, int **
 	double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, bcov_fixed_ball = 0.0;
 	double bcov_weight0_x = 0.0, bcov_weight_prob_x = 0.0;
 	double bcov_weight0_y = 0.0, bcov_weight_prob_y = 0.0;
-	double minor_ball_prop = 2 / (*n);
+	double minor_ball_prop = 2 / (*n), hhg_ball_num = 0.0;
 	for (i = 0; i < *n; i++) {
 		for (j = 0; j < *n; j++) {
 			pi = i;
@@ -239,6 +241,7 @@ void U_Ball_Correlation(double *bcor_stat, int *n, double *x, int *yrank, int **
 			if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1)
 			{
 				bcov_weight_hhg += bcov_fixed_ball / ((px - minor_ball_prop)*(1.0 - px + minor_ball_prop)*(py - minor_ball_prop)*(1.0 - py + minor_ball_prop));
+				hhg_ball_num += 1;
 			}
 
 			bcov_weight_prob_x += (1.0 - px)*(1.0 - px);
@@ -250,7 +253,7 @@ void U_Ball_Correlation(double *bcor_stat, int *n, double *x, int *yrank, int **
 	}
 	bcor_stat[0] = bcov_weight0 / (sqrt(bcov_weight0_x) * sqrt(bcov_weight0_y));
 	bcor_stat[1] = bcov_weight_prob / (sqrt(bcov_weight_prob_x) * sqrt(bcov_weight_prob_y));
-	bcor_stat[2] = bcov_weight_hhg / (1.0*(*n)*(*n));
+	bcor_stat[2] = bcov_weight_hhg / (hhg_ball_num);
 	
 	free_int_matrix(Rank, (*n) + 1, (*n) + 1);
 	free_int_matrix(lowxidx, *n, *n);
@@ -307,8 +310,6 @@ void _bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *
 		int f_thread, i_thread, k_thread, s_thread, stop_index_thread, x_size_thread;
 		double *x_thread;
 		double bcorsis_stat_tmp[3];
-
-		
 
 		// main loop for calculate bcor statistic
 #pragma omp for

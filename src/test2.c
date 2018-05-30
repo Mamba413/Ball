@@ -76,28 +76,43 @@ void test_bcor_value() {
 	int f_number = 2, n = 10, weight = 0, dst = 0, k = 0, p = 1, nth = 2, size = 2;
 
 	// univariate case:
+	printf("----- First Covariance ----- \n");
 	bcor_test(ball_stat_value, y, x, &x_number, &f_number, &size, &n, &p, &k, &dst, &nth);
 	printf("Univariate Ball Correlation: %f; \n", ball_stat_value[0]);
 	test_value(ball_stat_value[0], 1);
 	printf("Univariate Weight Ball Correlation: %f; \n", ball_stat_value[1]);
 	test_value(ball_stat_value[1], 1);
-	printf("Univariate Ball Correlation: %f; \n", ball_stat_value[0]);
+	printf("Univariate HHG Ball Correlation: %f; \n", ball_stat_value[2]);
+	test_value(ball_stat_value[2], 1);
+
+	printf("----- Second Covariance ----- \n");
+	printf("Univariate Ball Correlation: %f; \n", ball_stat_value[3]);
 	test_value(ball_stat_value[3], 1);
-	printf("Univariate Weight Ball Correlation: %f; \n", ball_stat_value[1]);
+	printf("Univariate Weight Ball Correlation: %f; \n", ball_stat_value[4]);
 	test_value(ball_stat_value[4], 1);
+	printf("Univariate HHG Ball Correlation: %f; \n", ball_stat_value[5]);
+	test_value(ball_stat_value[5], 1);
 
 	// multivariate case:
 	double y_dst[100] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 8, 7, 6, 5, 4, 3, 2, 1, 0, 1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
 	dst = 1;
+
+	printf("----- First Covariance ----- \n");
 	bcor_test(ball_stat_value, y_dst, x, &x_number, &f_number, &size, &n, &p, &k, &dst, &nth);
 	printf("Multivariate Ball Correlation: %f; \n", ball_stat_value[0]);
 	test_value(ball_stat_value[0], 1);
 	printf("Multivariate Weight Ball Correlation: %f; \n", ball_stat_value[1]);
 	test_value(ball_stat_value[1], 1);
-	printf("Multivariate Ball Correlation: %f; \n", ball_stat_value[0]);
+	printf("Multivariate HHG Ball Correlation: %f; \n", ball_stat_value[2]);
+	test_value(ball_stat_value[2], 1);
+
+	printf("----- Second Covariance ----- \n");
+	printf("Multivariate Ball Correlation: %f; \n", ball_stat_value[3]);
 	test_value(ball_stat_value[3], 1);
-	printf("Multivariate Weight Ball Correlation: %f; \n", ball_stat_value[1]);
+	printf("Multivariate Weight Ball Correlation: %f; \n", ball_stat_value[4]);
 	test_value(ball_stat_value[4], 1);
+	printf("Multivariate HHG Ball Correlation: %f; \n", ball_stat_value[5]);
+	test_value(ball_stat_value[5], 1);
 	return;
 }
 
