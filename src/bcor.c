@@ -286,8 +286,13 @@ void _bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *
 	yidx = alloc_int_matrix(*n, *n);
 	y_cpy = (double *)malloc(*n * sizeof(double));
 
-	vector2matrix(y, Dy, *n, *n, 1);
-	//Euclidean_distance(y, Dy, *n, *p);
+	if (*p == 0)
+	{
+		vector2matrix(y, Dy, *n, *n, 1);
+	}
+	else {
+		Euclidean_distance(y, Dy, *n, *p);
+	}
 
 	for (i = 0; i<*n; i++)
 	{
@@ -432,6 +437,189 @@ void _fast_bcor_test(double *bcorsis_stat, double *y, double *x, int *f_number, 
 }
 
 
+void _bcor_stat(double *bcorsis_stat, double *y, double *x, int *n)
+{
+	double **Dx, **Dy, *x_cpy, *y_cpy;
+	int **xidx, **yidx;
+	Dx = alloc_matrix(*n, *n);
+	Dy = alloc_matrix(*n, *n);
+	xidx = alloc_int_matrix(*n, *n);
+	yidx = alloc_int_matrix(*n, *n);
+
+	x_cpy = (double *)malloc((*n) * sizeof(double));
+	y_cpy = (double *)malloc((*n) * sizeof(double));
+	vector2matrix(x, Dx, *n, *n, 1);
+	vector2matrix(y, Dy, *n, *n, 1);
+
+	int s, t;
+	for (s = 0; s < *n; s++)
+	{
+		for (t = 0; t<*n; t++)
+		{
+			xidx[s][t] = t;
+			yidx[s][t] = t;
+		}
+	}
+
+	for (s = 0; s<(*n); s++)
+	{
+		// copy site to x_cpy and y_cpy
+		memcpy(x_cpy, Dx[s], *n * sizeof(double));
+		memcpy(y_cpy, Dy[s], *n * sizeof(double));
+		quicksort(x_cpy, xidx[s], 0, *n - 1);
+		quicksort(y_cpy, yidx[s], 0, *n - 1);
+	}
+	free(x_cpy);
+	free(y_cpy);
+
+	int i, j, k, pi, src, lastpos, *yrank, *isource, *icount, *xy_index, *xy_temp, **xyidx;
+	double pxy, px, py, lastval, *xx_cpy, *yy_cpy;
+	double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, bcov_fixed_ball = 0.0;
+	double bcov_weight0_x = 0.0, bcov_weight_prob_x = 0.0;
+	double bcov_weight0_y = 0.0, bcov_weight_prob_y = 0.0;
+	double hhg_ball_num = 0.0, minor_ball_prop = 2 / (*n);
+
+	yrank = (int *)malloc(*n * sizeof(int));
+	isource = (int *)malloc(*n * sizeof(int));
+	icount = (int *)malloc(*n * sizeof(int));
+	xy_index = (int *)malloc(*n * sizeof(int));
+	xy_temp = (int *)malloc(*n * sizeof(int));
+	xyidx = alloc_int_matrix(*n, *n);
+	xx_cpy = (double *)malloc(*n * sizeof(double));
+	yy_cpy = (double *)malloc(*n * sizeof(double));
+
+	for (i = 0; i<*n; i++)
+		for (j = 0; j<*n; j++)
+			xyidx[i][j] = j;
+
+	for (i = 0; i<(*n); i++)
+	{
+		memcpy(xx_cpy, Dx[i], *n * sizeof(double));
+		for (j = 0; j<*n; j++)
+			yy_cpy[j] = Dy[i][j];
+		quicksort2(xx_cpy, yy_cpy, xyidx[i], 0, *n - 1);
+	}
+	free(xx_cpy);
+	free(yy_cpy);
+
+	for (i = 0; i<(*n); i++)
+	{
+		pi = i;
+		lastval = 0;
+		lastpos = -1;
+		for (j = *n - 1, k = *n - 1; j >= 1; --j, --k)
+		{
+			k -= (yidx[pi][k] == pi);
+			if (lastpos == -1 || Dy[pi][yidx[pi][k]] != lastval)
+			{
+				lastval = Dy[pi][yidx[pi][k]];
+				lastpos = j;
+			}
+			src = yidx[pi][k];
+			src -= (src > i);
+			yrank[src] = lastpos;
+		}
+
+		for (j = 0, k = 0; j < *n - 1; ++j, ++k)
+		{
+			k += (xyidx[i][k] == i);
+			src = xyidx[i][k]; // NOTE: k may be different than from the line above
+			src -= (src > i);
+			xy_index[j] = yrank[src];
+			isource[j] = j;
+			icount[j] = 0;
+			xy_temp[j] = xy_index[j];
+		}
+		Inversions(xy_temp, isource, icount, *n - 1, *n);
+		lastval = 0;
+		lastpos = -1;
+
+		for (j = *n - 2, k = *n - 1; j >= 0; --j, --k)
+		{
+			k -= (xidx[i][k] == i);
+			if (lastpos == -1 || Dx[i][xidx[i][k]] != lastval) {
+				lastval = Dx[i][xidx[i][k]];
+				lastpos = j;
+			}
+
+			pxy = lastpos - icount[j] + 2;
+			px = lastpos + 2;
+			py = xy_index[j] + 1;
+			px /= (*n);
+			py /= (*n);
+			pxy /= (*n);
+			// compute BCov(X, Y)
+			bcov_fixed_ball = pow(pxy - px*py, 2);
+			bcov_weight0 += bcov_fixed_ball;
+			bcov_weight_prob += bcov_fixed_ball / (px*py);
+			if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1)
+			{
+				bcov_weight_hhg += bcov_fixed_ball / ((px - minor_ball_prop)*(1.0 - px + minor_ball_prop)*(py - minor_ball_prop)*(1.0 - py + minor_ball_prop));
+				hhg_ball_num += 1;
+			}
+			// compute BCov(X, X)
+			bcov_weight_prob_x += (1.0 - px)*(1.0 - px);
+			bcov_weight0_x += px*px*(1.0 - px)*(1.0 - px);
+
+			// compute BCov(Y, Y)
+			bcov_weight_prob_y += (1.0 - py)*(1.0 - py);
+			bcov_weight0_y += py*py*(1.0 - py)*(1.0 - py);
+		}
+		pxy = 0;
+		px = 0;
+		py = 0;
+		for (j = 0; j<*n; j++)
+		{
+			if (Dx[i][xidx[i][j]] == 0)
+			{
+				px += 1;
+				if (Dy[pi][xidx[i][j]] == 0)
+				{
+					pxy += 1;
+					py += 1;
+				}
+			}
+			else if (Dy[pi][xidx[i][j]] == 0)
+				py += 1;
+		}
+		px /= (*n);
+		py /= (*n);
+		pxy /= (*n);
+		// compute BCov(X, Y)
+		bcov_fixed_ball = pow(pxy - px*py, 2);
+		bcov_weight0 += bcov_fixed_ball;
+		bcov_weight_prob += bcov_fixed_ball / (px*py);
+		if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1)
+		{
+			bcov_weight_hhg += bcov_fixed_ball / ((px - minor_ball_prop)*(1.0 - px + minor_ball_prop)*(py - minor_ball_prop)*(1.0 - py + minor_ball_prop));
+			hhg_ball_num += 1;
+		}
+		// compute BCov(X, X)
+		bcov_weight_prob_x += (1.0 - px)*(1.0 - px);
+		bcov_weight0_x += px*px*(1.0 - px)*(1.0 - px);
+
+		// compute BCov(Y, Y)
+		bcov_weight_prob_y += (1.0 - py)*(1.0 - py);
+		bcov_weight0_y += py*py*(1.0 - py)*(1.0 - py);
+	}
+	bcorsis_stat[0] = bcov_weight0 / (sqrt(bcov_weight0_x) * sqrt(bcov_weight0_y));
+	bcorsis_stat[1] = bcov_weight_prob / (sqrt(bcov_weight_prob_x) * sqrt(bcov_weight_prob_y));
+	bcorsis_stat[2] = bcov_weight_hhg / (hhg_ball_num);
+
+	// free memory
+	free_int_matrix(xidx, *n, *n);
+	free_int_matrix(yidx, *n, *n);
+	free_int_matrix(Dx, *n, *n);
+	free_int_matrix(Dy, *n, *n);
+	free(isource);
+	free(icount);
+	free(xy_index);
+	free(yrank);
+	free(xy_temp);
+	free_int_matrix(xyidx, *n, *n);
+	return;
+}
+
 
 // R API function:
 /*
@@ -442,16 +630,22 @@ x_number: if x_number = [1, 2, 2, 1, 1], then x[:, 1], x[:, 2:3], x[:, 4:5], x[:
 f_number: the number of covariate
 size: sample size of each group
 n: total sample size
+p: dimensionlity of response variable
 k: group number
-dst: whether y should be recompute as distance
+dst_y: whether y should be recompute as distance
+dst_x: whether x should be recompute as distance
 R: permutation replication
 nthread: control the number threads used to compute statistics
 */
-void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f_number, int *size, int *n, int *p, int *k, int *dst, int *nthread)
+void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f_number, int *size, int *n, int *p, int *k, int *dst_y, int *dst_x, int *nthread)
 {
 	// 
-	if (*dst == 1) {
-		_bcor_test(bcorsis_stat, y, x, x_number, f_number, n, p, nthread);
+	if (*dst_y == 1) {
+		if (*dst_x == 0) {
+			_bcor_test(bcorsis_stat, y, x, x_number, f_number, n, p, nthread);
+		} else {
+			_bcor_stat(bcorsis_stat, y, x, n);
+		}
 	}
 	else {
 		// If y is univariate, and y indicator for K classes. We can simplify the computation for ball correlation by 
