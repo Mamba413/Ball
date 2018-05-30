@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "BD.h"
 #include "BI.h"
+#include "bcor.h"
 
 
 void test_value(double computed_value, double true_value)
@@ -68,22 +69,29 @@ void test_bcov_value()
 
 void test_bcor_value() {
 	printf("\n");
-	double ball_stat_value[1];
-	double x[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	double ball_stat_value[6];
+	double x[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
 	double y[10] = { 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
-	int n = 10;
-	int R = 0, weight = 0, dst = 0, type = 2, nth = 2;
+	int x_number[2] = { 1, 1 };
+	int f_number = 2, n = 10, weight = 0, dst = 0, k = 0, nth = 2, size = 2;
 
 	// univariate case:
-	bcov_stat(ball_stat_value, x, y, &n, &weight, &dst, &type, &nth);
+	bcor_test(ball_stat_value, y, x, &x_number, &f_number, &size, &n, &k, &dst, &nth);
 	printf("Univariate Ball Correlation: %f; \n", ball_stat_value[0]);
 	test_value(ball_stat_value[0], 1);
+	printf("Univariate Weight Ball Correlation: %f; \n", ball_stat_value[1]);
+	test_value(ball_stat_value[1], 1);
+	printf("Univariate Ball Correlation: %f; \n", ball_stat_value[0]);
+	test_value(ball_stat_value[3], 1);
+	printf("Univariate Weight Ball Correlation: %f; \n", ball_stat_value[1]);
+	test_value(ball_stat_value[4], 1);
 
 	// univariate case:
 	//type = 1;
 	//bcov_stat(ball_stat_value, x, y, &n, &weight, &dst, &type, &nth);
 	//printf("Univariate Ball Covariance: %f; \n", ball_stat_value[0]);
 	//test_value(ball_stat_value[0], 0.034214);
+	return;
 }
 
 
@@ -185,3 +193,24 @@ void main()
 	system("pause");
 	return;
 }
+
+
+//void test_Find2()
+//{
+//	double ball_stat_value[2], p_value[2];
+//	double x[100] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 8, 7, 6, 5, 4, 3, 2, 1, 0, 1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+//	int size[2] = { 5, 5 };
+//	int k = 2;
+//	int n = 10;
+//	int dst = 1, R = 10, nth = 1;
+//	int parallel_type = 1;
+//	bd_test(ball_stat_value, p_value, x, size, &n, &k, &dst, &R, &nth);
+//}
+
+
+//int main()
+//{
+//	test_Find2();
+//	system("pause");
+//	return;
+//}
