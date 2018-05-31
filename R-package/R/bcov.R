@@ -241,24 +241,29 @@ kbcov_test_internal <- function(x, R = 99, dst = FALSE, weight = FALSE,
     seed <- examine_seed_arguments(seed)
     set.seed(seed)
     # permutation procedure:
-    permuted_stat <- numeric(R)
+    permuted_stat <- matrix(nrow = 3, ncol = R)
     for (r in 1:R) {
       x_copy <- x
       for (v in 1:var_num) {
         index <- sample(1:num, size = num, replace = FALSE)
         x_copy[[v]] <- x[[v]][index, index]
       }
-      permuted_stat[r] <- kbcov_stat(x = x_copy, num = num, 
-                                     var_num = var_num, 
-                                     weight = weight, type = type)
+      permuted_stat[, r] <- kbcov_stat(x = x_copy, num = num, 
+                                       var_num = var_num, 
+                                       weight = weight, type = type)
     }
+    permuted_stat <- t(permuted_stat)
     # calculate pvalue:
-    pvalue <- calculatePvalue(stat_value, permuted_stat)
+    pvalue <- sapply(1:3, function(i) {
+      calculatePvalue(stat_value[i], permuted_stat[, i])
+    })
+    names(pvalue) <- paste0(names(stat_value), ".pvalue")
+    # pvalue <- calculatePvalue(stat_value, permuted_stat)
   }
   # return result:
   list("statistic" = stat_value, 
-       "N" = num, 
-       "p.value" = pvalue)
+       "p.value" = pvalue, 
+       "info" = list("N" = num, "R" = R))
 }
 
 
@@ -277,18 +282,28 @@ kbcov_stat <- function(x, num, var_num, weight, type) {
   compare_list <- list()
   prop_in_ball_vec <- c()
   value_diff <- numeric(1)
+  value_diff_prob <- numeric(1)
+  value_diff_hhg <- numeric(1)
+  hhg_ball_num <- numeric(1)
   #
   stat_value <- numeric(1)
-  stat_value_name <- c("bcov", "bcov.prob", "bcov.hhg")
-  weight_name <- c("none", "prob", "hhg")
-  names(stat_value) <- stat_value_name[which(weight_name == weight)]
+  stat_value_prob <- numeric(1)
+  stat_value_hhg <- numeric(1)
+  
+  # stat_value_name <- c("bcov", "bcov.prob", "bcov.hhg")
+  # weight_name <- c("none", "prob", "hhg")
+  # names(stat_value) <- stat_value_name[which(weight_name == weight)]
   # if(type == "bcor") {
   #   names(stat_value) <- gsub(x = names(stat_value), 
   #                             pattern = "bcov", replacement = "bcor")
   # }
+  
   # compute extention of BCov:
   for (i in 1:num) {
     for (j in 1:num) {
+      value_diff_hhg <- 0
+      value_diff_prob <- 0
+      value_diff <- 0
       # compute ball statistic for ball with sample i as center and radius is d(x_{i}, x_{j})
       # d(x_{i}, x_{j}) are stored in x[[v]][i, j], x = 1, ..., var_num
       all_in_ball_vec <- rep(1, num)
@@ -298,17 +313,22 @@ kbcov_stat <- function(x, num, var_num, weight, type) {
       }
       prop_in_ball_vec <- sapply(compare_list, mean)
       value_diff <- (mean(all_in_ball_vec) - prod(prop_in_ball_vec))^2
-      if(weight == "prob") {
-        value_diff <- value_diff / prod(prop_in_ball_vec)
-      } else if (weight == "hhg" & (!any(prop_in_ball_vec %in% c(0, 1)))) {
-        value_diff <- value_diff / (prod(prop_in_ball_vec)*(prod(1 - prop_in_ball_vec)))
+      value_diff_prob <- value_diff / prod(prop_in_ball_vec)
+      if (!any(prop_in_ball_vec %in% c(0, 1))) {
+        value_diff_hhg <- value_diff / (prod(prop_in_ball_vec)*(prod(1 - prop_in_ball_vec)))
+        hhg_ball_num <- hhg_ball_num + 1
       }
       # aggrate statistic value:
       stat_value <- stat_value + value_diff
+      stat_value_prob <- stat_value_prob + value_diff_prob
+      stat_value_hhg <- stat_value_hhg + value_diff_hhg
     }
   }
+  stat_value <- stat_value / (num)^2
+  stat_value_prob <- stat_value_prob / (num)^2
+  stat_value_hhg <- stat_value_hhg / (hhg_ball_num)^2
   # 
-  stat_value
+  c("bcov" = stat_value, "bcov.prob" = stat_value_prob, "bcov.hhg" = stat_value_hhg)
 }
 
 
