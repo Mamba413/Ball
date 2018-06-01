@@ -221,7 +221,7 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
     p.value = pvalue,
     replicates = R,
     size = result[["info"]][["size"]],
-    complete.test.info = result,
+    complete.info = result,
     alternative = alternative_message,
     method = sprintf("Nonparametric %s-Samples Ball Divergence Test%s", result[["info"]][["K"]], stat_message),
     data.name = data_name

@@ -140,7 +140,7 @@ bcov.test <- function(x, y = NULL, R = 99, dst = FALSE, weight = FALSE,
       p.value = pvalue,
       replicates = R,
       size = result[["info"]][["N"]],
-      complete.test.info = result,
+      complete.info = result,
       alternative = alternative_message,
       method = test_method,
       data.name = data_name
