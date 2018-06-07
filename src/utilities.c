@@ -643,6 +643,27 @@ double **alloc_matrix(int r, int c)
   return matrix;
 }
 
+
+double ***alloc_3d_matrix(int r, int c, int h)
+{
+	/* allocate a 3D matrix with r rows, c columns, h levels */
+	int ***arr3D;
+	int i, j, k;
+
+	arr3D = (double***)malloc(r * sizeof(double **));
+
+	for (i = 0; i < r; i++)
+	{
+		arr3D[i] = (double**)malloc(c * sizeof(double*));
+		for (j = 0; j < c; j++)
+		{
+			arr3D[i][j] = (double*)malloc(h * sizeof(double));
+		}
+	}
+	return arr3D;
+}
+
+
 int **alloc_int_matrix(int r, int c)
 {
   /* allocate a matrix with r rows and c columns */
@@ -662,6 +683,21 @@ void free_matrix(double **matrix, int r, int c)
     free(matrix[i]);	
   }
   free(matrix);
+}
+
+void free_3d_matrix(double ***arr3D, int r, int c)
+{
+	int i, j;
+
+	for (i = 0; i < r; i++)
+	{
+		for (int j = 0; j < c; j++)
+		{
+			free(arr3D[i][j]);
+		}
+		free(arr3D[i]);
+	}
+	free(arr3D);
 }
 
 void free_int_matrix(int **matrix, int r, int c)
@@ -689,6 +725,28 @@ void vector2matrix(double *x, double **y, int N, int d, int isroworder)
         y[i][k] = (*(x+k*N+i));
   }
   return;
+}
+
+
+void vector_2_3dmatrix(double *x, double ***y, int r, int c, int h, int isroworder)
+{
+	/* copy a d-variate sample into a matrix, N samples in rows */
+	int i, j, k;
+	int index = 0;
+	if (isroworder == 1) {
+		for (k = 0; k < h; k++)
+		{
+			for (j = 0; j < c; j++)
+			{
+				for (i = 0; i < r; i++)
+				{
+					y[i][j][k] = x[index];
+					index += 1;
+				}
+			}
+		}
+	}
+	return;
 }
 
 void Euclidean_distance(double *x, double **Dx, int n, int d)
@@ -752,6 +810,22 @@ void resample(int *i_perm, int *i_perm_inv, int *n)
   for (i = 0; i < *n; ++i) {
     i_perm_inv[i_perm[i]] = i;
   }
+}
+
+
+void resample_matrix(int **i_perm, int *r, int *c)
+{
+	int i, j, k, temp;
+	for (k = 0; k < *r; k++)
+	{
+		for (i = *c - 1; i > 0; --i) {
+			j = random_index2(i);
+			temp = i_perm[k][j];
+			i_perm[k][j] = i_perm[k][i];
+			i_perm[k][i] = temp;
+		}
+	}
+	return;
 }
 
 
