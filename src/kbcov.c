@@ -149,6 +149,6 @@ void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, i
 	}
 
 	free_3d_matrix(Dx, *n, *n);
-	free_matrix(i_perm, *k, *n);
+	free_int_matrix(i_perm, *k, *n);
 	return;
 }

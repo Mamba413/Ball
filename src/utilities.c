@@ -647,8 +647,8 @@ double **alloc_matrix(int r, int c)
 double ***alloc_3d_matrix(int r, int c, int h)
 {
 	/* allocate a 3D matrix with r rows, c columns, h levels */
-	int ***arr3D;
-	int i, j, k;
+	double ***arr3D;
+	int i, j;
 
 	arr3D = (double***)malloc(r * sizeof(double **));
 
@@ -691,7 +691,7 @@ void free_3d_matrix(double ***arr3D, int r, int c)
 
 	for (i = 0; i < r; i++)
 	{
-		for (int j = 0; j < c; j++)
+		for (j = 0; j < c; j++)
 		{
 			free(arr3D[i][j]);
 		}
