@@ -30,7 +30,7 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
 	int i, j, k, pi, src, lastpos, *yrank, *isource, *icount, *xy_index, *xy_temp, **xyidx;
 	double pxy, px, py, lastval, *xx_cpy, *yy_cpy;
 	double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, bcov_fixed_ball = 0.0;
-	double minor_ball_prop = 2 / (*n);
+	double hhg_ball_num = 0.0, minor_ball_prop = 2 / (*n);
 
 	yrank = (int *)malloc(*n * sizeof(int));
 	isource = (int *)malloc(*n * sizeof(int));
@@ -107,6 +107,7 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
 			if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1)
 			{
 				bcov_weight_hhg += bcov_fixed_ball / ((px - minor_ball_prop)*(1.0 - px + minor_ball_prop)*(py - minor_ball_prop)*(1.0 - py + minor_ball_prop));
+				hhg_ball_num += 1.0;
 			}
 		}
 		pxy = 0;
@@ -135,11 +136,12 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
 		if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1)
 		{
 			bcov_weight_hhg += bcov_fixed_ball / ((px - minor_ball_prop)*(1.0 - px + minor_ball_prop)*(py - minor_ball_prop)*(1.0 - py + minor_ball_prop));
+			hhg_ball_num += 1.0;
 		}
 	}
 	bcov_stat[0] = bcov_weight0 / (1.0*(*n)*(*n));
 	bcov_stat[1] = bcov_weight_prob / (1.0*(*n)*(*n));
-	bcov_stat[2] = bcov_weight_hhg / (1.0*(*n)*(*n));
+	bcov_stat[2] = bcov_weight_hhg / (hhg_ball_num);
 
 	// free memory
 	free(isource);
@@ -500,7 +502,7 @@ void U_Ball_Information(double *bcov_stat, int *n, int **Rank, int **lowxidx, in
 	int i, j, pi, pj;
 	double px, py, pxy;
 	double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, bcov_fixed_ball = 0.0;
-	double minor_ball_prop = 2 / (*n);
+	double hhg_ball_num = 0.0, minor_ball_prop = 2 / (*n);
 	for (i = 0; i < *n; i++) {
 		for (j = 0; j < *n; j++) {
 			pi = i_perm[i];
@@ -519,12 +521,13 @@ void U_Ball_Information(double *bcov_stat, int *n, int **Rank, int **lowxidx, in
 			if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1)
 			{
 				bcov_weight_hhg += bcov_fixed_ball / ((px - minor_ball_prop)*(1.0 - px + minor_ball_prop)*(py - minor_ball_prop)*(1.0 - py + minor_ball_prop));
+				hhg_ball_num += 1;
 			}
 		}
 	}
 	bcov_stat[0] = bcov_weight0 / (1.0*(*n)*(*n));
 	bcov_stat[1] = bcov_weight_prob / (1.0*(*n)*(*n));
-	bcov_stat[2] = bcov_weight_hhg / (1.0*(*n)*(*n));
+	bcov_stat[2] = bcov_weight_hhg / hhg_ball_num;
 
 	return;
 }
