@@ -91,7 +91,6 @@ Dx <- dist(ArcticLake[["depth"]])
 bcov.test(x = Dx, y = Dy, dst = TRUE, weight = TRUE)
 
 ################# Mutual Independence Test #################
-\dontrun{
 x <- rnorm(30)
 y <- (x > 0) * x + rnorm(30)
 z <- (x <= 0) * x + rnorm(30)
@@ -101,7 +100,6 @@ bcov.test(data_list)
 ################# Mutual Independence Test for Meteorology data #################
 data("meteorology")
 bcov.test(meteorology)
-}
 
 }
 \seealso{

@@ -82,7 +82,6 @@
 #' bcov.test(x = Dx, y = Dy, dst = TRUE, weight = TRUE)
 #' 
 #' ################# Mutual Independence Test #################
-#' \dontrun{
 #' x <- rnorm(30)
 #' y <- (x > 0) * x + rnorm(30)
 #' z <- (x <= 0) * x + rnorm(30)
@@ -92,7 +91,6 @@
 #' ################# Mutual Independence Test for Meteorology data #################
 #' data("meteorology")
 #' bcov.test(meteorology)
-#' }
 #' 
 bcov.test <- function(x, y = NULL, R = 99, dst = FALSE, weight = FALSE, 
                       seed = 4, num.threads = 2)
@@ -215,7 +213,7 @@ bcov_test_internal <- function(x, y, R = 99, dst = FALSE, weight = FALSE,
 #' @noRd
 #'
 kbcov_test_internal <- function(x, R = 99, dst = FALSE, weight = FALSE, 
-                                seed = 4, method = 'permute', type = "bcov")
+                                seed = 4, method = 'permute', num.threads)
 {
   x <- lapply(x, as.matrix)
   size_list <- sapply(x, nrow)
@@ -223,47 +221,86 @@ kbcov_test_internal <- function(x, R = 99, dst = FALSE, weight = FALSE,
   if(length(num) > 1) {
     stop("sample sizes in each list must equal!")
   }
-  #
+  ############################################################
+  #################### R Version (1.1.0) #####################
+  ############################################################
+  # if(dst) {
+  #   
+  # } else {
+  #   x <- lapply(x, dist, diag = TRUE, upper = TRUE)
+  #   x <- lapply(x, as.matrix)
+  # }
+  # var_num <- length(x)
+  # # compute statistic:
+  # stat_value <- kbcov_stat(x = x, num = num, var_num = var_num, 
+  #                          weight = weight, type = type)
+  # if(R == 0) {
+  #   names(stat_value)
+  #   return(stat_value)
+  # } else {
+  #   seed <- examine_seed_arguments(seed)
+  #   set.seed(seed)
+  #   # permutation procedure:
+  #   permuted_stat <- matrix(nrow = 3, ncol = R)
+  #   for (r in 1:R) {
+  #     x_copy <- x
+  #     for (v in 1:var_num) {
+  #       index <- sample(1:num, size = num, replace = FALSE)
+  #       x_copy[[v]] <- x[[v]][index, index]
+  #     }
+  #     permuted_stat[, r] <- kbcov_stat(x = x_copy, num = num, 
+  #                                      var_num = var_num, 
+  #                                      weight = weight, type = type)
+  #   }
+  #   permuted_stat <- t(permuted_stat)
+  #   # calculate pvalue:
+  #   pvalue <- sapply(1:3, function(i) {
+  #     calculatePvalue(stat_value[i], permuted_stat[, i])
+  #   })
+  #   names(pvalue) <- paste0(names(stat_value), ".pvalue")
+  #   # pvalue <- calculatePvalue(stat_value, permuted_stat)
+  # }
+  # return result:
+  # list("statistic" = stat_value, 
+  #      "p.value" = pvalue, 
+  #      "info" = list("N" = num, "R" = R))
+
+  
+  ############################################################
+  #################### C Version (1.2.0) #####################
+  ############################################################
+  var_num <- length(x)
   if(dst) {
     
   } else {
     x <- lapply(x, dist, diag = TRUE, upper = TRUE)
-    x <- lapply(x, as.matrix)
   }
-  var_num <- length(x)
-  # compute statistic:
-  stat_value <- kbcov_stat(x = x, num = num, var_num = var_num, 
-                           weight = weight, type = type)
+  x <- lapply(x, as.matrix)
+  x <- unlist(lapply(x, as.vector))
+  dst <- TRUE
+  #
   if(R == 0) {
-    names(stat_value)
-    return(stat_value)
-  } else {
-    seed <- examine_seed_arguments(seed)
-    set.seed(seed)
-    # permutation procedure:
-    permuted_stat <- matrix(nrow = 3, ncol = R)
-    for (r in 1:R) {
-      x_copy <- x
-      for (v in 1:var_num) {
-        index <- sample(1:num, size = num, replace = FALSE)
-        x_copy[[v]] <- x[[v]][index, index]
+    result <- kbcov_test_wrap_c(x = x, K = var_num, n = num, R = 0, 
+                                dst = dst, num.threads = num.threads)
+    if(method == "approx") {
+      pvalue <- calculatePvalue(result[["statistic"]] * result[["info"]][["N"]], 
+                                BITestNullDistribution)
+    } else {
+      if (weight == "none") {
+        return(result[[1]][1])
+      } else if (weight == "prob") {
+        return(result[[1]][2])
+      } else {
+        return(result[[1]][3])
       }
-      permuted_stat[, r] <- kbcov_stat(x = x_copy, num = num, 
-                                       var_num = var_num, 
-                                       weight = weight, type = type)
     }
-    permuted_stat <- t(permuted_stat)
-    # calculate pvalue:
-    pvalue <- sapply(1:3, function(i) {
-      calculatePvalue(stat_value[i], permuted_stat[, i])
-    })
-    names(pvalue) <- paste0(names(stat_value), ".pvalue")
-    # pvalue <- calculatePvalue(stat_value, permuted_stat)
+  } else {
+    set.seed(seed = examine_seed_arguments(seed))
+    result <- kbcov_test_wrap_c(x = x, K = var_num, n = num, R = R, 
+                                dst = dst, num.threads = num.threads)
+    return(result)
   }
-  # return result:
-  list("statistic" = stat_value, 
-       "p.value" = pvalue, 
-       "info" = list("N" = num, "R" = R))
+  
 }
 
 
@@ -340,9 +377,17 @@ bcov_test_internal_wrap <- function(x = x, y = y, R, dst, seed,
                                     weight, method, type, num.threads)
 {
   if(class(x) == "list") {
-    result <- kbcov_test_internal(x = x, R = R, dst = dst, weight = weight, 
-                                  seed = seed, 
-                                  method = method)
+    if (length(x) > 2)
+    {
+      result <- kbcov_test_internal(x = x, R = R, dst = dst, weight = weight, 
+                                    seed = seed, method = method, num.threads = num.threads)
+    } else {
+      y <- x[[2]]
+      x <- x[[1]]
+      result <- bcov_test_internal(x = x, y = y, R = R, dst = dst, 
+                                   weight = weight, seed = seed, method = method, 
+                                   num.threads = num.threads)
+    }
   } else {
     result <- bcov_test_internal(x = x, y = y, R = R, dst = dst, 
                                  weight = weight, seed = seed, method = method, 

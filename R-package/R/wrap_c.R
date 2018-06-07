@@ -146,6 +146,35 @@ bcov_test_wrap_c <- function(x, y, n, R, dst, num.threads) {
 }
 
 
+#' compute K Ball Covariance statistic and Ball Covariance statistic after permutation
+#' @inheritParams bcov.test
+#' @param x numeric vector.
+#' @param n sample size. it must be integer value.
+#'
+#' @return A list contain: Ball Covariance statistic, Ball Covariance statistic after permutation, 
+#' sample size, replication times, weight
+#' @useDynLib Ball, .registration = TRUE
+#' @noRd
+#' 
+kbcov_test_wrap_c <- function(x, K, n, R, dst, num.threads) {
+  dst <- as.integer(dst) 
+  x <- as.double(x)
+  K <- as.integer(K)
+  n <- as.integer(n)
+  R <- as.integer(R)
+  num.threads <- as.integer(num.threads)
+  #
+  kbcov <- as.double(numeric(3))
+  p_value <- as.double(numeric(3))
+  res <- .C("kbcov_test", kbcov, p_value, x, K, n, R, dst, num.threads)
+  bcov <- res[[1]]
+  p_value <- res[[2]]
+  names(bcov) <- c("bcov", "bcov.prob", "bcov.hhg")
+  names(p_value) <- paste0(names(bcov), ".pvalue")
+  list('statistic' = bcov, 'p.value' = p_value,
+       'info' = list("N" = res[[5]], "R" = res[[6]]))
+}
+
 
 #' compute Ball Covariance statistic for each variable
 #' @inheritParams bcov.test
