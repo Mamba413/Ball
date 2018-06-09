@@ -94,7 +94,7 @@ examine_seed_arguments <- function(seed) {
 #' @noRd
 #'
 examine_weight_arguments <- function(weight) {
-  WEIGHT_METHODS <- c(TRUE, FALSE, "none", "hhg", "prob")
+  WEIGHT_METHODS <- c(TRUE, FALSE, "none", "chisq", "prob")
   method <- pmatch(weight, WEIGHT_METHODS)
   if (is.na(method)) 
     stop("invalid weight method")
@@ -127,7 +127,7 @@ select_ball_stat <- function(ball_stat, weight, type = "bcov", fun_name = "bcov"
       names(ball_stat) <- ifelse(type == "bcov", "bcov.prob", "bcor.prob")
     } else {
       ball_stat <- ball_stat[3]
-      names(ball_stat) <- ifelse(type == "bcov", "bcov.hhg", "bcor.hhg")
+      names(ball_stat) <- ifelse(type == "bcov", "bcov.chisq", "bcor.chisq")
     }
   }
   return(ball_stat)

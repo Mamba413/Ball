@@ -52,8 +52,12 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
   p_value <- res[[2]]
   if (K == 2) {
     names(bd) <- stat_name_bd
+    bd <- bd[1]
+    p_value <- p_value[1]
   } else {
     names(bd) <- stat_name_kbd
+    bd <- bd[c(1, 3)]
+    p_value <- p_value[c(1, 3)]
   }
   names(p_value) <- paste0(names(bd), ".pvalue")
   list('statistic' = bd, 'p.value' = p_value, 
@@ -105,7 +109,7 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
 #'       names(bcov) <- "bcov.prob"
 #'     } else {
 #'       bcov <- bcov[3]
-#'       names(bcov) <- "bcov.hhg"
+#'       names(bcov) <- "bcov.chisq"
 #'     } 
 #'   } else {
 #'     names(bcov) <- ifelse(weight, "wbcor", "bcor")
@@ -139,7 +143,7 @@ bcov_test_wrap_c <- function(x, y, n, R, dst, num.threads) {
   res <- .C("bcov_test", bcov, p_value, x, y, n, R, dst, num.threads)
   bcov <- res[[1]]
   p_value <- res[[2]]
-  names(bcov) <- c("bcov", "bcov.prob", "bcov.hhg")
+  names(bcov) <- c("bcov", "bcov.prob", "bcov.chisq")
   names(p_value) <- paste0(names(bcov), ".pvalue")
   list('statistic' = bcov, 'p.value' = p_value,
        'info' = list("N" = res[[5]], "R" = res[[6]]))
@@ -169,7 +173,7 @@ kbcov_test_wrap_c <- function(x, K, n, R, dst, num.threads) {
   res <- .C("kbcov_test", kbcov, p_value, x, K, n, R, dst, num.threads)
   bcov <- res[[1]]
   p_value <- res[[2]]
-  names(bcov) <- c("bcov", "bcov.prob", "bcov.hhg")
+  names(bcov) <- c("bcov", "bcov.prob", "bcov.chisq")
   names(p_value) <- paste0(names(bcov), ".pvalue")
   list('statistic' = bcov, 'p.value' = p_value,
        'info' = list("N" = res[[5]], "R" = res[[6]]))
@@ -203,7 +207,7 @@ apply_bcor_wrap <- function(x, y, n, p, dst, weight, method, num.threads) {
   #
   res <- .C("bcor_test", bcor_stat, y, x, x_number, f_number, size_num, num, p, k, dst_y, dst_x, nth)[[1]]
   bcor_stat <- matrix(res, ncol = 3, byrow = TRUE)
-  colnames(bcor_stat) <- c("bcor", "bcor.prob", "bcor.hhg")
+  colnames(bcor_stat) <- c("bcor", "bcor.prob", "bcor.chisq")
   screening_bcor_stat <- select_ball_stat(bcor_stat, weight = weight, fun_name = "bcorsis")
   if (method %in% c("interaction", "standard"))
   {

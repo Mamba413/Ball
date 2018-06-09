@@ -134,7 +134,7 @@ y <- 3*x[, 1] + 5*(x[, 3])^2 + error
 res <- bcorsis(y = y, x = x, weight = "prob")
 head(res[["ix"]])
 # Alternative, chisq weight:
-res <- bcorsis(y = y, x = x, weight = "hhg")
+res <- bcorsis(y = y, x = x, weight = "chisq")
 head(res[["ix"]])
 }
 }

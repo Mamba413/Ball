@@ -121,7 +121,7 @@ bcov.test <- function(x, y = NULL, R = 99, dst = FALSE, weight = FALSE,
     } else {
       stat <- result[["statistic"]][3]
       pvalue <- result[["p.value"]][3]
-      weight_name <- "HHG"
+      weight_name <- "Chisquare"
     } 
     
     data_name <- paste0(data_name,"\nnumber of observations = ", result[["info"]][["N"]])
@@ -365,7 +365,7 @@ kbcov_stat <- function(x, num, var_num, weight, type) {
   stat_value_prob <- stat_value_prob / (num)^2
   stat_value_hhg <- stat_value_hhg / (hhg_ball_num)^2
   # 
-  c("bcov" = stat_value, "bcov.prob" = stat_value_prob, "bcov.hhg" = stat_value_hhg)
+  c("bcov" = stat_value, "bcov.prob" = stat_value_prob, "bcov.chisq" = stat_value_hhg)
 }
 
 
@@ -478,7 +478,7 @@ bcov_test_internal_wrap <- function(x = x, y = y, R, dst, seed,
 #' bcov(x, y)
 #' bcov(x, y, weight = TRUE)
 #' bcov(x, y, weight = "prob")
-#' bcov(x, y, weight = "hhg")
+#' bcov(x, y, weight = "chisq")
 bcov <- function(x, y, dst = FALSE, weight = FALSE) {
   weight <- examine_weight_arguments(weight)
   res <- bcov_test_internal_wrap(x = x, y = y, R = 0, dst = dst, seed = 0,

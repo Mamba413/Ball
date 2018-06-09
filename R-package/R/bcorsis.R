@@ -11,7 +11,7 @@
 #' bcor(x, y)
 #' bcor(x, y, weight = TRUE)
 #' bcor(x, y, weight = "prob")
-#' bcor(x, y, weight = "hhg")
+#' bcor(x, y, weight = "chisq")
 bcor <- function(x, y, dst = FALSE, weight = FALSE) {
   x <- as.matrix(x)
   y <- as.matrix(y)
@@ -180,7 +180,7 @@ bcor <- function(x, y, dst = FALSE, weight = FALSE) {
 #' res <- bcorsis(y = y, x = x, weight = "prob")
 #' head(res[["ix"]])
 #' # Alternative, chisq weight:
-#' res <- bcorsis(y = y, x = x, weight = "hhg")
+#' res <- bcorsis(y = y, x = x, weight = "chisq")
 #' head(res[["ix"]])
 #' }
 bcorsis <- function(x, y, d = "small", weight = FALSE, 
