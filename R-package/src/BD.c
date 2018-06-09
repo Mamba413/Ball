@@ -395,8 +395,8 @@ void UBD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *
 		  Ball_Divergence_wrapper(bd_tmp, Rxy, Rx, i_perm_tmp, n1, n2, nthread);
 		  permuted_bd_w0[i] = bd_tmp[0]; permuted_bd_w1[i] = bd_tmp[1];
 	  }
-	  pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, *R);
-	  pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, *R);
+	  pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, i);
+	  pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, i);
 	  free(bd_tmp); free(permuted_bd_w0); free(permuted_bd_w1);
   }
   
