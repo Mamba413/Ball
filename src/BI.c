@@ -647,11 +647,11 @@ void UBI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int
 			resample2(i_perm, n);
 			initRank(*n, Rank, xrank, yrank, i_perm);
 			U_Ball_Information_wrapper(bcov_tmp, n, Rank, lowxidx, higxidx, lowyidx, higyidx, i_perm, thread);
-			permuted_bcov_weight0[i] = bcov_tmp[0]; permuted_bcov_weight_prob[i] = bcov_tmp[1]; permuted_bcov_weight_hhg[i] = bcov_tmp[2];
+			permuted_bcov_weight0[j] = bcov_tmp[0]; permuted_bcov_weight_prob[j] = bcov_tmp[1]; permuted_bcov_weight_hhg[j] = bcov_tmp[2];
 		}
-		pvalue[0] = compute_pvalue(bcov[0], permuted_bcov_weight0, i);
-		pvalue[1] = compute_pvalue(bcov[1], permuted_bcov_weight_prob, i);
-		pvalue[2] = compute_pvalue(bcov[2], permuted_bcov_weight_hhg, i);
+		pvalue[0] = compute_pvalue(bcov[0], permuted_bcov_weight0, j);
+		pvalue[1] = compute_pvalue(bcov[1], permuted_bcov_weight_prob, j);
+		pvalue[2] = compute_pvalue(bcov[2], permuted_bcov_weight_hhg, j);
 
 		free(permuted_bcov_weight0); free(permuted_bcov_weight_prob); free(permuted_bcov_weight_hhg);
 	}
@@ -749,9 +749,9 @@ void UBI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, in
 			free_int_matrix(Rank_thread, (*n) + 1, (*n) + 1);
 		}
 
-		pvalue[0] = compute_pvalue(bcov[0], permuted_bcov_weight0, i);
-		pvalue[1] = compute_pvalue(bcov[1], permuted_bcov_weight_prob, i);
-		pvalue[2] = compute_pvalue(bcov[2], permuted_bcov_weight_hhg, i);
+		pvalue[0] = compute_pvalue(bcov[0], permuted_bcov_weight0, *R);
+		pvalue[1] = compute_pvalue(bcov[1], permuted_bcov_weight_prob, *R);
+		pvalue[2] = compute_pvalue(bcov[2], permuted_bcov_weight_hhg, *R);
 
 		free(permuted_bcov_weight0); free(permuted_bcov_weight_prob); free(permuted_bcov_weight_hhg);
 	}
