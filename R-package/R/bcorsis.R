@@ -85,6 +85,9 @@ bcor <- function(x, y, dst = FALSE, weight = FALSE) {
 #' 
 #' @return 
 #' \item{\code{ix }}{ the vector of indices selected by ball correlation sure independence screening procedure.} 
+#' \item{\code{method }}{ the method used.} 
+#' \item{\code{weight }}{ the weight used.} 
+#' \item{\code{complete.info }}{ a \code{list} containing at least one \eqn{p x 3} matrix, where each row is corresponding to variable and each column is corresponding to differe ball correlation weight. If \code{method = "gam"} or \code{method = "lm"}, \code{complete.info} is empty list.} 
 #' 
 #' @details 
 #' \code{bcorsis} implements a model-free generic screening procedure, 
@@ -167,6 +170,7 @@ bcor <- function(x, y, dst = FALSE, weight = FALSE) {
 #' error <- rnorm(n)
 #' rm(sigma_mat); gc(reset = TRUE)
 #' y <- 3*(x[, 1])^2 + 5*(x[, 2])^2 + 5*x[, 8] - 8*x[, 16] + error
+#' res <- bcorsis(y = y, x = x, method = "lm", d = 15)
 #' res <- bcorsis(y = y, x = x, method = "gam", d = 15)
 #' res[["ix"]]
 #' 
@@ -227,7 +231,7 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
       # examine_R_arguments(R)
       # seed <- examine_seed_arguments(seed = seed)
       # set.seed(seed = seed)
-      stop("After version 1.2.0, 'pvalue' method is no longer supported due to its low efficiency.")
+      stop("After version 1.2.0, 'pvalue' method is no longer supported.")
     }
     # data prepare for screening:
     if(dst == FALSE) {
@@ -265,6 +269,7 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
     rcory_result <- apply_bcor_wrap(x = x, y = y_copy, n = n, p = p, 
                                     dst = dst, weight = weight, 
                                     method = method, num.threads = num.threads)
+    # complete_info[[1]] <- rcory_result[[1]]
     # get d1 variables as initial variables set:
     Xhavepickout <- get_screened_vars(ids, rcory_result, d1)
     Xlastpickout <- Xhavepickout
@@ -274,9 +279,9 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
       while(length(Xhavepickout) < final_d)
       {
         # lm fit for x
-        Xnew <- lm(x[, ids] ~ x[, Xhavepickout])[["resid"]]
+        Xnew <- residuals(lm(x[, ids] ~ x[, Xhavepickout]))
         # lm fit for y
-        y <- lm(y ~ x[, Xlastpickout])[["resid"]]
+        y <- residuals(lm(y ~ x[, Xlastpickout]))
         
         # BCor-screening
         y_copy <- preprocess_bcorsis_y(y, y_p)[[1]]

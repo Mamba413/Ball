@@ -25,6 +25,7 @@
 #' \item{\code{p.value}}{the p-value for the test.}
 #' \item{\code{replicates}}{replicates of the test statistic.}
 #' \item{\code{size}}{sample sizes.}
+#' \item{\code{complete.info}}{a \code{list} containing multiple statistics value and their corresponding $p$ value.}
 #' \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 #' \item{\code{method}}{a character string indicating what type of test was performed.}
 #' \item{\code{data.name}}{description of data.}
@@ -48,7 +49,7 @@
 #' @seealso
 #' \code{\link{bd}}
 #' 
-#' @references Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. (2017) Ball divergence: nonparametric two sample test, \emph{The Annals of Statistics}, to appear
+#' @references Pan, Wenliang; Tian, Yuan; Wang, Xueqin; Zhang, Heping. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
 #' 
 #' @export
 #' @examples

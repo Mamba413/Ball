@@ -29,6 +29,7 @@ bcov.test returns a list with class "htest" containing the following components:
 \item{\code{p.value}}{the p-value for the test.}  
 \item{\code{replicates}}{replicates of the test statistic.}
 \item{\code{size}}{sample size.} 
+\item{\code{complete.info}}{a \code{list} containing multiple statistics value and their corresponding $p$ value.}
 \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 \item{\code{method}}{a character string indicating what type of test was performed.}
 \item{\code{data.name}}{description of data.}
