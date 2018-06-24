@@ -53,7 +53,7 @@ int pending_interrupt_status()
 int r_available_rand()
 {
   GetRNGstate();
-  int random_value = round(RAND_MAX*unif_rand());
+  int random_value = round(RAND_MAX * unif_rand());
   PutRNGstate();
   return random_value;
 }

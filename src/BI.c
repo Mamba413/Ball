@@ -779,6 +779,7 @@ void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *
 	//parallel method
 	// if parallel_type == 1, we parallel the computation through statistics.
 	// if parallel_type == 2, we parallel the computation through permutation.
+	int single_thread = 1;
 	int parallel_type = 2;
 	if ((*n) >= 500)
 	{
@@ -789,21 +790,25 @@ void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *
 		*thread = 1;
 	}
 	if ((*dst)) {
-		if (parallel_type == 2)
+		if (parallel_type == 2 && *thread > 1)
 		{
+		  // printf("BI parallel\n");
 			BI_parallel(bcov, pvalue, x, y, n, R, thread);
 		}
 		else {
+		  // printf("BI\n");
+		  *thread = single_thread;
 			BI(bcov, pvalue, x, y, n, R, thread);
 		}
 	}
 	else {
-		if (parallel_type == 2)
+		if (parallel_type == 2 && *thread > 1)
 		{
 			UBI_parallel(bcov, pvalue, x, y, n, R, thread);
 		}
 		else
 		{
+		  *thread = single_thread;
 			UBI(bcov, pvalue, x, y, n, R, thread);
 		}
 	}
