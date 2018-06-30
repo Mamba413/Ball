@@ -355,7 +355,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
 	free(y_cpy);
 
 	Ball_Information_wrapper(bcov, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, thread);
-	printf("RCTV0 = %f\n", bcov[0]);
+	// printf("RCTV0 = %f\n", bcov[0]);
 	if (*R > 0)
 	{
 		double bcov_tmp[3], *permuted_bcov_weight0, *permuted_bcov_weight_prob, *permuted_bcov_weight_hhg;
@@ -381,7 +381,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
 			*/
 			Ball_Information_wrapper(bcov_tmp, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, thread);
 			permuted_bcov_weight0[i] = bcov_tmp[0]; permuted_bcov_weight_prob[i] = bcov_tmp[1]; permuted_bcov_weight_hhg[i] = bcov_tmp[2];
-	    printf("i = %d, RCTV1 = %f\n", i, bcov_tmp[0]);
+	    // printf("i = %d, RCTV1 = %f\n", i, bcov_tmp[0]);
 		}
 		pvalue[0] = compute_pvalue(bcov[0], permuted_bcov_weight0, i);
 		pvalue[1] = compute_pvalue(bcov[1], permuted_bcov_weight_prob, i);
