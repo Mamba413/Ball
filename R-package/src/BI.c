@@ -441,8 +441,10 @@ void BI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, int
 
 	Ball_Information(bcov, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv);
 	// printf("RCTV0 = %f\n", bcov[0]);
+	/*
 	free_int_matrix(xidx, *n, *n);
 	free_int_matrix(yidx, *n, *n);
+	 */
 	free(i_perm);
 	free(i_perm_inv);
 
@@ -457,22 +459,24 @@ void BI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, int
 #endif
 #pragma omp parallel
 		{
-			int **xidx_thread, **yidx_thread, *i_perm_thread, *i_perm_inv_thread;
-			int k, kk, i_thread;
+			// int kk, **xidx_thread, **yidx_thread;
+			// xidx_thread = alloc_int_matrix(*n, *n);
+			// yidx_thread = alloc_int_matrix(*n, *n);
+			int *i_perm_thread, *i_perm_inv_thread, k, i_thread;
 			double bcov_tmp[3];
-			xidx_thread = alloc_int_matrix(*n, *n);
-			yidx_thread = alloc_int_matrix(*n, *n);
 			i_perm_thread = (int *)malloc(*n * sizeof(int));
 			i_perm_inv_thread = (int *)malloc(*n * sizeof(int));
 #pragma omp critical
 			{
 				for (k = 0; k < *n; k++)
 				{
+				  /*
 					for (kk = 0; kk < *n; kk++)
 					{
 						xidx_thread[k][kk] = kk;
 						yidx_thread[k][kk] = kk;
 					}
+				   */
 					i_perm_thread[k] = k;
 					i_perm_inv_thread[k] = k;
 				}
@@ -485,7 +489,7 @@ void BI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, int
 				{
 					resample(i_perm_thread, i_perm_inv_thread, n);
 				}
-				Ball_Information(bcov_tmp, n, Dx, Dy, xidx_thread, yidx_thread, i_perm_thread, i_perm_inv_thread);
+				Ball_Information(bcov_tmp, n, Dx, Dy, xidx, yidx, i_perm_thread, i_perm_inv_thread);
 				permuted_bcov_weight0[i_thread] = bcov_tmp[0]; 
 				permuted_bcov_weight_prob[i_thread] = bcov_tmp[1]; 
 				permuted_bcov_weight_hhg[i_thread] = bcov_tmp[2];
@@ -493,8 +497,10 @@ void BI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, int
 			}
 			free(i_perm_thread);
 			free(i_perm_inv_thread);
+			/*
 			free_int_matrix(xidx_thread, *n, *n);
 			free_int_matrix(yidx_thread, *n, *n);
+			 */
 		}
 		pvalue[0] = compute_pvalue(bcov[0], permuted_bcov_weight0, *R);
 		pvalue[1] = compute_pvalue(bcov[1], permuted_bcov_weight_prob, *R);
@@ -796,9 +802,9 @@ void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *
 	{
 		parallel_type = 1;
 	}
-	if ((*R) <= 100)
+	if ((*R) <= 200)
 	{
-		*thread = 1;
+		*thread = single_thread;
 	}
 	if ((*dst)) {
 		if (parallel_type == 2 && *thread > 1)

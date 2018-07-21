@@ -18,7 +18,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "utilize_R.h"
-#include "utilize_cross.h"
 
 
 void swap(double *x, double *y) {
@@ -851,7 +850,9 @@ void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1)
   
 	// permute step:
 	for (i = n - 1; i > 0; --i) {
-		// j = rand() % (i + 1);
+	  // j = rand() % (i + 1);
+		// printf("%d, ", rand());
+		// printf("%d \n", random_index2(i));
 		j = random_index2(i);
 		temp = i_perm[j];
 		i_perm[j] = i_perm[i];

@@ -42,9 +42,9 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
       //TS++;
       //TS += pow(fabs(p1/(*n1)-p2/(*n2)),*gamma)/(pow(p3,*alpha)*pow(1-p3,*beta));
       ans = p1/(*n1) - p2/(*n2);
-	  TS_weight0 += (ans * ans);
-	  // TODO: Weight Ball Divergence: 
-	  TS_weight1 += (ans * ans) * 1.0;
+	    TS_weight0 += (ans * ans);
+	    // TODO: Weight Ball Divergence: 
+	    TS_weight1 += (ans * ans) * 1.0;
     }
   }
   // Calculate C_{kl}^{X} and C_{kl}^{Y}:
@@ -58,9 +58,9 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
       //SS++;
       //SS += pow(fabs(p1/(*n1)-p2/(*n2)),*gamma)/(pow(p3,*alpha)*pow(1-p3,*beta));
       ans = p1/(*n1)-p2/(*n2);
-	  SS_weight0 += (ans * ans);
-	  // TODO: Weight Ball Divergence: 
-	  SS_weight1 += (ans * ans) * 1.0;
+	    SS_weight0 += (ans * ans);
+	    // TODO: Weight Ball Divergence: 
+	    SS_weight1 += (ans * ans) * 1.0;
     }
   }
   bd_stat[0] = TS_weight0 / (1.0*(*n1)*(*n1)) + SS_weight0 / (1.0*(*n2)*(*n2));
@@ -215,6 +215,8 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *p, int *R
 		  Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
 		  Ball_Divergence_wrapper(bd_tmp, Rxy, Rx, i_perm_tmp, n1, n2, nthread);
 		  permuted_bd_w0[i] = bd_tmp[0]; permuted_bd_w1[i] = bd_tmp[1];
+		  // printf("R=%d, ", i);
+		  // printf("TST1=%f\n", bd_tmp[0]);
 	  }
 	  pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, i);
 	  pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, i);
@@ -686,11 +688,11 @@ void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k)
       ij_dst = (double *) malloc(two_group_size * sizeof(double)); 
       get_ij_dst(xy, ij_dst, cumulate_size, size, n, &i, &j);
       bd_value(bd_stat_value, ij_dst, n1, n2);
-	  // summation version:
-	  kbd_stat_value_sum_w0 += bd_stat_value[0]; kbd_stat_value_sum_w1 += bd_stat_value[1];
-	  // maximum K-1 version:
-	  bd_stat_w0_array[s] = bd_stat_value[0]; bd_stat_w1_array[s] = bd_stat_value[1];
-	  s += 1;
+	    // summation version:
+	    kbd_stat_value_sum_w0 += bd_stat_value[0]; kbd_stat_value_sum_w1 += bd_stat_value[1];
+	    // maximum K-1 version:
+	    bd_stat_w0_array[s] = bd_stat_value[0]; bd_stat_w1_array[s] = bd_stat_value[1];
+	    s += 1;
       free(ij_dst);
     }
   }
@@ -1029,31 +1031,31 @@ void bd_test(double *bd, double *pvalue, double *xy, int *size, int *n, int *k, 
   //parallel method
   // if parallel_type == 1, we parallel the computation through statistics.
   // if parallel_type == 2, we parallel the computation through permutation.
+  int single_thread = 1;
   int parallel_type = 2;
   if (((*n) > 1000)) {
 	  parallel_type = 1;
   }
-  if ((*R) <= 100) {
-	  *nthread = 1;
+  if ((*R) <= 200) {
+	  *nthread = single_thread;
   }
   //
   if((*k) == 2) {
     n1 = size[0];
     n2 = size[1];
     if(*dst) {
-		if ((parallel_type) == 2) {
-			BD_parallel(bd, pvalue, xy, &n1, &n2, &p, R, nthread);
-		}
-		else {
-			BD(bd, pvalue, xy, &n1, &n2, &p, R, nthread); 
-		}
+  		if (parallel_type == 2 && *nthread > 1) {
+  			BD_parallel(bd, pvalue, xy, &n1, &n2, &p, R, nthread);
+  		} else {
+  			BD(bd, pvalue, xy, &n1, &n2, &p, R, nthread); 
+  		}
     } else {
-		if ((parallel_type) == 2) {
-			UBD_parallel(bd, pvalue, xy, &n1, &n2, R, nthread);
-		}
-		else {
-			UBD(bd, pvalue, xy, &n1, &n2, R, nthread);
-		}
+  		if ((parallel_type) == 2) {
+  			UBD_parallel(bd, pvalue, xy, &n1, &n2, R, nthread);
+  		}
+  		else {
+  			UBD(bd, pvalue, xy, &n1, &n2, R, nthread);
+  		}
     } 
   } else {
     if(*dst) {
