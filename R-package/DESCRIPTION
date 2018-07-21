@@ -9,7 +9,7 @@ Description: Hypothesis tests and sure independence screening (SIS) procedure ba
 License: GPL-3
 Packaged: 2017-12-18 19:00:00 UTC; 
 RoxygenNote: 6.0.1
-Depends: R (>= 2.10), gam, survival
+Depends: R (>= 2.10), gam, survival, mvtnorm
 Imports: utils
 Suggests: knitr, rmarkdown,
     testthat
