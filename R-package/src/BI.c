@@ -802,9 +802,9 @@ void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *
 	{
 		parallel_type = 1;
 	}
-	if ((*R) <= 100)
+	if ((*R) <= 200)
 	{
-		*thread = 1;
+		*thread = single_thread;
 	}
 	if ((*dst)) {
 		if (parallel_type == 2 && *thread > 1)
