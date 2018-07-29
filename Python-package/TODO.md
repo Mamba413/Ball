@@ -5,7 +5,11 @@ TODO List
 * bcor and bcorsis
 * *unit test* are needed. (filename test_bcor) 
 * A successful pip version. We can use ```pip install Ball``` to install Ball package in another computer.
-* Note: From the [answer](https://stackoverflow.com/questions/456884/extending-python-to-swig-not-to-swig-or-cython) of stackflow, we know that swig is a easy to start method with high cost performance. Hence, we had better write a crude version python with swig.
+* Note: 
+    - From the [answer](https://stackoverflow.com/questions/456884/extending-python-to-swig-not-to-swig-or-cython) of stackflow, we know that swig is a easy to start method with high cost performance. Hence, we had better write a crude version python with swig.
+    - A good quick start Chinese [tutorial](https://www.ibm.com/developerworks/cn/linux/l-pythc/index.html)
+    - Google search : Extending python with C/C++
+
 
 # 2018-03-24
 - ~~add *unit test* for ball divergence (filename test_bd)~~
