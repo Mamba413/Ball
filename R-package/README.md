@@ -36,7 +36,7 @@ install.packages("Ball")
 To install the development version from GitHub, run:      
 ```R
 library(devtools)
-install_github("Mamba413/Ball/R-package", build_vignettes = TRUE)
+install_github("Mamba413/Ball", build_vignettes = TRUE)
 ```
 *Windows* user will need to install [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first.       
 
