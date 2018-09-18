@@ -195,6 +195,31 @@ void bd_test_ksample_multithread_permutation()
 	return;
 }
 
+/*
+void bd_test_ksample_permutation2()
+{
+printf("Another Implementation for Ball Divergence based K-Sample Test\n");
+double ball_stat_value[4], p_value[4];
+double x[81] = { 0, 1.14048, 2.00949, 2.3061, 1.49642, 1.1779, 0.0205, 1.62007, 1.89523, 1.14048, 0, 0.86901, 1.16562, 0.35594, 0.03742, 1.16098, 0.4796, 0.75476, 2.00949, 0.86901, 0, 0.29661, 0.51307, 0.83159, 2.02999, 0.38941, 0.11425, 2.3061, 1.16562, 0.29661, 0, 0.80968, 1.1282, 2.3266, 0.68602, 0.41086, 1.49642, 0.35594, 0.51307, 0.80968, 0, 0.31852, 1.51692, 0.12366, 0.39882, 1.1779, 0.03742, 0.83159, 1.1282, 0.31852, 0, 1.1984, 0.44218, 0.71734, 0.0205, 1.16098, 2.02999, 2.3266, 1.51692, 1.1984, 0, 1.64058, 1.91574, 1.62007, 0.4796, 0.38941, 0.68602, 0.12366, 0.44218, 1.64058, 0, 0.27516, 1.89523, 0.75476, 0.11425, 0.41086, 0.39882, 0.71734, 1.91574, 0.27516, 0 };
+int size[3] = { 3, 3, 3 };
+int k = 3;
+int n = 9;
+int dst = 1, R = 199, nth = 2;
+int parallel_type = 2;
+KBD2(ball_stat_value, p_value, x, size, &n, &k, &R);
+printf("Ball statistics: %f; ", ball_stat_value[0]);
+printf("p-value: %f \n", p_value[0]);
+printf("Ball statistics: %f; ", ball_stat_value[1]);
+printf("p-value: %f \n", p_value[1]);
+printf("Ball statistics: %f; ", ball_stat_value[2]);
+printf("p-value: %f \n", p_value[2]);
+printf("Ball statistics: %f; ", ball_stat_value[3]);
+printf("p-value: %f \n", p_value[3]);
+test_value(ball_stat_value[0], 0.74074);
+return;
+}
+*/
+
 
 void bcov_test_multithread_permutaion()
 {
@@ -246,6 +271,10 @@ void main()
 	bd_test_2sample_multithread_permutation();
 	bd_test_ksample_multithread_permutation();
 	bcov_test_multithread_permutaion();
+	printf("-------------------------------- \n");
+	//printf("Test newest feature: \n");
+	//bd_test_ksample_permutation2();
+	//printf("-------------------------------- \n");
 	system("pause");
 	return;
 }
