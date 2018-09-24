@@ -662,7 +662,7 @@ void permute_dst(double *xy, double *new_xy, int *index, int *N)
 void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k)
 {
   int K = *k;
-  int i, j, s = 0;
+  int i, j, s = 0, t = 0;
   int *cumulate_size;
   double *ij_dst, *bd_stat_w0_array, *bd_stat_w1_array, *bd_stat_w0_part_sum_array, *bd_stat_w1_part_sum_array;
   int two_group_size, tmp_value1 = 0, tmp_value2 = 0;
@@ -679,32 +679,34 @@ void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k)
 
   bd_stat_w0_part_sum_array = (double *)malloc(K * sizeof(double));
   bd_stat_w1_part_sum_array = (double *)malloc(K * sizeof(double));
-  for (i = 0; i < K; i++) {
-	  bd_stat_w0_part_sum_array[i] = 0.0;
-	  bd_stat_w1_part_sum_array[i] = 0.0;
-  }
 
   cumulate_size = (int *) malloc(K * sizeof(int));
   compute_cumulate_size(cumulate_size, size, k);
   
   // compute two type of KBD:
   for(i = 0; i < K; i++) {
-    for(j = (i + 1); j < K; j++) {
-		tmp_value1 = size[i]; 
-		tmp_value2 = size[j]; 
-		two_group_size = tmp_value1 + tmp_value2;
-		two_group_size = two_group_size * two_group_size;
-		ij_dst = (double *) malloc(two_group_size * sizeof(double)); 
-		get_ij_dst(xy, ij_dst, cumulate_size, size, n, &i, &j);
-		bd_value(bd_stat_value, ij_dst, n1, n2);
-		// summation version:
-		kbd_stat_value_sum_w0 += bd_stat_value[0]; kbd_stat_value_sum_w1 += bd_stat_value[1];
-		// maximum K-1 version:
-		bd_stat_w0_array[s] = bd_stat_value[0]; bd_stat_w1_array[s] = bd_stat_value[1]; s += 1;
-		// maximum version:
-		bd_stat_w0_part_sum_array[i] += bd_stat_value[0]; bd_stat_w1_part_sum_array[i] += bd_stat_value[1];
-		free(ij_dst);
-    }
+	  bd_stat_w0_part_sum_array[i] = 0.0;
+	  bd_stat_w1_part_sum_array[i] = 0.0;
+	  for (t = 0; t < (i - 1); t++) {
+		  bd_stat_w0_part_sum_array[i] += bd_stat_w0_array[(t + 1)*i - t*(t + 1) / 2];
+		  bd_stat_w1_part_sum_array[i] += bd_stat_w1_array[(t + 1)*i - t*(t + 1) / 2];
+	  }
+	  for (j = (i + 1); j < K; j++) {
+		  tmp_value1 = size[i];
+		  tmp_value2 = size[j];
+		  two_group_size = tmp_value1 + tmp_value2;
+		  two_group_size = two_group_size * two_group_size;
+		  ij_dst = (double *)malloc(two_group_size * sizeof(double));
+		  get_ij_dst(xy, ij_dst, cumulate_size, size, n, &i, &j);
+		  bd_value(bd_stat_value, ij_dst, n1, n2);
+		  // summation version:
+		  kbd_stat_value_sum_w0 += bd_stat_value[0]; kbd_stat_value_sum_w1 += bd_stat_value[1];
+		  // maximum K-1 version:
+		  bd_stat_w0_array[s] = bd_stat_value[0]; bd_stat_w1_array[s] = bd_stat_value[1]; s += 1;
+		  // maximum version:
+		  bd_stat_w0_part_sum_array[i] += bd_stat_value[0]; bd_stat_w1_part_sum_array[i] += bd_stat_value[1];
+		  free(ij_dst);
+	  }
   }
   // compute maximum K-1 version statistic:
   quick_sort(bd_stat_w0_array, bd_stat_number);
@@ -1042,7 +1044,7 @@ void get_ij_value(double *xy, double *ij_value, int *cumulate_size, int *size, i
 void ukbd_value(double *kbd_stat, double *xy, int *size, int *k)
 {
   int K = *k;
-  int i, j, s = 0;
+  int i, j, s = 0, t = 0;
   int *cumulate_size;
   int two_group_size, tmp_value1 = 0, tmp_value2 = 0;
   int *n1 = &tmp_value1;
@@ -1059,32 +1061,46 @@ void ukbd_value(double *kbd_stat, double *xy, int *size, int *k)
 
   bd_stat_w0_part_sum_array = (double *)malloc(K * sizeof(double));
   bd_stat_w1_part_sum_array = (double *)malloc(K * sizeof(double));
-  for (i = 0; i < K; i++) {
-	  bd_stat_w0_part_sum_array[i] = 0.0;
-	  bd_stat_w1_part_sum_array[i] = 0.0;
-  }
 
   cumulate_size = (int *) malloc(K * sizeof(int));
   compute_cumulate_size(cumulate_size, size, k);
 
   // KBD statistic:
   for(i = 0; i < K; i++) {
-    for(j = (i + 1); j < K; j++) {
-      tmp_value1 = size[i]; 
-      tmp_value2 = size[j]; 
-      two_group_size = tmp_value1 + tmp_value2;
-      ij_value = (double *) malloc(two_group_size * sizeof(double)); 
-      get_ij_value(xy, ij_value, cumulate_size, size, &i, &j);
-      ubd_value(bd_stat_value, ij_value, n1, n2);
-	  // summation version:
-	  kbd_stat_value_sum_w0 += bd_stat_value[0]; kbd_stat_value_sum_w1 += bd_stat_value[1];
-	  // maximum K-1 version:
-	  bd_stat_w0_array[s] = bd_stat_value[0]; bd_stat_w1_array[s] = bd_stat_value[1]; s += 1;
-	  // maximum version:
-	  bd_stat_w0_part_sum_array[i] += bd_stat_value[0]; bd_stat_w1_part_sum_array[i] += bd_stat_value[1];
-      free(ij_value);
-    }
+	  bd_stat_w0_part_sum_array[i] = 0.0;
+	  bd_stat_w1_part_sum_array[i] = 0.0;
+	  for (t = 0; t < (i - 1); t++) {
+		  bd_stat_w0_part_sum_array[i] += bd_stat_w0_array[(t + 1)*i - t*(t + 1) / 2];
+		  bd_stat_w1_part_sum_array[i] += bd_stat_w1_array[(t + 1)*i - t*(t + 1) / 2];
+	  }
+	  for (j = (i + 1); j < K; j++) {
+		  tmp_value1 = size[i];
+		  tmp_value2 = size[j];
+		  two_group_size = tmp_value1 + tmp_value2;
+		  ij_value = (double *)malloc(two_group_size * sizeof(double));
+		  get_ij_value(xy, ij_value, cumulate_size, size, &i, &j);
+		  ubd_value(bd_stat_value, ij_value, n1, n2);
+		  // summation version:
+		  kbd_stat_value_sum_w0 += bd_stat_value[0]; kbd_stat_value_sum_w1 += bd_stat_value[1];
+		  // maximum K-1 version:
+		  bd_stat_w0_array[s] = bd_stat_value[0]; bd_stat_w1_array[s] = bd_stat_value[1]; s += 1;
+		  // maximum version:
+		  bd_stat_w0_part_sum_array[i] += bd_stat_value[0]; bd_stat_w1_part_sum_array[i] += bd_stat_value[1];
+		  free(ij_value);
+	  }
   }
+  //s = 0;
+  //for (i = 0; i < K; i++) {
+	 // for (j = 0; j < K; j++) {
+		//  if (j < (i + 1)) {
+		//	  printf(" , ");
+		//  } else {
+		//	  printf("%f,", bd_stat_w0_array[s]);
+		//	  s++;
+		//  }
+	 // }
+	 // printf("\n");
+  //}
   quick_sort(bd_stat_w0_array, bd_stat_number);
   quick_sort(bd_stat_w1_array, bd_stat_number);
   // compute maximum K-1 version statistic:
