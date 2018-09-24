@@ -664,38 +664,49 @@ void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k)
   int K = *k;
   int i, j, s = 0;
   int *cumulate_size;
-  double *ij_dst, *bd_stat_w0_array, *bd_stat_w1_array;
+  double *ij_dst, *bd_stat_w0_array, *bd_stat_w1_array, *bd_stat_w0_part_sum_array, *bd_stat_w1_part_sum_array;
   int two_group_size, tmp_value1 = 0, tmp_value2 = 0;
   int *n1 = &tmp_value1;
   int *n2 = &tmp_value2;
   double bd_stat_value[2];
   double kbd_stat_value_sum_w0 = 0.0, kbd_stat_value_sum_w1 = 0.0; 
   double kbd_stat_value_max_w0 = 0.0, kbd_stat_value_max_w1 = 0.0;
+  double kbd_stat_value_max1_w0 = 0.0, kbd_stat_value_max1_w1 = 0.0;
   int bd_stat_number = K*(K - 1) / 2;
 
   bd_stat_w0_array = (double *)malloc(bd_stat_number * sizeof(double));
   bd_stat_w1_array = (double *)malloc(bd_stat_number * sizeof(double));
+
+  bd_stat_w0_part_sum_array = (double *)malloc(K * sizeof(double));
+  bd_stat_w1_part_sum_array = (double *)malloc(K * sizeof(double));
+  for (i = 0; i < K; i++) {
+	  bd_stat_w0_part_sum_array[i] = 0.0;
+	  bd_stat_w1_part_sum_array[i] = 0.0;
+  }
+
   cumulate_size = (int *) malloc(K * sizeof(int));
   compute_cumulate_size(cumulate_size, size, k);
   
   // compute two type of KBD:
   for(i = 0; i < K; i++) {
     for(j = (i + 1); j < K; j++) {
-      tmp_value1 = size[i]; 
-      tmp_value2 = size[j]; 
-      two_group_size = tmp_value1 + tmp_value2;
-      two_group_size = two_group_size * two_group_size;
-      ij_dst = (double *) malloc(two_group_size * sizeof(double)); 
-      get_ij_dst(xy, ij_dst, cumulate_size, size, n, &i, &j);
-      bd_value(bd_stat_value, ij_dst, n1, n2);
-	    // summation version:
-	    kbd_stat_value_sum_w0 += bd_stat_value[0]; kbd_stat_value_sum_w1 += bd_stat_value[1];
-	    // maximum K-1 version:
-	    bd_stat_w0_array[s] = bd_stat_value[0]; bd_stat_w1_array[s] = bd_stat_value[1];
-	    s += 1;
-      free(ij_dst);
+		tmp_value1 = size[i]; 
+		tmp_value2 = size[j]; 
+		two_group_size = tmp_value1 + tmp_value2;
+		two_group_size = two_group_size * two_group_size;
+		ij_dst = (double *) malloc(two_group_size * sizeof(double)); 
+		get_ij_dst(xy, ij_dst, cumulate_size, size, n, &i, &j);
+		bd_value(bd_stat_value, ij_dst, n1, n2);
+		// summation version:
+		kbd_stat_value_sum_w0 += bd_stat_value[0]; kbd_stat_value_sum_w1 += bd_stat_value[1];
+		// maximum K-1 version:
+		bd_stat_w0_array[s] = bd_stat_value[0]; bd_stat_w1_array[s] = bd_stat_value[1]; s += 1;
+		// maximum version:
+		bd_stat_w0_part_sum_array[i] += bd_stat_value[0]; bd_stat_w1_part_sum_array[i] += bd_stat_value[1];
+		free(ij_dst);
     }
   }
+  // compute maximum K-1 version statistic:
   quick_sort(bd_stat_w0_array, bd_stat_number);
   quick_sort(bd_stat_w1_array, bd_stat_number);
   for (i = bd_stat_number - 1; i > (bd_stat_number - K); i--)
@@ -705,8 +716,16 @@ void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k)
   }
   free(bd_stat_w0_array); free(bd_stat_w1_array);
   free(cumulate_size);
+  // compute maximum version statistic:
+  quick_sort(bd_stat_w0_part_sum_array, K);
+  quick_sort(bd_stat_w1_part_sum_array, K);
+  kbd_stat_value_max1_w0 = bd_stat_w0_part_sum_array[K - 1];
+  kbd_stat_value_max1_w1 = bd_stat_w1_part_sum_array[K - 1];
+  free(bd_stat_w0_part_sum_array); free(bd_stat_w1_part_sum_array);
+  // 
   kbd_stat[0] = kbd_stat_value_sum_w0; kbd_stat[1] = kbd_stat_value_sum_w1;
   kbd_stat[2] = kbd_stat_value_max_w0; kbd_stat[3] = kbd_stat_value_max_w1;
+  kbd_stat[4] = kbd_stat_value_max1_w0; kbd_stat[5] = kbd_stat_value_max1_w1;
   return;
 }
 
@@ -732,15 +751,16 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
   // permutation test:
   if((*R) > 0) {
     int *index, j;
-    double *new_xy, kbd_tmp[4];
-	double *permuted_kbd_sum_w0, *permuted_kbd_sum_w1;
-	double *permuted_kbd_max_w0, *permuted_kbd_max_w1;
+    double *new_xy, kbd_tmp[6];
+	double *permuted_kbd_sum_w0, *permuted_kbd_sum_w1, *permuted_kbd_max_w0, *permuted_kbd_max_w1, *permuted_kbd_max1_w0, *permuted_kbd_max1_w1;
     new_xy = (double *) malloc(dst_size * sizeof(double));
     index = (int *) malloc(N * sizeof(int));
 	permuted_kbd_sum_w0 = (double *)malloc(*R * sizeof(double));
 	permuted_kbd_sum_w1 = (double *)malloc(*R * sizeof(double));
 	permuted_kbd_max_w0 = (double *)malloc(*R * sizeof(double));
 	permuted_kbd_max_w1 = (double *)malloc(*R * sizeof(double));
+	permuted_kbd_max1_w0 = (double *)malloc(*R * sizeof(double));
+	permuted_kbd_max1_w1 = (double *)malloc(*R * sizeof(double));
 
     for(i_permute = 0; i_permute < N; i_permute++) {
       index[i_permute] = i_permute;
@@ -759,13 +779,17 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
       kbd_value(kbd_tmp, new_xy, size, n, k);
 	  permuted_kbd_sum_w0[j] = kbd_tmp[0]; permuted_kbd_sum_w1[j] = kbd_tmp[1];
 	  permuted_kbd_max_w0[j] = kbd_tmp[2]; permuted_kbd_max_w1[j] = kbd_tmp[3];
+	  permuted_kbd_max1_w0[j] = kbd_tmp[4]; permuted_kbd_max1_w1[j] = kbd_tmp[5];
     }
 	pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, j);
 	pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, j);
 	pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, j);
 	pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, j);
+	pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, j);
+	pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, j);
 	free(permuted_kbd_sum_w0); free(permuted_kbd_sum_w1);
 	free(permuted_kbd_max_w0); free(permuted_kbd_max_w1);
+	free(permuted_kbd_max1_w0); free(permuted_kbd_max1_w1);
     free(new_xy);
     free(index);
   }
@@ -777,151 +801,151 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
 * K-sample ball divergence test, computational complexity O(n^2)
 * However, it seems that we can't control the type-I error rate
 */
-void KBD2(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R)
-{
-	if (*R == 0) {
-		kbd_value(kbd, xy, size, n, k);
-	}
-	else {
-		int two_group_size;
-		int i, j, r, s = 0;
-		int    **Ixy, **Rxy, **Rx, *i_perm, *i_perm_tmp;
-		double **Dxy, **permuted_kbd_stat_value_w0_array, **permuted_kbd_stat_value_w1_array, *ij_dst;
-		double kbd_stat_value_sum_w0, kbd_stat_value_sum_w1, kbd_stat_value_max_w0, kbd_stat_value_max_w1;
-		double *bd_stat_w0_array, *bd_stat_w1_array;
-		double bd_stat_value[2];
-
-		kbd_stat_value_sum_w0 = 0.0; kbd_stat_value_sum_w1 = 0.0;
-		kbd_stat_value_max_w0 = 0.0; kbd_stat_value_max_w1 = 0.0;
-
-		int *cumulate_size;
-		cumulate_size = (int *)malloc(*k * sizeof(int));
-		compute_cumulate_size(cumulate_size, size, k);
-
-		int bd_stat_number = (*k)*((*k) - 1) / 2;
-		bd_stat_w0_array = (double *)malloc(bd_stat_number * sizeof(double));
-		bd_stat_w1_array = (double *)malloc(bd_stat_number * sizeof(double));
-		double *permuted_kbd_stat_value_sum_w0, *permuted_kbd_stat_value_sum_w1, 
-			*permuted_kbd_stat_value_max_w0, *permuted_kbd_stat_value_max_w1;
-		permuted_kbd_stat_value_sum_w0 = (double *)malloc(*R * sizeof(double));
-		permuted_kbd_stat_value_sum_w1 = (double *)malloc(*R * sizeof(double));
-		permuted_kbd_stat_value_max_w0 = (double *)malloc(*R * sizeof(double));
-		permuted_kbd_stat_value_max_w1 = (double *)malloc(*R * sizeof(double));
-		for (r = 0; r < *R; r++) {
-			permuted_kbd_stat_value_sum_w0[r] = 0.0;
-			permuted_kbd_stat_value_sum_w1[r] = 0.0;
-			permuted_kbd_stat_value_max_w0[r] = 0.0;
-			permuted_kbd_stat_value_max_w1[r] = 0.0;
-		}
-
-		permuted_kbd_stat_value_w0_array = alloc_matrix(*R, bd_stat_number);
-		permuted_kbd_stat_value_w1_array = alloc_matrix(*R, bd_stat_number);
-
-		for (int group_i = 0; group_i < *k; group_i++) {
-			for (int group_j = (group_i + 1); group_j < *k; group_j++) {
-				int *n1 = &size[group_i];
-				int *n2 = &size[group_j];
-				two_group_size = *n1 + *n2;
-				ij_dst = (double *)malloc((two_group_size * two_group_size) * sizeof(double));
-
-				// allocate space
-				get_ij_dst(xy, ij_dst, cumulate_size, size, n, &group_i, &group_j);
-				Dxy = alloc_matrix(two_group_size, two_group_size);
-				Ixy = alloc_int_matrix(two_group_size, two_group_size);
-				Rx = alloc_int_matrix(two_group_size, two_group_size);
-				Rxy = alloc_int_matrix(two_group_size, two_group_size);
-				i_perm = (int *)malloc(two_group_size * sizeof(int));
-				i_perm_tmp = (int *)malloc(two_group_size * sizeof(int));
-
-				// Init Dxy:
-				vector2matrix(ij_dst, Dxy, two_group_size, two_group_size, 1);
-				// Init Ixy:
-				for (i = 0; i < two_group_size; i++)
-					for (j = 0; j < two_group_size; j++)
-						Ixy[i][j] = j;
-				// Init i_perm and i_perm_tmp:
-				for (i = 0; i < two_group_size; i++) {
-					if (i < *n1) {
-						i_perm[i] = 1;
-					}
-					else {
-						i_perm[i] = 0;
-					}
-					i_perm_tmp[i] = i;
-				}
-				// compute two sample ball divergence:
-				for (i = 0; i < two_group_size; i++) {
-					quicksort(Dxy[i], Ixy[i], 0, two_group_size - 1);
-				}
-				ranksort2(two_group_size, Rxy, Dxy, Ixy);
-				Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
-				Ball_Divergence(bd_stat_value, Rxy, Rx, i_perm_tmp, n1, n2);
-				kbd_stat_value_sum_w0 += bd_stat_value[0]; kbd_stat_value_sum_w1 += bd_stat_value[1];
-				bd_stat_w0_array[s] = bd_stat_value[0]; bd_stat_w1_array[s] = bd_stat_value[1];
-				
-				for (r = 0; r < *R; r++) {
-					// not support interupting by user
-					resample3(i_perm, i_perm_tmp, two_group_size, n1);
-					Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
-					Ball_Divergence(bd_stat_value, Rxy, Rx, i_perm_tmp, n1, n2);
-
-					// permuted summation statistic:
-					permuted_kbd_stat_value_sum_w0[r] += bd_stat_value[0]; 
-					permuted_kbd_stat_value_sum_w1[r] += bd_stat_value[1];
-					// pre-process maximum statistic:
-					permuted_kbd_stat_value_w0_array[r][s] = bd_stat_value[0];
-					permuted_kbd_stat_value_w1_array[r][s] = bd_stat_value[1];
-				}
-				
-				free_matrix(Dxy, two_group_size, two_group_size);
-				free_int_matrix(Ixy, two_group_size, two_group_size);
-				free_int_matrix(Rxy, two_group_size, two_group_size);
-				free_int_matrix(Rx, two_group_size, two_group_size);
-				free(i_perm);
-				free(i_perm_tmp);
-				free(ij_dst);
-				s += 1;
-			}
-		}
-		// compute the maximum statistic:
-		quick_sort(bd_stat_w0_array, bd_stat_number);
-		quick_sort(bd_stat_w1_array, bd_stat_number);
-		for (i = bd_stat_number - 1; i > (bd_stat_number - *k); i--)
-		{
-			kbd_stat_value_max_w0 += bd_stat_w0_array[i];
-			kbd_stat_value_max_w1 += bd_stat_w1_array[i];
-		}
-		// compute the permuted maximum statistic:
-		for (r = 0; r < *R; r++) {
-			for (s = 0; s < bd_stat_number; s++) {
-				bd_stat_w0_array[s] = permuted_kbd_stat_value_w0_array[r][s];
-				bd_stat_w1_array[s] = permuted_kbd_stat_value_w1_array[r][s];
-			}
-			quick_sort(bd_stat_w0_array, bd_stat_number);
-			quick_sort(bd_stat_w1_array, bd_stat_number);
-			for (i = bd_stat_number - 1; i > (bd_stat_number - *k); i--)
-			{
-				permuted_kbd_stat_value_max_w0[r] += bd_stat_w0_array[i];
-				permuted_kbd_stat_value_max_w1[r] += bd_stat_w1_array[i];
-			}
-		}
-		// compute p-value:
-		kbd[0] = kbd_stat_value_sum_w0;
-		kbd[1] = kbd_stat_value_sum_w1;
-		kbd[2] = kbd_stat_value_max_w0;
-		kbd[3] = kbd_stat_value_max_w1;
-		pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_stat_value_sum_w0, *R);
-		pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_stat_value_sum_w1, *R);
-		pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_stat_value_max_w0, *R);
-		pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_stat_value_max_w1, *R);
-
-		free(permuted_kbd_stat_value_sum_w0); free(permuted_kbd_stat_value_sum_w1);
-		free(permuted_kbd_stat_value_max_w0); free(permuted_kbd_stat_value_max_w1);
-		free(bd_stat_w0_array); free(bd_stat_w1_array);
-		free(cumulate_size);
-	}
-	return;
-}
+//void KBD2(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R)
+//{
+//	if (*R == 0) {
+//		kbd_value(kbd, xy, size, n, k);
+//	}
+//	else {
+//		int two_group_size;
+//		int i, j, r, s = 0;
+//		int    **Ixy, **Rxy, **Rx, *i_perm, *i_perm_tmp;
+//		double **Dxy, **permuted_kbd_stat_value_w0_array, **permuted_kbd_stat_value_w1_array, *ij_dst;
+//		double kbd_stat_value_sum_w0, kbd_stat_value_sum_w1, kbd_stat_value_max_w0, kbd_stat_value_max_w1;
+//		double *bd_stat_w0_array, *bd_stat_w1_array;
+//		double bd_stat_value[2];
+//
+//		kbd_stat_value_sum_w0 = 0.0; kbd_stat_value_sum_w1 = 0.0;
+//		kbd_stat_value_max_w0 = 0.0; kbd_stat_value_max_w1 = 0.0;
+//
+//		int *cumulate_size;
+//		cumulate_size = (int *)malloc(*k * sizeof(int));
+//		compute_cumulate_size(cumulate_size, size, k);
+//
+//		int bd_stat_number = (*k)*((*k) - 1) / 2;
+//		bd_stat_w0_array = (double *)malloc(bd_stat_number * sizeof(double));
+//		bd_stat_w1_array = (double *)malloc(bd_stat_number * sizeof(double));
+//		double *permuted_kbd_stat_value_sum_w0, *permuted_kbd_stat_value_sum_w1, 
+//			*permuted_kbd_stat_value_max_w0, *permuted_kbd_stat_value_max_w1;
+//		permuted_kbd_stat_value_sum_w0 = (double *)malloc(*R * sizeof(double));
+//		permuted_kbd_stat_value_sum_w1 = (double *)malloc(*R * sizeof(double));
+//		permuted_kbd_stat_value_max_w0 = (double *)malloc(*R * sizeof(double));
+//		permuted_kbd_stat_value_max_w1 = (double *)malloc(*R * sizeof(double));
+//		for (r = 0; r < *R; r++) {
+//			permuted_kbd_stat_value_sum_w0[r] = 0.0;
+//			permuted_kbd_stat_value_sum_w1[r] = 0.0;
+//			permuted_kbd_stat_value_max_w0[r] = 0.0;
+//			permuted_kbd_stat_value_max_w1[r] = 0.0;
+//		}
+//
+//		permuted_kbd_stat_value_w0_array = alloc_matrix(*R, bd_stat_number);
+//		permuted_kbd_stat_value_w1_array = alloc_matrix(*R, bd_stat_number);
+//
+//		for (int group_i = 0; group_i < *k; group_i++) {
+//			for (int group_j = (group_i + 1); group_j < *k; group_j++) {
+//				int *n1 = &size[group_i];
+//				int *n2 = &size[group_j];
+//				two_group_size = *n1 + *n2;
+//				ij_dst = (double *)malloc((two_group_size * two_group_size) * sizeof(double));
+//
+//				// allocate space
+//				get_ij_dst(xy, ij_dst, cumulate_size, size, n, &group_i, &group_j);
+//				Dxy = alloc_matrix(two_group_size, two_group_size);
+//				Ixy = alloc_int_matrix(two_group_size, two_group_size);
+//				Rx = alloc_int_matrix(two_group_size, two_group_size);
+//				Rxy = alloc_int_matrix(two_group_size, two_group_size);
+//				i_perm = (int *)malloc(two_group_size * sizeof(int));
+//				i_perm_tmp = (int *)malloc(two_group_size * sizeof(int));
+//
+//				// Init Dxy:
+//				vector2matrix(ij_dst, Dxy, two_group_size, two_group_size, 1);
+//				// Init Ixy:
+//				for (i = 0; i < two_group_size; i++)
+//					for (j = 0; j < two_group_size; j++)
+//						Ixy[i][j] = j;
+//				// Init i_perm and i_perm_tmp:
+//				for (i = 0; i < two_group_size; i++) {
+//					if (i < *n1) {
+//						i_perm[i] = 1;
+//					}
+//					else {
+//						i_perm[i] = 0;
+//					}
+//					i_perm_tmp[i] = i;
+//				}
+//				// compute two sample ball divergence:
+//				for (i = 0; i < two_group_size; i++) {
+//					quicksort(Dxy[i], Ixy[i], 0, two_group_size - 1);
+//				}
+//				ranksort2(two_group_size, Rxy, Dxy, Ixy);
+//				Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
+//				Ball_Divergence(bd_stat_value, Rxy, Rx, i_perm_tmp, n1, n2);
+//				kbd_stat_value_sum_w0 += bd_stat_value[0]; kbd_stat_value_sum_w1 += bd_stat_value[1];
+//				bd_stat_w0_array[s] = bd_stat_value[0]; bd_stat_w1_array[s] = bd_stat_value[1];
+//				
+//				for (r = 0; r < *R; r++) {
+//					// not support interupting by user
+//					resample3(i_perm, i_perm_tmp, two_group_size, n1);
+//					Findx(Rxy, Ixy, i_perm, n1, n2, Rx);
+//					Ball_Divergence(bd_stat_value, Rxy, Rx, i_perm_tmp, n1, n2);
+//
+//					// permuted summation statistic:
+//					permuted_kbd_stat_value_sum_w0[r] += bd_stat_value[0]; 
+//					permuted_kbd_stat_value_sum_w1[r] += bd_stat_value[1];
+//					// pre-process maximum statistic:
+//					permuted_kbd_stat_value_w0_array[r][s] = bd_stat_value[0];
+//					permuted_kbd_stat_value_w1_array[r][s] = bd_stat_value[1];
+//				}
+//				
+//				free_matrix(Dxy, two_group_size, two_group_size);
+//				free_int_matrix(Ixy, two_group_size, two_group_size);
+//				free_int_matrix(Rxy, two_group_size, two_group_size);
+//				free_int_matrix(Rx, two_group_size, two_group_size);
+//				free(i_perm);
+//				free(i_perm_tmp);
+//				free(ij_dst);
+//				s += 1;
+//			}
+//		}
+//		// compute the maximum statistic:
+//		quick_sort(bd_stat_w0_array, bd_stat_number);
+//		quick_sort(bd_stat_w1_array, bd_stat_number);
+//		for (i = bd_stat_number - 1; i > (bd_stat_number - *k); i--)
+//		{
+//			kbd_stat_value_max_w0 += bd_stat_w0_array[i];
+//			kbd_stat_value_max_w1 += bd_stat_w1_array[i];
+//		}
+//		// compute the permuted maximum statistic:
+//		for (r = 0; r < *R; r++) {
+//			for (s = 0; s < bd_stat_number; s++) {
+//				bd_stat_w0_array[s] = permuted_kbd_stat_value_w0_array[r][s];
+//				bd_stat_w1_array[s] = permuted_kbd_stat_value_w1_array[r][s];
+//			}
+//			quick_sort(bd_stat_w0_array, bd_stat_number);
+//			quick_sort(bd_stat_w1_array, bd_stat_number);
+//			for (i = bd_stat_number - 1; i > (bd_stat_number - *k); i--)
+//			{
+//				permuted_kbd_stat_value_max_w0[r] += bd_stat_w0_array[i];
+//				permuted_kbd_stat_value_max_w1[r] += bd_stat_w1_array[i];
+//			}
+//		}
+//		// compute p-value:
+//		kbd[0] = kbd_stat_value_sum_w0;
+//		kbd[1] = kbd_stat_value_sum_w1;
+//		kbd[2] = kbd_stat_value_max_w0;
+//		kbd[3] = kbd_stat_value_max_w1;
+//		pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_stat_value_sum_w0, *R);
+//		pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_stat_value_sum_w1, *R);
+//		pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_stat_value_max_w0, *R);
+//		pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_stat_value_max_w1, *R);
+//
+//		free(permuted_kbd_stat_value_sum_w0); free(permuted_kbd_stat_value_sum_w1);
+//		free(permuted_kbd_stat_value_max_w0); free(permuted_kbd_stat_value_max_w1);
+//		free(bd_stat_w0_array); free(bd_stat_w1_array);
+//		free(cumulate_size);
+//	}
+//	return;
+//}
 
 
 /*
@@ -1023,14 +1047,23 @@ void ukbd_value(double *kbd_stat, double *xy, int *size, int *k)
   int two_group_size, tmp_value1 = 0, tmp_value2 = 0;
   int *n1 = &tmp_value1;
   int *n2 = &tmp_value2;
-  double *ij_value, *bd_stat_w0_array, *bd_stat_w1_array;
+  double *ij_value, *bd_stat_w0_array, *bd_stat_w1_array, *bd_stat_w0_part_sum_array, *bd_stat_w1_part_sum_array;
   double bd_stat_value[2];
   double kbd_stat_value_sum_w0 = 0.0, kbd_stat_value_sum_w1 = 0.0;
   double kbd_stat_value_max_w0 = 0.0, kbd_stat_value_max_w1 = 0.0;
+  double kbd_stat_value_max1_w0 = 0.0, kbd_stat_value_max1_w1 = 0.0;
   int bd_stat_number = K*(K - 1) / 2;
 
   bd_stat_w0_array = (double *) malloc(bd_stat_number * sizeof(double));
   bd_stat_w1_array = (double *) malloc(bd_stat_number * sizeof(double));
+
+  bd_stat_w0_part_sum_array = (double *)malloc(K * sizeof(double));
+  bd_stat_w1_part_sum_array = (double *)malloc(K * sizeof(double));
+  for (i = 0; i < K; i++) {
+	  bd_stat_w0_part_sum_array[i] = 0.0;
+	  bd_stat_w1_part_sum_array[i] = 0.0;
+  }
+
   cumulate_size = (int *) malloc(K * sizeof(int));
   compute_cumulate_size(cumulate_size, size, k);
 
@@ -1046,13 +1079,15 @@ void ukbd_value(double *kbd_stat, double *xy, int *size, int *k)
 	  // summation version:
 	  kbd_stat_value_sum_w0 += bd_stat_value[0]; kbd_stat_value_sum_w1 += bd_stat_value[1];
 	  // maximum K-1 version:
-	  bd_stat_w0_array[s] = bd_stat_value[0]; bd_stat_w1_array[s] = bd_stat_value[1];
-	  s += 1;
+	  bd_stat_w0_array[s] = bd_stat_value[0]; bd_stat_w1_array[s] = bd_stat_value[1]; s += 1;
+	  // maximum version:
+	  bd_stat_w0_part_sum_array[i] += bd_stat_value[0]; bd_stat_w1_part_sum_array[i] += bd_stat_value[1];
       free(ij_value);
     }
   }
   quick_sort(bd_stat_w0_array, bd_stat_number);
   quick_sort(bd_stat_w1_array, bd_stat_number);
+  // compute maximum K-1 version statistic:
   for (i = bd_stat_number - 1; i > (bd_stat_number - K); i--)
   {
 	  //printf("ordinary bd stat: %f, weighted bd stat: %f\n", bd_stat_w0_array[i], bd_stat_w1_array[i]);
@@ -1062,8 +1097,16 @@ void ukbd_value(double *kbd_stat, double *xy, int *size, int *k)
   free(bd_stat_w0_array);
   free(bd_stat_w1_array);
   free(cumulate_size);
+  // compute maximum version statistic:
+  quick_sort(bd_stat_w0_part_sum_array, K);
+  quick_sort(bd_stat_w1_part_sum_array, K);
+  kbd_stat_value_max1_w0 = bd_stat_w0_part_sum_array[K - 1];
+  kbd_stat_value_max1_w1 = bd_stat_w1_part_sum_array[K - 1];
+  free(bd_stat_w0_part_sum_array); free(bd_stat_w1_part_sum_array);
+  // 
   kbd_stat[0] = kbd_stat_value_sum_w0; kbd_stat[1] = kbd_stat_value_sum_w1;
   kbd_stat[2] = kbd_stat_value_max_w0; kbd_stat[3] = kbd_stat_value_max_w1;
+  kbd_stat[4] = kbd_stat_value_max1_w0; kbd_stat[5] = kbd_stat_value_max1_w1;
   return;
 }
 
@@ -1085,14 +1128,15 @@ void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, in
   ukbd_value(kbd, xy, size, k);
   if ((*R) > 0) {
 	  int j;
-	  double kbd_tmp[4];
-	  double *permuted_kbd_sum_w0, *permuted_kbd_sum_w1;
-	  double *permuted_kbd_max_w0, *permuted_kbd_max_w1;
+	  double kbd_tmp[6];
+	  double *permuted_kbd_sum_w0, *permuted_kbd_sum_w1, *permuted_kbd_max_w0, *permuted_kbd_max_w1, *permuted_kbd_max1_w0, *permuted_kbd_max1_w1;
 
 	  permuted_kbd_sum_w0 = (double *)malloc(*R * sizeof(double));
 	  permuted_kbd_sum_w1 = (double *)malloc(*R * sizeof(double));
 	  permuted_kbd_max_w0 = (double *)malloc(*R * sizeof(double));
 	  permuted_kbd_max_w1 = (double *)malloc(*R * sizeof(double));
+	  permuted_kbd_max1_w0 = (double *)malloc(*R * sizeof(double));
+	  permuted_kbd_max1_w1 = (double *)malloc(*R * sizeof(double));
 
 	  // permutation test:
 	  for (j = 0; j < (*R); j++) {
@@ -1107,6 +1151,7 @@ void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, in
 		  ukbd_value(kbd_tmp, xy, size, k);
 		  permuted_kbd_sum_w0[j] = kbd_tmp[0]; permuted_kbd_sum_w1[j] = kbd_tmp[1];
 		  permuted_kbd_max_w0[j] = kbd_tmp[2]; permuted_kbd_max_w1[j] = kbd_tmp[3];
+		  permuted_kbd_max1_w0[j] = kbd_tmp[4]; permuted_kbd_max1_w1[j] = kbd_tmp[5];
 	  }
 
 	  // compute p-value
@@ -1114,9 +1159,12 @@ void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, in
 	  pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, j);
 	  pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, j);
 	  pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, j);
+	  pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, j);
+	  pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, j);
 	  //printf("pvalue: %f, %f, %f, %f\n", pvalue[0], pvalue[1], pvalue[2], pvalue[3]);
 	  free(permuted_kbd_sum_w0); free(permuted_kbd_sum_w1);
 	  free(permuted_kbd_max_w0); free(permuted_kbd_max_w1);
+	  free(permuted_kbd_max1_w0); free(permuted_kbd_max1_w1);
   }
   return;
 }

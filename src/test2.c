@@ -175,7 +175,7 @@ void bd_test_2sample_multithread_permutation()
 void bd_test_ksample_multithread_permutation()
 {
 	printf("Test Ball Divergence based K Sample Test\n");
-	double ball_stat_value[4], p_value[4];
+	double ball_stat_value[6], p_value[6];
 	double x[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 	int size[3] = { 5, 5, 5};
 	int k = 3;
@@ -191,6 +191,10 @@ void bd_test_ksample_multithread_permutation()
 	printf("p-value: %f \n", p_value[2]);
 	printf("Ball statistics: %f; ", ball_stat_value[3]);
 	printf("p-value: %f \n", p_value[3]);
+	printf("Ball statistics: %f; ", ball_stat_value[4]);
+	printf("p-value: %f \n", p_value[4]);
+	printf("Ball statistics: %f; ", ball_stat_value[5]);
+	printf("p-value: %f \n", p_value[5]);
 	printf("No need to check the K-sample test statistic! \n\n");
 	return;
 }
