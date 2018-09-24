@@ -182,7 +182,9 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
       } else {
         if (kbd.type == "sum") {
           return_stat <- result[["statistic"]][1]
-        } else {
+        } else if (kbd.type == "max") {
+          return_stat <- result[["statistic"]][2] 
+        } else if (kbd.type == "maxsum") {
           return_stat <- result[["statistic"]][3] 
         }
       }
@@ -205,10 +207,14 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
     stat <- result[["statistic"]][1]
     pvalue <- result[["p.value"]][1]
     stat_message <- " (Summation Version)"
+  } else if (kbd.type == "max") {
+    stat <- result[["statistic"]][2]
+    pvalue <- result[["p.value"]][2]
+    stat_message <- " (Maximum Version)"
   } else {
     stat <- result[["statistic"]][3]
     pvalue <- result[["p.value"]][3]
-    stat_message <- " (Maximum Version)"
+    stat_message <- " (Maximum-Summation Version)"
   }
   data_name <- paste(data_name, sprintf("\nnumber of observations = %s,", result[["info"]][["N"]]))
   data_name <- paste(data_name, "group sizes:", paste0(result[["info"]][["size"]], collapse = " "))
@@ -224,7 +230,7 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
     size = result[["info"]][["size"]],
     complete.info = result,
     alternative = alternative_message,
-    method = sprintf("Nonparametric %s-Samples Ball Divergence Test%s", result[["info"]][["K"]], stat_message),
+    method = sprintf("Nonparametric %s-sample Ball Divergence Test%s", result[["info"]][["K"]], stat_message),
     data.name = data_name
   )
   class(e) <- "htest"
@@ -294,7 +300,7 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
 #' y <- rnorm(50)
 #' bd(x, y)
 bd <- function(x, y = NULL, dst = FALSE, size = NULL, num.threads = 2, kbd.type = "sum") {
-  res <- bd.test(x = x, y = y, dst = dst, size = size, R = 0)
+  res <- bd.test(x = x, y = y, dst = dst, size = size, R = 0, kbd.type = kbd.type)
   res
 }
 

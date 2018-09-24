@@ -22,6 +22,30 @@ test_that("Error if input data contain abnormal values", {
 })
 
 
+test_that("bd, bd.test function return unmatched ball divergence statistic", {
+  dat <- lapply(rep(50, 3), function(i) {
+    rnorm(i)
+  })
+  res1 <- bd(dat, kbd.type = "sum")
+  res2 <- bd(dat, kbd.type = "max")
+  res3 <- bd(dat, kbd.type = "maxsum")
+  expect_equal(names(res1), "kbd.sum")
+  expect_equal(names(res2), "kbd.max")
+  expect_equal(names(res3), "kbd.maxsum")
+  
+  res1 <- bd.test(dat, kbd.type = "sum")
+  res2 <- bd.test(dat, kbd.type = "max")
+  res3 <- bd.test(dat, kbd.type = "maxsum")
+  expect_equal(names(res1[["statistic"]]), "kbd.sum")
+  expect_equal(names(res2[["statistic"]]), "kbd.max")
+  expect_equal(names(res3[["statistic"]]), "kbd.maxsum")
+  
+  expect_equal(names(res1[["p.value"]]), "kbd.sum.pvalue")
+  expect_equal(names(res2[["p.value"]]), "kbd.max.pvalue")
+  expect_equal(names(res3[["p.value"]]), "kbd.maxsum.pvalue")
+})
+
+
 # test_that("Multi-thread support is valid!", {
 #   cat("Multi-thread computation via permutation.\n")
 #   set.seed(4)

@@ -39,7 +39,7 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
   num.threads <- as.integer(num.threads)
   #
   K <- as.integer(length(size))
-  stat_num <- ifelse(K == 2, 2, 4)
+  stat_num <- ifelse(K == 2, 2, 6)
   bd <- as.double(numeric(stat_num))
   p_value <- as.double(numeric(stat_num))
   size <- as.integer(size)
@@ -47,7 +47,7 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
   res <- .C("bd_test", bd, p_value, xy, size, N, K, dst, R, num.threads)
   #
   stat_name_bd <- c("bd", "wbd")
-  stat_name_kbd <- c("kbd.sum", "wkbd.sum", "kbd.max", "wkbd.max")
+  stat_name_kbd <- c("kbd.sum", "wkbd.sum", "kbd.max", "wkbd.max", "kbd.maxsum", "wkbd.maxsum")
   bd <- res[[1]]
   p_value <- res[[2]]
   if (K == 2) {
@@ -56,8 +56,8 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
     p_value <- p_value[1]
   } else {
     names(bd) <- stat_name_kbd
-    bd <- bd[c(1, 3)]
-    p_value <- p_value[c(1, 3)]
+    bd <- bd[c(1, 3, 5)]
+    p_value <- p_value[c(1, 3, 5)]
   }
   names(p_value) <- paste0(names(bd), ".pvalue")
   list('statistic' = bd, 'p.value' = p_value, 

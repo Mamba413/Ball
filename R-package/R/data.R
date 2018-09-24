@@ -165,6 +165,7 @@ NULL
 #' @importFrom gam gam
 #' @importFrom gam s
 #' @importFrom stats residuals
+#' @importFrom mvtnorm rmvnorm
 NULL
 
 
