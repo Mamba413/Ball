@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifdef _OPENMP
-# include "omp.h"
+#include "omp.h"
 #endif
 
 #include "math.h"
@@ -306,8 +306,7 @@ void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *
 					//printf("In thread: %d\n", omp_get_thread_num());
 					if (k < (*n1)) {
 						i_perm_thread[k] = 1;
-					}
-					else {
+					} else {
 						i_perm_thread[k] = 0;
 					}
 					i_perm_tmp_thread[k] = k;
@@ -752,48 +751,48 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
 
   // permutation test:
   if((*R) > 0) {
-    int *index, j;
-    double *new_xy, kbd_tmp[6];
-	double *permuted_kbd_sum_w0, *permuted_kbd_sum_w1, *permuted_kbd_max_w0, *permuted_kbd_max_w1, *permuted_kbd_max1_w0, *permuted_kbd_max1_w1;
-    new_xy = (double *) malloc(dst_size * sizeof(double));
-    index = (int *) malloc(N * sizeof(int));
-	permuted_kbd_sum_w0 = (double *)malloc(*R * sizeof(double));
-	permuted_kbd_sum_w1 = (double *)malloc(*R * sizeof(double));
-	permuted_kbd_max_w0 = (double *)malloc(*R * sizeof(double));
-	permuted_kbd_max_w1 = (double *)malloc(*R * sizeof(double));
-	permuted_kbd_max1_w0 = (double *)malloc(*R * sizeof(double));
-	permuted_kbd_max1_w1 = (double *)malloc(*R * sizeof(double));
+	  int *index, j;
+	  double *new_xy, kbd_tmp[6];
+	  double *permuted_kbd_sum_w0, *permuted_kbd_sum_w1, *permuted_kbd_max_w0, *permuted_kbd_max_w1, *permuted_kbd_max1_w0, *permuted_kbd_max1_w1;
+	  new_xy = (double *)malloc(dst_size * sizeof(double));
+	  index = (int *)malloc(N * sizeof(int));
+	  permuted_kbd_sum_w0 = (double *)malloc(*R * sizeof(double));
+	  permuted_kbd_sum_w1 = (double *)malloc(*R * sizeof(double));
+	  permuted_kbd_max_w0 = (double *)malloc(*R * sizeof(double));
+	  permuted_kbd_max_w1 = (double *)malloc(*R * sizeof(double));
+	  permuted_kbd_max1_w0 = (double *)malloc(*R * sizeof(double));
+	  permuted_kbd_max1_w1 = (double *)malloc(*R * sizeof(double));
 
-    for(i_permute = 0; i_permute < N; i_permute++) {
-      index[i_permute] = i_permute;
-    }
-    for(j = 0; j < (*R); j++) {
-      // stop permutation if user stop it manually:
-      if(pending_interrupt()) {
-        print_stop_message();
-        break;
-      }
-      // permute data index:
-      shuffle(index, n);
-      // adjust vectorized distance matrix according to permuted index: 
-      permute_dst(xy, new_xy, index, n);
-      // K-sample BD after permutation:
-      kbd_value(kbd_tmp, new_xy, size, n, k);
-	  permuted_kbd_sum_w0[j] = kbd_tmp[0]; permuted_kbd_sum_w1[j] = kbd_tmp[1];
-	  permuted_kbd_max_w0[j] = kbd_tmp[2]; permuted_kbd_max_w1[j] = kbd_tmp[3];
-	  permuted_kbd_max1_w0[j] = kbd_tmp[4]; permuted_kbd_max1_w1[j] = kbd_tmp[5];
-    }
-	pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, j);
-	pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, j);
-	pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, j);
-	pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, j);
-	pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, j);
-	pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, j);
-	free(permuted_kbd_sum_w0); free(permuted_kbd_sum_w1);
-	free(permuted_kbd_max_w0); free(permuted_kbd_max_w1);
-	free(permuted_kbd_max1_w0); free(permuted_kbd_max1_w1);
-    free(new_xy);
-    free(index);
+	  for (i_permute = 0; i_permute < N; i_permute++) {
+		  index[i_permute] = i_permute;
+	  }
+	  for (j = 0; j < (*R); j++) {
+		  // stop permutation if user stop it manually:
+		  if (pending_interrupt()) {
+			  print_stop_message();
+			  break;
+		  }
+		  // permute data index:
+		  shuffle(index, n);
+		  // adjust vectorized distance matrix according to permuted index: 
+		  permute_dst(xy, new_xy, index, n);
+		  // K-sample BD after permutation:
+		  kbd_value(kbd_tmp, new_xy, size, n, k);
+		  permuted_kbd_sum_w0[j] = kbd_tmp[0]; permuted_kbd_sum_w1[j] = kbd_tmp[1];
+		  permuted_kbd_max_w0[j] = kbd_tmp[2]; permuted_kbd_max_w1[j] = kbd_tmp[3];
+		  permuted_kbd_max1_w0[j] = kbd_tmp[4]; permuted_kbd_max1_w1[j] = kbd_tmp[5];
+	  }
+	  pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, j);
+	  pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, j);
+	  pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, j);
+	  pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, j);
+	  pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, j);
+	  pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, j);
+	  free(permuted_kbd_sum_w0); free(permuted_kbd_sum_w1);
+	  free(permuted_kbd_max_w0); free(permuted_kbd_max_w1);
+	  free(permuted_kbd_max1_w0); free(permuted_kbd_max1_w1);
+	  free(new_xy);
+	  free(index);
   }
   return;
 }

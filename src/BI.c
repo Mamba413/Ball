@@ -13,17 +13,15 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifdef _OPENMP
-# include "omp.h"
-#endif
-
 #include "math.h"
 #include "stdlib.h" 
 #include "string.h"
 #include "stdio.h"
 #include "utilities.h"
 #include "BI.h"
-
+#ifdef _OPENMP
+# include "omp.h"
+#endif
 
 void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv)
 {
