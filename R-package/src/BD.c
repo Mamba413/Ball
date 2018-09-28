@@ -13,16 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifdef _OPENMP
-#include "omp.h"
-#endif
-
 #include "math.h"
 #include "stdlib.h" 
 #include "stdio.h"
 #include "BD.h"
 #include "utilities.h"
-
+#include "Ball_omp.h"
 
 void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2)
 {
@@ -74,7 +70,7 @@ void Ball_Divergence_parallel(double *bd_stat, int **Rxy, int **Rx, int *i_perm_
   int n;
   n = *n1 + *n2;
   double TS_weight0 = 0, SS_weight0 = 0, TS_weight1 = 0.0, SS_weight1 = 0.0;
-#ifdef _OPENMP
+#ifdef Ball_OMP_H_
   omp_set_num_threads(*nthread);
 #endif
 #pragma omp parallel
@@ -287,7 +283,7 @@ void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *
 		permuted_bd_w0 = (double *)malloc(*R * sizeof(double));
 		permuted_bd_w1 = (double *)malloc(*R * sizeof(double));
 
-#ifdef _OPENMP
+#ifdef Ball_OMP_H_
 		omp_set_num_threads(*nthread);
 #endif
 		// Init parallel
@@ -454,7 +450,7 @@ void UBD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int 
 		permuted_bd_w0 = (double *)malloc(*R * sizeof(double));
 		permuted_bd_w1 = (double *)malloc(*R * sizeof(double));
 
-#ifdef _OPENMP
+#ifdef Ball_OMP_H_
 		omp_set_num_threads(*nthread);
 #endif
 		#pragma omp parallel

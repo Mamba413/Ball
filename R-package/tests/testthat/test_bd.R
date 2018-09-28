@@ -1,3 +1,4 @@
+library(testthat)
 library(Ball)
 context("bd and bd.test function")
 skip_on_cran()
