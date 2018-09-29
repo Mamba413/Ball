@@ -784,6 +784,13 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
             pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, permute_time);
             pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, permute_time);
             pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, permute_time);
+        } else if (stop_flag == 0) {
+            pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, *R);
+            pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, *R);
+            pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, *R);
+            pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, *R);
+            pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, *R);
+            pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, *R);
         }
 
         free(permuted_kbd_sum_w0);
