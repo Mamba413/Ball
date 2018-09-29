@@ -710,6 +710,65 @@ void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k) {
 }
 
 
+void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R) {
+    int N = (*n);
+    int dst_size = N * N;
+    int i_permute;
+
+    // permutation test:
+    if ((*R) > 0) {
+        int *index, j;
+        double *new_xy, kbd_tmp[6];
+        double *permuted_kbd_sum_w0, *permuted_kbd_sum_w1, *permuted_kbd_max_w0, *permuted_kbd_max_w1, *permuted_kbd_max1_w0, *permuted_kbd_max1_w1;
+        new_xy = (double *) malloc(dst_size * sizeof(double));
+        index = (int *) malloc(N * sizeof(int));
+        permuted_kbd_sum_w0 = (double *) malloc(*R * sizeof(double));
+        permuted_kbd_sum_w1 = (double *) malloc(*R * sizeof(double));
+        permuted_kbd_max_w0 = (double *) malloc(*R * sizeof(double));
+        permuted_kbd_max_w1 = (double *) malloc(*R * sizeof(double));
+        permuted_kbd_max1_w0 = (double *) malloc(*R * sizeof(double));
+        permuted_kbd_max1_w1 = (double *) malloc(*R * sizeof(double));
+        for (i_permute = 0; i_permute < N; i_permute++) {
+            index[i_permute] = i_permute;
+        }
+        for (j = 0; j < (*R); j++) {
+            // stop permutation if user stop it manually:
+            if (pending_interrupt()) {
+                print_stop_message();
+                break;
+            }
+            // permute data index:
+            shuffle(index, n);
+            // adjust vectorized distance matrix according to permuted index:
+            permute_dst(xy, new_xy, index, n);
+            // K-sample BD after permutation:
+            kbd_value(kbd_tmp, new_xy, size, n, k);
+            permuted_kbd_sum_w0[j] = kbd_tmp[0];
+            permuted_kbd_sum_w1[j] = kbd_tmp[1];
+            permuted_kbd_max_w0[j] = kbd_tmp[2];
+            permuted_kbd_max_w1[j] = kbd_tmp[3];
+            permuted_kbd_max1_w0[j] = kbd_tmp[4];
+            permuted_kbd_max1_w1[j] = kbd_tmp[5];
+        }
+        pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, j);
+        pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, j);
+        pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, j);
+        pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, j);
+        pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, j);
+        pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, j);
+        free(permuted_kbd_sum_w0);
+        free(permuted_kbd_sum_w1);
+        free(permuted_kbd_max_w0);
+        free(permuted_kbd_max_w1);
+        free(permuted_kbd_max1_w0);
+        free(permuted_kbd_max1_w1);
+        free(new_xy);
+        free(index);
+    }
+    return;
+}
+
+
 // R function call this function to implement ball divergence based k-sample test
 // if R = 0, k-sample ball divergence statistic will be returned, else, k-sample test p-value 
 // base on ball divergence statistic will be return
@@ -721,7 +780,7 @@ void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k) {
 // n: sample size
 // k: group number
 // weight: if weight == TRUE, weight BD will be returned
-void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R, int *nthread) {
+void KBD_parallel(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R, int *nthread) {
     int N = (*n);
     int dst_size = N * N;
     int i_permute;
@@ -729,7 +788,6 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
 
     // permutation test:
     if ((*R) > 0) {
-        int stop_flag = 0, permute_time;
         double *permuted_kbd_sum_w0, *permuted_kbd_sum_w1, *permuted_kbd_max_w0, *permuted_kbd_max_w1, *permuted_kbd_max1_w0, *permuted_kbd_max1_w1;
         permuted_kbd_sum_w0 = (double *) malloc(*R * sizeof(double));
         permuted_kbd_sum_w1 = (double *) malloc(*R * sizeof(double));
@@ -754,14 +812,9 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
 
 #pragma omp for
             for (j = 0; j < (*R); j++) {
-                // stop permutation if user stop it manually:
-                if (pending_interrupt()) {  stop_flag = 1; }
-                if (stop_flag == 1) { continue; }
                 // permute data index:
 #pragma omp critical
-                {
-                    shuffle(index, n);
-                };
+                { shuffle(index, n); };
                 // adjust vectorized distance matrix according to permuted index:
                 permute_dst(xy, new_xy, index, n);
                 // K-sample BD after permutation:
@@ -775,23 +828,13 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
             }
             free(new_xy);
             free(index);
-            permute_time = j;
         };
-        if (*nthread == 1) {
-            pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, permute_time);
-            pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, permute_time);
-            pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, permute_time);
-            pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, permute_time);
-            pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, permute_time);
-            pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, permute_time);
-        } else if (stop_flag == 0) {
-            pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, *R);
-            pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, *R);
-            pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, *R);
-            pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, *R);
-            pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, *R);
-            pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, *R);
-        }
+        pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, *R);
+        pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, *R);
+        pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, *R);
+        pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, *R);
+        pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, *R);
+        pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, *R);
 
         free(permuted_kbd_sum_w0);
         free(permuted_kbd_sum_w1);
@@ -1286,7 +1329,11 @@ void bd_test(double *bd, double *pvalue, double *xy, int *size, int *n, int *k, 
         }
     } else {
         if (*dst) {
-            KBD(bd, pvalue, xy, size, n, k, R, nthread);
+            if (parallel_type == 2 && *nthread > 1) {
+                KBD_parallel(bd, pvalue, xy, size, n, k, R, nthread);
+            } else {
+                KBD(bd, pvalue, xy, size, n, k, R);
+            }
         } else {
             UKBD(bd, pvalue, xy, size, n, k, R);
         }
