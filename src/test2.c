@@ -245,7 +245,7 @@ return;
 }
 */
 
-
+//int ii_thread, jj_thread, temp_thread, tmp0_thread, tmp1_thread;
 //for (ii_thread = n - 1; ii_thread > 0; --ii_thread) {
 //	jj_thread = random_index2(ii_thread);
 //	temp_thread = i_perm_thread[jj_thread];
@@ -318,6 +318,7 @@ void main()
 	//printf("Test newest feature: \n");
 	//bd_test_ksample_permutation2();
 	//printf("-------------------------------- \n");
+
 	system("pause");
 	return;
 }

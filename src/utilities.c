@@ -17,7 +17,7 @@
 #include "utilities.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "utilize_R.h"
+#include "utilize_cross.h"
 
 
 void swap(double *x, double *y) {
@@ -859,6 +859,32 @@ void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1)
 		i_perm[i] = temp;
 	}
   
+	tmp0 = 0;
+	tmp1 = 0;
+	for (i = 0; i < n; i++) {
+		if (i_perm[i] == 1) {
+			i_perm_tmp[tmp0++] = i;
+		}
+		else {
+			i_perm_tmp[*n1 + tmp1] = i;
+			tmp1++;
+		}
+	}
+}
+
+int random_index_thread_wrap(int i) {
+	return random_index_thread(i);
+}
+
+void resample3_thread(int *permuted_arr, int *i_perm, int *i_perm_tmp, int n, int *n1) {
+	int i, j, temp, tmp0, tmp1;
+	for (i = n - 1; i > 0; --i) {
+		j = permuted_arr[i];
+		temp = i_perm[j];
+		i_perm[j] = i_perm[i];
+		i_perm[i] = temp;
+	}
+
 	tmp0 = 0;
 	tmp1 = 0;
 	for (i = 0; i < n; i++) {

@@ -22,6 +22,7 @@ int pending_interrupt_status();
 int r_available_rand();
 int random_index(int n, int i);
 int random_index2(int i);
+int random_index_thread(int i);
 
 
 #endif /* UTILIZE_CROSS_H_ */

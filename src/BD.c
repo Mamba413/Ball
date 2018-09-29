@@ -13,6 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include "math.h"
 #include "stdlib.h" 
 #include "stdio.h"
@@ -229,7 +230,22 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *p, int *R
   return;
 }	 
 
-
+/*
+ * Note:
+ * I have tried to use following to avoid the lock during the parallelism. However, this method is not efficient.
+ * int **random_permute_matrix;
+ * random_permute_matrix = alloc_int_matrix(n, n);
+ * for (i = 0; i < *R; i++) {
+ *      for (j = n - 1; j > 0; j--) {
+ *          random_permute_matrix[i][j] = random_index_thread_wrap(j);
+ *      }
+ *      random_permute_matrix[i][0] = 0;
+ * }
+ * ....
+ * resample3_thread(random_permute_matrix[i_thread], i_perm_thread, i_perm_tmp_thread, n, n1);
+ * ....
+ * free_int_matrix(random_permute_matrix, n, n);
+ */
 void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *p, int *R, int *nthread)
 {
 	int i, j, n;
@@ -246,12 +262,6 @@ void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *
 
 	// get vectorize distance matrix Dxy:
 	vector2matrix(xy, Dxy, n, n, 1);
-	//if (*dst == 1) {
-	// vector2matrix(xy, Dxy, n, n, 1);
-	//}
-	//else {
-	// Euclidean_distance(xy, Dxy, n, *p);
-	//}
 
 	for (i = 0; i < n; i++)
 		for (j = 0; j < n; j++)

@@ -50,8 +50,7 @@ int pending_interrupt_status()
 * Following the rule in "Writing R Extension"[https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Random-numbers]!
 * output:
 * A random integer
-*/
-int r_available_rand()
+*/int r_available_rand()
 {
 	int random_value = (int) (rand());
 	return random_value;
@@ -68,7 +67,6 @@ int random_index(int n, int i)
 	return index;
 }
 
-
 /*
 * API function for utilities.c
 */
@@ -76,4 +74,9 @@ int random_index2(int i)
 {
 	int index = r_available_rand() % (i + 1);
 	return index;
+}
+
+int random_index_thread(int i) {
+	int random_value = (int) (rand());
+	return random_value % (i + 1);
 }
