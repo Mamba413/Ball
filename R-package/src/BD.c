@@ -286,7 +286,6 @@ void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *
 #ifdef Ball_OMP_H_
 		omp_set_num_threads(*nthread);
 #endif
-		// Init parallel
 		#pragma omp parallel
 		{
 			int **Rx_thread, *i_perm_thread, *i_perm_tmp_thread;
@@ -296,26 +295,25 @@ void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *
 			i_perm_thread = (int *)malloc(n * sizeof(int));
 			i_perm_tmp_thread = (int *)malloc(n * sizeof(int));
 
-			#pragma omp critical
-			{
-				for (k = 0; k < n; k++) {
-					//printf("In thread: %d\n", omp_get_thread_num());
-					if (k < (*n1)) {
-						i_perm_thread[k] = 1;
-					} else {
-						i_perm_thread[k] = 0;
-					}
-					i_perm_tmp_thread[k] = k;
-					//printf("End assign\n");
+			for (k = 0; k < n; k++) {
+				//printf("In thread: %d\n", omp_get_thread_num());
+				if (k < (*n1)) {
+					i_perm_thread[k] = 1;
+				} else {
+					i_perm_thread[k] = 0;
 				}
+				i_perm_tmp_thread[k] = k;
+				//printf("End assign\n");
 			}
+			
 			#pragma omp for
 			for (i_thread = 0; i_thread < (*R); i_thread++) {
-				bd_tmp = (double *)malloc(2 * sizeof(double));
-#pragma omp critical
-				{
-					resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
-				}
+			  bd_tmp = (double *)malloc(2 * sizeof(double));
+			  // because the PutRNGstate() is not a multi-safe function. Lock here:
+#pragma omp critical 
+			  {
+          resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
+        }
 				Findx(Rxy, Ixy, i_perm_thread, n1, n2, Rx_thread);
 				Ball_Divergence(bd_tmp, Rxy, Rx_thread, i_perm_tmp_thread, n1, n2);
 				permuted_bd_w0[i_thread] = bd_tmp[0]; permuted_bd_w1[i_thread] = bd_tmp[1];

@@ -52,6 +52,8 @@ void resample(int *i_perm, int *i_perm_inv, int *n);
 void resample_matrix(int **i_perm, int *r, int *c);
 void resample2(int *i_perm, int *n);
 void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1);
+int random_index_thread_wrap(int i);
+void resample3_thread(int *permuted_arr, int *i_perm, int *i_perm_tmp, int n, int *n1);
 void ranksort(int *n, int *zrank, double *z, int *zidx);
 
 

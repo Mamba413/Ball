@@ -78,3 +78,11 @@ int random_index2(int i)
   int index = r_available_rand() % (i + 1);
   return index;
 }
+
+
+int random_index_thread(int i) {
+  GetRNGstate();
+  int random_value = round(RAND_MAX * unif_rand());
+  PutRNGstate();
+  return random_value % (i + 1);
+}
