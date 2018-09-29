@@ -179,14 +179,14 @@ void mbd_test_2sample_multithread_permutation()
 	int size[2] = { 10, 10 };
 	int k = 2;
 	int n = 20;
-	int dst = 1, R = 300, nth = 2;
+	int dst = 1, R = 300, nth = 1;
+	printf("------------- Singele thread ---------------");
 	bd_test(ball_stat_value, p_value, x, size, &n, &k, &dst, &R, &nth);
 	printf("Ball statistics: %f; ", ball_stat_value[0]);
 	printf("p-value: %f \n", p_value[0]);
 	printf("Ball statistics: %f; ", ball_stat_value[1]);
 	printf("p-value: %f \n", p_value[1]);
-
-	// Software of ChengFeng Liu output result (golden standard): 0.059821 
+	// Software of ChengFeng Liu output result (golden standard): 0.059821
 	test_value(ball_stat_value[0], 0.141);
 	return;
 }
@@ -199,7 +199,8 @@ void mbd_test_ksample_multithread_permutation()
 	int size[3] = { 5, 5, 5};
 	int k = 3;
 	int n = 15;
-	int dst = 1, R = 300, nth = 2;
+	int dst = 1, R = 299, nth = 1;
+	printf("------------- Single-thread ---------------\n");
 	bd_test(ball_stat_value, p_value, x, size, &n, &k, &dst, &R, &nth);
 	printf("Ball statistics: %f; ", ball_stat_value[0]);
 	printf("p-value: %f \n", p_value[0]);
@@ -213,7 +214,21 @@ void mbd_test_ksample_multithread_permutation()
 	printf("p-value: %f \n", p_value[4]);
 	printf("Ball statistics: %f; ", ball_stat_value[5]);
 	printf("p-value: %f \n", p_value[5]);
-	printf("No need to check the K-sample test statistic! \n\n");
+	printf("------------- Multi-thread ---------------\n");
+	nth = 2;
+	bd_test(ball_stat_value, p_value, x, size, &n, &k, &dst, &R, &nth);
+	printf("Ball statistics: %f; ", ball_stat_value[0]);
+	printf("p-value: %f \n", p_value[0]);
+	printf("Ball statistics: %f; ", ball_stat_value[1]);
+	printf("p-value: %f \n", p_value[1]);
+	printf("Ball statistics: %f; ", ball_stat_value[2]);
+	printf("p-value: %f \n", p_value[2]);
+	printf("Ball statistics: %f; ", ball_stat_value[3]);
+	printf("p-value: %f \n", p_value[3]);
+	printf("Ball statistics: %f; ", ball_stat_value[4]);
+	printf("p-value: %f \n", p_value[4]);
+	printf("Ball statistics: %f; ", ball_stat_value[5]);
+	printf("p-value: %f \n", p_value[5]);
 	return;
 }
 

@@ -710,10 +710,22 @@ void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k) {
 }
 
 
+// Ball divergence based k-sample test
+// if R = 0, k-sample ball divergence statistic will be returned, else, k-sample test p-value
+// base on ball divergence statistic will be return
+// Input Arugement:
+// kbd: K-samples ball divergence statistic or p-value
+// permuted_kbd: K-samples ball divergence statistic after permutation
+// xy: vectorized distance matrix
+// size: an array contain sample size in each group
+// n: sample size
+// k: group number
+// weight: if weight == TRUE, weight BD will be returned
 void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R) {
     int N = (*n);
     int dst_size = N * N;
     int i_permute;
+    kbd_value(kbd, xy, size, n, k);
 
     // permutation test:
     if ((*R) > 0) {
@@ -768,18 +780,7 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
     return;
 }
 
-
-// R function call this function to implement ball divergence based k-sample test
-// if R = 0, k-sample ball divergence statistic will be returned, else, k-sample test p-value 
-// base on ball divergence statistic will be return
-// Input Arugement: 
-// kbd: K-samples ball divergence statistic or p-value
-// permuted_kbd: K-samples ball divergence statistic after permutation
-// xy: vectorized distance matrix
-// size: an array contain sample size in each group
-// n: sample size
-// k: group number
-// weight: if weight == TRUE, weight BD will be returned
+// nthread: number of thread will be used
 void KBD_parallel(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R, int *nthread) {
     int N = (*n);
     int dst_size = N * N;
