@@ -33,8 +33,7 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
             p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
             p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
             p3 = (p1 + p2) / n;
-            if (p3 * (1 - p3) == 0)
-                continue;
+            if (p3 * (1 - p3) == 0) { continue; }
             //TS++;
             //TS += pow(fabs(p1/(*n1)-p2/(*n2)),*gamma)/(pow(p3,*alpha)*pow(1-p3,*beta));
             ans = p1 / (*n1) - p2 / (*n2);
@@ -49,8 +48,8 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
             p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
             p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
             p3 = (p1 + p2) / n;
-            if (p3 * (1 - p3) == 0)
-                continue;
+            if (p3 * (1 - p3) == 0) { continue; }
+
             //SS++;
             //SS += pow(fabs(p1/(*n1)-p2/(*n2)),*gamma)/(pow(p3,*alpha)*pow(1-p3,*beta));
             ans = p1 / (*n1) - p2 / (*n2);
@@ -63,7 +62,6 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
     bd_stat[1] = TS_weight1 / (1.0 * (*n1) * (*n1)) + SS_weight1 / (1.0 * (*n2) * (*n2));
     return;
 }
-
 
 void Ball_Divergence_parallel(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2, int *nthread) {
     int n;
@@ -79,15 +77,15 @@ void Ball_Divergence_parallel(double *bd_stat, int **Rxy, int **Rx, int *i_perm_
         double TS_value_w0 = 0.0, SS_value_w0 = 0.0, TS_value_w1 = 0.0, SS_value_w1 = 0.0;
         double p1, p2, p3;
 
-        // Calculate A_{ij}^{X} and A_{ij}^{Y}:
+        // Calculate A_{ij}^{X} and A_{ij}^{Y}
+        // TODO: further optimized by : pragma omp for reduction ...
 #pragma omp for
         for (i = 0; i < *n1; i++) {
             for (j = 0; j < *n1; j++) {
                 p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
                 p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
                 p3 = (p1 + p2) / n;
-                if (p3 * (1 - p3) == 0)
-                    continue;
+                if (p3 * (1 - p3) == 0) { continue; }
                 ans = p1 / (*n1) - p2 / (*n2);
                 TS_value_w0 += (ans * ans);
                 TS_value_w1 += (ans * ans) * 1.0;
@@ -106,8 +104,7 @@ void Ball_Divergence_parallel(double *bd_stat, int **Rxy, int **Rx, int *i_perm_
                 p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
                 p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
                 p3 = (p1 + p2) / n;
-                if (p3 * (1 - p3) == 0)
-                    continue;
+                if (p3 * (1 - p3) == 0) { continue; }
                 ans = p1 / (*n1) - p2 / (*n2);
                 SS_value_w0 += (ans * ans);
                 SS_value_w1 += (ans * ans) * 1.0;
@@ -350,15 +347,11 @@ void UBD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *
     xyidx = (int *) malloc(n * sizeof(int));
     for (i = 0; i < n; i++) {
         xyidx[i] = i;
-        for (j = 0; j < n; j++)
-            Ixy[i][j] = j;
+        for (j = 0; j < n; j++) { Ixy[i][j] = j; }
     }
 
     for (i = 0; i < n; i++) {
-        if (i < (*n1))
-            i_perm[i] = 1;
-        else
-            i_perm[i] = 0;
+        i_perm[i] = i < *n1 ? 1 : 0;
         i_perm_tmp[i] = i;
     }
 
@@ -422,10 +415,7 @@ void UBD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int 
     }
 
     for (i = 0; i < n; i++) {
-        if (i < (*n1))
-            i_perm[i] = 1;
-        else
-            i_perm[i] = 0;
+        i_perm[i] = i < *n1 ? 1 : 0;
         i_perm_tmp[i] = i;
     }
 
@@ -455,32 +445,27 @@ void UBD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int 
             Rx_thread = alloc_int_matrix(n, n);
             i_perm_thread = (int *) malloc(n * sizeof(int));
             i_perm_tmp_thread = (int *) malloc(n * sizeof(int));
-            bd_tmp = (double *) malloc(2 * sizeof(double));
 
 #pragma omp critical
             {
                 for (k = 0; k < n; k++) {
-                    if (k < (*n1)) {
-                        i_perm_thread[k] = 1;
-                    } else {
-                        i_perm_thread[k] = 0;
-                    }
+                    i_perm_thread[k] = k < (*n1) ? 1 : 0;
                     i_perm_tmp_thread[k] = k;
                 }
             }
 #pragma omp for
             for (i_thread = 0; i_thread < (*R); i_thread++) {
+                bd_tmp = (double *) malloc(2 * sizeof(double));
 #pragma omp critical
                 {
-                    // TODO: I don't know why this command can only be runned in a single thread. But it makes R console temporarily available and seems to be correct.
                     resample3(i_perm_thread, i_perm_tmp_thread, n, n1);
                 }
                 Findx(Rxy, Ixy, i_perm_thread, n1, n2, Rx_thread);
                 Ball_Divergence(bd_tmp, Rxy, Rx_thread, i_perm_tmp_thread, n1, n2);
                 permuted_bd_w0[i_thread] = bd_tmp[0];
                 permuted_bd_w1[i_thread] = bd_tmp[1];
+                free(bd_tmp);
             }
-            free(bd_tmp);
             free(i_perm_thread);
             free(i_perm_tmp_thread);
             free_int_matrix(Rx_thread, n, n);
@@ -564,8 +549,8 @@ void compute_cumulate_size(int *cumulate_size, int *size, int *k) {
 }
 
 
-// need to fetch submatrix and vectorize it
-// xy: vectorize distance matrix
+// need to fetch sub-matrix and vectorized it
+// xy: vectorized distance matrix
 // ij_dst: vectorized distance matrix of group i and group j
 // cumulate_size: the cumulative sums of size vector  
 // size: an array contain sample size in each group
@@ -656,7 +641,7 @@ void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k) {
     double bd_stat_value[2];
     double kbd_stat_value_sum_w0 = 0.0, kbd_stat_value_sum_w1 = 0.0;
     double kbd_stat_value_max_w0 = 0.0, kbd_stat_value_max_w1 = 0.0;
-    double kbd_stat_value_max1_w0 = 0.0, kbd_stat_value_max1_w1 = 0.0;
+    double kbd_stat_value_max1_w0, kbd_stat_value_max1_w1;
     int bd_stat_number = K * (K - 1) / 2;
 
     bd_stat_w0_array = (double *) malloc(bd_stat_number * sizeof(double));
@@ -736,7 +721,7 @@ void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k) {
 // n: sample size
 // k: group number
 // weight: if weight == TRUE, weight BD will be returned
-void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R) {
+void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R, int *nthread) {
     int N = (*n);
     int dst_size = N * N;
     int i_permute;
@@ -744,11 +729,8 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
 
     // permutation test:
     if ((*R) > 0) {
-        int *index, j;
-        double *new_xy, kbd_tmp[6];
+        int stop_flag = 0, permute_time;
         double *permuted_kbd_sum_w0, *permuted_kbd_sum_w1, *permuted_kbd_max_w0, *permuted_kbd_max_w1, *permuted_kbd_max1_w0, *permuted_kbd_max1_w1;
-        new_xy = (double *) malloc(dst_size * sizeof(double));
-        index = (int *) malloc(N * sizeof(int));
         permuted_kbd_sum_w0 = (double *) malloc(*R * sizeof(double));
         permuted_kbd_sum_w1 = (double *) malloc(*R * sizeof(double));
         permuted_kbd_max_w0 = (double *) malloc(*R * sizeof(double));
@@ -756,46 +738,64 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
         permuted_kbd_max1_w0 = (double *) malloc(*R * sizeof(double));
         permuted_kbd_max1_w1 = (double *) malloc(*R * sizeof(double));
 
-        for (i_permute = 0; i_permute < N; i_permute++) {
-            index[i_permute] = i_permute;
-        }
-        for (j = 0; j < (*R); j++) {
-            // stop permutation if user stop it manually:
-            if (pending_interrupt()) {
-                print_stop_message();
-                break;
+#ifdef Ball_OMP_H_
+        omp_set_num_threads(*nthread);
+#endif
+
+#pragma omp parallel
+        {
+            int *index, j = 0;
+            double *new_xy, kbd_tmp[6];
+            new_xy = (double *) malloc(dst_size * sizeof(double));
+            index = (int *) malloc(N * sizeof(int));
+            for (i_permute = 0; i_permute < N; i_permute++) {
+                index[i_permute] = i_permute;
             }
-            // permute data index:
-            shuffle(index, n);
-            // adjust vectorized distance matrix according to permuted index:
-            permute_dst(xy, new_xy, index, n);
-            // K-sample BD after permutation:
-            kbd_value(kbd_tmp, new_xy, size, n, k);
-            permuted_kbd_sum_w0[j] = kbd_tmp[0];
-            permuted_kbd_sum_w1[j] = kbd_tmp[1];
-            permuted_kbd_max_w0[j] = kbd_tmp[2];
-            permuted_kbd_max_w1[j] = kbd_tmp[3];
-            permuted_kbd_max1_w0[j] = kbd_tmp[4];
-            permuted_kbd_max1_w1[j] = kbd_tmp[5];
+
+#pragma omp for
+            for (j = 0; j < (*R); j++) {
+                // stop permutation if user stop it manually:
+                if (pending_interrupt()) {  stop_flag = 1; }
+                if (stop_flag == 1) { continue; }
+                // permute data index:
+#pragma omp critical
+                {
+                    shuffle(index, n);
+                };
+                // adjust vectorized distance matrix according to permuted index:
+                permute_dst(xy, new_xy, index, n);
+                // K-sample BD after permutation:
+                kbd_value(kbd_tmp, new_xy, size, n, k);
+                permuted_kbd_sum_w0[j] = kbd_tmp[0];
+                permuted_kbd_sum_w1[j] = kbd_tmp[1];
+                permuted_kbd_max_w0[j] = kbd_tmp[2];
+                permuted_kbd_max_w1[j] = kbd_tmp[3];
+                permuted_kbd_max1_w0[j] = kbd_tmp[4];
+                permuted_kbd_max1_w1[j] = kbd_tmp[5];
+            }
+            free(new_xy);
+            free(index);
+            permute_time = j;
+        };
+        if (*nthread == 1) {
+            pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, permute_time);
+            pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, permute_time);
+            pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, permute_time);
+            pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, permute_time);
+            pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, permute_time);
+            pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, permute_time);
         }
-        pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, j);
-        pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, j);
-        pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, j);
-        pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, j);
-        pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, j);
-        pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, j);
+
         free(permuted_kbd_sum_w0);
         free(permuted_kbd_sum_w1);
         free(permuted_kbd_max_w0);
         free(permuted_kbd_max_w1);
         free(permuted_kbd_max1_w0);
         free(permuted_kbd_max1_w1);
-        free(new_xy);
-        free(index);
+
     }
     return;
 }
-
 
 /*
 * K-sample ball divergence test, computational complexity O(n^2)
@@ -1279,7 +1279,7 @@ void bd_test(double *bd, double *pvalue, double *xy, int *size, int *n, int *k, 
         }
     } else {
         if (*dst) {
-            KBD(bd, pvalue, xy, size, n, k, R);
+            KBD(bd, pvalue, xy, size, n, k, R, nthread);
         } else {
             UKBD(bd, pvalue, xy, size, n, k, R);
         }

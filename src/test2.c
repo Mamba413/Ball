@@ -53,7 +53,7 @@ void test_bcov_value()
 	double x_dst[100] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 8, 7, 6, 5, 4, 3, 2, 1, 0, 1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
 	double y_dst[100] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 8, 7, 6, 5, 4, 3, 2, 1, 0, 1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
 	int n = 10;
-	int R = 0, weight = 0, dst = 0, type = 1, nth = 1;
+	int R = 0, dst = 0, nth = 1;
 
 	// Software of ChengFeng Liu output result (golden standard): 0.034214
 	// univariate case:
@@ -159,7 +159,6 @@ void bd_test_2sample_multithread_permutation()
 	int k = 2;
 	int n = 500;
 	int dst = 0, R = 199, nth = 2;
-	int parallel_type = 2;
 	bd_test(ball_stat_value, p_value, x, size, &n, &k, &dst, &R, &nth);
 	printf("Ball statistics: %f; ", ball_stat_value[0]);
 	printf("p-value: %f \n", p_value[0]);
@@ -181,7 +180,6 @@ void mbd_test_2sample_multithread_permutation()
 	int k = 2;
 	int n = 20;
 	int dst = 1, R = 300, nth = 2;
-	int parallel_type = 2;
 	bd_test(ball_stat_value, p_value, x, size, &n, &k, &dst, &R, &nth);
 	printf("Ball statistics: %f; ", ball_stat_value[0]);
 	printf("p-value: %f \n", p_value[0]);
@@ -193,16 +191,42 @@ void mbd_test_2sample_multithread_permutation()
 	return;
 }
 
+void mbd_test_ksample_multithread_permutation()
+{
+	printf("----- Test Ball Divergence based K Sample Test (Multivariate) -----\n");
+	double ball_stat_value[6], p_value[6];
+	double x[225] = { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 4.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 11.0, 10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 3.0, 12.0, 11.0, 10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0, 1.0, 2.0, 13.0, 12.0, 11.0, 10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0, 1.0, 14.0, 13.0, 12.0, 11.0, 10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0 };
+	int size[3] = { 5, 5, 5};
+	int k = 3;
+	int n = 15;
+	int dst = 1, R = 300, nth = 2;
+	bd_test(ball_stat_value, p_value, x, size, &n, &k, &dst, &R, &nth);
+	printf("Ball statistics: %f; ", ball_stat_value[0]);
+	printf("p-value: %f \n", p_value[0]);
+	printf("Ball statistics: %f; ", ball_stat_value[1]);
+	printf("p-value: %f \n", p_value[1]);
+	printf("Ball statistics: %f; ", ball_stat_value[2]);
+	printf("p-value: %f \n", p_value[2]);
+	printf("Ball statistics: %f; ", ball_stat_value[3]);
+	printf("p-value: %f \n", p_value[3]);
+	printf("Ball statistics: %f; ", ball_stat_value[4]);
+	printf("p-value: %f \n", p_value[4]);
+	printf("Ball statistics: %f; ", ball_stat_value[5]);
+	printf("p-value: %f \n", p_value[5]);
+	printf("No need to check the K-sample test statistic! \n\n");
+	return;
+}
+
+
 void bd_test_ksample_multithread_permutation()
 {
-	printf("Test Ball Divergence based K Sample Test\n");
+	printf("----- Test Ball Divergence based K Sample Test (Univariate) -----\n");
 	double ball_stat_value[6], p_value[6];
 	double x[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 	int size[3] = { 5, 5, 5};
 	int k = 3;
 	int n = 15;
 	int dst = 0, R = 199, nth = 2;
-	int parallel_type = 2;
 	bd_test(ball_stat_value, p_value, x, size, &n, &k, &dst, &R, &nth);
 	printf("Ball statistics: %f; ", ball_stat_value[0]);
 	printf("p-value: %f \n", p_value[0]);
@@ -313,6 +337,7 @@ void main()
 	bd_test_2sample_multithread_permutation();
 	mbd_test_2sample_multithread_permutation();
 	bd_test_ksample_multithread_permutation();
+	mbd_test_ksample_multithread_permutation();
 	bcov_test_multithread_permutaion();
 	printf("-------------------------------- \n");
 	//printf("Test newest feature: \n");

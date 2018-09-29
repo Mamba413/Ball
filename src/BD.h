@@ -33,7 +33,7 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *p, int *R
 void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *p, int *R, int *nthread);
 void UBD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *nthread);
 void UBD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *nthread);
-void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R);
+void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R, int *nthread);
 void KBD2(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R);
 void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R);
 // R API function:
