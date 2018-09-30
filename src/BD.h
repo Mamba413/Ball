@@ -37,6 +37,7 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
 void KBD_parallel(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R, int *nthread);
 void KBD2(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R);
 void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R);
+void UKBD_parallel(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R);
 // R API function:
 //void bd_stat(double *bd, double *xy, int *size, int *n, int *k, int *weight, int *dst, int *nthread);
 // void kbd_stat(double *bd, double *xy, int *size, int *n, int *k, int *weight, int *dst, int *nthread);

@@ -713,7 +713,7 @@ void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k) {
 // Ball divergence based k-sample test
 // if R = 0, k-sample ball divergence statistic will be returned, else, k-sample test p-value
 // base on ball divergence statistic will be return
-// Input Arugement:
+// Input Arugements:
 // kbd: K-samples ball divergence statistic or p-value
 // permuted_kbd: K-samples ball divergence statistic after permutation
 // xy: vectorized distance matrix
@@ -1198,7 +1198,6 @@ void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, in
         int j;
         double kbd_tmp[6];
         double *permuted_kbd_sum_w0, *permuted_kbd_sum_w1, *permuted_kbd_max_w0, *permuted_kbd_max_w1, *permuted_kbd_max1_w0, *permuted_kbd_max1_w1;
-
         permuted_kbd_sum_w0 = (double *) malloc(*R * sizeof(double));
         permuted_kbd_sum_w1 = (double *) malloc(*R * sizeof(double));
         permuted_kbd_max_w0 = (double *) malloc(*R * sizeof(double));
@@ -1239,6 +1238,58 @@ void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, in
         free(permuted_kbd_max_w1);
         free(permuted_kbd_max1_w0);
         free(permuted_kbd_max1_w1);
+    }
+    return;
+}
+
+void UKBD_parallel(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R) {
+    ukbd_value(kbd, xy, size, k);
+    if ((*R) > 0) {
+#pragma omp parallel
+        {
+            int j;
+            double kbd_tmp[6];
+            double *permuted_kbd_sum_w0, *permuted_kbd_sum_w1, *permuted_kbd_max_w0, *permuted_kbd_max_w1, *permuted_kbd_max1_w0, *permuted_kbd_max1_w1, *xy_new;
+            permuted_kbd_sum_w0 = (double *) malloc(*R * sizeof(double));
+            permuted_kbd_sum_w1 = (double *) malloc(*R * sizeof(double));
+            permuted_kbd_max_w0 = (double *) malloc(*R * sizeof(double));
+            permuted_kbd_max_w1 = (double *) malloc(*R * sizeof(double));
+            permuted_kbd_max1_w0 = (double *) malloc(*R * sizeof(double));
+            permuted_kbd_max1_w1 = (double *) malloc(*R * sizeof(double));
+            xy_new = (double *) malloc(*n * sizeof(double));
+            for (int i = 0; i < *n; i++) { xy_new[i] = xy[i]; }
+
+#pragma omp for
+            for (j = 0; j < (*R); j++) {
+#pragma omp critical
+                {
+                    shuffle_value(xy_new, n);
+                };
+                // K-sample UBD after permutation:
+                ukbd_value(kbd_tmp, xy_new, size, k);
+                permuted_kbd_sum_w0[j] = kbd_tmp[0];
+                permuted_kbd_sum_w1[j] = kbd_tmp[1];
+                permuted_kbd_max_w0[j] = kbd_tmp[2];
+                permuted_kbd_max_w1[j] = kbd_tmp[3];
+                permuted_kbd_max1_w0[j] = kbd_tmp[4];
+                permuted_kbd_max1_w1[j] = kbd_tmp[5];
+            }
+            free(xy_new);
+            // compute p-value
+            pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, *R);
+            pvalue[1] = compute_pvalue(kbd[1], permuted_kbd_sum_w1, *R);
+            pvalue[2] = compute_pvalue(kbd[2], permuted_kbd_max_w0, *R);
+            pvalue[3] = compute_pvalue(kbd[3], permuted_kbd_max_w1, *R);
+            pvalue[4] = compute_pvalue(kbd[4], permuted_kbd_max1_w0, *R);
+            pvalue[5] = compute_pvalue(kbd[5], permuted_kbd_max1_w1, *R);
+            // free
+            free(permuted_kbd_sum_w0);
+            free(permuted_kbd_sum_w1);
+            free(permuted_kbd_max_w0);
+            free(permuted_kbd_max_w1);
+            free(permuted_kbd_max1_w0);
+            free(permuted_kbd_max1_w1);
+        };
     }
     return;
 }
@@ -1336,7 +1387,14 @@ void bd_test(double *bd, double *pvalue, double *xy, int *size, int *n, int *k, 
                 KBD(bd, pvalue, xy, size, n, k, R);
             }
         } else {
-            UKBD(bd, pvalue, xy, size, n, k, R);
+            if (parallel_type == 2 && *nthread > 1) {
+#ifdef Ball_OMP_H_
+                omp_set_num_threads(*nthread);
+#endif
+                UKBD_parallel(bd, pvalue, xy, size, n, k, R);
+            } else {
+                UKBD(bd, pvalue, xy, size, n, k, R);
+            }
         }
     }
     return;
