@@ -180,7 +180,7 @@ void mbd_test_2sample_multithread_permutation()
 	int k = 2;
 	int n = 20;
 	int dst = 1, R = 300, nth = 1;
-	printf("------------- Singele thread ---------------");
+	printf("------------- Singele thread --------------- \n");
 	bd_test(ball_stat_value, p_value, x, size, &n, &k, &dst, &R, &nth);
 	printf("Ball statistics: %f; ", ball_stat_value[0]);
 	printf("p-value: %f \n", p_value[0]);
@@ -229,6 +229,7 @@ void mbd_test_ksample_multithread_permutation()
 	printf("p-value: %f \n", p_value[4]);
 	printf("Ball statistics: %f; ", ball_stat_value[5]);
 	printf("p-value: %f \n", p_value[5]);
+	printf("\n\n");
 	return;
 }
 
@@ -241,8 +242,25 @@ void bd_test_ksample_multithread_permutation()
 	int size[3] = { 5, 5, 5};
 	int k = 3;
 	int n = 15;
-	int dst = 0, R = 199, nth = 2;
+	int dst = 0, R = 199, nth = 1;
+	printf("------------- Single-thread ---------------\n");
 	bd_test(ball_stat_value, p_value, x, size, &n, &k, &dst, &R, &nth);
+	printf("Ball statistics: %f; ", ball_stat_value[0]);
+	printf("p-value: %f \n", p_value[0]);
+	printf("Ball statistics: %f; ", ball_stat_value[1]);
+	printf("p-value: %f \n", p_value[1]);
+	printf("Ball statistics: %f; ", ball_stat_value[2]);
+	printf("p-value: %f \n", p_value[2]);
+	printf("Ball statistics: %f; ", ball_stat_value[3]);
+	printf("p-value: %f \n", p_value[3]);
+	printf("Ball statistics: %f; ", ball_stat_value[4]);
+	printf("p-value: %f \n", p_value[4]);
+	printf("Ball statistics: %f; ", ball_stat_value[5]);
+	printf("p-value: %f \n", p_value[5]);
+	printf("------------- Multi-thread ---------------\n");
+	double y[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+	R = 299; nth = 2;
+	bd_test(ball_stat_value, p_value, y, size, &n, &k, &dst, &R, &nth);
 	printf("Ball statistics: %f; ", ball_stat_value[0]);
 	printf("p-value: %f \n", p_value[0]);
 	printf("Ball statistics: %f; ", ball_stat_value[1]);
@@ -311,7 +329,7 @@ void bcov_test_multithread_permutaion()
 	double x[30] = { 0.55857, -0.88513, -1.03412, -1.40474, -1.10467, 0.30942, -0.20533, -0.46152, 1.5576, -2.32913, 1.75847, -0.72713, -0.66923, -1.23832, -0.33659, -1.12517, 0.36774, 0.61427, -1.99729, -0.80402, 1.26468, 0.8728, 0.41631, 1.10425, 0.71517, -0.3624, -0.0231, 0.04377, -1.19637, -1.60299 };
 	double y[30] = { 1.26563, -0.55919, 0.37567, -0.74784, 0.49488, -0.71079, -0.73417, 0.29584, 0.44349, -0.43708, 0.43647, 0.7982, 1.14516, 0.33614, 0.6907, 2.50737, -1.22405, 0.00076, -1.32848, -2.43514, -2.01974, 0.53529, 0.06206, 0.4013, 0.79001, -0.52747, -0.94115, -0.49046, 0.22897, -1.53251 };
 	int n = 30;
-	int R = 1000, weight = 0, dst = 0, type = 1, nth = 2;
+	int R = 1000, dst = 0, nth = 2;
 	
 	// univariate case:
 	bcov_test(ball_stat_value, p_value, x, y, &n, &R, &dst, &nth);
