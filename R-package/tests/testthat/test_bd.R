@@ -47,25 +47,52 @@ test_that("bd, bd.test function return unmatched ball divergence statistic", {
 })
 
 
-# test_that("Multi-thread support is valid!", {
-#   cat("Multi-thread computation via permutation.\n")
-#   set.seed(4)
-#   num <- 150
-#   x <- c(rnorm(num, mean = 0.1), rnorm(num, mean = 0))
-#   x1 <- matrix(rnorm(num * 2), ncol = 2)
-#   x2 <- matrix(rnorm(num * 2), ncol = 2)
-#   #
-#   cat("Univariate case: \n")
-#   t1 <- system.time(res1 <- bd.test(x, size = c(num, num), R = 1999, num.threads = 1))
-#   t2 <- system.time(res2 <- bd.test(x, size = c(num, num), R = 1999, num.threads = 2))
-#   expect_equal(res1$statistic, res2$statistic)
-#   expect_equal(res1$p.value < 0.05, res2$p.value < 0.05)
-#   expect_true(t1[3]/t2[3] > 1.1)
-#   #
-#   cat("Multivariate case: \n")
-#   t1 <- system.time(res1 <- bd.test(x1, x2, R = 1999, num.threads = 1))
-#   t2 <- system.time(res2 <- bd.test(x1, x2, R = 1999, num.threads = 2))
-#   expect_equal(res1$statistic, res2$statistic)
-#   expect_equal(res1$p.value < 0.05, res2$p.value < 0.05)
-#   expect_true(t1[3]/t2[3] > 1.1)
-# })
+test_that("Multi-thread support is valid!", {
+  cat("Multi-thread computation via permutation for univariate K-sample problem.\n")
+  n1 <- 200
+  n2 <- 200
+  n3 <- 200
+  x <- rnorm(n1)
+  y <- rnorm(n2)
+  z <- rnorm(n3)
+  fit1 <- bd.test(list(x, y, z), R = 399, num.threads = 1)
+  fit2 <- bd.test(list(x, y, z), R = 399, num.threads = 2)
+  fit3 <- bd.test(list(x, y, z), R = 399, num.threads = 4)
+  expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
+  expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
+  
+  cat("Multi-thread computation via permutation for multivariate K-sample problem.\n")
+  Y <- matrix(rnorm(100*10), ncol = 10)
+  X <- matrix(rnorm(100*10), ncol = 10)
+  Z <- matrix(rnorm(100*10), ncol = 10)
+  
+  fit1 <- bd.test(list(X, Y, Z), R = 399, size = c(100, 100, 100), num.threads = 1)
+  fit2 <- bd.test(list(X, Y, Z), R = 399, size = c(100, 100, 100), num.threads = 2)
+  fit3 <- bd.test(list(X, Y, Z), R = 399, size = c(100, 100, 100), num.threads = 4)
+  expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
+  expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
+})
+
+
+test_that("Multi-thread support is valid!", {
+  cat("Multi-thread computation via permutation for univariate two-sample problem.\n")
+  n1 <- 200
+  n2 <- 200
+  x <- rnorm(n1)
+  y <- rnorm(n2)
+  fit1 <- bd.test(list(x, y), R = 399, num.threads = 1)
+  fit2 <- bd.test(list(x, y), R = 399, num.threads = 2)
+  fit3 <- bd.test(list(x, y), R = 399, num.threads = 4)
+  expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
+  expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
+  
+  cat("Multi-thread computation via permutation for multivariate two-sample problem.\n")
+  Y <- matrix(rnorm(100*10), ncol = 10)
+  X <- matrix(rnorm(100*10), ncol = 10)
+  
+  fit1 <- bd.test(list(X, Y), R = 399, size = c(100, 100, 100), num.threads = 1)
+  fit2 <- bd.test(list(X, Y), R = 399, size = c(100, 100, 100), num.threads = 2)
+  fit3 <- bd.test(list(X, Y), R = 399, size = c(100, 100, 100), num.threads = 4)
+  expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
+  expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
+})
