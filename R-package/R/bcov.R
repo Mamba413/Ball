@@ -1,5 +1,5 @@
 #' @title Ball Covariance Test
-#' @author WenLiang Pan, XueQin Wang, HePing Zhang, HongTu Zhu, Jin Zhu
+#' @author Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu, Jin Zhu
 #' @description Ball covariance test of multivariate independence. 
 #' Ball covariance are generic multivariate measures of dependence in Banach space.
 #' 

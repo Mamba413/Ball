@@ -149,5 +149,5 @@ Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) A Generic Sure Indepe
 \code{\link{bcor}}
 }
 \author{
-WenLiang Pan, WeiNan Xiao, XueQin Wang, HePing Zhang, HongTu Zhu
+Wenliang Pan, Weinan Xiao, Xueqin Wang, Hongtu Zhu
 }

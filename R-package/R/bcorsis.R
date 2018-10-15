@@ -56,7 +56,7 @@ bcor <- function(x, y, dst = FALSE, weight = FALSE) {
 
 
 #' @title Ball Correlation Sure Independence Screening
-#' @author WenLiang Pan, WeiNan Xiao, XueQin Wang, HePing Zhang, HongTu Zhu
+#' @author Wenliang Pan, Weinan Xiao, Xueqin Wang, Hongtu Zhu
 #' @description Generic non-parametric sure independence screening procedure based on ball correlation.
 #' Ball correlation is a generic multivariate measure of dependence in Banach space.
 #' @inheritParams bcov.test

@@ -107,5 +107,5 @@ bcov.test(meteorology)
 \code{\link{bcov}}, \code{\link{bcor}}
 }
 \author{
-WenLiang Pan, XueQin Wang, HePing Zhang, HongTu Zhu, Jin Zhu
+Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu, Jin Zhu
 }

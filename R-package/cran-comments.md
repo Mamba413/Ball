@@ -1,3 +1,5 @@
+I'm sorry for my carelessness. I have updated the Date field in the DESCRIPTION file.
+
 ## Test environments
 * Ubuntu 14.04 (on travis-ci), R 3.4.2
 * win-builder (realease)

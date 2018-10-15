@@ -2,7 +2,7 @@
 #' @description Performs the nonparametric two-sample or K-sample ball divergence test for
 #' equality of multivariate distributions
 #' @aliases bd.test
-#' @author XueQin Wang, WenLiang Pan, HePing Zhang, Yuan Tian
+#' @author Wenliang Pan, Yuan tian, Xueqin Wang, Heping Zhang
 #' @param x a numeric vector, matrix, data.frame, \code{dist} object or list contains vector, matrix or data.frame.
 #' @param y a numeric vector, matrix or data.frame.
 #' @param R the number of replications, when R equals to 0, the function returns
@@ -240,7 +240,7 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
 
 #' @title Ball Divergence
 #' @description Compute ball divergence statistic between two-sample or K-sample.
-#' @author XueQin Wang, WenLiang Pan, HePing Zhang, Yuan Tian
+#' @author Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang
 #' @inheritParams bd.test
 #' @rdname bd
 #' @return 

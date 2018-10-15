@@ -1,3 +1,8 @@
+# Ball 1.3.0
+* Add a KBD statistic designed for detecting the distribution distinction when a part of group distributions are identical. (setting *kbd.type = "maxsum"*)
+* OPENMP based Multi-thread support for KBD
+* Optimized OPENMP parallelism
+
 # Ball 1.2.0
 * Speed up feature screening.
 * Speed up mutual independence test.

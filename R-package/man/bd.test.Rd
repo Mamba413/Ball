@@ -108,5 +108,5 @@ Pan, Wenliang; Tian, Yuan; Wang, Xueqin; Zhang, Heping. Ball Divergence: Nonpara
 \code{\link{bd}}
 }
 \author{
-XueQin Wang, WenLiang Pan, HePing Zhang, Yuan Tian
+Wenliang Pan, Yuan tian, Xueqin Wang, Heping Zhang
 }

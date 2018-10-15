@@ -83,5 +83,5 @@ Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. (2017) Ball divergence: nonp
 \code{\link{bd.test}}
 }
 \author{
-XueQin Wang, WenLiang Pan, HePing Zhang, Yuan Tian
+Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang
 }
