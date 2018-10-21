@@ -10,7 +10,7 @@ test_that("Error if computation result for ball covariance is wrong!", {
 })
 
 
-test_that("Multi-thread support is valid!", {
+test_that("Multi-thread support for independence test is valid!", {
   cat("Multi-thread computation via permutation for univariate test of independence problem.\n")
   Y <- rnorm(400)
   X <- rnorm(400)
@@ -26,6 +26,17 @@ test_that("Multi-thread support is valid!", {
   fit1 <- bcov.test(Y, X, R = 300, num.threads = 1)
   fit2 <- bcov.test(Y, X, R = 300, num.threads = 2)
   fit3 <- bcov.test(Y, X, R = 300, num.threads = 4)
+  expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
+  expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
+})
+
+
+test_that("Multi-thread support for mutual independence test is valid!", {
+  cat("Multi-thread computation via permutation for mutual independence test.\n")
+  x <- lapply(rep(60, 3), rnorm)
+  fit1 <- bcov.test(x, R = 299, num.threads = 1)
+  fit2 <- bcov.test(x, R = 299, num.threads = 2)
+  fit3 <- bcov.test(x, R = 299, num.threads = 4)
   expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
   expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
 })
