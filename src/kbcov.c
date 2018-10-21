@@ -1,8 +1,4 @@
-#ifdef _OPENMP
-
-# include "omp.h"
-
-#endif
+#include "Ball_omp.h"
 
 #include "stdio.h"
 #include "stdlib.h"
@@ -24,9 +20,7 @@ void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm
         for (j = 0; j < (*n); j++) {
             // init the computation for each Ball
             p_all = *n;
-            for (var_index = 0; var_index < (*k); var_index++) {
-                p_k_array[var_index] = 0.0;
-            }
+            for (var_index = 0; var_index < (*k); var_index++) { p_k_array[var_index] = 0.0; }
             p_prod = 1.0, p_inv_prod = 1.0;
             hhg_include_ball_index = 1;
 
@@ -52,25 +46,6 @@ void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm
             } else {
                 p_all = 0.0;
             }
-
-            // compute the count (rude crude)
-//            for (t = 0; t < (*n); t++) {
-//                // to compute P_{i, j}^{\mu_{1}}, ..., P_{i, j}^{\mu_{*k}} (marginal):
-//                for (var_index = 0; var_index < (*k); var_index++) {
-//                    if (Dx[i_perm[var_index][i]][i_perm[var_index][j]][var_index] >=
-//                        Dx[i_perm[var_index][i]][i_perm[var_index][t]][var_index]) {
-//                        p_k_array[var_index] += 1.0;
-//                    }
-//                }
-//                // to compute P_{i, j}^{\mu_{1}, ..., \mu_{*k}} (joint):
-//                for (var_index = 0; var_index < (*k); var_index++) {
-//                    if (Dx[i_perm[var_index][i]][i_perm[var_index][j]][var_index] <
-//                        Dx[i_perm[var_index][i]][i_perm[var_index][t]][var_index]) {
-//                        p_all -= 1.0;
-//                        break;
-//                    }
-//                }
-//            }
 
             for (var_index = 0; var_index < (*k); var_index++) {
                 p_prod *= p_k_array[var_index];
@@ -99,8 +74,7 @@ void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm
     free(p_k_array);
 }
 
-
-void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread) {
+void kbcov_test_single(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst) {
     int i, j, **i_perm, ***Rx;
     // create a 3D matrix to store distance matrix:
     double ***Dx;
@@ -158,4 +132,76 @@ void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, i
     free_3d_matrix(Dx, *n, *n);
     free_3d_int_matrix(Rx, *n, *n);
     free_int_matrix(i_perm, *k, *n);
+}
+
+void kbcov_test_parallel(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst) {
+    int i, j, **i_perm, ***Rx;
+    // create a 3D matrix to store distance matrix:
+    double ***Dx;
+
+    Dx = alloc_3d_matrix(*n, *n, *k);
+    Rx = alloc_3d_int_matrix(*n, *n, *k);
+    i_perm = alloc_int_matrix(*k, *n);
+
+    // convert x to 3D distance matrix:
+    if (*dst == 1) { vector_2_3dmatrix(x, Dx, *n, *n, *k, 1); }
+
+    // compute rank 3D distance matrix row by row and one by one
+    rank_matrix_3d(Dx, *n, *k, Rx);
+
+    // create 2D permute index matrix:
+    for (j = 0; j < *k; j++) {
+        for (i = 0; i < *n; i++) { i_perm[j][i] = i; }
+    }
+
+    // compute kbcov value
+    K_Ball_Covariance(kbcov_stat, Dx, Rx, i_perm, n, k);
+
+    // permutation test
+    if (*R > 0) {
+        double *permuted_bcov_weight0, *permuted_bcov_weight_prob, *permuted_bcov_weight_hhg;
+        permuted_bcov_weight0 = (double *) malloc(*R * sizeof(double));
+        permuted_bcov_weight_prob = (double *) malloc(*R * sizeof(double));
+        permuted_bcov_weight_hhg = (double *) malloc(*R * sizeof(double));
+
+#pragma omp parallel
+        {
+            int i_thread;
+            double bcov_tmp[3];
+#pragma omp for
+            for (i_thread = 0; i_thread < *R; i_thread++) {
+#pragma omp critical
+                {
+                    resample_matrix(i_perm, k, n);
+                }
+                K_Ball_Covariance(bcov_tmp, Dx, Rx, i_perm, n, k);
+                permuted_bcov_weight0[i_thread] = bcov_tmp[0];
+                permuted_bcov_weight_prob[i_thread] = bcov_tmp[1];
+                permuted_bcov_weight_hhg[i_thread] = bcov_tmp[2];
+            }
+        }
+
+        pvalue[0] = compute_pvalue(kbcov_stat[0], permuted_bcov_weight0, *R);
+        pvalue[1] = compute_pvalue(kbcov_stat[1], permuted_bcov_weight_prob, *R);
+        pvalue[2] = compute_pvalue(kbcov_stat[2], permuted_bcov_weight_hhg, *R);
+
+        free(permuted_bcov_weight0);
+        free(permuted_bcov_weight_prob);
+        free(permuted_bcov_weight_hhg);
+    }
+    free_3d_matrix(Dx, *n, *n);
+    free_3d_int_matrix(Rx, *n, *n);
+    free_int_matrix(i_perm, *k, *n);
+}
+
+void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread) {
+#ifdef Ball_OMP_H_
+    omp_set_num_threads(*thread);
+#endif
+
+    if (*thread > 1) {
+        kbcov_test_parallel(kbcov_stat, pvalue, x, k, n, R, dst);
+    } else {
+        kbcov_test_single(kbcov_stat, pvalue, x, k, n, R, dst);
+    }
 }
