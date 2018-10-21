@@ -146,7 +146,6 @@ void test_kbcov_value()
 	test_value(ball_stat_value[0], 0.010842);
 	printf("Weight K Ball Covariance: %f; \n", ball_stat_value[1]);
 	test_value(ball_stat_value[1], 1.14240);
-	return;
 }
 
 
@@ -167,7 +166,6 @@ void bd_test_2sample_multithread_permutation()
 
 	// Software of ChengFeng Liu output result (golden standard): 0.059821 
 	test_value(ball_stat_value[0], 0.059821);
-	return;
 }
 
 
@@ -188,7 +186,6 @@ void mbd_test_2sample_multithread_permutation()
 	printf("p-value: %f \n", p_value[1]);
 	// Software of ChengFeng Liu output result (golden standard): 0.059821
 	test_value(ball_stat_value[0], 0.141);
-	return;
 }
 
 void mbd_test_ksample_multithread_permutation()
@@ -230,7 +227,6 @@ void mbd_test_ksample_multithread_permutation()
 	printf("Ball statistics: %f; ", ball_stat_value[5]);
 	printf("p-value: %f \n", p_value[5]);
 	printf("\n\n");
-	return;
 }
 
 
@@ -274,7 +270,6 @@ void bd_test_ksample_multithread_permutation()
 	printf("Ball statistics: %f; ", ball_stat_value[5]);
 	printf("p-value: %f \n", p_value[5]);
 	printf("No need to check the K-sample test statistic! \n\n");
-	return;
 }
 
 /*
@@ -351,9 +346,7 @@ void bcov_test_multithread_permutaion()
 	printf("Ball statistics: %f; ", ball_stat_value[2]);
 	printf("p-value: %f \n", p_value[2]);
 	test_value(ball_stat_value[0], 0.001256868);
-	return;
 }
-
 
 void main()
 {

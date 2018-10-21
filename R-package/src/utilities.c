@@ -314,7 +314,6 @@ void sort(int *n, int *zidx, double *z, int **dzidx)
 	}
 }
 
-
 void ranksort2(int n, int **Rxy, double **Dxy, int **Ixy)
 {
 	int i, j, lastpos = n - 1;
@@ -674,6 +673,25 @@ int **alloc_int_matrix(int r, int c)
   return matrix;
 }
 
+int ***alloc_3d_int_matrix(int r, int c, int h)
+{
+	/* allocate a 3D matrix with r rows, c columns, h levels */
+	int ***arr3D;
+	int i, j;
+
+	arr3D = (int***)malloc(r * sizeof(int **));
+
+	for (i = 0; i < r; i++)
+	{
+		arr3D[i] = (int**)malloc(c * sizeof(int*));
+		for (j = 0; j < c; j++)
+		{
+			arr3D[i][j] = (int*)malloc(h * sizeof(int));
+		}
+	}
+	return arr3D;
+}
+
 void free_matrix(double **matrix, int r, int c)
 {
   /* free a matrix with r rows and c columns */
@@ -707,6 +725,21 @@ void free_int_matrix(int **matrix, int r, int c)
     free(matrix[i]);	
   }
   free(matrix);
+}
+
+void free_3d_int_matrix(int ***arr3D, int r, int c)
+{
+	int i, j;
+
+	for (i = 0; i < r; i++)
+	{
+		for (j = 0; j < c; j++)
+		{
+			free(arr3D[i][j]);
+		}
+		free(arr3D[i]);
+	}
+	free(arr3D);
 }
 
 void vector2matrix(double *x, double **y, int N, int d, int isroworder)
@@ -746,6 +779,56 @@ void vector_2_3dmatrix(double *x, double ***y, int r, int c, int h, int isroword
 		}
 	}
 	return;
+}
+
+void rank_matrix_3d(double ***Dx, int n, int k, int ***Rx)
+{
+	int i, j, h, *x_part_rank;
+	double *x_part;
+	x_part = (double *) malloc(n * sizeof(double));
+	x_part_rank = (int *) malloc(n * sizeof(int));
+	for (h = 0; h < k; h++) {
+		for (i = 0; i < n; i++) {
+			for (j = 0; j < n; j++) {
+				x_part[j] = Dx[i][j][h];
+			}
+			quick_rank(x_part, x_part_rank, n);
+			for (j = 0; j < n; j++) {
+				Rx[i][j][h] = x_part_rank[j];
+			}
+		}
+	}
+	free(x_part);
+	free(x_part_rank);
+}
+
+/*
+ * double aaa[6] = {1.2, 1.3, 1.3, 1.3, 1.3, 0.9};
+ * int aaa_r[6] = {0, 0, 0, 0, 0, 0};
+ * quick_rank(aaa, aaa_r, 6);
+ */
+void quick_rank(double *x, int *r, int n) {
+    int *x_index, rank_value = n, i_loc, tmp = 1;
+    double *x_cpy;
+    x_index = (int *) malloc(n * sizeof(int));
+	x_cpy = (double *) malloc(n * sizeof(double));
+    for (int j = 0; j < n; j++) { x_index[j] = j; }
+	for (int j = 0; j < n; j++) { x_cpy[j] = x[j]; }
+	quicksort(x_cpy, x_index, 0, n - 1);
+    r[x_index[n - 1]] = rank_value;
+    for (int i = n - 2; 0 <= i; i--) {
+        i_loc = x_index[i];
+        if (x[i_loc] == x[x_index[i+1]]) {
+            r[i_loc] = rank_value;
+            tmp++;
+        } else {
+			rank_value = rank_value - tmp;
+            r[i_loc] = rank_value;
+            tmp = 1;
+        }
+    }
+    free(x_index);
+    free(x_cpy);
 }
 
 void Euclidean_distance(double *x, double **Dx, int n, int d)
@@ -824,7 +907,6 @@ void resample_matrix(int **i_perm, int *r, int *c)
 			i_perm[k][i] = temp;
 		}
 	}
-	return;
 }
 
 
@@ -873,31 +955,31 @@ void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1)
 }
 
 int random_index_thread_wrap(int i) {
-  return random_index_thread(i);
+	return random_index_thread(i);
 }
-
 
 void resample3_thread(int *permuted_arr, int *i_perm, int *i_perm_tmp, int n, int *n1) {
-  int i, j, temp, tmp0, tmp1;
-  for (i = n - 1; i > 0; --i) {
-    j = permuted_arr[i];
-    temp = i_perm[j];
-    i_perm[j] = i_perm[i];
-    i_perm[i] = temp;
-  }
-  
-  tmp0 = 0;
-  tmp1 = 0;
-  for (i = 0; i < n; i++) {
-    if (i_perm[i] == 1) {
-      i_perm_tmp[tmp0++] = i;
-    }
-    else {
-      i_perm_tmp[*n1 + tmp1] = i;
-      tmp1++;
-    }
-  }
+	int i, j, temp, tmp0, tmp1;
+	for (i = n - 1; i > 0; --i) {
+		j = permuted_arr[i];
+		temp = i_perm[j];
+		i_perm[j] = i_perm[i];
+		i_perm[i] = temp;
+	}
+
+	tmp0 = 0;
+	tmp1 = 0;
+	for (i = 0; i < n; i++) {
+		if (i_perm[i] == 1) {
+			i_perm_tmp[tmp0++] = i;
+		}
+		else {
+			i_perm_tmp[*n1 + tmp1] = i;
+			tmp1++;
+		}
+	}
 }
+
 
 /* Arrange the N elements of ARRAY in random order.
  Only effective if N is much smaller than RAND_MAX;
