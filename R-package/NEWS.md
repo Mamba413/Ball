@@ -1,3 +1,8 @@
+# Ball 1.3.5
+* Faster implementation of mutual independence test
+* Multi-thread support for the test of mutual independence
+* Modify document
+
 # Ball 1.3.0
 * Add a KBD statistic designed for detecting the distribution distinction when a part of group distributions are identical. (setting *kbd.type = "maxsum"*)
 * OPENMP based Multi-thread support for KBD
@@ -16,7 +21,6 @@
 * Implement Angular metric for compostional data 
 
 # Ball 1.0.0
-
 * Initial CRAN version
 
 

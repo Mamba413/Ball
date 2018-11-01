@@ -4,12 +4,16 @@
 #' Ball covariance are generic multivariate measures of dependence in Banach space.
 #' 
 #' @inheritParams bd.test
-#' @param x a numeric vector, matirx, data.frame or \code{dist} object or list contains numeric vector, matrix or data.frame.
+#' @param x a numeric vector, matirx, data.frame or \code{dist} object or list containing numeric vector, matrix, data.frame, or \code{dist} object.
 #' @param y a numeric vector, matirx, data.frame or \code{dist} object.
 #' @param R the number of replications. When \code{R = 0}, the function return ball covariance. Default: \code{R = 99}
 #' @param dst if \code{dst = TRUE}, \code{x} and \code{y} will be considered as a distance matrix. Default: \code{dst = FALSE}
-#' @param weight when \code{weight = TRUE}, weighted ball covariance or weighted ball correlation is used instead of ball covariance
-#' or ball correlation. Default: \code{weight = FALSE} 
+#' @param weight a logical or character value used to choose the form of weight. 
+#' If \code{weight = FALSE}, the ball covariance / correlation with constant weight is used. 
+#' Alternatively, \code{weight = TRUE} and \code{weight = "prob"} indicates the probability weight is chosen 
+#' while setting \code{weight = "chisq"} means select the Chi-square weight. 
+#' Note that this arguments actually only influences the printed result in R console and is 
+#' only available for the \code{bcov.test} function at present. Default: \code{weight = FALSE}
 ## @param type If \code{type = 'bcor'}, ball correlation will be used instead of ball covariance.(default \code{type = 'bcov'})
 ## @param method if \code{method = 'permute'}, a permutation procedure will be carried out;
 ## if \code{method = 'approx'}, the p-values based on approximate Ball Covariance distribution are given.(Test arguments)
@@ -128,7 +132,9 @@ bcov.test <- function(x, y = NULL, R = 99, dst = FALSE, weight = FALSE,
     data_name <- paste0(data_name,"\nnumber of observations = ", result[["info"]][["N"]])
     data_name <- paste0(data_name, "\nreplicates = ", R, 
                         ", weight: ", weight_name)
-    test_method <- "Ball Covariance test of independence"
+    test_method <- "Ball Covariance test of %sindependence"
+    test_type <- ifelse(class(x) == "list" && length(x) > 2, "mutual ", "")
+    test_method <- sprintf(test_method, test_type)
     # if(type == "bcor") {
     #   test_method <- gsub(pattern = "Covariance", replacement = "Correlation", x = test_method)
     #   data_name <- gsub(pattern = "Covariance", replacement = "Correlation", x = data_name)

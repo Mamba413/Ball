@@ -1,8 +1,9 @@
-<img src=https://github.com/Mamba413/git_picture/blob/master/scrcss.png width=135/>  Ball Statistics
+<img src=https://github.com/Mamba413/git_picture/blob/master/scrcss.jpg width=135/>  Ball Statistics
 ===========
 
 [![Travis Build Status](https://travis-ci.org/Mamba413/Ball.svg?branch=master)](https://travis-ci.org/Mamba413/Ball)
-
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Mamba413/Ball?branch=master&svg=true)](https://ci.appveyor.com/project/Mamba413/Ball)
+[![CRAN Status Badge](http://www.r-pkg.org/badges/version/Ball)](http://cran.r-project.org/web/packages/Ball)
 <!-- [Chinese version](https://gitlab.com/mamba413/Ball/blob/develop_KS_V1.1/README_CN.md) -->
 
 ### Introduction
@@ -59,7 +60,7 @@ If the assumption invalid, the *p*-value of the **bd.test**  will be under 0.05.
 In this example, the result is:
 
 ```
-	Nonparametric 2-Samples Ball Divergence Test
+	2-Samples Ball Divergence Test
 
 data:  virginica and versicolor 
 number of observations = 100, group sizes: 50 50

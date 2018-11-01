@@ -3,7 +3,7 @@
 #' equality of multivariate distributions
 #' @aliases bd.test
 #' @author Wenliang Pan, Yuan tian, Xueqin Wang, Heping Zhang
-#' @param x a numeric vector, matrix, data.frame, \code{dist} object or list contains vector, matrix or data.frame.
+#' @param x a numeric vector, matrix, data.frame, \code{dist} object or list containing vector, matrix, or data.frame.
 #' @param y a numeric vector, matrix or data.frame.
 #' @param R the number of replications, when R equals to 0, the function returns
 #' the sample version of ball divergence. Default: \code{R = 99}
@@ -11,9 +11,10 @@
 #' @param size a vector record sample size of each group.
 #' @param seed the random seed. 
 #' @param num.threads Number of threads. Default \code{num.threads = 2}.
-#' @param kbd.type the type of K-sample test statistics. Setting \code{kbd.type = "sum"} print the statistic 
-#' and \eqn{p}-value of the summation version of \eqn{K} sample ball divergence while setting \code{kbd.type = "max"} print
-#' the maximum version. Further, you can obtain the information of both summation and maximum by \code{summary} function.
+#' @param kbd.type a character value controlling the output information. 
+#' Setting \code{kdb.type = "sum"}, \code{kdb.type = "summax"}, or \code{kdb.type = "max"}, 
+#' the corresponding statistics value and \eqn{p}-value of \eqn{K}-sample test procedure are demonstrated. 
+#' Note that this arguments actually only influences the printed result in R console. Default: \code{kdb.type = "sum"}
 #' 
 ## @param weight not available now
 ## @param method if \code{method = 'permute'}, a permutation procedure will be carried out;
@@ -230,7 +231,7 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
     size = result[["info"]][["size"]],
     complete.info = result,
     alternative = alternative_message,
-    method = sprintf("Nonparametric %s-sample Ball Divergence Test%s", result[["info"]][["K"]], stat_message),
+    method = sprintf("%s-sample Ball Divergence Test%s", result[["info"]][["K"]], stat_message),
     data.name = data_name
   )
   class(e) <- "htest"

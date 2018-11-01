@@ -124,7 +124,9 @@ distsurface <- function(x) {
   x <- as.matrix(x)
   Dmat <- x %*% t(x)
   diag(Dmat) <- 1
-  acos(Dmat)
+  suppressWarnings(Dmat <- acos(Dmat))
+  Dmat[is.na(Dmat)] <- 1
+  Dmat
 }
 
 

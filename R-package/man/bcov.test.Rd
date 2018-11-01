@@ -8,7 +8,7 @@ bcov.test(x, y = NULL, R = 99, dst = FALSE, weight = FALSE, seed = 4,
   num.threads = 2)
 }
 \arguments{
-\item{x}{a numeric vector, matirx, data.frame or \code{dist} object or list contains numeric vector, matrix or data.frame.}
+\item{x}{a numeric vector, matirx, data.frame or \code{dist} object or list containing numeric vector, matrix, data.frame, or \code{dist} object.}
 
 \item{y}{a numeric vector, matirx, data.frame or \code{dist} object.}
 
@@ -16,8 +16,12 @@ bcov.test(x, y = NULL, R = 99, dst = FALSE, weight = FALSE, seed = 4,
 
 \item{dst}{if \code{dst = TRUE}, \code{x} and \code{y} will be considered as a distance matrix. Default: \code{dst = FALSE}}
 
-\item{weight}{when \code{weight = TRUE}, weighted ball covariance or weighted ball correlation is used instead of ball covariance
-or ball correlation. Default: \code{weight = FALSE}}
+\item{weight}{a logical or character value used to choose the form of weight. 
+If \code{weight = FALSE}, the ball covariance / correlation with constant weight is used. 
+Alternatively, \code{weight = TRUE} and \code{weight = "prob"} indicates the probability weight is chosen 
+while setting \code{weight = "chisq"} means select the Chi-square weight. 
+Note that this arguments actually only influences the printed result in R console and is 
+only available for the \code{bcov.test} function at present. Default: \code{weight = FALSE}}
 
 \item{seed}{the random seed.}
 
