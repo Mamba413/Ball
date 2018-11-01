@@ -2,7 +2,7 @@
 #' @description Performs the nonparametric two-sample or K-sample ball divergence test for
 #' equality of multivariate distributions
 #' @aliases bd.test
-#' @author Wenliang Pan, Yuan tian, Xueqin Wang, Heping Zhang
+#' @author Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang
 #' @param x a numeric vector, matrix, data.frame, \code{dist} object or list containing vector, matrix, or data.frame.
 #' @param y a numeric vector, matrix or data.frame.
 #' @param R the number of replications, when R equals to 0, the function returns
