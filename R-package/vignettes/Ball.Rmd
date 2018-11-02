@@ -71,7 +71,7 @@ In this example, we generate two normal random variables with different location
 $$X \sim N(0,1), Y \sim N(1, 1)$$ 
 <!-- In the mean time, we use the non-parametric kernel density estimation to plot the kernel density of two distribution: -->
 
-```{r, fig.width=6, fig.align='center', fig.height=4}
+```{r}
 x <- rnorm(50)
 y <- rnorm(50, mean = 1)
 # plot(density(x), xlim = c(-5, 5))
@@ -96,7 +96,7 @@ $$X \sim N(\mu_{X},I_{2 \times 2}), Y \sim N(\mu_{Y}, I_{2 \times 2})$$
 $$\mu_{X} = (0,0), \mu_{Y} = (1,1)$$
 <!-- Then we will show the difference between these two samples in the way of kernel density estimation: -->
           
-```{r, fig.width=6, fig.align='center', fig.height=4}
+```{r}
 x <- matrix(rnorm(100), nrow = 50, ncol = 2)
 y <- matrix(rnorm(100, mean = 3), nrow = 50, ncol = 2)
 ```
@@ -142,7 +142,7 @@ with the following example: $X=(x_{1}, x_{2})$ come from the bivariate normal di
 The relation between $Y$ and $X$ is:      
 $$Y=sin(x_{1}^{2} + x_{2})+ \epsilon, \quad \epsilon \sim Unif(-0.3, 0.3)$$
 
-```{r, fig.width=6, fig.align='center', fig.height=4}
+```{r}
 x <- matrix(runif(50 * 2, -pi, pi), nrow = 50, ncol = 2)
 error <- runif(50, min = -0.3, max = 0.3)
 y <- (sin((x[,1])^2 + x[,2])) + error
@@ -159,9 +159,8 @@ bcov.test(x = x, y = y)
 ```
           
 The result of **bcov.test** is that *p*-value < 0.05, so we conclude that multivariate random variable $X$ and $Y$ are associated.
-            
-
-***
+          
+<!-- *** -->
 
 <!-- # Introduction           -->
 
@@ -175,7 +174,7 @@ The result of **bcov.test** is that *p*-value < 0.05, so we conclude that multiv
 <!-- where $\bar{B}(x_{i}, \rho(x_{i}, x_{j}))$ is a closed ball with center $x_{i}$, -->
 <!-- and radius $\rho(x_{i}, x_{j})$ and $I$ is indicator function. -->
 
-<!-- <!-- ![](BDPlot.jpeg) --> -->
+<!-- ![](BDPlot.jpeg) -->
 
 <!-- In a similar way, for any two points $y_{i}, y_{j} \in \mathcal{Y}$, -->
 <!-- they should also have the property: -->
@@ -203,7 +202,7 @@ The result of **bcov.test** is that *p*-value < 0.05, so we conclude that multiv
 <!-- ### Ball Covariance                  -->
 <!-- Investigate the dependence between variables is a fundamental step in statistical inference and data mining. Suppose, We are given pairs of independent observations $\{(x_1, y_1),\ldots,(x_n,y_n)\}$, where $x_i$ and $y_i$  can be of any dimension and the dimensionality of $x_i$ and $y_i$ need not be the same. Let $X = (x_1,\ldots,x_n)$ be the $X$ vector, and $Y=(y_1,\ldots,y_n)$ the  -->
 <!-- $Y$ vector and we want to determine whether $X$ and $Y$ are dependent. -->
-<!-- <!-- , which means whether $F_{XY}=F_{X}F_{Y}$ is valid or not. Where $F_{XY}$ is the joint distribution function of $X, Y$. --> -->
+<!-- <!-- , which means whether $F_{XY}=F_{X}F_{Y}$ is valid or not. Where $F_{XY}$ is the joint distribution function of $X, Y$. -->
 <!-- To achieve the goal, we come up with **Ball Covariance** ($\mathbf{BCor}_{\omega, n}^{2}$), a generic measure of dependence in banach space. Moreover, the $\mathbf{BCor}_{\omega, n}^{2}$ based independence test utilized permutation technique to calculate *p*-value is also developed. Sample version of $\mathbf{BCor}_{\omega, n}^{2}$ is defined as follow:          -->
 <!-- $$\mathbf{BCor}_{\omega, n}^{2}(X, Y)=\frac{1}{n^{2}}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{X,Y}-\Delta_{ij,n}^{X}\Delta_{ij,n}^{Y})^{2}}\hat{\omega}_1(X_i,X_j)\hat{\omega}_2(Y_i,Y_j)$$ -->
 <!-- where: -->
@@ -234,7 +233,6 @@ The result of **bcov.test** is that *p*-value < 0.05, so we conclude that multiv
 
 <!-- *** -->
 
-
 # Advance Features        
 The features below have been implemented to help you analyse diverse and complicated real data.        
 
@@ -253,7 +251,7 @@ data("bdvmf")
 ```
  
 The distribution of the data is shown in the following image:                 
-```{r, eval=FALSE, echo=FALSE, fig.align='center', fig.width=4.5, fig.height=4.5}
+```{r, eval=FALSE, echo=FALSE}
 library(scatterplot3d)
 scatterplot3d(bdvmf[["x"]], color = bdvmf[["group"]], 
               xlab = "X1", ylab = "X2", zlab = "X3")
@@ -312,7 +310,7 @@ bd.test(x = Dmat, R = 99, size = c(9, 9), dst = TRUE)
 distance between samples of two multivariate random variables.
 Therefore, we can examine independence assumption by employing **bcov.test** to non-Hilbert space real data so long as we obtain the distance matrix of the samples.        
 
-We take a data in [The Statistical Analysis of Compositional Data](https://www.jstor.org/stable/2345821?seq=1#page_scan_tab_contents) as an example to demonstate how to use **bcov.test** to determine the dependence of non-Hilbert space data. Scientists collect Sand, silt and clay compositions of 39 sediment samples of different water depth in an Arctic lake. They want to figure out whether the compositions of sediment samples of different water depth are identical or not.
+We take a data in the Book, **The Statistical Analysis of Compositional Data**, as an example to demonstrate how to use **bcov.test** to determine the dependence of non-Hilbert space data. Scientists collect Sand, silt and clay compositions of 39 sediment samples of different water depth in an Arctic lake. They want to figure out whether the compositions of sediment samples of different water depth are identical or not.
 To achieve the goal, we use **bcov.test** to perform the test of independence. The detailed procedure is demonstrated below:
 
 ```{r}

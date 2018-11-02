@@ -1,3 +1,5 @@
+Thanks you so much for your correction! I have replaced the invalid URL http://cran.r-project.org/web/packages/Ball to canonical URL https://CRAN.R-project.org/package=Ball.
+
 ## Test environments
 * Ubuntu 14.04 (on travis-ci), R 3.4.2
 * win-builder (realease)
@@ -6,13 +8,8 @@
 * Ubuntu 14.04 enviorment:
 0 errors | 0 warnings | 0 note
 
-* Win-builder:
-There was 1 NOTE:
-
-```
-* checking CRAN incoming feasibility ... NOTE
-Maintainer: 'Jin Zhu <zhuj37@mail2.sysu.edu.cn>'
-```
+## Win-builder:
+Status: OK
 
 ## Reverse dependencies
 

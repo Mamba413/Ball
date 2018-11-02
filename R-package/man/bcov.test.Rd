@@ -4,8 +4,8 @@
 \alias{bcov.test}
 \title{Ball Covariance Test}
 \usage{
-bcov.test(x, y = NULL, R = 99, dst = FALSE, weight = FALSE, seed = 4,
-  num.threads = 2)
+bcov.test(x, y = NULL, R = 99, dst = FALSE, weight = FALSE,
+  seed = 4, num.threads = 2)
 }
 \arguments{
 \item{x}{a numeric vector, matirx, data.frame or \code{dist} object or list containing numeric vector, matrix, data.frame, or \code{dist} object.}
