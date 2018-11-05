@@ -60,15 +60,19 @@ double compute_pvalue(double ball_stat_value, double *permuted_stat, int R)
 	double larger_num = 0.0;
 	for (int i = 0; i < R; i++)
 	{
-		//printf("lastest permute value: %f\n", permuted_stat[i]);
-		if (permuted_stat[i] > ball_stat_value)
-		{
-			larger_num += 1.0;
+		if (permuted_stat[i] > ball_stat_value) {
+			larger_num +=  1;
 		}
 	}
-	double R_double = R;
-	double p_value = (1.0 + larger_num) / (1.0 + R_double);
-	return(p_value);
+	double R_double = R, p_value;
+	if ((int) larger_num == 0) {
+		p_value = (1.0 + larger_num) / (1.0 + R_double);
+	} else {
+		p_value = (larger_num + 0.0) / R_double;
+	}
+//	printf("type I : %f, ", (1.0 + larger_num) / (1.0 + R_double));
+//	printf("type I : %f \n", (larger_num + 0.0) / R_double);
+	return p_value;
 }
 
 void Merge(int *permutation, int *source, int *inversion_count, int dim, int n)
@@ -558,7 +562,7 @@ void quicksort(double *a, int *idx, int l, int u)
       idx_temp = idx[m];
       idx[m] = idx[i];
       idx[i] = idx_temp;
-      
+
       a_temp = a[m];
       a[m] = a[i];
       a[i] = a_temp;
@@ -567,11 +571,11 @@ void quicksort(double *a, int *idx, int l, int u)
   idx_temp = idx[l];
   idx[l] = idx[m];
   idx[m] = idx_temp;
-  
+
   a_temp = a[l];
   a[l] = a[m];
   a[m] = a_temp;
-  
+
   quicksort(a, idx, l, m-1);
   quicksort(a, idx, m+1, u);
 }
@@ -604,11 +608,11 @@ void quicksort2(double *a, double *b, int *idx, int l, int u)
       idx_temp = idx[m];
       idx[m] = idx[i];
       idx[i] = idx_temp;
-      
+
       a_temp = a[m];
       a[m] = a[i];
       a[i] = a_temp;
-      
+
       a_temp = b[m];
       b[m] = b[i];
       b[i] = a_temp;
@@ -617,15 +621,15 @@ void quicksort2(double *a, double *b, int *idx, int l, int u)
   idx_temp = idx[l];
   idx[l] = idx[m];
   idx[m] = idx_temp;
-  
+
   a_temp = a[l];
   a[l] = a[m];
   a[m] = a_temp;
-  
+
   a_temp = b[l];
   b[l] = b[m];
   b[m] = a_temp;
-  
+
   quicksort2(a, b, idx, l, m-1);
   quicksort2(a, b, idx, m+1, u);
 }
@@ -697,7 +701,7 @@ void free_matrix(double **matrix, int r, int c)
   /* free a matrix with r rows and c columns */
   int i;
   for (i = 0; i < r; i++){
-    free(matrix[i]);	
+    free(matrix[i]);
   }
   free(matrix);
 }
@@ -722,7 +726,7 @@ void free_int_matrix(int **matrix, int r, int c)
   /* free a matrix with r rows and c columns */
   int i;
   for (i = 0; i < r; i++){
-    free(matrix[i]);	
+    free(matrix[i]);
   }
   free(matrix);
 }
@@ -929,7 +933,7 @@ void resample2(int *i_perm, int *n)
 void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1)
 {
 	int i, j, temp, tmp0, tmp1;
-  
+
 	// permute step:
 	for (i = n - 1; i > 0; --i) {
 	  // j = rand() % (i + 1);
@@ -940,7 +944,7 @@ void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1)
 		i_perm[j] = i_perm[i];
 		i_perm[i] = temp;
 	}
-  
+
 	tmp0 = 0;
 	tmp1 = 0;
 	for (i = 0; i < n; i++) {
@@ -989,10 +993,10 @@ void shuffle(int *array, int *N)
 {
   // Rprintf("%d", RAND_MAX);  RAND_MAX = 32767;
   int n = *N;
-  if (n > 1) 
+  if (n > 1)
   {
     int i, j, t;
-    for (i = 0; i < n - 1; i++) 
+    for (i = 0; i < n - 1; i++)
     {
       j = random_index(n, i);
       t = array[j];
@@ -1007,11 +1011,11 @@ void shuffle_value(double *array, int *N)
 {
   // Rprintf("%d", RAND_MAX);  RAND_MAX = 32767;
   int n = *N;
-  if (n > 1) 
+  if (n > 1)
   {
     int i, j;
     double tmp;
-    for (i = 0; i < n - 1; i++) 
+    for (i = 0; i < n - 1; i++)
     {
       j = random_index(n, i);
       tmp = array[j];
