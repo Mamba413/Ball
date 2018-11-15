@@ -145,7 +145,7 @@ y &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">5
 <p>We use <strong>bd.test</strong> to perform the two-sample test to determine whether two samples come from the same distribution.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bd.test</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)</code></pre></div>
 <pre><code># 
-#   Nonparametric 2-Samples Ball Divergence Test
+#   2-sample Ball Divergence Test
 # 
 # data:  x and y 
 # number of observations = 100, group sizes: 50 50
@@ -163,7 +163,7 @@ y &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">
 <p>We use <strong>bd.test</strong> to test whether two multivariate random samples are identically distributed.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bd.test</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)</code></pre></div>
 <pre><code># 
-#   Nonparametric 2-Samples Ball Divergence Test
+#   2-sample Ball Divergence Test
 # 
 # data:  x and y 
 # number of observations = 100, group sizes: 50 50
@@ -189,7 +189,7 @@ y &lt;-<span class="st"> </span><span class="kw">cos</span>(x) <span class="op">
 # 
 # data:  x and y
 # number of observations = 50
-# replicates = 99, Weighted Ball Covariance = FALSE
+# replicates = 99, weight: Constant
 # bcov = 0.0022224, p-value = 0.01
 # alternative hypothesis: random variables are dependent</code></pre>
 <p>The result of <strong>bcov.test</strong> is that <em>p</em>-value &lt; 0.05, so we conclude that <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are not independent, which means there is some kind of correlation between X and Y.</p>
@@ -210,11 +210,11 @@ y &lt;-<span class="st"> </span>(<span class="kw">sin</span>((x[,<span class="dv
 # 
 # data:  x and y
 # number of observations = 50
-# replicates = 99, Weighted Ball Covariance = FALSE
-# bcov = 0.0014671, p-value = 0.03
+# replicates = 99, weight: Constant
+# bcov = 0.0014671, p-value = 0.0202
 # alternative hypothesis: random variables are dependent</code></pre>
 <p>The result of <strong>bcov.test</strong> is that <em>p</em>-value &lt; 0.05, so we conclude that multivariate random variable <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are associated.</p>
-<hr />
+<!-- *** -->
 <!-- # Introduction           -->
 <!-- ### Ball Divergence        -->
 <!-- We want to determine whether distributions of two samples $\mathcal{X} = \lbrace x_{1},...,x_{n} \rbrace$ and $\mathcal{Y} = \lbrace y_{1},...,y_{m} \rbrace$ are distinct.         -->
@@ -224,8 +224,7 @@ y &lt;-<span class="st"> </span>(<span class="kw">sin</span>((x[,<span class="dv
 <!-- $$A^{Y}_{ij} = \frac{1}{m}\sum_{v=1}^{m}{I(y_{v} \in \bar{B}(x_{i}, \rho(x_{i}, x_{j}))}$$ -->
 <!-- where $\bar{B}(x_{i}, \rho(x_{i}, x_{j}))$ is a closed ball with center $x_{i}$, -->
 <!-- and radius $\rho(x_{i}, x_{j})$ and $I$ is indicator function. -->
-<!-- <!-- ![](BDPlot.jpeg) -->
-<p>–&gt;</p>
+<!-- ![](BDPlot.jpeg) -->
 <!-- In a similar way, for any two points $y_{i}, y_{j} \in \mathcal{Y}$, -->
 <!-- they should also have the property: -->
 <!-- $$C^{X}_{ij} \approx C^{Y}_{ij}$$ -->
@@ -247,7 +246,10 @@ y &lt;-<span class="st"> </span>(<span class="kw">sin</span>((x[,<span class="dv
 <!-- Investigate the dependence between variables is a fundamental step in statistical inference and data mining. Suppose, We are given pairs of independent observations $\{(x_1, y_1),\ldots,(x_n,y_n)\}$, where $x_i$ and $y_i$  can be of any dimension and the dimensionality of $x_i$ and $y_i$ need not be the same. Let $X = (x_1,\ldots,x_n)$ be the $X$ vector, and $Y=(y_1,\ldots,y_n)$ the  -->
 <!-- $Y$ vector and we want to determine whether $X$ and $Y$ are dependent. -->
 <!-- <!-- , which means whether $F_{XY}=F_{X}F_{Y}$ is valid or not. Where $F_{XY}$ is the joint distribution function of $X, Y$. -->
-<p>–&gt; <!-- To achieve the goal, we come up with **Ball Covariance** ($\mathbf{BCor}_{\omega, n}^{2}$), a generic measure of dependence in banach space. Moreover, the $\mathbf{BCor}_{\omega, n}^{2}$ based independence test utilized permutation technique to calculate *p*-value is also developed. Sample version of $\mathbf{BCor}_{\omega, n}^{2}$ is defined as follow:          --> <!-- $$\mathbf{BCor}_{\omega, n}^{2}(X, Y)=\frac{1}{n^{2}}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{X,Y}-\Delta_{ij,n}^{X}\Delta_{ij,n}^{Y})^{2}}\hat{\omega}_1(X_i,X_j)\hat{\omega}_2(Y_i,Y_j)$$ --> <!-- where: --> <!-- $$ \Delta_{ij,n}^{X,Y}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{X} \delta_{ij,k}^{Y}}$$ --></p>
+<!-- To achieve the goal, we come up with **Ball Covariance** ($\mathbf{BCor}_{\omega, n}^{2}$), a generic measure of dependence in banach space. Moreover, the $\mathbf{BCor}_{\omega, n}^{2}$ based independence test utilized permutation technique to calculate *p*-value is also developed. Sample version of $\mathbf{BCor}_{\omega, n}^{2}$ is defined as follow:          -->
+<!-- $$\mathbf{BCor}_{\omega, n}^{2}(X, Y)=\frac{1}{n^{2}}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{X,Y}-\Delta_{ij,n}^{X}\Delta_{ij,n}^{Y})^{2}}\hat{\omega}_1(X_i,X_j)\hat{\omega}_2(Y_i,Y_j)$$ -->
+<!-- where: -->
+<!-- $$ \Delta_{ij,n}^{X,Y}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{X} \delta_{ij,k}^{Y}}$$ -->
 <!-- $$\Delta_{ij,n}^{X}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{X}},  -->
 <!-- \Delta_{ij,n}^{Y}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{Y}} $$ -->
 <!-- $$ \delta_{ij,k}^{X} = I(x_{k} \in \bar{B}(x_{i}, \rho(x_{i}, x_{j})))$$ -->
@@ -288,7 +290,7 @@ Dmat &lt;-<span class="st"> </span><span class="kw">nhdist</span>(bdvmf[[<span c
 <span class="co"># Two-Sample Test based on BD :</span>
 <span class="kw">bd.test</span>(<span class="dt">x =</span> Dmat, <span class="dt">size =</span> <span class="kw">c</span>(<span class="dv">150</span>, <span class="dv">150</span>), <span class="dt">R =</span> <span class="dv">99</span>, <span class="dt">dst =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <pre><code># 
-#   Nonparametric 2-Samples Ball Divergence Test
+#   2-sample Ball Divergence Test
 # 
 # data:  Dmat 
 # number of observations = 300, group sizes: 150 150
@@ -309,19 +311,19 @@ Dmat &lt;-<span class="st"> </span><span class="kw">nhdist</span>(macaques[[<spa
 <span class="co"># hypothesis test with BD:</span>
 <span class="kw">bd.test</span>(<span class="dt">x =</span> Dmat, <span class="dt">R =</span> <span class="dv">99</span>, <span class="dt">size =</span> <span class="kw">c</span>(<span class="dv">9</span>, <span class="dv">9</span>), <span class="dt">dst =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <pre><code># 
-#   Nonparametric 2-Samples Ball Divergence Test
+#   2-sample Ball Divergence Test
 # 
 # data:  Dmat 
 # number of observations = 18, group sizes: 9 9
 # replicates = 99
-# bd = 0.1922, p-value = 0.03
+# bd = 0.1922, p-value = 0.0202
 # alternative hypothesis: distributions of samples are distinct</code></pre>
 <p><em>p</em>-value is under 0.05, which means the skull shape differs between male macaques and female macaques.</p>
 </div>
 <div id="example-3-arcticlake-data" class="section level4">
 <h4>Example 3: ArcticLake Data</h4>
 <p><strong>bcov.test</strong> is related to calculating the distance between samples of two multivariate random variables. Therefore, we can examine independence assumption by employing <strong>bcov.test</strong> to non-Hilbert space real data so long as we obtain the distance matrix of the samples.</p>
-<p>We take a data in <a href="https://www.jstor.org/stable/2345821?seq=1#page_scan_tab_contents">The Statistical Analysis of Compositional Data</a> as an example to demonstate how to use <strong>bcov.test</strong> to determine the dependence of non-Hilbert space data. Scientists collect Sand, silt and clay compositions of 39 sediment samples of different water depth in an Arctic lake. They want to figure out whether the compositions of sediment samples of different water depth are identical or not. To achieve the goal, we use <strong>bcov.test</strong> to perform the test of independence. The detailed procedure is demonstrated below:</p>
+<p>We take a data in the Book, <strong>The Statistical Analysis of Compositional Data</strong>, as an example to demonstrate how to use <strong>bcov.test</strong> to determine the dependence of non-Hilbert space data. Scientists collect Sand, silt and clay compositions of 39 sediment samples of different water depth in an Arctic lake. They want to figure out whether the compositions of sediment samples of different water depth are identical or not. To achieve the goal, we use <strong>bcov.test</strong> to perform the test of independence. The detailed procedure is demonstrated below:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;ArcticLake&quot;</span>)
 <span class="co"># Distance matrix between y:</span>
 Dy &lt;-<span class="st"> </span><span class="kw">nhdist</span>(ArcticLake[[<span class="st">&quot;x&quot;</span>]], <span class="dt">method =</span> <span class="st">&quot;compositional&quot;</span>)
@@ -334,7 +336,7 @@ Dx &lt;-<span class="st"> </span><span class="kw">dist</span>(ArcticLake[[<span 
 # 
 # data:  Dx and Dy
 # number of observations = 39
-# replicates = 99, Weighted Ball Covariance = FALSE
+# replicates = 99, weight: Constant
 # bcov = 0.0083848, p-value = 0.01
 # alternative hypothesis: random variables are dependent</code></pre>
 <p>We first calculate the distance matrix <em>Dy</em> and <em>Dx</em>. Then, we pass <em>Dx</em> to arguments <em>x</em>, <em>Dy</em> to arguments <em>y</em>, and set the replication times <em>R = 99</em>, <em>dst = TRUE</em> to indicate that the <em>x</em> and <em>y</em> parameters are distance matrixs.<br />
@@ -348,12 +350,12 @@ The result shows that <em>p</em>-value &lt; 0.05, so we conclude that the compos
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="dv">150</span>
 <span class="kw">bd.test</span>(<span class="kw">rnorm</span>(n), <span class="dt">size =</span> <span class="kw">rep</span>(<span class="dv">50</span>, <span class="dv">3</span>))</code></pre></div>
 <pre><code># 
-#   Nonparametric 3-Samples Ball Divergence Test
+#   3-sample Ball Divergence Test (Summation Version)
 # 
 # data:  rnorm(n) 
 # number of observations = 150, group sizes: 50 50 50
 # replicates = 99
-# bd = 0.062061, p-value = 0.16
+# kbd.sum = 0.062061, p-value = 0.1515
 # alternative hypothesis: distributions of samples are distinct</code></pre>
 <p>As the result shown, <em>p</em>-value&gt;0.05, which means we can’t reject the null hypothesis.<br />
 We can also utilize <strong>bd.test</strong> to deal with <span class="math inline">\(K\)</span>-Sample problem in non-Hilbert space following the aforementioned procedure. At the same time, remember to assign size vector to parameter <em>size</em> arguments and set <em>dst = TRUE</em>.</p>
@@ -379,8 +381,8 @@ Dx &lt;-<span class="st"> </span><span class="kw">dist</span>(ArcticLake[[<span 
 # 
 # data:  Dx and Dy
 # number of observations = 39
-# replicates = 99, Weighted Ball Covariance = TRUE
-# wbcov = 0.088597, p-value = 0.01
+# replicates = 99, weight: Probability
+# bcov.prob = 0.088597, p-value = 0.01
 # alternative hypothesis: random variables are dependent</code></pre>
 </div>
 <div id="ball-covariance-mutual-independence-test" class="section level2">
@@ -404,21 +406,21 @@ example2 &lt;-<span class="st"> </span><span class="kw">list</span>(w, x, y, z)<
 <p>We bind these data to list <em>example1</em> and <em>example2</em> and pass them to arguments <em>x</em> in <strong>bcov.test</strong> to carry out ball covariance mutual independence test.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bcov.test</span>(<span class="dt">x =</span> example1)</code></pre></div>
 <pre><code># 
-#   Ball Covariance test of independence
+#   Ball Covariance test of mutual independence
 # 
 # data:  example1
 # number of observations = 30
-# replicates = 99, Weighted Ball Covariance = FALSE
-# bcov = 4.2107, p-value = 0.01
+# replicates = 99, weight: Constant
+# bcov = 0.0046785, p-value = 0.01
 # alternative hypothesis: random variables are dependent</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bcov.test</span>(<span class="dt">x =</span> example2)</code></pre></div>
 <pre><code># 
-#   Ball Covariance test of independence
+#   Ball Covariance test of mutual independence
 # 
 # data:  example2
 # number of observations = 30
-# replicates = 99, Weighted Ball Covariance = FALSE
-# bcov = 37.742, p-value = 0.01
+# replicates = 99, weight: Constant
+# bcov = 0.041936, p-value = 0.01
 # alternative hypothesis: random variables are dependent</code></pre>
 <p>The hypothesis test result for two examples show that <em>p</em>-value &lt; 0.05, coinciding with the simulation setting.</p>
 </div>

@@ -13,7 +13,7 @@ library(Ball)
 ## ---- echo=FALSE---------------------------------------------------------
 library(Ball)
 
-## ---- fig.width=6, fig.align='center', fig.height=4----------------------
+## ------------------------------------------------------------------------
 x <- rnorm(50)
 y <- rnorm(50, mean = 1)
 # plot(density(x), xlim = c(-5, 5))
@@ -22,7 +22,7 @@ y <- rnorm(50, mean = 1)
 ## ------------------------------------------------------------------------
 bd.test(x = x, y = y)
 
-## ---- fig.width=6, fig.align='center', fig.height=4----------------------
+## ------------------------------------------------------------------------
 x <- matrix(rnorm(100), nrow = 50, ncol = 2)
 y <- matrix(rnorm(100, mean = 3), nrow = 50, ncol = 2)
 
@@ -39,7 +39,7 @@ y <- cos(x) + error
 ## ------------------------------------------------------------------------
 bcov.test(x = x, y = y)
 
-## ---- fig.width=6, fig.align='center', fig.height=4----------------------
+## ------------------------------------------------------------------------
 x <- matrix(runif(50 * 2, -pi, pi), nrow = 50, ncol = 2)
 error <- runif(50, min = -0.3, max = 0.3)
 y <- (sin((x[,1])^2 + x[,2])) + error
@@ -51,7 +51,7 @@ bcov.test(x = x, y = y)
 # load data:
 data("bdvmf")
 
-## ---- eval=FALSE, echo=FALSE, fig.align='center', fig.width=4.5, fig.height=4.5----
+## ---- eval=FALSE, echo=FALSE---------------------------------------------
 #  library(scatterplot3d)
 #  scatterplot3d(bdvmf[["x"]], color = bdvmf[["group"]],
 #                xlab = "X1", ylab = "X2", zlab = "X3")
