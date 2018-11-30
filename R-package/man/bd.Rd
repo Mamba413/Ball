@@ -4,7 +4,7 @@
 \alias{bd}
 \title{Ball Divergence}
 \usage{
-bd(x, y = NULL, dst = FALSE, size = NULL, num.threads = 2,
+bd(x, y = NULL, dst = FALSE, size = NULL, num.threads = 1,
   kbd.type = "sum")
 }
 \arguments{

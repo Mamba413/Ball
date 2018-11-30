@@ -73,9 +73,7 @@ test_that("Multi-thread support is valid!", {
   expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
 })
 
-
-test_that("Multi-thread support is valid!", {
-  cat("Multi-thread computation via permutation for univariate two-sample problem.\n")
+test_that("Multi-thread computation via permutation for univariate two-sample problem", {
   n1 <- 200
   n2 <- 200
   x <- rnorm(n1)
@@ -85,11 +83,11 @@ test_that("Multi-thread support is valid!", {
   fit3 <- bd.test(list(x, y), R = 399, num.threads = 4)
   expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
   expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
-  
-  cat("Multi-thread computation via permutation for multivariate two-sample problem.\n")
+})
+
+test_that("Multi-thread computation via permutation for multivariate two-sample problem", {
   Y <- matrix(rnorm(100*10), ncol = 10)
   X <- matrix(rnorm(100*10), ncol = 10)
-  
   fit1 <- bd.test(list(X, Y), R = 399, size = c(100, 100, 100), num.threads = 1)
   fit2 <- bd.test(list(X, Y), R = 399, size = c(100, 100, 100), num.threads = 2)
   fit3 <- bd.test(list(X, Y), R = 399, size = c(100, 100, 100), num.threads = 4)
@@ -103,10 +101,19 @@ test_that("output of formula interface is incorrect", {
   expect_equal(strsplit(res1[["data.name"]], "\n")[[1]][1], "x by y")
 })
 
-test_that("formula interface result is different to default interface", {
+test_that("Compare the outputs of formula interface and default interface (two-sample)", {
   dat <- data.frame("x" = rnorm(100), "y" = as.factor(c(0, 1)))
   res1 <- bd.test(x ~ y, data = dat)
   res2 <- bd.test(dat[["x"]][seq(1, 100, 2)], dat[["x"]][seq(2, 100, 2)])
+  res1[["data.name"]] <- ""
+  res2[["data.name"]] <- ""
+  expect_equal(res1, res2)
+})
+
+test_that("Compare the outputs of formula interface and default interface (K-sample)", {
+  res1 <- bd.test(Sepal.Width ~ Species, data = iris)
+  iris_list <- split(iris[["Sepal.Width"]], iris[["Species"]])
+  res2 <- bd.test(iris_list)
   res1[["data.name"]] <- ""
   res2[["data.name"]] <- ""
   expect_equal(res1, res2)

@@ -9,7 +9,7 @@
 bd.test(x, ...)
 
 \method{bd.test}{default}(x, y = NULL, R = 99, dst = FALSE,
-  size = NULL, seed = 4, num.threads = 2, kbd.type = "sum", ...)
+  size = NULL, seed = 4, num.threads = 1, kbd.type = "sum", ...)
 
 \method{bd.test}{formula}(formula, data, subset, na.action, ...)
 }
@@ -118,7 +118,10 @@ x <- lapply(c(40, 50, 60), rnorm)
 bd.test(x)
 
 ## Formula interface
+## Two-sample test
 bd.test(extra ~ group, data = sleep)
+## K-sample test
+bd.test(Sepal.Width ~ Species, data = iris)
 
 }
 \references{

@@ -105,7 +105,7 @@ bd.test <- function(x, ...) UseMethod("bd.test")
 #' @export
 #' @method bd.test default
 bd.test.default <- function(x, y = NULL, R = 99, dst = FALSE,
-                            size = NULL, seed = 4, num.threads = 2, 
+                            size = NULL, seed = 4, num.threads = 1, 
                             kbd.type = "sum", ...) {
   weight = FALSE
   method = 'permute'
@@ -259,13 +259,13 @@ bd.test.default <- function(x, y = NULL, R = 99, dst = FALSE,
 #' 
 #' @export
 #' @method bd.test formula
-#' @importFrom stats model.frame
-#' @importFrom stats setNames
-#' @importFrom stats terms
 #'
 #' @examples
 #' ## Formula interface
+#' ## Two-sample test
 #' bd.test(extra ~ group, data = sleep)
+#' ## K-sample test
+#' bd.test(Sepal.Width ~ Species, data = iris)
 #' 
 bd.test.formula <- function(formula, data, subset, na.action, ...) {
   if(missing(formula)
@@ -285,7 +285,8 @@ bd.test.formula <- function(formula, data, subset, na.action, ...) {
   g <- factor(mf[[-response]])
   if(nlevels(g) < 2L)
     stop("grouping factor must contain at least two levels")
-  DATA <- stats::setNames(split(mf[[response]], g), c("x", "y"))
+  DATA <- list()
+  DATA[["x"]] <- split(mf[[response]], g)
   y <- do.call("bd.test", c(DATA, list(...)))
   remind_info <- strsplit(y$data.name, split = "number of observations")[[1]][2]
   DNAME <- paste0(DNAME, "\nnumber of observations")
@@ -355,7 +356,7 @@ bd.test.formula <- function(formula, data, subset, na.action, ...) {
 #' x <- rnorm(50)
 #' y <- rnorm(50)
 #' bd(x, y)
-bd <- function(x, y = NULL, dst = FALSE, size = NULL, num.threads = 2, kbd.type = "sum") {
+bd <- function(x, y = NULL, dst = FALSE, size = NULL, num.threads = 1, kbd.type = "sum") {
   res <- bd.test(x = x, y = y, dst = dst, size = size, R = 0, kbd.type = kbd.type)
   res
 }
