@@ -15,6 +15,7 @@
 #' Setting \code{kdb.type = "sum"}, \code{kdb.type = "summax"}, or \code{kdb.type = "max"}, 
 #' the corresponding statistics value and \eqn{p}-value of \eqn{K}-sample test procedure are demonstrated. 
 #' Note that this arguments actually only influences the printed result in R console. Default: \code{kdb.type = "sum"}
+#' @param ... further arguments to be passed to or from methods.
 #' 
 ## @param weight not available now
 ## @param method if \code{method = 'permute'}, a permutation procedure will be carried out;
@@ -97,12 +98,21 @@
 #' x <- lapply(c(40, 50, 60), rnorm)
 #' bd.test(x)
 #' 
-bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
-                    size = NULL, seed = 4, num.threads = 2, 
-                    kbd.type = "sum") {
+bd.test <- function(x, ...) UseMethod("bd.test")
+
+
+#' @rdname bd.test
+#' @export
+#' @method bd.test default
+bd.test.default <- function(x, y = NULL, R = 99, dst = FALSE,
+                            size = NULL, seed = 4, num.threads = 2, 
+                            kbd.type = "sum", ...) {
   weight = FALSE
   method = 'permute'
   data_name <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
+  if (length(data_name) > 1) {
+    data_name <- ""
+  }
   if(is.null(x)|is.null(y)) {
     # modify input information:
     data_name <- gsub(x = data_name, pattern = " and NULL", replacement = "")
@@ -236,6 +246,51 @@ bd.test <- function(x, y = NULL, R = 99, dst = FALSE,
   )
   class(e) <- "htest"
   return(e)
+}
+
+
+#' @rdname bd.test
+#'
+#' @param formula a formula of the form response ~ group where response gives the data values and group a vector or factor of the corresponding groups.
+#' @param data an optional matrix or data frame (or similar: see model.frame) containing the variables in the formula formula. By default the variables are taken from environment(formula).
+#' @param subset an optional vector specifying a subset of observations to be used.
+#' @param na.action a function which indicates what should happen when the data contain NAs. Defaults to getOption("na.action").
+#'
+#' 
+#' @export
+#' @method bd.test formula
+#' @importFrom stats model.frame
+#' @importFrom stats setNames
+#' @importFrom stats terms
+#'
+#' @examples
+#' ## Formula interface
+#' bd.test(extra ~ group, data = sleep)
+#' 
+bd.test.formula <- function(formula, data, subset, na.action, ...) {
+  if(missing(formula)
+     || (length(formula) != 3L)
+     || (length(attr(terms(formula[-2L]), "term.labels")) != 1L))
+    stop("'formula' missing or incorrect")
+  m <- match.call(expand.dots = FALSE)
+  if(is.matrix(eval(m$data, parent.frame())))
+    m$data <- as.data.frame(data)
+  ## need stats:: for non-standard evaluation
+  m[[1L]] <- quote(stats::model.frame)
+  m$... <- NULL
+  mf <- eval(m, parent.frame())
+  DNAME <- paste(names(mf), collapse = " by ")
+  names(mf) <- NULL
+  response <- attr(attr(mf, "terms"), "response")
+  g <- factor(mf[[-response]])
+  if(nlevels(g) < 2L)
+    stop("grouping factor must contain at least two levels")
+  DATA <- stats::setNames(split(mf[[response]], g), c("x", "y"))
+  y <- do.call("bd.test", c(DATA, list(...)))
+  remind_info <- strsplit(y$data.name, split = "number of observations")[[1]][2]
+  DNAME <- paste0(DNAME, "\nnumber of observations")
+  y$data.name <- paste0(DNAME, remind_info)
+  y
 }
 
 

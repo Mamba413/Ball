@@ -96,3 +96,18 @@ test_that("Multi-thread support is valid!", {
   expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
   expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
 })
+
+test_that("output of formula interface is incorrect", {
+  dat <- data.frame("x" = rnorm(100), "y" = as.factor(c(0, 1)))
+  res1 <- bd.test(x ~ y, data = dat)
+  expect_equal(strsplit(res1[["data.name"]], "\n")[[1]][1], "x by y")
+})
+
+test_that("formula interface result is different to default interface", {
+  dat <- data.frame("x" = rnorm(100), "y" = as.factor(c(0, 1)))
+  res1 <- bd.test(x ~ y, data = dat)
+  res2 <- bd.test(dat[["x"]][seq(1, 100, 2)], dat[["x"]][seq(2, 100, 2)])
+  res1[["data.name"]] <- ""
+  res2[["data.name"]] <- ""
+  expect_equal(res1, res2)
+})

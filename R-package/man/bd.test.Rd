@@ -2,13 +2,21 @@
 % Please edit documentation in R/bd.R
 \name{bd.test}
 \alias{bd.test}
+\alias{bd.test.default}
+\alias{bd.test.formula}
 \title{Ball Divergence based Equality of Distributions Test}
 \usage{
-bd.test(x, y = NULL, R = 99, dst = FALSE, size = NULL, seed = 4,
-  num.threads = 2, kbd.type = "sum")
+bd.test(x, ...)
+
+\method{bd.test}{default}(x, y = NULL, R = 99, dst = FALSE,
+  size = NULL, seed = 4, num.threads = 2, kbd.type = "sum", ...)
+
+\method{bd.test}{formula}(formula, data, subset, na.action, ...)
 }
 \arguments{
 \item{x}{a numeric vector, matrix, data.frame, \code{dist} object or list containing vector, matrix, or data.frame.}
+
+\item{...}{further arguments to be passed to or from methods.}
 
 \item{y}{a numeric vector, matrix or data.frame.}
 
@@ -27,6 +35,14 @@ the sample version of ball divergence. Default: \code{R = 99}}
 Setting \code{kdb.type = "sum"}, \code{kdb.type = "summax"}, or \code{kdb.type = "max"}, 
 the corresponding statistics value and \eqn{p}-value of \eqn{K}-sample test procedure are demonstrated. 
 Note that this arguments actually only influences the printed result in R console. Default: \code{kdb.type = "sum"}}
+
+\item{formula}{a formula of the form response ~ group where response gives the data values and group a vector or factor of the corresponding groups.}
+
+\item{data}{an optional matrix or data frame (or similar: see model.frame) containing the variables in the formula formula. By default the variables are taken from environment(formula).}
+
+\item{subset}{an optional vector specifying a subset of observations to be used.}
+
+\item{na.action}{a function which indicates what should happen when the data contain NAs. Defaults to getOption("na.action").}
 }
 \value{
 bd.test returns a list with class "htest" containing the following components:
@@ -100,6 +116,9 @@ bd.test(rnorm(n), size = c(40, 50, 60))
 # alternative input method:
 x <- lapply(c(40, 50, 60), rnorm)
 bd.test(x)
+
+## Formula interface
+bd.test(extra ~ group, data = sleep)
 
 }
 \references{
