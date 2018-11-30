@@ -2,13 +2,21 @@
 % Please edit documentation in R/bcov.R
 \name{bcov.test}
 \alias{bcov.test}
+\alias{bcov.test.default}
+\alias{bcov.test.formula}
 \title{Ball Covariance Test}
 \usage{
-bcov.test(x, y = NULL, R = 99, dst = FALSE, weight = FALSE,
-  seed = 4, num.threads = 2)
+bcov.test(x, ...)
+
+\method{bcov.test}{default}(x, y = NULL, R = 99, dst = FALSE,
+  weight = FALSE, seed = 4, num.threads = 1, ...)
+
+\method{bcov.test}{formula}(formula, data, subset, na.action, ...)
 }
 \arguments{
 \item{x}{a numeric vector, matirx, data.frame or \code{dist} object or list containing numeric vector, matrix, data.frame, or \code{dist} object.}
+
+\item{...}{further arguments to be passed to or from methods.}
 
 \item{y}{a numeric vector, matirx, data.frame or \code{dist} object.}
 
@@ -26,6 +34,14 @@ only available for the \code{bcov.test} function at present. Default: \code{weig
 \item{seed}{the random seed.}
 
 \item{num.threads}{Number of threads. Default \code{num.threads = 2}.}
+
+\item{formula}{a formula of the form response ~ group where response gives the data values and group a vector or factor of the corresponding groups.}
+
+\item{data}{an optional matrix or data frame (or similar: see model.frame) containing the variables in the formula formula. By default the variables are taken from environment(formula).}
+
+\item{subset}{an optional vector specifying a subset of observations to be used.}
+
+\item{na.action}{a function which indicates what should happen when the data contain NAs. Defaults to getOption("na.action").}
 }
 \value{
 bcov.test returns a list with class "htest" containing the following components:
@@ -105,6 +121,9 @@ bcov.test(data_list)
 ################# Mutual Independence Test for Meteorology data #################
 data("meteorology")
 bcov.test(meteorology)
+## Formula interface
+bcov.test(~ CONT + INTG, data = USJudgeRatings)
+bcov.test(~ CONT + INTG + DMNR, data = USJudgeRatings)
 
 }
 \seealso{

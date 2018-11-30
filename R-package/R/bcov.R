@@ -49,6 +49,7 @@
 #' \eqn{Y} are unknown, the test based on \code{bcov} can be implemented as a permutation test.
 #' See (Pan et al 2017) for theoretical properties of the test, including statistical consistency.
 #' 
+#' @rdname bcov.test
 #' 
 #' @useDynLib Ball, .registration = TRUE
 #' @export
@@ -96,12 +97,21 @@
 #' ################# Mutual Independence Test for Meteorology data #################
 #' data("meteorology")
 #' bcov.test(meteorology)
-#' 
-bcov.test <- function(x, y = NULL, R = 99, dst = FALSE, weight = FALSE, 
-                      seed = 4, num.threads = 2)
+bcov.test <- function(x, ...) UseMethod("bcov.test")
+
+
+#' @rdname bcov.test
+#' @export
+#' @method bcov.test default
+bcov.test.default <- function(x, y = NULL, R = 99, 
+                              dst = FALSE, weight = FALSE, 
+                              seed = 4, num.threads = 1, ...)
 {
   method = 'permute'
   data_name <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
+  if (length(data_name) > 1) {
+    data_name <- ""
+  }
   type <- "bcov"
   # modify input information:
   if(class(x) == "list") {
@@ -153,6 +163,48 @@ bcov.test <- function(x, y = NULL, R = 99, dst = FALSE, weight = FALSE,
     class(e) <- "htest"
     return(e)
   }
+}
+
+
+#' @rdname bcov.test
+#'
+#' @param formula a formula of the form response ~ group where response gives the data values and group a vector or factor of the corresponding groups.
+#' @param data an optional matrix or data frame (or similar: see model.frame) containing the variables in the formula formula. By default the variables are taken from environment(formula).
+#' @param subset an optional vector specifying a subset of observations to be used.
+#' @param na.action a function which indicates what should happen when the data contain NAs. Defaults to getOption("na.action").
+#' 
+#' @export
+#' @method bcov.test formula
+#' @importFrom stats model.frame
+#'
+#' @examples
+#' ## Formula interface
+#' # independence test:
+#' bcov.test(~ CONT + INTG, data = USJudgeRatings)
+#' # mutual independence test:
+#' bcov.test(~ CONT + INTG + DMNR, data = USJudgeRatings)
+#' 
+bcov.test.formula <- function(formula, data, subset, na.action, ...) {
+  if(missing(formula)
+     || !inherits(formula, "formula")
+     || length(formula) != 2L)
+    stop("'formula' missing or invalid")
+  m <- match.call(expand.dots = FALSE)
+  if(is.matrix(eval(m$data, parent.frame())))
+    m$data <- as.data.frame(data)
+  m[[1L]] <- quote(stats::model.frame)
+  m$... <- NULL
+  mf <- eval(m, environment(formula))
+  if(length(mf) < 2L)
+    stop("invalid formula")
+  DNAME <- paste(names(mf), collapse = " and ")
+  dat <- list()
+  dat[["x"]] <- as.list(mf)
+  y <- do.call("bcov.test", c(dat, list(...)))
+  remind_info <- strsplit(y$data.name, split = "number of observations")[[1]][2]
+  DNAME <- paste0(DNAME, "\nnumber of observations")
+  y$data.name <- paste0(DNAME, remind_info)
+  y
 }
 
 
