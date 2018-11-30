@@ -164,6 +164,7 @@ NULL
 #' @importFrom utils head
 #' @importFrom utils memory.limit
 #' @importFrom survival survfit
+#' @importFrom survival Surv
 #' @importFrom stats lm
 #' @importFrom gam gam
 #' @importFrom gam s

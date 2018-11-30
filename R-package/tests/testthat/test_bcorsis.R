@@ -25,7 +25,7 @@ test_that("Ball Correlation based survival screening is unreasonable!", {
   expect_equal("hsa.miR.564", top_gene[1])
 })
 
-test_that("Ball Correlation based iterative SIS is unreasonable!", {
+test_that("Ball Correlation based SIS is unreasonable!", {
   set.seed(1)
   n <- 150
   p <- 3000
@@ -39,16 +39,18 @@ test_that("Ball Correlation based iterative SIS is unreasonable!", {
 test_that("Ball Correlation based iterative SIS is unreasonable!", {
   set.seed(1)
   n <- 150
-  p <- 3000
+  p <- 1500
   sigma_mat <- matrix(0.5, nrow = p, ncol = p)
   diag(sigma_mat) <- 1
   x <- rmvnorm(n = n, sigma = sigma_mat)
   error <- rnorm(n)
   rm(sigma_mat); gc(reset = TRUE)
-  y <- 3*(x[, 1])^2 + 5*(x[, 2])^2 + 5*x[, 8] - 8*x[, 16] + error
-  res <- bcorsis(y = y, x = x, method = "lm", d = 15)
-  res <- bcorsis(y = y, x = x, method = "gam", d = 15)
-  res[["ix"]]
+  y <- 6*(x[, 1])^2 + 5*(x[, 2])^2 + 5*x[, 8] - 8*x[, 16] + error
+  index <- c(1, 2, 8, 16)
+  res1 <- bcorsis(y = y, x = x, method = "lm", d = 15)
+  expect_true(all(index %in% head(res1[["ix"]])))
+  res2 <- bcorsis(y = y, x = x, method = "gam", d = 15)
+  expect_true(all(index %in% head(res2[["ix"]])))
 })
 
 test_that("Ball Correlation based iterative SIS with probability weight is unreasonable!", {

@@ -279,9 +279,9 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
       while(length(Xhavepickout) < final_d)
       {
         # lm fit for x
-        Xnew <- residuals(lm(x[, ids] ~ x[, Xhavepickout]))
+        Xnew <- residuals(stats::lm(x[, ids] ~ x[, Xhavepickout]))
         # lm fit for y
-        y <- residuals(lm(y ~ x[, Xlastpickout]))
+        y <- residuals(stats::lm(y ~ x[, Xlastpickout]))
         
         # BCor-screening
         y_copy <- preprocess_bcorsis_y(y, y_p)[[1]]
@@ -298,7 +298,7 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
       while(length(Xhavepickout) < final_d)
       {
         # gam fit for x
-        lastpickout_formula <- paste0(' + s(',colnames(x)[Xlastpickout], collapse = paste0(", df = ", df, ")"))
+        lastpickout_formula <- paste0(' + gam::s(',colnames(x)[Xlastpickout], collapse = paste0(", df = ", df, ")"))
         lastpickout_formula <- paste0(lastpickout_formula, paste0(", df = ", df, ")"), collapse = "")
         lastpickout_dat <- x[, Xlastpickout]
         Xnew <- sapply(ids, function(index){
@@ -354,7 +354,7 @@ bcorsis.surv <- function(y, x, final_d, n, p, ids, standized = TRUE){
   }
   
   # BCor Screening(survival)
-  fitc <- survival::survfit(Surv(time, 1 - delta) ~ 1)
+  fitc <- survival::survfit(survival::Surv(time, 1 - delta) ~ 1)
   Sc <- fitc[["surv"]]
   if(length(unique(ord.t)) != n) {
     rep_num <- as.data.frame(table(ord.t))[, "Freq"]
