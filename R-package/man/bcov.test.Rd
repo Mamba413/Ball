@@ -122,7 +122,9 @@ bcov.test(data_list)
 data("meteorology")
 bcov.test(meteorology)
 ## Formula interface
+## independence test:
 bcov.test(~ CONT + INTG, data = USJudgeRatings)
+## mutual independence test:
 bcov.test(~ CONT + INTG + DMNR, data = USJudgeRatings)
 
 }

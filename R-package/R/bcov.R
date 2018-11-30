@@ -179,9 +179,9 @@ bcov.test.default <- function(x, y = NULL, R = 99,
 #'
 #' @examples
 #' ## Formula interface
-#' # independence test:
+#' ## independence test:
 #' bcov.test(~ CONT + INTG, data = USJudgeRatings)
-#' # mutual independence test:
+#' ## mutual independence test:
 #' bcov.test(~ CONT + INTG + DMNR, data = USJudgeRatings)
 #' 
 bcov.test.formula <- function(formula, data, subset, na.action, ...) {
