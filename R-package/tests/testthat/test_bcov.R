@@ -1,5 +1,5 @@
 library(Ball)
-context("bd and bd.test function")
+context("bcov and bcov.test function")
 skip_on_cran()
 
 test_that("Error if computation result for ball covariance is wrong!", {

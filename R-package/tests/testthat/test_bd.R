@@ -47,8 +47,7 @@ test_that("bd, bd.test function return unmatched ball divergence statistic", {
 })
 
 
-test_that("Multi-thread support is valid!", {
-  cat("Multi-thread computation via permutation for univariate K-sample problem.\n")
+test_that("Multi-thread computation via permutation for univariate K-sample problem", {
   n1 <- 200
   n2 <- 200
   n3 <- 200
@@ -60,10 +59,11 @@ test_that("Multi-thread support is valid!", {
   fit3 <- bd.test(list(x, y, z), R = 399, num.threads = 4)
   expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
   expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
-  
-  cat("Multi-thread computation via permutation for multivariate K-sample problem.\n")
-  Y <- matrix(rnorm(100*10), ncol = 10)
+})
+
+test_that("Multi-thread computation via permutation for multivariate K-sample problem", {
   X <- matrix(rnorm(100*10), ncol = 10)
+  Y <- matrix(rnorm(100*10), ncol = 10)
   Z <- matrix(rnorm(100*10), ncol = 10)
   
   fit1 <- bd.test(list(X, Y, Z), R = 399, size = c(100, 100, 100), num.threads = 1)
