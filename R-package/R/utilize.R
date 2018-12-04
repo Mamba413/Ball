@@ -6,7 +6,13 @@
 #' @return p-value
 #'
 calculatePvalue <- function(statValue, NullDistribution) {
-  (sum(statValue < NullDistribution) + 1) / (length(NullDistribution) + 1)
+  surpass_number <- sum(statValue < NullDistribution)
+  if (surpass_number == 0) {
+    p.value <- (surpass_number + 1) / (length(NullDistribution) + 1)
+  } else {
+    p.value <- surpass_number / length(NullDistribution)
+  }
+  p.value
 }
 
 

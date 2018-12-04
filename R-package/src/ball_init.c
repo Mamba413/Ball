@@ -11,6 +11,7 @@ extern void bcov_test(double *, double *, double *, double *, int *, int *, int 
 extern void kbcov_test(double *, double *, double *, int *, int *, int *, int *, int *);
 extern void bd_test(double *, double *, double *, int *, int *, int *, int *, int *, int *);
 extern void SRCT_new(double *, int *, int *, double *, int *, double *);
+extern void bd_gwas_test(double *, double *, double *, int *, int *, int *, int *, int *, double *, int *, int *, int *, int *);
 
 static const R_CMethodDef CEntries[] = {
   {"bcor_test", (DL_FUNC) &bcor_test, 12},
@@ -18,6 +19,7 @@ static const R_CMethodDef CEntries[] = {
   {"kbcov_test", (DL_FUNC) &kbcov_test, 8},
   {"bd_test",   (DL_FUNC) &bd_test,   9},
   {"SRCT_new",  (DL_FUNC) &SRCT_new,  6},
+  {"bd_gwas_test", (DL_FUNC) &bd_gwas_test, 13},
   {NULL, NULL, 0}
 };
 
