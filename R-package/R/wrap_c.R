@@ -6,16 +6,16 @@
 #' @return Ball Divergence statistic
 #' @useDynLib Ball, .registration = TRUE
 #' @noRd
-bd_value_wrap_c <- function(xy, size, weight, dst, num.threads) {
+bd_value_wrap_c <- function(xy, size, weight, distance, num.threads) {
   xy <- as.double(xy)
   bd <- as.double(numeric(1))
   weight <- as.integer(weight)
-  dst <- as.integer(dst)
+  distance <- as.integer(distance)
   num.threads <- as.integer(num.threads)
   K <- as.integer(length(size))
   size <- as.integer(size)
   N <- as.integer(sum(size))
-  res <- .C("bd_stat", bd, xy, size, N, K, weight, dst, num.threads)
+  res <- .C("bd_stat", bd, xy, size, N, K, weight, distance, num.threads)
   #
   bd <- res[[1]]
   names(bd) <- ifelse(weight, "wbd", "bd")
@@ -32,10 +32,10 @@ bd_value_wrap_c <- function(xy, size, weight, dst, num.threads) {
 #' @return Ball Divergence statistic
 #' @useDynLib Ball, .registration = TRUE
 #' @noRd
-bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
+bd_test_wrap_c <- function(xy, size, num.permutations, weight, distance, num.threads) {
   xy <- as.double(xy)
-  dst <- as.integer(dst)
-  R <- as.integer(R)
+  distance <- as.integer(distance)
+  r <- as.integer(num.permutations)
   num.threads <- as.integer(num.threads)
   #
   K <- as.integer(length(size))
@@ -44,7 +44,7 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
   p_value <- as.double(numeric(stat_num))
   size <- as.integer(size)
   N <- as.integer(sum(size))
-  res <- .C("bd_test", bd, p_value, xy, size, N, K, dst, R, num.threads)
+  res <- .C("bd_test", bd, p_value, xy, size, N, K, distance, r, num.threads)
   #
   stat_name_bd <- c("bd", "wbd")
   stat_name_kbd <- c("kbd.sum", "wkbd.sum", "kbd.max", "wkbd.max", "kbd.maxsum", "wkbd.maxsum")
@@ -62,7 +62,7 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
   names(p_value) <- paste0(names(bd), ".pvalue")
   list('statistic' = bd, 'p.value' = p_value, 
        'info' = list('N' = N, 'K' = K, 'size' = size, 
-                     'weight' = as.logical(weight), 'R' = R))
+                     'weight' = as.logical(weight), 'num.permutations' = num.permutations))
 }
 
 
@@ -77,9 +77,9 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
 #' #' @useDynLib Ball, .registration = TRUE
 #' #' @noRd
 #' #' 
-#' bcov_value_wrap_c <- function(x, y, n, weight, dst, type, num.threads) {
+#' bcov_value_wrap_c <- function(x, y, n, weight, distance, type, num.threads) {
 #'   bcov <- as.double(numeric(1))
-#'   dst <- as.integer(dst)
+#'   distance <- as.integer(distance)
 #'   x <- as.double(x)
 #'   y <- as.double(y)
 #'   n <- as.integer(n)
@@ -89,15 +89,15 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
 #'   type <- ifelse(type == "bcov", 1, 2)
 #'   type <- as.integer(type)
 #'   if (type == 2) {
-#'     res <- .C("bcov_stat", bcov, x, y, n, weight, dst, type, num.threads)
+#'     res <- .C("bcov_stat", bcov, x, y, n, weight, distance, type, num.threads)
 #'     bcov <- res[[1]]
 #'   } else {
 #'     bcov <- as.double(numeric(3))
 #'     p_value <- as.double(numeric(3))
-#'     R <- as.integer(numeric(1))
+#'     r <- as.integer(numeric(1))
 #'     weight <- as.integer(numeric(1))
 #'     weight_cp <- examine_weight_arguments(weight_cp, "bcov.test")
-#'     res <- .C("bcov_test", bcov, p_value, x, y, n, R, dst, num.threads)
+#'     res <- .C("bcov_test", bcov, p_value, x, y, n, r, distance, num.threads)
 #'     bcov <- res[[1]]
 #'   }
 #'   if (type == 1) {
@@ -130,23 +130,23 @@ bd_test_wrap_c <- function(xy, size, R, weight, dst, num.threads) {
 #' @useDynLib Ball, .registration = TRUE
 #' @noRd
 #' 
-bcov_test_wrap_c <- function(x, y, n, R, dst, num.threads) {
-  dst <- as.integer(dst)
+bcov_test_wrap_c <- function(x, y, n, num.permutations, distance, num.threads) {
+  distance <- as.integer(distance)
   x <- as.double(x)
   y <- as.double(y)
   n <- as.integer(n)
   num.threads <- as.integer(num.threads)
-  R <- as.integer(R)
+  r <- as.integer(num.permutations)
   #
   bcov <- as.double(numeric(3))
   p_value <- as.double(numeric(3))
-  res <- .C("bcov_test", bcov, p_value, x, y, n, R, dst, num.threads)
+  res <- .C("bcov_test", bcov, p_value, x, y, n, r, distance, num.threads)
   bcov <- res[[1]]
   p_value <- res[[2]]
   names(bcov) <- c("bcov", "bcov.prob", "bcov.chisq")
   names(p_value) <- paste0(names(bcov), ".pvalue")
   list('statistic' = bcov, 'p.value' = p_value,
-       'info' = list("N" = res[[5]], "R" = res[[6]]))
+       'info' = list("N" = res[[5]], "num.permutations" = res[[6]]))
 }
 
 
@@ -160,23 +160,23 @@ bcov_test_wrap_c <- function(x, y, n, R, dst, num.threads) {
 #' @useDynLib Ball, .registration = TRUE
 #' @noRd
 #' 
-kbcov_test_wrap_c <- function(x, K, n, R, dst, num.threads) {
-  dst <- as.integer(dst) 
+kbcov_test_wrap_c <- function(x, K, n, num.permutations, distance, num.threads) {
+  distance <- as.integer(distance) 
   x <- as.double(x)
   K <- as.integer(K)
   n <- as.integer(n)
-  R <- as.integer(R)
+  r <- as.integer(num.permutations)
   num.threads <- as.integer(num.threads)
   #
   kbcov <- as.double(numeric(3))
   p_value <- as.double(numeric(3))
-  res <- .C("kbcov_test", kbcov, p_value, x, K, n, R, dst, num.threads)
+  res <- .C("kbcov_test", kbcov, p_value, x, K, n, r, distance, num.threads)
   bcov <- res[[1]]
   p_value <- res[[2]]
   names(bcov) <- c("bcov", "bcov.prob", "bcov.chisq")
   names(p_value) <- paste0(names(bcov), ".pvalue")
   list('statistic' = bcov, 'p.value' = p_value,
-       'info' = list("N" = res[[5]], "R" = res[[6]]))
+       'info' = list("N" = res[[5]], "num.permutations" = res[[6]]))
 }
 
 
@@ -190,7 +190,7 @@ kbcov_test_wrap_c <- function(x, K, n, R, dst, num.threads) {
 #' @useDynLib Ball, .registration = TRUE
 #' @noRd
 #' 
-apply_bcor_wrap <- function(x, y, n, p, dst, weight, method, num.threads) {
+apply_bcor_wrap <- function(x, y, n, p, distance, weight, method, num.threads) {
   bcor_stat <- as.double(numeric(3*p))
   y <- as.double(y)
   x <- as.vector(x)
@@ -201,7 +201,7 @@ apply_bcor_wrap <- function(x, y, n, p, dst, weight, method, num.threads) {
   nthread <- integer(1)
   p <- as.integer(1)
   k <- as.integer(1)
-  dst_y <- as.integer(dst)
+  dst_y <- as.integer(distance)
   dst_x <- as.integer(0)
   nth <- as.integer(num.threads)
   #

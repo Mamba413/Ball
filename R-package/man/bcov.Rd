@@ -5,16 +5,16 @@
 \alias{bcov}
 \title{Ball Correlation and Covariance Statistics}
 \usage{
-bcor(x, y, dst = FALSE, weight = FALSE)
+bcor(x, y, distance = FALSE, weight = FALSE)
 
-bcov(x, y, dst = FALSE, weight = FALSE)
+bcov(x, y, distance = FALSE, weight = FALSE)
 }
 \arguments{
 \item{x}{a numeric vector, matirx, data.frame or \code{dist} object or list containing numeric vector, matrix, data.frame, or \code{dist} object.}
 
 \item{y}{a numeric vector, matirx, data.frame or \code{dist} object.}
 
-\item{dst}{if \code{dst = TRUE}, \code{x} and \code{y} will be considered as a distance matrix. Default: \code{dst = FALSE}}
+\item{distance}{if \code{distance = TRUE}, \code{x} and \code{y} will be considered as a distance matrix. Default: \code{distance = FALSE}}
 
 \item{weight}{a logical or character value used to choose the form of weight. 
 If \code{weight = FALSE}, the ball covariance / correlation with constant weight is used. 
@@ -37,7 +37,7 @@ which are multivariate measures of dependence in Banach space.
 
 The sample sizes (number of rows or length of the vector) of the two variables must agree, 
 and samples must not contain missing values. 
-If we set \code{dst = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
+If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
 symmetric numeric matrix recording distance between samples; 
 otherwise, these arguments are treated as data.
 

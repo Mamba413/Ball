@@ -8,8 +8,9 @@
 \usage{
 bd.test(x, ...)
 
-\method{bd.test}{default}(x, y = NULL, R = 99, dst = FALSE,
-  size = NULL, seed = 4, num.threads = 1, kbd.type = "sum", ...)
+\method{bd.test}{default}(x, y = NULL, num.permutations = 99,
+  distance = FALSE, size = NULL, seed = 4, num.threads = 1,
+  kbd.type = "sum", ...)
 
 \method{bd.test}{formula}(formula, data, subset, na.action, ...)
 }
@@ -20,35 +21,35 @@ bd.test(x, ...)
 
 \item{y}{a numeric vector, matrix or data.frame.}
 
-\item{R}{the number of replications, when R equals to 0, the function returns
-the sample version of ball divergence. Default: \code{R = 99}}
+\item{num.permutations}{the number of permutation replications, when \code{num.permutations} equals to 0, the function returns
+the sample version of ball divergence. Default: \code{num.permutations = 99}}
 
-\item{dst}{if \code{dst = TRUE}, x will be considered as a distance matrix. Default: \code{dst = FALSE}}
+\item{distance}{if \code{distance = TRUE}, \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}}
 
 \item{size}{a vector record sample size of each group.}
 
 \item{seed}{the random seed.}
 
-\item{num.threads}{Number of threads. Default \code{num.threads = 2}.}
+\item{num.threads}{Number of threads. Default \code{num.threads = 1}.}
 
 \item{kbd.type}{a character value controlling the output information. 
 Setting \code{kdb.type = "sum"}, \code{kdb.type = "summax"}, or \code{kdb.type = "max"}, 
 the corresponding statistics value and \eqn{p}-value of \eqn{K}-sample test procedure are demonstrated. 
 Note that this arguments actually only influences the printed result in R console. Default: \code{kdb.type = "sum"}}
 
-\item{formula}{a formula of the form response ~ group where response gives the data values and group a vector or factor of the corresponding groups.}
+\item{formula}{a formula of the form \code{response ~ group} where \code{response} gives the data values and \code{group} a vector or factor of the corresponding groups.}
 
-\item{data}{an optional matrix or data frame (or similar: see model.frame) containing the variables in the formula formula. By default the variables are taken from environment(formula).}
+\item{data}{an optional matrix or data frame (or similar: see \code{model.frame}) containing the variables in the formula \code{formula}. By default the variables are taken from \code{environment(formula)}.}
 
 \item{subset}{an optional vector specifying a subset of observations to be used.}
 
-\item{na.action}{a function which indicates what should happen when the data contain NAs. Defaults to getOption("na.action").}
+\item{na.action}{a function which indicates what should happen when the data contain \code{NA}s. Defaults to \code{getOption("na.action")}.}
 }
 \value{
 bd.test returns a list with class "htest" containing the following components:
 \item{\code{statistic}}{ball divergence statistic.}            
 \item{\code{p.value}}{the p-value for the test.}
-\item{\code{replicates}}{replicates of the test statistic.}
+\item{\code{replicates}}{permutation replications of the test statistic.}
 \item{\code{size}}{sample sizes.}
 \item{\code{complete.info}}{a \code{list} containing multiple statistics value and their corresponding $p$ value.}
 \item{\code{alternative}}{a character string describing the alternative hypothesis.}
@@ -56,7 +57,7 @@ bd.test returns a list with class "htest" containing the following components:
 \item{\code{data.name}}{description of data.}
 }
 \description{
-Performs the nonparametric two-sample or K-sample ball divergence test for
+Performs the nonparametric two-sample or \eqn{K}-sample ball divergence test for
 equality of multivariate distributions
 }
 \details{
@@ -64,14 +65,14 @@ equality of multivariate distributions
 K-sample problem. If only \code{x} is given, the statistic is 
 computed from the original pooled samples, stacked in 
 matrix where each row is a multivariate observation, or from the distance matrix 
-when \code{dst = TRUE}. The first \code{sizes[1]} rows of \code{x} are the first sample, the next 
+when \code{distance = TRUE}. The first \code{sizes[1]} rows of \code{x} are the first sample, the next 
 \code{sizes[2]} rows of \code{x} are the second sample, etc.
-If x is a list, its elements are taken as the samples to be compared, 
+If \code{x} is a \code{list}, its elements are taken as the samples to be compared, 
 and hence have to be numeric data vectors, matrix or data.frame.
 
 Based on sample version ball divergence (see \code{\link{bd}}), the test is implemented by 
-permutation with R replicates. The function simply returns the test statistic 
-when \code{R = 0}.
+permutation with \code{num.permutations} times. The function simply returns the test statistic 
+when \code{num.permutations = 0}.
 }
 \examples{
 ################# Quick Start #################
@@ -98,7 +99,7 @@ scatterplot3d(bdvmf[["x"]], color = bdvmf[["group"]],
 # calculate geodesic distance between sample:
 Dmat <- nhdist(bdvmf[["x"]], method = "geodesic")
 # hypothesis test with BD :
-bd.test(x = Dmat, size = c(150, 150), R = 99, dst = TRUE)
+bd.test(x = Dmat, size = c(150, 150), num.permutations = 99, distance = TRUE)
 
 ################# Non-Hilbert Real Data #################
 # load data:
@@ -108,7 +109,7 @@ table(macaques[["group"]])
 # calculate Riemannian shape distance matrix:
 Dmat <- nhdist(macaques[["x"]], method = "riemann")
 # hypothesis test with BD:
-bd.test(x = Dmat, R = 99, size = c(9, 9), dst = TRUE)
+bd.test(x = Dmat, num.permutations = 99, size = c(9, 9), distance = TRUE)
 
 ################  K-sample Test  #################
 n <- 150
@@ -117,15 +118,16 @@ bd.test(rnorm(n), size = c(40, 50, 60))
 x <- lapply(c(40, 50, 60), rnorm)
 bd.test(x)
 
-## Formula interface
+################  Formula interface  ################
 ## Two-sample test
 bd.test(extra ~ group, data = sleep)
 ## K-sample test
 bd.test(Sepal.Width ~ Species, data = iris)
-
 }
 \references{
 Pan, Wenliang; Tian, Yuan; Wang, Xueqin; Zhang, Heping. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
+
+Jin, Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. URL http://arxiv.org/abs/1811.03750.
 }
 \seealso{
 \code{\link{bd}}

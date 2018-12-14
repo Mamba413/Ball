@@ -5,7 +5,8 @@
 \title{Ball Correlation Sure Independence Screening}
 \usage{
 bcorsis(x, y, d = "small", weight = FALSE, method = "standard",
-  dst = FALSE, parms = list(d1 = 5, d2 = 5, df = 3), num.threads = 2)
+  distance = FALSE, parms = list(d1 = 5, d2 = 5, df = 3),
+  num.threads = 2)
 }
 \arguments{
 \item{x}{a numeric matirx or data.frame included \eqn{n} rows and \eqn{p} columns. 
@@ -29,8 +30,8 @@ linear regression and generalized additive models, respectively.
 Options \code{"interaction"} and \code{"survival"} are designed for detecting variables 
 with potential linear interaction or associated with censored responses. Default: \code{method = "standard"}}
 
-\item{dst}{if \code{dst = TRUE}, \code{y} will be considered as a distance matrix. 
-Arguments only available when \code{ method = "standard"} and \code{ method = "interaction"}. Default: \code{dst = FALSE}}
+\item{distance}{if \code{distance = TRUE}, \code{y} will be considered as a distance matrix. 
+Arguments only available when \code{ method = "standard"} and \code{ method = "interaction"}. Default: \code{distance = FALSE}}
 
 \item{parms}{parameters list only available when \code{method = "lm"} or \code{"gam"}. 
 It contains three parameters: \code{d1}, \code{d2}, and \code{df}. \code{d1} is the
@@ -38,7 +39,7 @@ number of initially selected variables, \code{d2} is the number of variables col
 \code{df} is degree freedom of basis in generalized additive models 
 playing a role only when \code{method = "gam"}. Default: \code{ parms = list(d1 = 5, d2 = 5, df = 3)}}
 
-\item{num.threads}{Number of threads. Default \code{num.threads = 2}.}
+\item{num.threads}{Number of threads. Default \code{num.threads = 1}.}
 }
 \value{
 \item{\code{ix }}{ the vector of indices selected by ball correlation sure independence screening procedure.} 
@@ -61,7 +62,7 @@ BCor-SIS procedure for censored response is carried out when \code{method = "sur
 the matrix or data.frame pass to argument \code{y} must have exactly two columns and the first column is 
 event (failure) time while the second column is censored status, a dichotomous variable. 
 
-If we set \code{dst = TRUE}, arguments \code{y} is considered as distance matrix, 
+If we set \code{distance = TRUE}, arguments \code{y} is considered as distance matrix, 
 otherwise \code{y} is treated as data.
 
 BCor-SIS is based on a recently developed universal dependence measure: Ball correlation (BCor). 
@@ -144,6 +145,8 @@ head(res[["ix"]])
 }
 \references{
 Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) A Generic Sure Independence Screening Procedure, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709
+
+Jin, Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. URL http://arxiv.org/abs/1811.03750.
 }
 \seealso{
 \code{\link{bcor}}

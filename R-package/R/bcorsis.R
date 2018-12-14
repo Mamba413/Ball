@@ -12,7 +12,7 @@
 #' bcor(x, y, weight = TRUE)
 #' bcor(x, y, weight = "prob")
 #' bcor(x, y, weight = "chisq")
-bcor <- function(x, y, dst = FALSE, weight = FALSE) {
+bcor <- function(x, y, distance = FALSE, weight = FALSE) {
   x <- as.matrix(x)
   y <- as.matrix(y)
   x_y_info <- examine_x_y(x, y)
@@ -20,7 +20,7 @@ bcor <- function(x, y, dst = FALSE, weight = FALSE) {
   #
   weight <- examine_weight_arguments(weight)
   #
-  if(dst == FALSE) {
+  if(distance == FALSE) {
     if(p != 1) {
       x <- as.double(as.vector(as.matrix(dist(x, diag = TRUE))))
       y <- as.double(as.vector(as.matrix(dist(y, diag = TRUE))))
@@ -75,8 +75,8 @@ bcor <- function(x, y, dst = FALSE, weight = FALSE) {
 #' linear regression and generalized additive models, respectively.
 #' Options \code{"interaction"} and \code{"survival"} are designed for detecting variables 
 #' with potential linear interaction or associated with censored responses. Default: \code{method = "standard"}
-#' @param dst if \code{dst = TRUE}, \code{y} will be considered as a distance matrix. 
-#' Arguments only available when \code{ method = "standard"} and \code{ method = "interaction"}. Default: \code{dst = FALSE}
+#' @param distance if \code{distance = TRUE}, \code{y} will be considered as a distance matrix. 
+#' Arguments only available when \code{ method = "standard"} and \code{ method = "interaction"}. Default: \code{distance = FALSE}
 #' @param parms parameters list only available when \code{method = "lm"} or \code{"gam"}. 
 #' It contains three parameters: \code{d1}, \code{d2}, and \code{df}. \code{d1} is the
 #' number of initially selected variables, \code{d2} is the number of variables collection size added in each iteration.
@@ -100,7 +100,7 @@ bcor <- function(x, y, dst = FALSE, weight = FALSE) {
 #' the matrix or data.frame pass to argument \code{y} must have exactly two columns and the first column is 
 #' event (failure) time while the second column is censored status, a dichotomous variable. 
 #' 
-#' If we set \code{dst = TRUE}, arguments \code{y} is considered as distance matrix, 
+#' If we set \code{distance = TRUE}, arguments \code{y} is considered as distance matrix, 
 #' otherwise \code{y} is treated as data.
 #' 
 #' BCor-SIS is based on a recently developed universal dependence measure: Ball correlation (BCor). 
@@ -125,6 +125,7 @@ bcor <- function(x, y, dst = FALSE, weight = FALSE) {
 #' \code{\link{bcor}}
 #' 
 #' @references Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) A Generic Sure Independence Screening Procedure, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709
+#' @references Jin, Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. URL http://arxiv.org/abs/1811.03750.
 #' 
 #' @export
 #' @examples 
@@ -188,7 +189,7 @@ bcor <- function(x, y, dst = FALSE, weight = FALSE) {
 #' head(res[["ix"]])
 #' }
 bcorsis <- function(x, y, d = "small", weight = FALSE, 
-                    method = "standard", dst = FALSE,
+                    method = "standard", distance = FALSE,
                     parms = list(d1 = 5, d2 = 5, df = 3),
                     num.threads = 2)
 {
@@ -218,7 +219,7 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
   # examine method arguments
   method <- examine_method_arguments(method)
   # examine dst and method arguments
-  examine_dst_method(dst = dst, method = method)
+  examine_dst_method(dst = distance, method = method)
   
   if(method == "survival") {
     Xhavepickout <- bcorsis.surv(y = y, x = x, final_d = final_d, 
@@ -234,17 +235,17 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
       stop("After version 1.2.0, 'pvalue' method is no longer supported.")
     }
     # data prepare for screening:
-    if(dst == FALSE) {
+    if(distance == FALSE) {
       if(y_p != 1) {
         y <- as.vector(as.matrix(dist(y, diag = TRUE)))
-        dst <- TRUE
+        distance <- TRUE
       }
     } else {
       y <- as.vector(y)
     }
     # BCor-SIS:
     rcory_result <- apply_bcor_wrap(x = x, y = y, n = n, p = p, 
-                                    dst = dst, weight = weight, 
+                                    distance = distance, weight = weight, 
                                     method = method, num.threads = num.threads)
     Xhavepickout <- get_screened_vars(ids, rcory_result[[2]], final_d)
     complete_info[[1]] <- rcory_result[[1]]
@@ -252,7 +253,7 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
     Xhavepickout2 <- c()
     if(method == "interaction") {
       rcory2_result <- apply_bcor_wrap(x = (x)^2, y = y, n = n, p = p, 
-                                       dst = dst, weight = weight, 
+                                       distance = distance, weight = weight, 
                                        method = method, num.threads = num.threads)
       Xhavepickout2 <- get_screened_vars(ids, rcory2_result[[2]], final_d)
       complete_info[[2]] <- rcory_result[[2]]
@@ -262,12 +263,12 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
   if(method %in% c("gam", "lm")) {
     # data prepare for screening:
     y_copy <- preprocess_bcorsis_y(y, y_p)
-    dst <- y_copy[[2]]
+    distance <- y_copy[[2]]
     y_copy <- y_copy[[1]]
     R <- 0
     # Initial screening:
     rcory_result <- apply_bcor_wrap(x = x, y = y_copy, n = n, p = p, 
-                                    dst = dst, weight = weight, 
+                                    distance = distance, weight = weight, 
                                     method = method, num.threads = num.threads)
     # complete_info[[1]] <- rcory_result[[1]]
     # get d1 variables as initial variables set:
@@ -286,7 +287,7 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
         # BCor-screening
         y_copy <- preprocess_bcorsis_y(y, y_p)[[1]]
         rcory_result <- apply_bcor_wrap(x = Xnew, y = y_copy, n = n, p = p, 
-                                        dst = dst, weight = weight, 
+                                        distance = distance, weight = weight, 
                                         method = method, num.threads = num.threads)
         # get d2 variables for each iteration:
         Xlastpickout <- get_screened_vars(ids, rcory_result, d2)
@@ -318,7 +319,7 @@ bcorsis <- function(x, y, d = "small", weight = FALSE,
         # BCor-screening
         y_copy <- preprocess_bcorsis_y(y, y_p)[[1]]
         rcory_result <- apply_bcor_wrap(x = Xnew, y = y_copy, n = n, p = p, 
-                                        dst = dst, weight = weight, 
+                                        distance = distance, weight = weight, 
                                         method = method, num.threads = num.threads)
         # get d2 variables for each iteration:
         Xlastpickout <- get_screened_vars(ids, rcory_result, d2)

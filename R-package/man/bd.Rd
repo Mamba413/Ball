@@ -4,7 +4,7 @@
 \alias{bd}
 \title{Ball Divergence}
 \usage{
-bd(x, y = NULL, dst = FALSE, size = NULL, num.threads = 1,
+bd(x, y = NULL, distance = FALSE, size = NULL, num.threads = 1,
   kbd.type = "sum")
 }
 \arguments{
@@ -12,11 +12,11 @@ bd(x, y = NULL, dst = FALSE, size = NULL, num.threads = 1,
 
 \item{y}{a numeric vector, matrix or data.frame.}
 
-\item{dst}{if \code{dst = TRUE}, x will be considered as a distance matrix. Default: \code{dst = FALSE}}
+\item{distance}{if \code{distance = TRUE}, \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}}
 
 \item{size}{a vector record sample size of each group.}
 
-\item{num.threads}{Number of threads. Default \code{num.threads = 2}.}
+\item{num.threads}{Number of threads. Default \code{num.threads = 1}.}
 
 \item{kbd.type}{a character value controlling the output information. 
 Setting \code{kdb.type = "sum"}, \code{kdb.type = "summax"}, or \code{kdb.type = "max"}, 
@@ -31,7 +31,7 @@ Compute ball divergence statistic between two-sample or K-sample.
 }
 \details{
 Given the samples not containing missing values, \code{bd} returns sample version of ball divergence.
-If we set \code{dst = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
+If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
 symmetric numeric matrix recording distance between samples; 
 otherwise, these arguments are treated as data.
 

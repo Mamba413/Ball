@@ -1,20 +1,25 @@
 #' @title Ball Divergence based Equality of Distributions Test
-#' @description Performs the nonparametric two-sample or K-sample ball divergence test for
+#' 
+#' @description Performs the nonparametric two-sample or \eqn{K}-sample ball divergence test for
 #' equality of multivariate distributions
+#' 
 #' @aliases bd.test
+#' 
 #' @author Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang
+#' 
 #' @param x a numeric vector, matrix, data.frame, \code{dist} object or list containing vector, matrix, or data.frame.
 #' @param y a numeric vector, matrix or data.frame.
-#' @param R the number of replications, when R equals to 0, the function returns
-#' the sample version of ball divergence. Default: \code{R = 99}
-#' @param dst if \code{dst = TRUE}, x will be considered as a distance matrix. Default: \code{dst = FALSE}
+#' @param num.permutations the number of permutation replications, when \code{num.permutations} equals to 0, the function returns
+#' the sample version of ball divergence. Default: \code{num.permutations = 99}
+#' @param distance if \code{distance = TRUE}, \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}
 #' @param size a vector record sample size of each group.
 #' @param seed the random seed. 
-#' @param num.threads Number of threads. Default \code{num.threads = 2}.
+#' @param num.threads Number of threads. Default \code{num.threads = 1}.
 #' @param kbd.type a character value controlling the output information. 
 #' Setting \code{kdb.type = "sum"}, \code{kdb.type = "summax"}, or \code{kdb.type = "max"}, 
 #' the corresponding statistics value and \eqn{p}-value of \eqn{K}-sample test procedure are demonstrated. 
 #' Note that this arguments actually only influences the printed result in R console. Default: \code{kdb.type = "sum"}
+#' 
 #' @param ... further arguments to be passed to or from methods.
 #' 
 ## @param weight not available now
@@ -25,7 +30,7 @@
 #' @return bd.test returns a list with class "htest" containing the following components:
 #' \item{\code{statistic}}{ball divergence statistic.}            
 #' \item{\code{p.value}}{the p-value for the test.}
-#' \item{\code{replicates}}{replicates of the test statistic.}
+#' \item{\code{replicates}}{permutation replications of the test statistic.}
 #' \item{\code{size}}{sample sizes.}
 #' \item{\code{complete.info}}{a \code{list} containing multiple statistics value and their corresponding $p$ value.}
 #' \item{\code{alternative}}{a character string describing the alternative hypothesis.}
@@ -39,19 +44,20 @@
 #' K-sample problem. If only \code{x} is given, the statistic is 
 #' computed from the original pooled samples, stacked in 
 #' matrix where each row is a multivariate observation, or from the distance matrix 
-#' when \code{dst = TRUE}. The first \code{sizes[1]} rows of \code{x} are the first sample, the next 
+#' when \code{distance = TRUE}. The first \code{sizes[1]} rows of \code{x} are the first sample, the next 
 #' \code{sizes[2]} rows of \code{x} are the second sample, etc.
-#' If x is a list, its elements are taken as the samples to be compared, 
+#' If \code{x} is a \code{list}, its elements are taken as the samples to be compared, 
 #' and hence have to be numeric data vectors, matrix or data.frame.
 #' 
 #' Based on sample version ball divergence (see \code{\link{bd}}), the test is implemented by 
-#' permutation with R replicates. The function simply returns the test statistic 
-#' when \code{R = 0}.
+#' permutation with \code{num.permutations} times. The function simply returns the test statistic 
+#' when \code{num.permutations = 0}.
 #' 
 #' @seealso
 #' \code{\link{bd}}
 #' 
 #' @references Pan, Wenliang; Tian, Yuan; Wang, Xueqin; Zhang, Heping. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
+#' @references Jin, Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. URL http://arxiv.org/abs/1811.03750.
 #' 
 #' @export
 #' @examples
@@ -79,7 +85,7 @@
 #' # calculate geodesic distance between sample:
 #' Dmat <- nhdist(bdvmf[["x"]], method = "geodesic")
 #' # hypothesis test with BD :
-#' bd.test(x = Dmat, size = c(150, 150), R = 99, dst = TRUE)
+#' bd.test(x = Dmat, size = c(150, 150), num.permutations = 99, distance = TRUE)
 #'
 #' ################# Non-Hilbert Real Data #################
 #' # load data:
@@ -89,7 +95,7 @@
 #' # calculate Riemannian shape distance matrix:
 #' Dmat <- nhdist(macaques[["x"]], method = "riemann")
 #' # hypothesis test with BD:
-#' bd.test(x = Dmat, R = 99, size = c(9, 9), dst = TRUE)
+#' bd.test(x = Dmat, num.permutations = 99, size = c(9, 9), distance = TRUE)
 #' 
 #' ################  K-sample Test  #################
 #' n <- 150
@@ -97,14 +103,13 @@
 #' # alternative input method:
 #' x <- lapply(c(40, 50, 60), rnorm)
 #' bd.test(x)
-#' 
 bd.test <- function(x, ...) UseMethod("bd.test")
 
 
 #' @rdname bd.test
 #' @export
 #' @method bd.test default
-bd.test.default <- function(x, y = NULL, R = 99, dst = FALSE,
+bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE,
                             size = NULL, seed = 4, num.threads = 1, 
                             kbd.type = "sum", ...) {
   weight = FALSE
@@ -128,16 +133,16 @@ bd.test.default <- function(x, y = NULL, R = 99, dst = FALSE,
     # examine input arguments size:
     examine_size_arguments(x, size)
     # 
-    if(dst) {
+    if(distance) {
       xy <- as.vector(x)
     } else {
       p <- ncol(x)
       if(p > 1) {
         xy <- as.vector(as.matrix(dist(x, diag = TRUE)))
-        dst <- TRUE
+        distance <- TRUE
       } else {
         xy <- x
-        dst <- FALSE
+        distance <- FALSE
       }
     }
   } else {
@@ -148,31 +153,31 @@ bd.test.default <- function(x, y = NULL, R = 99, dst = FALSE,
     # 
     if(p > 1) {
       xy <- get_vectorized_distance_matrix(x, y)
-      dst <- TRUE
+      distance <- TRUE
       size <- c(xy[[2]], xy[[3]])
       xy <- xy[[1]]
     } else {
       xy <- rbind(x, y)
-      dst <- FALSE
+      distance <- FALSE
       size <- c(dim(x)[1], dim(y)[1])
     }
   }
   ## memory protect step:
   memoryAvailable(n = sum(size), funs = 'BD.test')
   
-  ## examine R arguments:
+  ## examine num.permutations arguments:
   if(method == "approx") {
-    R <- 0
+    num.permutations <- 0
   } else {
-    examine_R_arguments(R)
+    examine_R_arguments(num.permutations)
   }
   
   ## examine num.thread arguments:
   examine_threads_arguments(num.threads)
   
   ## main:
-  if(R == 0) {
-    result <- bd_test_wrap_c(xy, size, R = 0, weight, dst, num.threads)
+  if(num.permutations == 0) {
+    result <- bd_test_wrap_c(xy, size, num.permutations = 0, weight, distance, num.threads)
     # approximately method:
     if(method == "approx") {
       if(result[["info"]][["K"]] == 2) {
@@ -182,7 +187,7 @@ bd.test.default <- function(x, y = NULL, R = 99, dst = FALSE,
         return(result[["statistic"]])
       }
     } 
-    # return statistic when R = 0:
+    # return statistic when num.permutations = 0:
     else {
       if (result[["info"]][["K"]] == 2) {
         if (weight) {
@@ -206,7 +211,7 @@ bd.test.default <- function(x, y = NULL, R = 99, dst = FALSE,
     ## examine seed arguments:
     set.seed(examine_seed_arguments(seed))
     ## hypothesis test:
-    result <- bd_test_wrap_c(xy, size, R, weight, dst, num.threads)
+    result <- bd_test_wrap_c(xy, size, num.permutations, weight, distance, num.threads)
     # pvalue <- calculatePvalue(result[["statistic"]], result[["permuted_stat"]])
   }
   # output information:
@@ -229,7 +234,7 @@ bd.test.default <- function(x, y = NULL, R = 99, dst = FALSE,
   }
   data_name <- paste(data_name, sprintf("\nnumber of observations = %s,", result[["info"]][["N"]]))
   data_name <- paste(data_name, "group sizes:", paste0(result[["info"]][["size"]], collapse = " "))
-  data_name <- paste0(data_name, "\nreplicates = ", R)
+  data_name <- paste0(data_name, "\nreplicates = ", num.permutations)
   # data_name <- paste0(data_name, ", Weighted Ball Divergence = ", result[["info"]][["weight"]])
   alternative_message <- "distributions of samples are distinct"
   
@@ -237,7 +242,7 @@ bd.test.default <- function(x, y = NULL, R = 99, dst = FALSE,
   e <- list(
     statistic = stat,
     p.value = pvalue,
-    replicates = R,
+    replicates = num.permutations,
     size = result[["info"]][["size"]],
     complete.info = result,
     alternative = alternative_message,
@@ -251,22 +256,19 @@ bd.test.default <- function(x, y = NULL, R = 99, dst = FALSE,
 
 #' @rdname bd.test
 #'
-#' @param formula a formula of the form response ~ group where response gives the data values and group a vector or factor of the corresponding groups.
-#' @param data an optional matrix or data frame (or similar: see model.frame) containing the variables in the formula formula. By default the variables are taken from environment(formula).
+#' @param formula a formula of the form \code{response ~ group} where \code{response} gives the data values and \code{group} a vector or factor of the corresponding groups.
+#' @param data an optional matrix or data frame (or similar: see \code{model.frame}) containing the variables in the formula \code{formula}. By default the variables are taken from \code{environment(formula)}.
 #' @param subset an optional vector specifying a subset of observations to be used.
-#' @param na.action a function which indicates what should happen when the data contain NAs. Defaults to getOption("na.action").
-#'
-#' 
-#' @export
+#' @param na.action a function which indicates what should happen when the data contain \code{NA}s. Defaults to \code{getOption("na.action")}.
 #' @method bd.test formula
-#'
+#' @export
 #' @examples
-#' ## Formula interface
+#' 
+#' ################  Formula interface  ################
 #' ## Two-sample test
 #' bd.test(extra ~ group, data = sleep)
 #' ## K-sample test
 #' bd.test(Sepal.Width ~ Species, data = iris)
-#' 
 bd.test.formula <- function(formula, data, subset, na.action, ...) {
   if(missing(formula)
      || (length(formula) != 3L)
@@ -305,7 +307,7 @@ bd.test.formula <- function(formula, data, subset, na.action, ...) {
 #' 
 #' @details 
 #' Given the samples not containing missing values, \code{bd} returns sample version of ball divergence.
-#' If we set \code{dst = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
+#' If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
 #' symmetric numeric matrix recording distance between samples; 
 #' otherwise, these arguments are treated as data.
 #' 
@@ -356,8 +358,8 @@ bd.test.formula <- function(formula, data, subset, na.action, ...) {
 #' x <- rnorm(50)
 #' y <- rnorm(50)
 #' bd(x, y)
-bd <- function(x, y = NULL, dst = FALSE, size = NULL, num.threads = 1, kbd.type = "sum") {
-  res <- bd.test(x = x, y = y, dst = dst, size = size, R = 0, kbd.type = kbd.type)
+bd <- function(x, y = NULL, distance = FALSE, size = NULL, num.threads = 1, kbd.type = "sum") {
+  res <- bd.test(x = x, y = y, distance = distance, size = size, num.permutations = 0, kbd.type = kbd.type)
   res
 }
 

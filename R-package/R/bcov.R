@@ -6,8 +6,7 @@
 #' @inheritParams bd.test
 #' @param x a numeric vector, matirx, data.frame or \code{dist} object or list containing numeric vector, matrix, data.frame, or \code{dist} object.
 #' @param y a numeric vector, matirx, data.frame or \code{dist} object.
-#' @param R the number of replications. When \code{R = 0}, the function return ball covariance. Default: \code{R = 99}
-#' @param dst if \code{dst = TRUE}, \code{x} and \code{y} will be considered as a distance matrix. Default: \code{dst = FALSE}
+#' @param distance if \code{distance = TRUE}, \code{x} and \code{y} will be considered as a distance matrix. Default: \code{distance = FALSE}
 #' @param weight a logical or character value used to choose the form of weight. 
 #' If \code{weight = FALSE}, the ball covariance / correlation with constant weight is used. 
 #' Alternatively, \code{weight = TRUE} and \code{weight = "prob"} indicates the probability weight is chosen 
@@ -17,12 +16,12 @@
 ## @param type If \code{type = 'bcor'}, ball correlation will be used instead of ball covariance.(default \code{type = 'bcov'})
 ## @param method if \code{method = 'permute'}, a permutation procedure will be carried out;
 ## if \code{method = 'approx'}, the p-values based on approximate Ball Covariance distribution are given.(Test arguments)
-#' @param num.threads Number of threads. Default \code{num.threads = 2}.
+#' @param num.threads Number of threads. Default \code{num.threads = 1}.
 #' 
 #' @return bcov.test returns a list with class "htest" containing the following components:
 #' \item{\code{statistic}}{ball covariance or ball correlation statistic.}            
 #' \item{\code{p.value}}{the p-value for the test.}  
-#' \item{\code{replicates}}{replicates of the test statistic.}
+#' \item{\code{replicates}}{permutation replications of the test statistic.}
 #' \item{\code{size}}{sample size.} 
 #' \item{\code{complete.info}}{a \code{list} containing multiple statistics value and their corresponding $p$ value.}
 #' \item{\code{alternative}}{a character string describing the alternative hypothesis.}
@@ -31,13 +30,13 @@
 #' 
 #' @details 
 #' \code{bcov.test} are non-parametric tests of multivariate independence in Banach space. 
-#' The test decision is obtained via permutation, with \code{R} replicates.
+#' The test decision is obtained via permutation, with \code{num.permutations} replicates.
 #' 
 #' If two samples are pass to arguments \code{x} and \code{y}, the sample sizes (i.e. number of rows or length of the vector) 
 #' of the two variables must agree. If a \code{\link{list}} object is passed to \code{x}, 
 #' each element must with same sample sizes. Moreover, data pass to \code{x} or \code{y} 
 #' must not contain missing or infinite values. 
-#' If we set \code{dst = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
+#' If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
 #' symmetric numeric matrix recording distance between samples; 
 #' otherwise, these arguments are treated as data.
 #' 
@@ -47,7 +46,9 @@
 #' 
 #' For the general problem of testing independence when the distributions of \eqn{X} and 
 #' \eqn{Y} are unknown, the test based on \code{bcov} can be implemented as a permutation test.
-#' See (Pan et al 2017) for theoretical properties of the test, including statistical consistency.
+#' See (Jin et al 2018) for theoretical properties of the test, including statistical consistency.
+#' 
+#' @references Jin, Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. URL http://arxiv.org/abs/1811.03750.
 #' 
 #' @rdname bcov.test
 #' 
@@ -78,14 +79,14 @@
 #' # Distance matrix between x:
 #' Dx <- dist(ArcticLake[["depth"]])
 #' # hypothesis test with BCov:
-#' bcov.test(x = Dx, y = Dy, dst = TRUE)
+#' bcov.test(x = Dx, y = Dy, distance = TRUE)
 #' 
 #' ################  Weighted Ball Covariance Test  #################
 #' data("ArcticLake")
 #' Dy <- nhdist(ArcticLake[["x"]], method = "compositional")
 #' Dx <- dist(ArcticLake[["depth"]])
 #' # hypothesis test with weighted BCov:
-#' bcov.test(x = Dx, y = Dy, dst = TRUE, weight = TRUE)
+#' bcov.test(x = Dx, y = Dy, distance = TRUE, weight = TRUE)
 #' 
 #' ################# Mutual Independence Test #################
 #' x <- rnorm(30)
@@ -103,8 +104,8 @@ bcov.test <- function(x, ...) UseMethod("bcov.test")
 #' @rdname bcov.test
 #' @export
 #' @method bcov.test default
-bcov.test.default <- function(x, y = NULL, R = 99, 
-                              dst = FALSE, weight = FALSE, 
+bcov.test.default <- function(x, y = NULL, num.permutations = 99, 
+                              distance = FALSE, weight = FALSE, 
                               seed = 4, num.threads = 1, ...)
 {
   method = 'permute'
@@ -118,11 +119,11 @@ bcov.test.default <- function(x, y = NULL, R = 99,
     data_name <- gsub(x = data_name, pattern = " and NULL", replacement = "")
   }
   weight <- examine_weight_arguments(weight)
-  result <- bcov_test_internal_wrap(x = x, y = y, R = R, dst = dst, weight = weight, 
+  result <- bcov_test_internal_wrap(x = x, y = y, num.permutations = num.permutations, distance = distance, weight = weight, 
                                     seed = seed, method = method, type = type, 
                                     num.threads = num.threads)
   # return result of hypothesis test:
-  if(R == 0) {
+  if(num.permutations == 0) {
     return(result)
   } else {
     if (weight == "none") {
@@ -140,7 +141,7 @@ bcov.test.default <- function(x, y = NULL, R = 99,
     } 
     
     data_name <- paste0(data_name,"\nnumber of observations = ", result[["info"]][["N"]])
-    data_name <- paste0(data_name, "\nreplicates = ", R, 
+    data_name <- paste0(data_name, "\nreplicates = ", num.permutations, 
                         ", weight: ", weight_name)
     test_method <- "Ball Covariance test of %sindependence"
     test_type <- ifelse(class(x) == "list" && length(x) > 2, "mutual ", "")
@@ -153,7 +154,7 @@ bcov.test.default <- function(x, y = NULL, R = 99,
     e <- list(
       statistic = stat,
       p.value = pvalue,
-      replicates = R,
+      replicates = num.permutations,
       size = result[["info"]][["N"]],
       complete.info = result,
       alternative = alternative_message,
@@ -166,24 +167,26 @@ bcov.test.default <- function(x, y = NULL, R = 99,
 }
 
 
+
 #' @rdname bcov.test
 #'
-#' @param formula a formula of the form response ~ group where response gives the data values and group a vector or factor of the corresponding groups.
-#' @param data an optional matrix or data frame (or similar: see model.frame) containing the variables in the formula formula. By default the variables are taken from environment(formula).
+#' @param formula a formula of the form \code{~ u + v}, where each of \code{u} and \code{v} are numeric variables giving the data values for one sample. The samples must be of the same length.
+#' @param data an optional matrix or data frame (or similar: see \code{model.frame}) containing the variables in the formula formula. By default the variables are taken from environment(formula).
 #' @param subset an optional vector specifying a subset of observations to be used.
-#' @param na.action a function which indicates what should happen when the data contain NAs. Defaults to getOption("na.action").
+#' @param na.action a function which indicates what should happen when the data contain \code{NA}s. Defaults to \code{getOption("na.action")}.
+#' @param ... further arguments to be passed to or from methods.
 #' 
 #' @export
 #' @method bcov.test formula
 #' @importFrom stats model.frame
 #'
 #' @examples
-#' ## Formula interface
+#' 
+#' ################  Formula interface  ################
 #' ## independence test:
 #' bcov.test(~ CONT + INTG, data = USJudgeRatings)
 #' ## mutual independence test:
 #' bcov.test(~ CONT + INTG + DMNR, data = USJudgeRatings)
-#' 
 bcov.test.formula <- function(formula, data, subset, na.action, ...) {
   if(missing(formula)
      || !inherits(formula, "formula")
@@ -213,7 +216,7 @@ bcov.test.formula <- function(formula, data, subset, na.action, ...) {
 #' @param type 
 #'
 #' @noRd
-bcov_test_internal <- function(x, y, R = 99, dst = FALSE, weight = FALSE, 
+bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, weight = FALSE, 
                                seed = 4, method = 'permute', num.threads)
 {
   x <- as.matrix(x)
@@ -222,11 +225,11 @@ bcov_test_internal <- function(x, y, R = 99, dst = FALSE, weight = FALSE,
   num <- x_y_info[1]
   p <- x_y_info[2]
   #
-  if(dst == FALSE) {
+  if(distance == FALSE) {
     if(p != 1) {
       x <- as.vector(as.matrix(dist(x, diag = TRUE)))
       y <- as.vector(as.matrix(dist(y, diag = TRUE)))
-      dst <- TRUE
+      distance <- TRUE
     }
   } else {
     x <- as.vector(x)
@@ -236,16 +239,16 @@ bcov_test_internal <- function(x, y, R = 99, dst = FALSE, weight = FALSE,
   memoryAvailable(num, funs = 'BI.test')
   ## examine test type:
   # type <- examine_type_arguments(type)
-  ## examine R arguments:
+  ## examine num.permutations arguments:
   if(method == "approx") {
-    R <- 0
+    num.permutations <- 0
   } else {
-    examine_R_arguments(R)
+    examine_R_arguments(num.permutations)
   }
   #
-  if(R == 0) {
-    result <- bcov_test_wrap_c(x = x, y = y, n = num, R = 0, 
-                               dst = dst, num.threads = num.threads)
+  if(num.permutations == 0) {
+    result <- bcov_test_wrap_c(x = x, y = y, n = num, num.permutations = 0, 
+                               distance = distance, num.threads = num.threads)
     if(method == "approx") {
       pvalue <- calculatePvalue(result[["statistic"]] * result[["info"]][["N"]], 
                                 BITestNullDistribution)
@@ -260,7 +263,7 @@ bcov_test_internal <- function(x, y, R = 99, dst = FALSE, weight = FALSE,
     }
   } else {
     set.seed(seed = examine_seed_arguments(seed))
-    result <- bcov_test_wrap_c(x = x, y = y, n = num, R = R, dst =  dst, num.threads = num.threads)
+    result <- bcov_test_wrap_c(x = x, y = y, n = num, num.permutations = num.permutations, distance =  distance, num.threads = num.threads)
     return(result)
   }
 }
@@ -270,8 +273,7 @@ bcov_test_internal <- function(x, y, R = 99, dst = FALSE, weight = FALSE,
 #' @inheritParams bcov.test
 #' @inherit return
 #' @noRd
-#'
-kbcov_test_internal <- function(x, R = 99, dst = FALSE, weight = FALSE, 
+kbcov_test_internal <- function(x, num.permutations = 99, distance = FALSE, weight = FALSE, 
                                 seed = 4, method = 'permute', num.threads)
 {
   x <- lapply(x, as.matrix)
@@ -283,7 +285,7 @@ kbcov_test_internal <- function(x, R = 99, dst = FALSE, weight = FALSE,
   ############################################################
   #################### R Version (1.1.0) #####################
   ############################################################
-  # if(dst) {
+  # if(distance) {
   #   
   # } else {
   #   x <- lapply(x, dist, diag = TRUE, upper = TRUE)
@@ -293,15 +295,15 @@ kbcov_test_internal <- function(x, R = 99, dst = FALSE, weight = FALSE,
   # # compute statistic:
   # stat_value <- kbcov_stat(x = x, num = num, var_num = var_num, 
   #                          weight = weight, type = type)
-  # if(R == 0) {
+  # if(num.permutations == 0) {
   #   names(stat_value)
   #   return(stat_value)
   # } else {
   #   seed <- examine_seed_arguments(seed)
   #   set.seed(seed)
   #   # permutation procedure:
-  #   permuted_stat <- matrix(nrow = 3, ncol = R)
-  #   for (r in 1:R) {
+  #   permuted_stat <- matrix(nrow = 3, ncol = num.permutations)
+  #   for (r in 1:num.permutations) {
   #     x_copy <- x
   #     for (v in 1:var_num) {
   #       index <- sample(1:num, size = num, replace = FALSE)
@@ -322,25 +324,25 @@ kbcov_test_internal <- function(x, R = 99, dst = FALSE, weight = FALSE,
   # return result:
   # list("statistic" = stat_value, 
   #      "p.value" = pvalue, 
-  #      "info" = list("N" = num, "R" = R))
+  #      "info" = list("N" = num, "num.permutations" = num.permutations))
 
   
   ############################################################
   #################### C Version (1.2.0) #####################
   ############################################################
   var_num <- length(x)
-  if(dst) {
+  if(distance) {
     
   } else {
     x <- lapply(x, dist, diag = TRUE, upper = TRUE)
   }
   x <- lapply(x, as.matrix)
   x <- unlist(lapply(x, as.vector))
-  dst <- TRUE
+  distance <- TRUE
   #
-  if(R == 0) {
-    result <- kbcov_test_wrap_c(x = x, K = var_num, n = num, R = 0, 
-                                dst = dst, num.threads = num.threads)
+  if(num.permutations == 0) {
+    result <- kbcov_test_wrap_c(x = x, K = var_num, n = num, num.permutations = 0, 
+                                distance = distance, num.threads = num.threads)
     if(method == "approx") {
       pvalue <- calculatePvalue(result[["statistic"]] * result[["info"]][["N"]], 
                                 BITestNullDistribution)
@@ -355,8 +357,8 @@ kbcov_test_internal <- function(x, R = 99, dst = FALSE, weight = FALSE,
     }
   } else {
     set.seed(seed = examine_seed_arguments(seed))
-    result <- kbcov_test_wrap_c(x = x, K = var_num, n = num, R = R, 
-                                dst = dst, num.threads = num.threads)
+    result <- kbcov_test_wrap_c(x = x, K = var_num, n = num, num.permutations = num.permutations, 
+                                distance = distance, num.threads = num.threads)
     return(result)
   }
   
@@ -373,7 +375,6 @@ kbcov_test_internal <- function(x, R = 99, dst = FALSE, weight = FALSE,
 #'
 #' @return ball covariance statistic
 #' @noRd
-#'
 kbcov_stat <- function(x, num, var_num, weight, type) {
   compare_list <- list()
   prop_in_ball_vec <- c()
@@ -431,24 +432,23 @@ kbcov_stat <- function(x, num, var_num, weight, type) {
 #' Wrap kbcov_test_internal and bcov_test_internal
 #' @inheritParams bcov.test
 #' @noRd
-#'
-bcov_test_internal_wrap <- function(x = x, y = y, R, dst, seed, 
+bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, seed, 
                                     weight, method, type, num.threads)
 {
   if(class(x) == "list") {
     if (length(x) > 2)
     {
-      result <- kbcov_test_internal(x = x, R = R, dst = dst, weight = weight, 
+      result <- kbcov_test_internal(x = x, num.permutations = num.permutations, distance = distance, weight = weight, 
                                     seed = seed, method = method, num.threads = num.threads)
     } else {
       y <- x[[2]]
       x <- x[[1]]
-      result <- bcov_test_internal(x = x, y = y, R = R, dst = dst, 
+      result <- bcov_test_internal(x = x, y = y, num.permutations = num.permutations, distance = distance, 
                                    weight = weight, seed = seed, method = method, 
                                    num.threads = num.threads)
     }
   } else {
-    result <- bcov_test_internal(x = x, y = y, R = R, dst = dst, 
+    result <- bcov_test_internal(x = x, y = y, num.permutations = num.permutations, distance = distance, 
                                  weight = weight, seed = seed, method = method, 
                                  num.threads = num.threads)
   }
@@ -467,7 +467,7 @@ bcov_test_internal_wrap <- function(x = x, y = y, R, dst, seed,
 #' 
 #' The sample sizes (number of rows or length of the vector) of the two variables must agree, 
 #' and samples must not contain missing values. 
-#' If we set \code{dst = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
+#' If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
 #' symmetric numeric matrix recording distance between samples; 
 #' otherwise, these arguments are treated as data.
 #' 
@@ -538,9 +538,9 @@ bcov_test_internal_wrap <- function(x = x, y = y, R, dst, seed,
 #' bcov(x, y, weight = TRUE)
 #' bcov(x, y, weight = "prob")
 #' bcov(x, y, weight = "chisq")
-bcov <- function(x, y, dst = FALSE, weight = FALSE) {
+bcov <- function(x, y, distance = FALSE, weight = FALSE) {
   weight <- examine_weight_arguments(weight)
-  res <- bcov_test_internal_wrap(x = x, y = y, R = 0, dst = dst, seed = 0,
+  res <- bcov_test_internal_wrap(x = x, y = y, num.permutations = 0, distance = distance, seed = 0,
                                  weight = weight, method = "permute", num.threads = 1)
   res
 }
