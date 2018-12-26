@@ -1,3 +1,11 @@
+# Ball 1.3.7
+* Modify ambiguous arguments of bcov.test, bd.test, bcorsis
+* Modify document
+
+# Ball 1.3.6
+* Formula interface for bd.test and bcov.test
+* Optimize the package dependency
+
 # Ball 1.3.5
 * Faster implementation of mutual independence test
 * Multi-thread support for the test of mutual independence
