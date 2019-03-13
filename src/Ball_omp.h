@@ -1,7 +1,9 @@
 #ifndef Ball_OMP_H_
 #define Ball_OMP_H_
 #if defined(_OPENMP)
+
 #include <omp.h>
+
 #else
 #ifndef DISABLE_OPENMP
 // use pragma message instead of warning
