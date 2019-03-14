@@ -312,12 +312,12 @@ TEST(BCov, bcov_test) {
     int n = 30;
     x = (double *) malloc(n * sizeof(double));
     y = (double *) malloc(n * sizeof(double));
-    x_dst = (double *) malloc((n * n) * sizeof(double));
-    y_dst = (double *) malloc((n * n) * sizeof(double));
+    x_dst = (double *) malloc(((n * (n - 1)) >> 1) * sizeof(double));
+    y_dst = (double *) malloc(((n * (n - 1)) >> 1) * sizeof(double));
     memcpy(x, BCOV_X, n * sizeof(double));
     memcpy(y, BCOV_Y, n * sizeof(double));
-    memcpy(x_dst, BCOV_X_DST, (n * n) * sizeof(double));
-    memcpy(y_dst, BCOV_Y_DST, (n * n) * sizeof(double));
+    memcpy(x_dst, BCOV_X_DST, ((n * (n - 1)) >> 1) * sizeof(double));
+    memcpy(y_dst, BCOV_Y_DST, ((n * (n - 1)) >> 1) * sizeof(double));
 
     int R = 1000, dst = 0, nth = 2;
 
@@ -332,8 +332,8 @@ TEST(BCov, bcov_test) {
 
     memcpy(x, BCOV_X, n * sizeof(double));
     memcpy(y, BCOV_Y, n * sizeof(double));
-    memcpy(x_dst, BCOV_X_DST, (n * n) * sizeof(double));
-    memcpy(y_dst, BCOV_Y_DST, (n * n) * sizeof(double));
+    memcpy(x_dst, BCOV_X_DST, ((n * (n - 1)) >> 1) * sizeof(double));
+    memcpy(y_dst, BCOV_Y_DST, ((n * (n - 1)) >> 1) * sizeof(double));
 
     nth = 1;
     dst = 0;
