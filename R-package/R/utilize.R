@@ -55,8 +55,7 @@ examine_x_y <- function(x, y) {
   if(is.null(dim_x) | is.null(dim_y)) {
     stop("x or y is NULL!")
   }
-  n <- dim_x[1]
-  if(n != dim_y[1]) {
+  if(dim_x[1] != dim_y[1]) {
     stop("x and y have different sample sizes!")
   }
   if(any(apply(y, 2, anyNA))) {
@@ -71,6 +70,19 @@ examine_x_y <- function(x, y) {
     p <- -1
   }
   c(n, p)
+}
+
+#' Examine x, y arguments in bcov.test, bcov
+#' @inheritParams bcov.test
+#' @noRd
+#' 
+examine_x_y_bcov <- function(x, y) {
+  if (anyNA(x) || anyNA(y)) {
+    stop("Missing value exist!")
+  }
+  if (length(x) != length(y)) {
+    stop("x and y have different sample sizes!")
+  }
 }
 
 

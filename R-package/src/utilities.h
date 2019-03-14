@@ -45,6 +45,7 @@ void free_3d_matrix(double ***arr3D, int r, int c);
 void free_int_matrix(int **matrix, int r, int c);
 void free_3d_int_matrix(int ***arr3D, int r, int c);
 void vector2matrix(double *x, double **y, int N, int d, int isroworder);
+void distance2matrix(double *distance, double **distance_matrix, int n);
 void vector_2_3dmatrix(double *x, double ***y, int r, int c, int h, int isroworder);
 void Euclidean_distance(double *x, double **Dx, int n, int d);
 void distance(double *x, double *Dx, int *n, int *d);

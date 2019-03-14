@@ -37,14 +37,17 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
     xx_cpy = (double *) malloc(*n * sizeof(double));
     yy_cpy = (double *) malloc(*n * sizeof(double));
 
-    for (i = 0; i < *n; i++)
-        for (j = 0; j < *n; j++)
+    for (i = 0; i < *n; i++) {
+        for (j = 0; j < *n; j++) {
             xyidx[i][j] = j;
+        }
+    }
 
     for (i = 0; i < (*n); i++) {
         memcpy(xx_cpy, Dx[i], *n * sizeof(double));
-        for (j = 0; j < *n; j++)
+        for (j = 0; j < *n; j++) {
             yy_cpy[j] = Dy[i_perm[i]][i_perm[j]];
+        }
         quicksort2(xx_cpy, yy_cpy, xyidx[i], 0, *n - 1);
     }
     free(xx_cpy);
@@ -300,8 +303,8 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
     y_cpy = (double *) malloc(*n * sizeof(double));
 
     // convert distance vector to distance matrix:
-    vector2matrix(x, Dx, *n, *n, 1);
-    vector2matrix(y, Dy, *n, *n, 1);
+    distance2matrix(x, Dx, *n);
+    distance2matrix(y, Dy, *n);
 
     for (i = 0; i < *n; i++) {
         for (j = 0; j < *n; j++) {
@@ -326,7 +329,6 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
     free(y_cpy);
 
     Ball_Information_wrapper(bcov, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, thread);
-    // printf("RCTV0 = %f\n", bcov[0]);
     if (*R > 0) {
         double bcov_tmp[3], *permuted_bcov_weight0, *permuted_bcov_weight_prob, *permuted_bcov_weight_hhg;
         permuted_bcov_weight0 = (double *) malloc(*R * sizeof(double));
@@ -341,18 +343,10 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
                 break;
             }
             resample(i_perm, i_perm_inv, n);
-            /*
-            for (iii = 0; iii < *n; iii++)
-            {
-              printf("%d ", i_perm[iii]);
-            }
-            printf("\n");
-            */
             Ball_Information_wrapper(bcov_tmp, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, thread);
             permuted_bcov_weight0[i] = bcov_tmp[0];
             permuted_bcov_weight_prob[i] = bcov_tmp[1];
             permuted_bcov_weight_hhg[i] = bcov_tmp[2];
-            // printf("i = %d, RCTV1 = %f\n", i, bcov_tmp[0]);
         }
         pvalue[0] = compute_pvalue(bcov[0], permuted_bcov_weight0, i);
         pvalue[1] = compute_pvalue(bcov[1], permuted_bcov_weight_prob, i);
@@ -385,8 +379,8 @@ void BI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, int
     x_cpy = (double *) malloc(*n * sizeof(double));
     y_cpy = (double *) malloc(*n * sizeof(double));
 
-    vector2matrix(x, Dx, *n, *n, 1);
-    vector2matrix(y, Dy, *n, *n, 1);
+    distance2matrix(x, Dx, *n);
+    distance2matrix(y, Dy, *n);
 
     for (i = 0; i < *n; i++) {
         for (j = 0; j < *n; j++) {

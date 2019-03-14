@@ -1,3 +1,4 @@
+library(testthat)
 library(Ball)
 context("bcov and bcov.test function")
 skip_on_cran()
@@ -19,7 +20,6 @@ test_that("Multi-thread computation via permutation for univariate test of indep
   expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
   expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
 })
-
 
 test_that("Multi-thread computation via permutation for multivariate test of independence problem.", {
   Y <- matrix(rnorm(200*10), ncol = 10)

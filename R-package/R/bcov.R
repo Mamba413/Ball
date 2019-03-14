@@ -219,24 +219,33 @@ bcov.test.formula <- function(formula, data, subset, na.action, ...) {
 bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, weight = FALSE, 
                                seed = 4, method = 'permute', num.threads)
 {
-  x <- as.matrix(x)
-  y <- as.matrix(y)
-  x_y_info <- examine_x_y(x, y)
-  num <- x_y_info[1]
-  p <- x_y_info[2]
-  #
-  if(distance == FALSE) {
-    if(p != 1) {
-      x <- as.vector(as.matrix(dist(x, diag = TRUE)))
-      y <- as.vector(as.matrix(dist(y, diag = TRUE)))
-      distance <- TRUE
+  if (distance) {
+    if (class(x) == "dist" || class(y) == "dist") {
+      num <- attr(x, "Size")
+      x <- as.vector(x)
+      y <- as.vector(y)
+    } else {
+      num <- nrow(x)
+      x <- as.vector(x[lower.tri(x)])
+      y <- as.vector(y[lower.tri(y)])
     }
   } else {
-    x <- as.vector(x)
-    y <- as.vector(y)
+    x <- as.matrix(x)
+    y <- as.matrix(y)
+    num <- nrow(x)
+    if (ncol(x) != 1 || ncol(y) != 1) {
+      x <- as.vector(dist(x))
+      y <- as.vector(dist(y))
+      distance <- TRUE
+    } else {
+      x <- as.vector(x)
+      y <- as.vector(y)
+    }
   }
+  examine_x_y_bcov(x, y)
+  
   ## memory protect step:
-  memoryAvailable(num, funs = 'BI.test')
+  # memoryAvailable(num, funs = 'BI.test')
   ## examine test type:
   # type <- examine_type_arguments(type)
   ## examine num.permutations arguments:
