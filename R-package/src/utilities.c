@@ -922,13 +922,51 @@ void resample_matrix(int **i_perm, int *r, int *c) {
 
 void resample2(int *i_perm, int *n) {
     int i, j, temp;
+#ifdef R_BUILD
+    GetRNGstate();
     for (i = *n - 1; i > 0; --i) {
-        // j = rand() % (i + 1);
-        j = random_index2(i);
+        j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
         temp = i_perm[j];
         i_perm[j] = i_perm[i];
         i_perm[i] = temp;
     }
+    PutRNGstate();
+#else
+    for (i = *n - 1; i > 0; --i) {
+        j = rand() % (i + 1);
+        temp = i_perm[j];
+        i_perm[j] = i_perm[i];
+        i_perm[i] = temp;
+    }
+#endif
+}
+
+void shuffle_indicator_matrix_UBI(int **i_perm_matrix, int *init_perm, int num_permutation, int num) {
+    int k, temp;
+#ifdef R_BUILD
+    GetRNGstate();
+    for (int i = 0; i < num_permutation; i++) {
+        for (int j = num - 1; j > 0; --j) {
+            k = ((int) round(RAND_MAX * unif_rand())) % (j + 1);
+            temp = init_perm[k];
+            init_perm[k] = init_perm[j];
+            init_perm[j] = temp;
+        }
+        memcpy(i_perm_matrix[i], init_perm, num * sizeof(int));
+    }
+    PutRNGstate();
+#else
+    srand((unsigned) time(NULL));
+    for (int i = 0; i < num_permutation; i++) {
+        for (int j = num - 1; j > 0; --j) {
+            k = rand() % (j + 1);
+            temp = init_perm[k];
+            init_perm[k] = init_perm[j];
+            init_perm[j] = temp;
+        }
+        memcpy(i_perm_matrix[i], init_perm, num * sizeof(int));
+    }
+#endif
 }
 
 

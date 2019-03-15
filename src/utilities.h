@@ -58,6 +58,7 @@ void shuffle_indicator_matrix(int **i_perm_matrix, int **i_perm_matrix_inv, int 
                               int num_permutation, int num);
 void resample_matrix(int **i_perm, int *r, int *c);
 void resample2(int *i_perm, int *n);
+void shuffle_indicator_matrix_UBI(int **i_perm_matrix, int *init_perm, int num_permutation, int num);
 void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1);
 void ranksort(int *n, int *zrank, double *z, int *zidx);
 
