@@ -144,6 +144,9 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
 }
 
 
+/**
+ * @deprecated
+ */
 void Ball_Information_parallel(double *bcov_stat, int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm,
                                int *i_perm_inv, int *nthread) {
     double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0;
@@ -287,7 +290,6 @@ void Ball_Information_wrapper(double *bcov_stat, int *n, double **Dx, double **D
     }
 }
 
-
 void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *thread) {
     /*  computes RCT(x,y)  */
     int i, j, **xidx, **yidx, *i_perm, *i_perm_inv;
@@ -328,25 +330,58 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
     free(x_cpy);
     free(y_cpy);
 
-    Ball_Information_wrapper(bcov, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, thread);
+    Ball_Information(bcov, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv);
     if (*R > 0) {
-        double bcov_tmp[3], *permuted_bcov_weight0, *permuted_bcov_weight_prob, *permuted_bcov_weight_hhg;
+        double *permuted_bcov_weight0, *permuted_bcov_weight_prob, *permuted_bcov_weight_hhg;
         permuted_bcov_weight0 = (double *) malloc(*R * sizeof(double));
         permuted_bcov_weight_prob = (double *) malloc(*R * sizeof(double));
         permuted_bcov_weight_hhg = (double *) malloc(*R * sizeof(double));
-
-        // int iii;
-        for (i = 0; i < *R; i++) {
-            // stop permutation if user stop it manually:
-            if (pending_interrupt()) {
-                print_stop_message();
-                break;
+        int not_parallel = *thread == 1 ? 1 : 0;
+#ifdef Ball_OMP_H_
+        if (not_parallel != 1) {
+            omp_set_dynamic(0);
+            if (*thread < 0) {
+                omp_set_num_threads(omp_get_num_procs());
+            } else {
+                omp_set_num_threads(*thread);
             }
-            resample(i_perm, i_perm_inv, n);
-            Ball_Information_wrapper(bcov_tmp, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv, thread);
-            permuted_bcov_weight0[i] = bcov_tmp[0];
-            permuted_bcov_weight_prob[i] = bcov_tmp[1];
-            permuted_bcov_weight_hhg[i] = bcov_tmp[2];
+        }
+#endif
+        if (not_parallel) {
+            double bcov_tmp[3];
+            for (i = 0; i < *R; i++) {
+                // stop permutation if user stop it manually:
+                if (pending_interrupt()) {
+                    print_stop_message();
+                    break;
+                }
+                resample(i_perm, i_perm_inv, n);
+                Ball_Information(bcov_tmp, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv);
+                permuted_bcov_weight0[i] = bcov_tmp[0];
+                permuted_bcov_weight_prob[i] = bcov_tmp[1];
+                permuted_bcov_weight_hhg[i] = bcov_tmp[2];
+            }
+        } else {
+            int **i_perm_matrix, **i_perm_inv_matrix;
+            i_perm_matrix = alloc_int_matrix(*R, *n);
+            i_perm_inv_matrix = alloc_int_matrix(*R, *n);
+            shuffle_indicator_matrix(i_perm_matrix, i_perm_inv_matrix, i_perm, i_perm_inv, *R, *n);
+#pragma omp parallel
+            {
+                int i_thread;
+                double bcov_tmp_thread[3];
+#pragma omp for
+                for (i_thread = 0; i_thread < (*R); i_thread++) {
+                    Ball_Information(bcov_tmp_thread, n, Dx, Dy, xidx, yidx,
+                                     i_perm_matrix[i_thread], i_perm_inv_matrix[i_thread]);
+                    permuted_bcov_weight0[i_thread] = bcov_tmp_thread[0];
+                    permuted_bcov_weight_prob[i_thread] = bcov_tmp_thread[1];
+                    permuted_bcov_weight_hhg[i_thread] = bcov_tmp_thread[2];
+                }
+            }
+            i = *R;
+            free_int_matrix(i_perm_matrix, *R, *n);
+            free_int_matrix(i_perm_inv_matrix, *R, *n);
         }
         pvalue[0] = compute_pvalue(bcov[0], permuted_bcov_weight0, i);
         pvalue[1] = compute_pvalue(bcov[1], permuted_bcov_weight_prob, i);
@@ -365,7 +400,9 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
     free(i_perm_inv);
 }
 
-
+/**
+ * @deprecated
+ */
 void BI_parallel(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *thread) {
     int i, j, **xidx, **yidx, *i_perm, *i_perm_inv;
     double **Dx, **Dy, *x_cpy, *y_cpy;
@@ -715,16 +752,18 @@ void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *
     }
     if (*thread > 1) {
 #ifdef Ball_OMP_H_
+        omp_set_dynamic(0);
         omp_set_num_threads(*thread);
 #endif
     }
     if ((*dst)) {
-        if (parallel_type == 2 && *thread > 1) {
-            BI_parallel(bcov, pvalue, x, y, n, R, thread);
-        } else {
-            *thread = single_thread;
-            BI(bcov, pvalue, x, y, n, R, thread);
-        }
+//        if (parallel_type == 2 && *thread > 1) {
+//            BI_parallel(bcov, pvalue, x, y, n, R, thread);
+//        } else {
+//            *thread = single_thread;
+//            BI(bcov, pvalue, x, y, n, R, thread);
+//        }
+        BI(bcov, pvalue, x, y, n, R, thread);
     } else {
         if (parallel_type == 2 && *thread > 1) {
             UBI_parallel(bcov, pvalue, x, y, n, R, thread);

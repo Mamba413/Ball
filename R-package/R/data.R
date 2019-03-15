@@ -7,15 +7,16 @@
 #' @importFrom stats model.frame
 #' @importFrom stats setNames
 #' @importFrom stats terms
+#' @importFrom stats as.dist
+#' @importFrom stats lm
+#' @importFrom stats residuals
 #' @importFrom utils data
 #' @importFrom utils head
 #' @importFrom utils memory.limit
 #' @importFrom survival survfit
 #' @importFrom survival Surv
-#' @importFrom stats lm
 #' @importFrom gam gam
 #' @importFrom gam s
-#' @importFrom stats residuals
 #' @importFrom mvtnorm rmvnorm
 NULL
 

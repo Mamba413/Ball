@@ -21,7 +21,6 @@
 void print_stop_message_internal()
 {
 	printf("Process stop due to user interruption! \n");
-	return;
 }
 
 
@@ -31,7 +30,6 @@ void print_stop_message_internal()
 * R_check_interrupt_fn is a R internal function;
 */
 void R_check_interrupt_fn(void *dummy) {
-	return;
 }
 
 

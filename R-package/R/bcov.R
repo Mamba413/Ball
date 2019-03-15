@@ -221,6 +221,12 @@ bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, we
 {
   if (distance) {
     if (class(x) == "dist" || class(y) == "dist") {
+      if (class(x) != "dist") {
+        x <- as.dist(x)
+      }
+      if (class(y) != "dist") {
+        y <- as.dist(y)
+      }
       num <- attr(x, "Size")
       x <- as.vector(x)
       y <- as.vector(y)

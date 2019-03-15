@@ -15,10 +15,19 @@
  */
 #include "math.h"
 #include "utilities.h"
+#include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "utilize_cross.h"
 
+#ifdef R_BUILD
+#include "R.h"
+#include "Rinternals.h"
+#else
+
+#include "time.h"
+
+#endif
 
 void swap(double *x, double *y) {
     double t = *x;
@@ -738,7 +747,6 @@ void vector_2_3dmatrix(double *x, double ***y, int r, int c, int h, int isroword
             }
         }
     }
-    return;
 }
 
 void rank_matrix_3d(double ***Dx, int n, int k, int ***Rx) {
@@ -839,17 +847,66 @@ This function permute i_perm array to achieve permutation
 */
 void resample(int *i_perm, int *i_perm_inv, int *n) {
     int i, j, temp;
+#ifdef R_BUILD
+    GetRNGstate();
     for (i = *n - 1; i > 0; --i) {
-        j = random_index2(i);
+        j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
         temp = i_perm[j];
         i_perm[j] = i_perm[i];
         i_perm[i] = temp;
     }
+    PutRNGstate();
+#else
+    srand((unsigned) time(NULL));
+    for (i = *n - 1; i > 0; --i) {
+        j = rand() % (i + 1);
+        temp = i_perm[j];
+        i_perm[j] = i_perm[i];
+        i_perm[i] = temp;
+    }
+#endif
+
     for (i = 0; i < *n; ++i) {
         i_perm_inv[i_perm[i]] = i;
     }
 }
 
+void shuffle_indicator_matrix(int **i_perm_matrix, int **i_perm_matrix_inv, int *init_perm, int *init_perm_inv,
+                              int num_permutation, int num) {
+    int k, temp;
+#ifdef R_BUILD
+    GetRNGstate();
+    for (int i = 0; i < num_permutation; i++) {
+        for (int j = num - 1; j > 0; --j) {
+            k = ((int) round(RAND_MAX * unif_rand())) % (j + 1);
+            temp = init_perm[k];
+            init_perm[k] = init_perm[j];
+            init_perm[j] = temp;
+        }
+        for (int j = 0; j < num; ++j) {
+            init_perm_inv[init_perm[j]] = j;
+        }
+        memcpy(i_perm_matrix[i], init_perm, num * sizeof(int));
+        memcpy(i_perm_matrix_inv[i], init_perm_inv, num * sizeof(int));
+    }
+    PutRNGstate();
+#else
+    srand((unsigned) time(NULL));
+    for (int i = 0; i < num_permutation; i++) {
+        for (int j = num - 1; j > 0; --j) {
+            k = rand() % (j + 1);
+            temp = init_perm[k];
+            init_perm[k] = init_perm[j];
+            init_perm[j] = temp;
+        }
+        for (int j = 0; j < num; ++j) {
+            init_perm_inv[init_perm[j]] = j;
+        }
+        memcpy(i_perm_matrix[i], init_perm, num * sizeof(int));
+        memcpy(i_perm_matrix_inv[i], init_perm_inv, num * sizeof(int));
+    }
+#endif
+}
 
 void resample_matrix(int **i_perm, int *r, int *c) {
     int i, j, k, temp;
@@ -862,7 +919,6 @@ void resample_matrix(int **i_perm, int *r, int *c) {
         }
     }
 }
-
 
 void resample2(int *i_perm, int *n) {
     int i, j, temp;

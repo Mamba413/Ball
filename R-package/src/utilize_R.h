@@ -26,3 +26,7 @@ int random_index2(int i);
 int random_index_thread(int i);
 
 #endif /* API_R_H_ */
+
+#ifndef R_BUILD
+#define R_BUILD
+#endif

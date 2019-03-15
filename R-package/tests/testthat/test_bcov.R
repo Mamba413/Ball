@@ -22,8 +22,8 @@ test_that("Multi-thread computation via permutation for univariate test of indep
 })
 
 test_that("Multi-thread computation via permutation for multivariate test of independence problem.", {
-  Y <- matrix(rnorm(200*10), ncol = 10)
-  X <- matrix(rnorm(200*10), ncol = 10)
+  Y <- matrix(rnorm(200 * 10), ncol = 10)
+  X <- matrix(rnorm(200 * 10), ncol = 10)
   fit1 <- bcov.test(Y, X, num.permutations = 300, num.threads = 1)
   fit2 <- bcov.test(Y, X, num.permutations = 300, num.threads = 2)
   fit3 <- bcov.test(Y, X, num.permutations = 300, num.threads = 4)

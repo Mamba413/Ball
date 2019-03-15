@@ -55,7 +55,8 @@ examine_x_y <- function(x, y) {
   if(is.null(dim_x) | is.null(dim_y)) {
     stop("x or y is NULL!")
   }
-  if(dim_x[1] != dim_y[1]) {
+  n <- dim_x[1]
+  if(n != dim_y[1]) {
     stop("x and y have different sample sizes!")
   }
   if(any(apply(y, 2, anyNA))) {
