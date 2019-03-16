@@ -108,6 +108,7 @@ TEST(BCOV, independence_test_multivariate) {
     double ball_stat_value[3], p_value[3];
     int nth, n = 10, R = 299, dst = 1;
 
+    // Note: there exists some test dependence, and hence, the error sometimes may occurs.
     nth = 1;
     bcov_test(ball_stat_value, p_value, X1_CONTINUOUS_DST, X2_CONTINUOUS_DST, &n, &R, &dst, &nth);
     EXPECT_GE(p_value[0], 0.05);

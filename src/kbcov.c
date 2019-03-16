@@ -19,7 +19,7 @@ void K_U_Ball_Covariance(double *kbcov_stat, double **x, int **i_perm, int *n, i
 
 void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm, int *n, int *k) {
     int i, j, t, var_index, compute_joint_index;
-    double p_all, p_prod, p_inv_prod;
+    double p_all, p_prod, p_inv_prod, at_least_point_number;
     double *p_k_array;
     double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, bcov_fixed_ball = 0.0;
     int hhg_include_ball_index;
@@ -35,12 +35,14 @@ void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm
             p_prod = 1.0, p_inv_prod = 1.0;
             hhg_include_ball_index = 1;
 
+            at_least_point_number = i == j ? 1 : 2;
             // to compute P_{i, j}^{\mu_{1}}, ..., P_{i, j}^{\mu_{*k}} (marginal):
             compute_joint_index = 1;
             for (var_index = 0; var_index < (*k); var_index++) {
                 p_k_array[var_index] = Rx[i_perm[var_index][i]][i_perm[var_index][j]][var_index];
                 if (compute_joint_index == 1) {
-                    compute_joint_index = p_k_array[var_index] == 0 ? 0 : 1;
+                    // Note: for each variable, if there is any only contain the at-least-point-number, we can derive that the joint number directly.
+                    compute_joint_index = p_k_array[var_index] == at_least_point_number ? 0 : 1;
                 }
             }
             // to compute P_{i, j}^{\mu_{1}, ..., \mu_{*k}} (joint):
@@ -55,7 +57,7 @@ void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm
                     }
                 }
             } else {
-                p_all = 0.0;
+                p_all = at_least_point_number;
             }
 
             for (var_index = 0; var_index < (*k); var_index++) {
@@ -95,7 +97,6 @@ void kbcov_test_single(double *kbcov_stat, double *pvalue, double *x, int *k, in
     i_perm = alloc_int_matrix(*k, *n);
 
     // convert x to 3D distance matrix:
-//    if (*dst == 1) { vector2matrix3d(x, Dx, *n, *n, *k, 1); }
     if (*dst == 1) { distance2matrix3d(x, Dx, *n, *k); }
 
     // compute rank 3D distance matrix row by row and one by one
@@ -106,13 +107,8 @@ void kbcov_test_single(double *kbcov_stat, double *pvalue, double *x, int *k, in
         for (i = 0; i < *n; i++) { i_perm[j][i] = i; }
     }
 
-    // compute kbcov value
     K_Ball_Covariance(kbcov_stat, Dx, Rx, i_perm, n, k);
-    //printf("KBcov: %f \n", kbcov_stat[0]);
-    //printf("KBcov-Probability: %f \n", kbcov_stat[1]);
-    //printf("KBcov-HHG: %f \n", kbcov_stat[2]);
 
-    // Hypothesis test
     if (*R > 0) {
         double bcov_tmp[3], *permuted_bcov_weight0, *permuted_bcov_weight_prob, *permuted_bcov_weight_hhg;
         permuted_bcov_weight0 = (double *) malloc(*R * sizeof(double));
@@ -135,7 +131,6 @@ void kbcov_test_single(double *kbcov_stat, double *pvalue, double *x, int *k, in
         pvalue[1] = compute_pvalue(kbcov_stat[1], permuted_bcov_weight_prob, i);
         pvalue[2] = compute_pvalue(kbcov_stat[2], permuted_bcov_weight_hhg, i);
 
-        //printf("%f, %f, %f\n", pvalue[0], pvalue[1], pvalue[2]);
         free(permuted_bcov_weight0);
         free(permuted_bcov_weight_prob);
         free(permuted_bcov_weight_hhg);
