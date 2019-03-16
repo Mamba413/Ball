@@ -733,7 +733,7 @@ void distance2matrix(double *distance, double **distance_matrix, int n) {
 }
 
 
-void vector_2_3dmatrix(double *x, double ***y, int r, int c, int h, int isroworder) {
+void vector2matrix3d(double *x, double ***y, int r, int c, int h, int isroworder) {
     /* copy a d-variate sample into a matrix, N samples in rows */
     int i, j, k;
     int index = 0;
@@ -744,6 +744,19 @@ void vector_2_3dmatrix(double *x, double ***y, int r, int c, int h, int isroword
                     y[i][j][k] = x[index];
                     index += 1;
                 }
+            }
+        }
+    }
+}
+
+void distance2matrix3d(double *distance, double ***distance_matrix3d, int n, int v) {
+    int s = 0;
+    for (int k = 0; k < v; ++k) {
+        for (int i = 0; i < n; ++i) {
+            distance_matrix3d[i][i][k] = 0.0;
+            for (int j = (i + 1); j < n; ++j) {
+                distance_matrix3d[j][i][k] = distance_matrix3d[i][j][k] = distance[s];
+                s++;
             }
         }
     }
@@ -865,14 +878,13 @@ void resample(int *i_perm, int *i_perm_inv, int *n) {
         i_perm[i] = temp;
     }
 #endif
-
     for (i = 0; i < *n; ++i) {
         i_perm_inv[i_perm[i]] = i;
     }
 }
 
-void shuffle_indicator_matrix(int **i_perm_matrix, int **i_perm_matrix_inv, int *init_perm, int *init_perm_inv,
-                              int num_permutation, int num) {
+void shuffle_indicator_inv_matrix(int **i_perm_matrix, int **i_perm_matrix_inv, int *init_perm, int *init_perm_inv,
+                                  int num_permutation, int num) {
     int k, temp;
 #ifdef R_BUILD
     GetRNGstate();
@@ -941,7 +953,7 @@ void resample2(int *i_perm, int *n) {
 #endif
 }
 
-void shuffle_indicator_matrix_UBI(int **i_perm_matrix, int *init_perm, int num_permutation, int num) {
+void shuffle_indicator_matrix(int **i_perm_matrix, int *init_perm, int num_permutation, int num) {
     int k, temp;
 #ifdef R_BUILD
     GetRNGstate();
@@ -973,20 +985,27 @@ void shuffle_indicator_matrix_UBI(int **i_perm_matrix, int *init_perm, int num_p
 /*
  * permute group index: i_perm
  */
-void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1) {
+void resample_indicator_label(int *i_perm, int *i_perm_tmp, int n, int *n1) {
     int i, j, temp, tmp0, tmp1;
-
-    // permute step:
+#ifdef R_BUILD
+    int k;
+    GetRNGstate();
+    for (int j = n - 1; j > 0; --j) {
+        k = ((int) round(RAND_MAX * unif_rand())) % (j + 1);
+        temp = init_perm[k];
+        init_perm[k] = init_perm[j];
+        init_perm[j] = temp;
+    }
+    PutRNGstate();
+#else
+    srand((unsigned) time(NULL));
     for (i = n - 1; i > 0; --i) {
-        // j = rand() % (i + 1);
-        // printf("%d, ", rand());
-        // printf("%d \n", random_index2(i));
-        j = random_index2(i);
+        j = rand() % (i + 1);
         temp = i_perm[j];
         i_perm[j] = i_perm[i];
         i_perm[i] = temp;
     }
-
+#endif
     tmp0 = 0;
     tmp1 = 0;
     for (i = 0; i < n; i++) {
@@ -997,6 +1016,58 @@ void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1) {
             tmp1++;
         }
     }
+}
+
+void resample_indicator_label_matrix(int **i_perm_matrix, int **i_perm_tmp_matrix,
+                                     int *init_perm, int *init_perm_tmp, int num_permutation, int n, int *n1) {
+    int i, j, temp, tmp0, tmp1;
+#ifdef R_BUILD
+    int k;
+    GetRNGstate();
+    for (int k = 0; k < num_permutation; ++k) {
+        for (i = n - 1; i > 0; --i) {
+            j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
+            temp = init_perm[j];
+            init_perm[j] = init_perm[i];
+            init_perm[i] = temp;
+        }
+        memcpy(i_perm_matrix[k], init_perm, n * sizeof(int));
+        tmp0 = 0;
+        tmp1 = 0;
+        for (i = 0; i < n; i++) {
+            if (init_perm[i] == 1) {
+                init_perm_tmp[tmp0++] = i;
+            } else {
+                init_perm_tmp[*n1 + tmp1] = i;
+                tmp1++;
+            }
+        }
+        memcpy(i_perm_tmp_matrix[k], init_perm_tmp, n * sizeof(int));
+    }
+    PutRNGstate();
+#else
+    srand((unsigned) time(NULL));
+    for (int k = 0; k < num_permutation; ++k) {
+        for (i = n - 1; i > 0; --i) {
+            j = rand() % (i + 1);
+            temp = init_perm[j];
+            init_perm[j] = init_perm[i];
+            init_perm[i] = temp;
+        }
+        memcpy(i_perm_matrix[k], init_perm, n * sizeof(int));
+        tmp0 = 0;
+        tmp1 = 0;
+        for (i = 0; i < n; i++) {
+            if (init_perm[i] == 1) {
+                init_perm_tmp[tmp0++] = i;
+            } else {
+                init_perm_tmp[*n1 + tmp1] = i;
+                tmp1++;
+            }
+        }
+        memcpy(i_perm_tmp_matrix[k], init_perm_tmp, n * sizeof(int));
+    }
+#endif
 }
 
 int random_index_thread_wrap(int i) {
@@ -1024,13 +1095,11 @@ void resample3_thread(int *permuted_arr, int *i_perm, int *i_perm_tmp, int n, in
     }
 }
 
-
 /* Arrange the N elements of ARRAY in random order.
  Only effective if N is much smaller than RAND_MAX;
  if this may not be the case, use a better random
  number generator. */
 void shuffle(int *array, int *N) {
-    // Rprintf("%d", RAND_MAX);  RAND_MAX = 32767;
     int n = *N;
     if (n > 1) {
         int i, j, t;
@@ -1042,7 +1111,6 @@ void shuffle(int *array, int *N) {
         }
     }
 }
-
 
 void shuffle_value(double *array, int *N) {
     // Rprintf("%d", RAND_MAX);  RAND_MAX = 32767;
@@ -1059,6 +1127,36 @@ void shuffle_value(double *array, int *N) {
     }
 }
 
+void shuffle_value_matrix(double **value_matrix, double *init_value, int num_permutation, int num) {
+    if (num > 1) {
+        int i, j;
+        double tmp;
+#ifdef R_BUILD
+        GetRNGstate();
+        for (int i = 0; i < num_permutation; i++) {
+            for (int j = num - 1; j > 0; --j) {
+                k = ((int) round(RAND_MAX * unif_rand())) % (j + 1);
+                tmp = init_value[k];
+                init_value[k] = init_value[j];
+                init_value[j] = tmp;
+            }
+            memcpy(value_matrix[i], init_value, num * sizeof(double));
+        }
+        PutRNGstate();
+#else
+        srand((unsigned) time(NULL));
+        for (int k = 0; k < num_permutation; ++k) {
+            for (i = 0; i < num - 1; i++) {
+                j = random_index(num, i);
+                tmp = init_value[j];
+                init_value[j] = init_value[i];
+                init_value[i] = tmp;
+            }
+            memcpy(value_matrix[i], init_value, num * sizeof(double));
+        }
+#endif
+    }
+}
 
 int pending_interrupt() {
     int interrupt_status = 0;
@@ -1066,8 +1164,6 @@ int pending_interrupt() {
     return interrupt_status;
 }
 
-
 void print_stop_message() {
     print_stop_message_internal();
-    return;
 }

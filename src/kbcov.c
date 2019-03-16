@@ -5,6 +5,17 @@
 #include "math.h"
 #include "utilities.h"
 
+/**
+ *
+ * @param kbcov_stat
+ * @param x
+ * @param i_perm
+ * @param n
+ * @param k
+ */
+void K_U_Ball_Covariance(double *kbcov_stat, double **x, int **i_perm, int *n, int *k) {
+    // TODO...
+}
 
 void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm, int *n, int *k) {
     int i, j, t, var_index, compute_joint_index;
@@ -84,7 +95,8 @@ void kbcov_test_single(double *kbcov_stat, double *pvalue, double *x, int *k, in
     i_perm = alloc_int_matrix(*k, *n);
 
     // convert x to 3D distance matrix:
-    if (*dst == 1) { vector_2_3dmatrix(x, Dx, *n, *n, *k, 1); }
+//    if (*dst == 1) { vector2matrix3d(x, Dx, *n, *n, *k, 1); }
+    if (*dst == 1) { distance2matrix3d(x, Dx, *n, *k); }
 
     // compute rank 3D distance matrix row by row and one by one
     rank_matrix_3d(Dx, *n, *k, Rx);
@@ -144,7 +156,8 @@ void kbcov_test_parallel(double *kbcov_stat, double *pvalue, double *x, int *k, 
     i_perm = alloc_int_matrix(*k, *n);
 
     // convert x to 3D distance matrix:
-    if (*dst == 1) { vector_2_3dmatrix(x, Dx, *n, *n, *k, 1); }
+//    if (*dst == 1) { vector2matrix3d(x, Dx, *n, *n, *k, 1); }
+    if (*dst == 1) { distance2matrix3d(x, Dx, *n, *k); }
 
     // compute rank 3D distance matrix row by row and one by one
     rank_matrix_3d(Dx, *n, *k, Rx);

@@ -46,7 +46,7 @@ void free_int_matrix(int **matrix, int r, int c);
 void free_3d_int_matrix(int ***arr3D, int r, int c);
 void vector2matrix(double *x, double **y, int N, int d, int isroworder);
 void distance2matrix(double *distance, double **distance_matrix, int n);
-void vector_2_3dmatrix(double *x, double ***y, int r, int c, int h, int isroworder);
+void vector2matrix3d(double *x, double ***y, int r, int c, int h, int isroworder);
 void Euclidean_distance(double *x, double **Dx, int n, int d);
 void distance(double *x, double *Dx, int *n, int *d);
 void shuffle(int *array, int *N);
@@ -54,13 +54,18 @@ void shuffle_value(double *array, int *N);
 int pending_interrupt();
 void print_stop_message();
 void resample(int *i_perm, int *i_perm_inv, int *n);
-void shuffle_indicator_matrix(int **i_perm_matrix, int **i_perm_matrix_inv, int *init_perm, int *init_perm_inv,
-                              int num_permutation, int num);
+void shuffle_indicator_inv_matrix(int **i_perm_matrix, int **i_perm_matrix_inv, int *init_perm, int *init_perm_inv,
+                                  int num_permutation, int num);
 void resample_matrix(int **i_perm, int *r, int *c);
 void resample2(int *i_perm, int *n);
-void shuffle_indicator_matrix_UBI(int **i_perm_matrix, int *init_perm, int num_permutation, int num);
+void resample_indicator_label(int *i_perm, int *i_perm_tmp, int n, int *n1);
+void resample_indicator_label_matrix(int **i_perm_matrix, int **i_perm_tmp_matrix,
+                                     int *init_perm, int *init_perm_tmp, int num_permutation, int n, int *n1);
+void shuffle_indicator_matrix(int **i_perm_matrix, int *init_perm, int num_permutation, int num);
+void shuffle_value_matrix(double **value_matrix, double *init_value, int num_permutation, int num);
 void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1);
 void ranksort(int *n, int *zrank, double *z, int *zidx);
+void distance2matrix3d(double *distance, double ***distance_matrix3d, int n, int v);
 
 
 #endif /* UTILITIES_H_ */
