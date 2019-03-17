@@ -219,6 +219,9 @@ bcov.test.formula <- function(formula, data, subset, na.action, ...) {
 bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, weight = FALSE, 
                                seed = 4, method = 'permute', num.threads)
 {
+  if (class(x) == "dist" && class(y) == "dist") {
+    distance <- TRUE
+  }
   if (distance) {
     if (class(x) == "dist" || class(y) == "dist") {
       if (class(x) != "dist") {
@@ -232,8 +235,8 @@ bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, we
       y <- as.vector(y)
     } else {
       num <- nrow(x)
-      x <- as.vector(x[lower.tri(x)])
-      y <- as.vector(y[lower.tri(y)])
+      x <- x[lower.tri(x)]
+      y <- y[lower.tri(y)]
     }
   } else {
     x <- as.matrix(x)

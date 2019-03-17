@@ -200,6 +200,9 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
 #endif
         if (not_parallel) {
             double bd_tmp[2];
+#ifdef R_BUILD
+            GetRNGstate();
+#endif
             for (i = 0; i < *R; i++) {
                 // stop permutation if user stop it manually:
                 if (pending_interrupt()) {
@@ -212,6 +215,9 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
                 permuted_bd_w0[i] = bd_tmp[0];
                 permuted_bd_w1[i] = bd_tmp[1];
             }
+#ifdef R_BUILD
+            PutRNGstate();
+#endif
             free(i_perm);
             free(i_perm_tmp);
         } else {
@@ -219,7 +225,6 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
             i_perm_matrix = alloc_int_matrix(*R, n);
             i_perm_tmp_matrix = alloc_int_matrix(*R, n);
             resample_indicator_label_matrix(i_perm_matrix, i_perm_tmp_matrix, i_perm, i_perm_tmp, *R, n, n1);
-
 #pragma omp parallel
             {
                 int **Rx_thread = alloc_int_matrix(n, n);
@@ -236,6 +241,7 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
             }
             free_int_matrix(i_perm_matrix, *R, n);
             free_int_matrix(i_perm_tmp_matrix, *R, n);
+            i = *R;
         }
         pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, i);
         pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, i);
@@ -638,14 +644,10 @@ void compute_cumulate_size(int *cumulate_size, int *size, int *k) {
 // size: an array contain sample size in each group
 // *p < *q is needed and *p == i, *q == j
 void get_ij_dst(double *xy, double *ij_dst, int *cumulate_size, int *size, int *n, int *p, int *q) {
-//void get_ij_dst(double *xy, double *ij_dst, int *cumulate_size, int *size, int *n, int i, int j) {
-    int k = 0;
-    int k1 = 0;
-    int k2 = 0;
+    int k = 0, k1 = 0, k2 = 0;
     int i = *p;
     int j = *q;
-    int n1 = size[i];
-    int n2 = size[j];
+    int n1 = size[i], n2 = size[j];
     int num = n1 + n2;
     // for group1:
     int index_ii = (*n) * cumulate_size[i] + cumulate_size[i];
@@ -811,6 +813,10 @@ void K_Ball_Divergence(double *kbd_stat, double *xy, int *cumsum_size, int *size
     bd_stat_w1_array = (double *) malloc(bd_stat_number * sizeof(double));
     bd_stat_w0_sum_array = (double *) malloc(*k * sizeof(double));
     bd_stat_w1_sum_array = (double *) malloc(*k * sizeof(double));
+    for (int l = 0; l < *k; ++l) {
+        bd_stat_w0_sum_array[l] = 0;
+        bd_stat_w1_sum_array[l] = 0;
+    }
 
     // compute two type of KBD:
     for (i = 0; i < *k; i++) {
@@ -837,7 +843,8 @@ void K_Ball_Divergence(double *kbd_stat, double *xy, int *cumsum_size, int *size
             bd_stat_w0_sum_array[l] += bd_stat_w0_array[s];
             bd_stat_w0_sum_array[m] += bd_stat_w0_array[s];
             bd_stat_w1_sum_array[l] += bd_stat_w1_array[s];
-            bd_stat_w1_sum_array[l] += bd_stat_w1_array[s];
+            bd_stat_w1_sum_array[m] += bd_stat_w1_array[s];
+            s++;
         }
     }
     quick_sort(bd_stat_w0_sum_array, *k);
@@ -944,7 +951,7 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
 #pragma omp for
                 for (j_thread = 0; j_thread < (*R); j_thread++) {
                     permute_dst(xy, new_xy, index_matrix[j_thread], n);
-                    kbd_value(kbd_tmp, new_xy, size, n, k);
+                    K_Ball_Divergence(kbd_tmp, new_xy, cumsum_size, size, n, k);
                     permuted_kbd_sum_w0[j_thread] = kbd_tmp[0];
                     permuted_kbd_sum_w1[j_thread] = kbd_tmp[1];
                     permuted_kbd_max_w0[j_thread] = kbd_tmp[2];
@@ -953,8 +960,8 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
                     permuted_kbd_maxsum_w1[j_thread] = kbd_tmp[5];
                 }
                 free(new_xy);
-                free_int_matrix(index_matrix, *R, *n);
             };
+            free_int_matrix(index_matrix, *R, *n);
             j = *R;
         }
 
@@ -972,6 +979,7 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
         free(permuted_kbd_maxsum_w1);
         free(index);
     }
+    free(cumsum_size);
 }
 
 /**
@@ -1414,7 +1422,6 @@ void ukbd_value(double *kbd_stat, double *xy, int *size, int *k) {
     quick_sort(bd_stat_w1_array, bd_stat_number);
     // compute maximum K-1 version statistic:
     for (i = bd_stat_number - 1; i > (bd_stat_number - K); i--) {
-        //printf("ordinary bd stat: %f, weighted bd stat: %f\n", bd_stat_w0_array[i], bd_stat_w1_array[i]);
         kbd_stat_value_max_w0 += bd_stat_w0_array[i];
         kbd_stat_value_max_w1 += bd_stat_w1_array[i];
     }
@@ -1451,6 +1458,10 @@ void U_K_Ball_Divergence(double *kbd_stat, double *xy, int *cumsum_size, int *si
 
     bd_stat_w0_sum_array = (double *) malloc(*k * sizeof(double));
     bd_stat_w1_sum_array = (double *) malloc(*k * sizeof(double));
+    for (int l = 0; l < *k; ++l) {
+        bd_stat_w0_sum_array[l] = 0.0;
+        bd_stat_w1_sum_array[l] = 0.0;
+    }
 
     // KBD statistic:
     for (i = 0; i < *k; i++) {
@@ -1465,6 +1476,7 @@ void U_K_Ball_Divergence(double *kbd_stat, double *xy, int *cumsum_size, int *si
             bd_stat_w0_array[s] = bd_stat_value[0];
             bd_stat_w1_array[s] = bd_stat_value[1];
             s += 1;
+            free(ij_value);
         }
     }
     // compute maxsum version statistic:
@@ -1474,7 +1486,8 @@ void U_K_Ball_Divergence(double *kbd_stat, double *xy, int *cumsum_size, int *si
             bd_stat_w0_sum_array[l] += bd_stat_w0_array[s];
             bd_stat_w0_sum_array[m] += bd_stat_w0_array[s];
             bd_stat_w1_sum_array[l] += bd_stat_w1_array[s];
-            bd_stat_w1_sum_array[l] += bd_stat_w1_array[s];
+            bd_stat_w1_sum_array[m] += bd_stat_w1_array[s];
+            s++;
         }
     }
     quick_sort(bd_stat_w0_sum_array, *k);
@@ -1574,6 +1587,7 @@ void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, in
                     permuted_kbd_max1_w1[j_thread] = kbd_tmp[5];
                 }
             }
+            free_matrix(xy_new, *R, *n);
             j = *R;
         }
         pvalue[0] = compute_pvalue(kbd[0], permuted_kbd_sum_w0, j);
@@ -1589,6 +1603,7 @@ void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, in
         free(permuted_kbd_max1_w0);
         free(permuted_kbd_max1_w1);
     }
+    free(cumsum_size);
 }
 
 /**

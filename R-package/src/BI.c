@@ -324,7 +324,6 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
     // computational complexity: O(n^2 * logn)
     // xidx, yidx is index of each row after sorted
     for (i = 0; i < (*n); i++) {
-        // copy site to x_cpy and y_cpy
         memcpy(x_cpy, Dx[i], *n * sizeof(double));
         memcpy(y_cpy, Dy[i], *n * sizeof(double));
         quicksort(x_cpy, xidx[i], 0, *n - 1);
@@ -368,7 +367,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
             int **i_perm_matrix, **i_perm_inv_matrix;
             i_perm_matrix = alloc_int_matrix(*R, *n);
             i_perm_inv_matrix = alloc_int_matrix(*R, *n);
-            shuffle_indicator_matrix(i_perm_matrix, i_perm_inv_matrix, i_perm, i_perm_inv, *R, *n);
+            shuffle_indicator_inv_matrix(i_perm_matrix, i_perm_inv_matrix, i_perm, i_perm_inv, *R, *n);
 #pragma omp parallel
             {
                 int i_thread;
@@ -651,7 +650,7 @@ void UBI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int
         } else {
             int **i_perm_thread;
             i_perm_thread = alloc_int_matrix(*R, *n);
-            shuffle_indicator_matrix_UBI(i_perm_thread, i_perm, *R, *n);
+            shuffle_indicator_matrix(i_perm_thread, i_perm, *R, *n);
 #pragma omp parallel
             {
                 int j_thread, **Rank_thread;

@@ -151,19 +151,13 @@ select_ball_stat <- function(ball_stat, weight, type = "bcov", fun_name = "bcov"
 #' @param size A integer vector
 #' @noRd
 #' 
-examine_size_arguments <- function(x, size) {
+examine_size_arguments <- function(size) {
   # self examine:
   if(is.null(size)) {
     stop("size arguments is needed")
   }
   size <- as.integer(size)
   if(any(is.na(size)) | any(size <= 0) | (length(size)==1)) {
-    stop("size arguments is invalid!")
-  }
-  # examine the consistency between x and size:
-  x_row <- nrow(x)
-  n <- sum(size)
-  if(x_row != n) {
     stop("size arguments is invalid!")
   }
 }
@@ -232,12 +226,8 @@ get_vectorized_distance_matrix <- function(x, y) {
   n2 <- dim(y)[1]
   n <- n1 + n2
   xy <- rbind(x, y)
-  Dxy <- as.vector(as.matrix(dist(xy, diag = TRUE)))
-  # p <- dim(xy)[2]
-  # Dxy <- numeric(n * n)
-  # Dxy <- .C("distance", as.double(t(xy)), as.double(t(Dxy)), as.integer(n), as.integer(p))
-  # Dxy <- Dxy[[2]]
-  list(Dxy, n1, n2)
+  dxy <- as.vector(dist(xy))
+  list(dxy, n1, n2)
 }
 
 
@@ -246,9 +236,6 @@ get_vectorized_distance_matrix <- function(x, y) {
 #' @noRd
 #' 
 get_matrixed_x <- function(x, y) {
-  if(is.null(x) & is.null(y)) {
-    stop("x and y are all null!")
-  }
   if(is.null(x)) {
     x <- y
   }

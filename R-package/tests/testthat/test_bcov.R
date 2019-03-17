@@ -8,6 +8,9 @@ test_that("Error if computation result for ball covariance is wrong!", {
   names(target_value) <- "bcov"
   expect_equal(bcov(1:10, 1:10), target_value)
   expect_equal(bcov.test(1:10, 1:10, num.permutations = 0), target_value)
+  dx <- dist(1:10)
+  dy <- dist(1:10)
+  expect_equal(bcov.test(dx, dy, distance = TRUE, num.permutations = 0), target_value)
 })
 
 
@@ -19,16 +22,21 @@ test_that("Multi-thread computation via permutation for univariate test of indep
   fit3 <- bcov.test(Y, X, num.permutations = 300, num.threads = 4)
   expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
   expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
+  expect_equal(fit1[["complete.info"]][["p.value"]], fit2[["complete.info"]][["p.value"]])
+  expect_equal(fit1[["complete.info"]][["p.value"]], fit3[["complete.info"]][["p.value"]])
 })
 
 test_that("Multi-thread computation via permutation for multivariate test of independence problem.", {
-  Y <- matrix(rnorm(200 * 10), ncol = 10)
-  X <- matrix(rnorm(200 * 10), ncol = 10)
+  set.seed(1)
+  Y <- matrix(rnorm(200 * 3), ncol = 3)
+  X <- matrix(rnorm(200 * 3), ncol = 3)
   fit1 <- bcov.test(Y, X, num.permutations = 300, num.threads = 1)
   fit2 <- bcov.test(Y, X, num.permutations = 300, num.threads = 2)
   fit3 <- bcov.test(Y, X, num.permutations = 300, num.threads = 4)
   expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
   expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
+  expect_equal(fit1[["complete.info"]][["p.value"]], fit2[["complete.info"]][["p.value"]])
+  expect_equal(fit1[["complete.info"]][["p.value"]], fit3[["complete.info"]][["p.value"]])
 })
 
 test_that("Multi-thread computation via permutation for mutual independence test", {

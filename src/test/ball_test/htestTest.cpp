@@ -4,8 +4,6 @@
 
 #include "gtest/gtest.h"
 
-static double ABSOLUTE_ERROR = 0.000001;
-
 extern "C" {
 #include "test_setting.h"
 #include "BD.h"

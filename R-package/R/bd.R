@@ -118,27 +118,63 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE
   if (length(data_name) > 1) {
     data_name <- ""
   }
-  if(is.null(x)|is.null(y)) {
+  if(is.null(x) || is.null(y)) {
+    
+    if(is.null(x) & is.null(y)) {
+      stop("x and y are all null!")
+    }
+    
     # modify input information:
     data_name <- gsub(x = data_name, pattern = " and NULL", replacement = "")
     
-    # examine input arguments x and y:
-    if(is.list(x)) {
-      x <- lapply(x, as.matrix)
-      size <- sapply(x, nrow)
-      x <- do.call("rbind", x)
-    } else {
-      x <- get_matrixed_x(x, y)
+    if (class(x) == "dist") {
+      distance <- TRUE
     }
-    # examine input arguments size:
-    examine_size_arguments(x, size)
-    # 
     if(distance) {
-      xy <- as.vector(x)
+      examine_size_arguments(size)
+      if (length(size) == 2) {
+        if (class(x) == "dist") {
+          if (attr(x, "Size") != sum(size)) { stop("size arguments is error!") }
+          xy <- as.vector(x)
+        } else {
+          xy <- x[lower.tri(x)]
+        }
+      } else if (length(size) > 2) {
+        if (class(x) == "dist") {
+          if (attr(x, "Size") != sum(size)) { stop("size arguments is error!") }
+          xy <- as.vector(as.matrix(x))
+        } else {
+          xy <- as.vector(x)
+        }
+      } else if (length(size) < 2) {
+        stop("size arguments is error!")
+      }
     } else {
-      p <- ncol(x)
-      if(p > 1) {
-        xy <- as.vector(as.matrix(dist(x, diag = TRUE)))
+      if (is.list(x)) {
+        x <- lapply(x, as.matrix)
+        if (length(unique(sapply(x, ncol))) != 1) {
+          stop("data with different dimension!")
+        }
+        size <- sapply(x, nrow)
+        x <- do.call("rbind", x)
+        p <- ncol(x)
+      } else if (is.vector(x)) {
+        p <- 1
+      } else {
+        p <- ncol(x)
+        if (p == 1) {
+          x <- as.vector(x)
+        }
+      }
+      if (p > 1) {
+        xy <- dist(x)
+        if (length(size) > 2) {
+          xy <- as.vector(as.matrix(xy))
+        } else if (length(size) == 2) {
+          xy <- as.vector(xy)
+        } else if (length(size) <= 1) {
+          stop("x arguments is invalid")
+        }
         distance <- TRUE
       } else {
         xy <- x
@@ -148,7 +184,6 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE
   } else {
     x <- as.matrix(x)
     y <- as.matrix(y)
-    # examine dimension:
     p <- examine_dimension(x, y)
     # 
     if(p > 1) {
@@ -157,13 +192,14 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE
       size <- c(xy[[2]], xy[[3]])
       xy <- xy[[1]]
     } else {
-      xy <- rbind(x, y)
+      xy <- c(x, y)
       distance <- FALSE
       size <- c(dim(x)[1], dim(y)[1])
     }
   }
+  
   ## memory protect step:
-  memoryAvailable(n = sum(size), funs = 'BD.test')
+  # memoryAvailable(n = sum(size), funs = 'BD.test')
   
   ## examine num.permutations arguments:
   if(method == "approx") {
