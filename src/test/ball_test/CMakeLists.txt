@@ -9,7 +9,7 @@ if (OPENMP_FOUND)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif ()
 
-add_executable(runBallTest statTest.cpp ../../BD.c ../../BI.c ../../kbcov.c ../../BD.h
+add_executable(runBallTest statTest.cpp ../../BD.c ../../BI.c ../../kbcov.c ../../BD.h ../../kbd.h ../../kbd.c
         ../../utilities.h ../../utilities.c ../../utilize_cross.h ../../utilize_cross.c ../../Ball_omp.h
         ../../bcor.h ../../bcor.c ../../kbcov.c ../../kbcov.h basic_test.cpp test_setting.h stats_crude.h stats_crude.c htestTest.cpp)
 

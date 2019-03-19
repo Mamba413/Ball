@@ -132,19 +132,13 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE
     }
     if(distance) {
       examine_size_arguments(size)
-      if (length(size) == 2) {
+      if (length(size) >= 2) {
         if (class(x) == "dist") {
           if (attr(x, "Size") != sum(size)) { stop("size arguments is error!") }
           xy <- as.vector(x)
         } else {
+          if (nrow(x) != sum(size)) { stop("size arguments is error!") }
           xy <- x[lower.tri(x)]
-        }
-      } else if (length(size) > 2) {
-        if (class(x) == "dist") {
-          if (attr(x, "Size") != sum(size)) { stop("size arguments is error!") }
-          xy <- as.vector(as.matrix(x))
-        } else {
-          xy <- as.vector(x)
         }
       } else if (length(size) < 2) {
         stop("size arguments is error!")
@@ -168,13 +162,8 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE
       }
       if (p > 1) {
         xy <- dist(x)
-        if (length(size) > 2) {
-          xy <- as.vector(as.matrix(xy))
-        } else if (length(size) == 2) {
-          xy <- as.vector(xy)
-        } else if (length(size) <= 1) {
-          stop("x arguments is invalid")
-        }
+        if (attr(xy, "Size") != sum(size)) { stop("size arguments is error!") }
+        xy <- as.vector(xy)
         distance <- TRUE
       } else {
         xy <- x

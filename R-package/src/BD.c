@@ -18,6 +18,7 @@
 #include "stdlib.h"
 #include "stdio.h"
 #include "BD.h"
+#include "kbd.h"
 #include "utilities.h"
 #include "Ball_omp.h"
 
@@ -621,22 +622,6 @@ void bd_value(double *bd_stat, double *xy, int *n1, int *n2) {
     free_int_matrix(Rx, n, n);
 }
 
-// input:
-// size: an array contain sample size in each group
-// cumulate_size: the cumulative sums of size vector  
-// k: group number
-void compute_cumulate_size(int *cumulate_size, int *size, int *k) {
-    int i;
-    for (i = 0; i < (*k); i++) {
-        if (i == 0) {
-            cumulate_size[i] = 0;
-        } else {
-            cumulate_size[i] = cumulate_size[i - 1] + size[i - 1];
-        }
-    }
-}
-
-
 // need to fetch sub-matrix and vectorized it
 // xy: vectorized distance matrix
 // ij_dst: vectorized distance matrix of group i and group j
@@ -733,7 +718,7 @@ void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k) {
     bd_stat_w1_part_sum_array = (double *) malloc(K * sizeof(double));
 
     cumulate_size = (int *) malloc(K * sizeof(int));
-    compute_cumulate_size(cumulate_size, size, k);
+    compute_cumsum_size(cumulate_size, size, k);
 
     // compute two type of KBD:
     for (i = 0; i < K; i++) {
@@ -886,7 +871,7 @@ void K_Ball_Divergence(double *kbd_stat, double *xy, int *cumsum_size, int *size
 void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R, int *thread) {
     int *cumsum_size;
     cumsum_size = (int *) malloc(*k * sizeof(int));
-    compute_cumulate_size(cumsum_size, size, k);
+    compute_cumsum_size(cumsum_size, size, k);
     K_Ball_Divergence(kbd, xy, cumsum_size, size, n, k);
 
     // permutation test:
@@ -1074,7 +1059,7 @@ void KBD2(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, in
 
         int *cumulate_size;
         cumulate_size = (int *) malloc(*k * sizeof(int));
-        compute_cumulate_size(cumulate_size, size, k);
+        compute_cumsum_size(cumulate_size, size, k);
 
         int bd_stat_number = (*k) * ((*k) - 1) / 2;
         bd_stat_w0_array = (double *) malloc(bd_stat_number * sizeof(double));
@@ -1388,7 +1373,7 @@ void ukbd_value(double *kbd_stat, double *xy, int *size, int *k) {
     bd_stat_w1_part_sum_array = (double *) malloc(K * sizeof(double));
 
     cumusum_size = (int *) malloc(K * sizeof(int));
-    compute_cumulate_size(cumusum_size, size, k);
+    compute_cumsum_size(cumusum_size, size, k);
 
     // KBD statistic:
     for (i = 0; i < K; i++) {
@@ -1529,7 +1514,7 @@ void U_K_Ball_Divergence(double *kbd_stat, double *xy, int *cumsum_size, int *si
 void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R, int *thread) {
     int *cumsum_size;
     cumsum_size = (int *) malloc(*k * sizeof(int));
-    compute_cumulate_size(cumsum_size, size, k);
+    compute_cumsum_size(cumsum_size, size, k);
     U_K_Ball_Divergence(kbd, xy, cumsum_size, size, k);
 
     if ((*R) > 0) {
@@ -1682,11 +1667,7 @@ void bd_test(double *bd, double *pvalue, double *xy, int *size, int *n, int *k, 
         }
     } else {
         if (*dst) {
-            if (*n > 1000) {
-                KBD2(bd, pvalue, xy, size, n, k, R);
-            } else {
-                KBD(bd, pvalue, xy, size, n, k, R, nthread);
-            }
+            KBD3(bd, pvalue, xy, size, n, k, R, nthread);
         } else {
             UKBD(bd, pvalue, xy, size, n, k, R, nthread);
         }

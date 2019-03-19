@@ -13,6 +13,7 @@ extern "C" {
 #include "utilities.h"
 #include "Ball_omp.h"
 #include "stats_crude.h"
+#include "kbd.h"
 }
 
 TEST(BD, two_sample_test_univariate) {
@@ -70,6 +71,20 @@ TEST(BD, k_sample_test_univariate) {
 
 TEST(BD, k_sample_test_multivariate) {
     // TODO:
+}
+
+TEST(KBD, k_sample_test_multivariate) {
+    double kbd_stat[6], pvalue[6];
+    int n = 30, k = 3, R = 199, nth = 1, size[3] = {10, 10, 10};
+    KBD3(kbd_stat, pvalue, X1_X2_X3_CONTINUOUS_DST, size, &n, &k, &R, &nth);
+    EXPECT_GE(pvalue[0], 0.05);
+    EXPECT_GE(pvalue[2], 0.05);
+    EXPECT_GE(pvalue[4], 0.05);
+    nth = 2;
+    KBD3(kbd_stat, pvalue, X1_X2_X3_CONTINUOUS_DST, size, &n, &k, &R, &nth);
+    EXPECT_GE(pvalue[0], 0.05);
+    EXPECT_GE(pvalue[2], 0.05);
+    EXPECT_GE(pvalue[4], 0.05);
 }
 
 TEST(BCov, independence_test_univariate) {

@@ -18,6 +18,8 @@
 
 #define MAX(a,b) (((a)>(b))?(a):(b));
 void swap(double *x, double *y);
+void find_group_relative_location(int *group_relative_location, int *group, int *cumsum_size, int num, int K);
+void compute_cumsum_size(int *cumulate_size, int *size, int *k);
 void quick_sort_recursive(double *arr, int start, int end);
 void quick_sort(double *arr, int len);
 double compute_pvalue(double ball_stat_value, double *permuted_stat, int R);
@@ -40,10 +42,12 @@ double **alloc_matrix(int r, int c);
 double ***alloc_3d_matrix(int r, int c, int h);
 int **alloc_int_matrix(int r, int c);
 int ***alloc_3d_int_matrix(int r, int c, int h);
+int ***alloc_int_square_matrix_list(int* size, int number);
 void free_matrix(double **matrix, int r, int c);
 void free_3d_matrix(double ***arr3D, int r, int c);
 void free_int_matrix(int **matrix, int r, int c);
 void free_3d_int_matrix(int ***arr3D, int r, int c);
+void free_int_square_matrix_list(int ***arr3d, int* size, int num);
 void vector2matrix(double *x, double **y, int N, int d, int isroworder);
 void distance2matrix(double *distance, double **distance_matrix, int n);
 void vector2matrix3d(double *x, double ***y, int r, int c, int h, int isroworder);
@@ -58,6 +62,7 @@ void shuffle_indicator_inv_matrix(int **i_perm_matrix, int **i_perm_matrix_inv, 
                                   int num_permutation, int num);
 void resample_matrix(int **i_perm, int *r, int *c);
 void resample2(int *i_perm, int *n);
+void resample2_matrix(int **i_perm, int *init_perm, int num_permutation, int n);
 void resample_indicator_label(int *i_perm, int *i_perm_tmp, int n, int *n1);
 void resample_indicator_label_matrix(int **i_perm_matrix, int **i_perm_tmp_matrix,
                                      int *init_perm, int *init_perm_tmp, int num_permutation, int n, int *n1);

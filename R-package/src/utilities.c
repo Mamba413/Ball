@@ -35,6 +35,43 @@ void swap(double *x, double *y) {
     *y = t;
 }
 
+/**
+ *
+ * @param group_relative_location : [0, 2, 4, 1, 3, 5]
+ * @param group :  [0, 1, 2, 0, 1, 2]
+ * @param K : 3
+ */
+void find_group_relative_location(int *group_relative_location, int *group, int *cumsum_size, int num, int K) {
+    int *init_group_relative_location = (int *) malloc(K * sizeof(int));
+    for (int k = 0; k < K; ++k) {
+        init_group_relative_location[k] = 0;
+    }
+    for (int i = 0; i < num; ++i) {
+        for (int j = 0; j < K; ++j) {
+            if (group[i] == j) {
+                group_relative_location[i] = cumsum_size[j] + init_group_relative_location[j];
+                init_group_relative_location[j] += 1;
+                break;
+            }
+        }
+    }
+}
+
+// input:
+// size: an array contain sample size in each group
+// cumulate_size: the cumulative sums of size vector
+// k: group number
+void compute_cumsum_size(int *cumulate_size, int *size, int *k) {
+    int i;
+    for (i = 0; i < (*k); i++) {
+        if (i == 0) {
+            cumulate_size[i] = 0;
+        } else {
+            cumulate_size[i] = cumulate_size[i - 1] + size[i - 1];
+        }
+    }
+}
+
 void quick_sort_recursive(double *arr, int start, int end) {
     if (start >= end)
         return;
@@ -661,6 +698,14 @@ int ***alloc_3d_int_matrix(int r, int c, int h) {
     return arr3D;
 }
 
+int ***alloc_int_square_matrix_list(int* size, int number) {
+    int ***arr3D = (int ***) malloc(number * sizeof(int **));
+    for (int i = 0; i < number; ++i) {
+        arr3D[i] = alloc_int_matrix(size[i], size[i]);
+    }
+    return arr3D;
+}
+
 void free_matrix(double **matrix, int r, int c) {
     /* free a matrix with r rows and c columns */
     int i;
@@ -701,6 +746,13 @@ void free_3d_int_matrix(int ***arr3D, int r, int c) {
         free(arr3D[i]);
     }
     free(arr3D);
+}
+
+void free_int_square_matrix_list(int ***arr3d, int* size, int num) {
+    for (int i = 0; i < num; ++i) {
+        free_int_matrix(arr3d[i], size[i], size[i]);
+    }
+    free(arr3d);
 }
 
 void vector2matrix(double *x, double **y, int N, int d, int isroworder) {
@@ -944,11 +996,40 @@ void resample2(int *i_perm, int *n) {
     }
     PutRNGstate();
 #else
+    srand((unsigned) time(NULL));
     for (i = *n - 1; i > 0; --i) {
         j = rand() % (i + 1);
         temp = i_perm[j];
         i_perm[j] = i_perm[i];
         i_perm[i] = temp;
+    }
+#endif
+}
+
+void resample2_matrix(int **i_perm, int *init_perm, int num_permutation, int n) {
+    int i, j, temp;
+#ifdef R_BUILD
+    GetRNGstate();
+    for (int r = 0; r < num_permutation; r++) {
+        for (i = n - 1; i > 0; --i) {
+            j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
+            temp = init_perm[j];
+            init_perm[j] = init_perm[i];
+            init_perm[i] = temp;
+        }
+        memcpy(i_perm[r], init_perm, n * sizeof(int));
+    }
+    PutRNGstate();
+#else
+    srand((unsigned) time(NULL));
+    for (int r = 0; r < num_permutation; r++) {
+        for (i = n - 1; i > 0; --i) {
+            j = rand() % (i + 1);
+            temp = init_perm[j];
+            init_perm[j] = init_perm[i];
+            init_perm[i] = temp;
+        }
+        memcpy(i_perm[r], init_perm, n * sizeof(int));
     }
 #endif
 }
@@ -980,7 +1061,6 @@ void shuffle_indicator_matrix(int **i_perm_matrix, int *init_perm, int num_permu
     }
 #endif
 }
-
 
 /*
  * permute group index: i_perm

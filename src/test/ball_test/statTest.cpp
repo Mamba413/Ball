@@ -15,6 +15,7 @@ extern "C" {
 #include "utilities.h"
 #include "Ball_omp.h"
 #include "stats_crude.h"
+#include "kbd.h"
 }
 
 TEST(BD, univariate_bd_value) {
@@ -102,6 +103,20 @@ TEST(BCOV, multivariate_bcov_value) {
 
     bcov_test(ball_stat_value, p_value, X1_CONTINUOUS_DST, X2_CONTINUOUS_DST, &n, &R, &dst, &nth);
     EXPECT_NEAR(ball_stat_value[0], ball_stat_value_golden[0], ABSOLUTE_ERROR);
+}
+
+TEST(KBD, multivariate_kbd_value) {
+    double kbd_stat[6], pvalue[6];
+    int n = 30, k = 3, R = 199, nth = 1, size[3] = {10, 10, 10};
+    KBD3(kbd_stat, pvalue, X1_X2_X3_CONTINUOUS_DST, size, &n, &k, &R, &nth);
+    EXPECT_NEAR(kbd_stat[0], 0.1372, ABSOLUTE_ERROR);
+    EXPECT_NEAR(kbd_stat[2], 0.1042, ABSOLUTE_ERROR);
+    EXPECT_NEAR(kbd_stat[4], 0.1042, ABSOLUTE_ERROR);
+//    nth = 2;
+//    KBD3(kbd_stat, pvalue, X1_X2_X3_CONTINUOUS_DST, size, &n, &k, &R, &nth);
+//    EXPECT_NEAR(kbd_stat[0], 0.1372, ABSOLUTE_ERROR);
+//    EXPECT_NEAR(kbd_stat[2], 0.1042, ABSOLUTE_ERROR);
+//    EXPECT_NEAR(kbd_stat[4], 0.1042, ABSOLUTE_ERROR);
 }
 
 TEST(KBCOV, kbcov_value) {
