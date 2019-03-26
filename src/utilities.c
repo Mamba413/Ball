@@ -105,17 +105,10 @@ double compute_pvalue(double ball_stat_value, double *permuted_stat, int R) {
     double larger_num = 0.0;
     for (int i = 0; i < R; i++) {
         if (permuted_stat[i] > ball_stat_value) {
-            larger_num += 1;
+            larger_num += 1.0;
         }
     }
-    double R_double = R, p_value;
-    if ((int) larger_num == 0) {
-        p_value = (1.0 + larger_num) / (1.0 + R_double);
-    } else {
-        p_value = (larger_num + 0.0) / R_double;
-    }
-//	printf("type I : %f, ", (1.0 + larger_num) / (1.0 + R_double));
-//	printf("type I : %f \n", (larger_num + 0.0) / R_double);
+    double p_value = (1.0 + larger_num) / (1.0 + R);
     return p_value;
 }
 
@@ -654,7 +647,6 @@ double **alloc_matrix(int r, int c) {
     return matrix;
 }
 
-
 double ***alloc_3d_matrix(int r, int c, int h) {
     /* allocate a 3D matrix with r rows, c columns, h levels */
     double ***arr3D;
@@ -670,7 +662,6 @@ double ***alloc_3d_matrix(int r, int c, int h) {
     }
     return arr3D;
 }
-
 
 int **alloc_int_matrix(int r, int c) {
     /* allocate a matrix with r rows and c columns */
@@ -982,6 +973,42 @@ void resample_matrix(int **i_perm, int *r, int *c) {
             i_perm[k][i] = temp;
         }
     }
+}
+
+void resample_matrix_3d(int ***i_perm, int **init_perm, int *h, int *r, int *c) {
+    int j, temp;
+#ifdef R_BUILD
+    GetRNGstate();
+    for (int l = 0; l < *h; ++l) {
+        for (int k = 0; k < *r; k++) {
+            for (int i = *c - 1; i > 0; --i) {
+                j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
+                temp = init_perm[k][j];
+                init_perm[k][j] = init_perm[k][i];
+                init_perm[k][i] = temp;
+            }
+        }
+        for (int k = 0; k < *r; ++k) {
+            memcpy(i_perm[l][k], init_perm[k], (*c * sizeof(int)));
+        }
+    }
+    PutRNGstate();
+#else
+    srand((unsigned) time(NULL));
+    for (int l = 0; l < *h; ++l) {
+        for (int k = 0; k < *r; k++) {
+            for (int i = *c - 1; i > 0; --i) {
+                j = rand() % (i + 1);
+                temp = init_perm[k][j];
+                init_perm[k][j] = init_perm[k][i];
+                init_perm[k][i] = temp;
+            }
+        }
+        for (int k = 0; k < *r; ++k) {
+            memcpy(i_perm[l][k], init_perm[k], (*c * sizeof(int)));
+        }
+    }
+#endif
 }
 
 void resample2(int *i_perm, int *n) {

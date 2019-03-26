@@ -161,11 +161,11 @@ bcov_test_wrap_c <- function(x, y, n, num.permutations, distance, num.threads) {
 #' @noRd
 #' 
 kbcov_test_wrap_c <- function(x, K, n, num.permutations, distance, num.threads) {
-  distance <- as.integer(distance) 
   x <- as.double(x)
   K <- as.integer(K)
   n <- as.integer(n)
   r <- as.integer(num.permutations)
+  distance <- as.integer(distance) 
   num.threads <- as.integer(num.threads)
   #
   kbcov <- as.double(numeric(3))

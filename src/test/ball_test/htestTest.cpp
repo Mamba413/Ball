@@ -136,3 +136,44 @@ TEST(BCOV, independence_test_multivariate) {
     bcov_test(ball_stat_value, p_value, X1_DISCRETE_DST, X2_DISCRETE_DST, &n, &R, &dst, &nth);
     EXPECT_LE(p_value[0], 0.05);
 }
+
+TEST(KBCOV, mutual_independence_test_multivariate) {
+    double ball_stat_value[3], p_value[3];
+    int nth, n = 10, k = 3, R = 299, dst = 1, dst_num = n * (n - 1)>>1;;
+    double *dxyz_vector;
+    dxyz_vector = (double *) malloc((k * ((n * (n - 1))>>1)) * sizeof(double));
+
+    // Discrete case:
+    nth = 1;
+    for (int l = 0; l < ((n * (n - 1))>>1); ++l) {
+        dxyz_vector[l] = X1_DISCRETE_DST[l];
+        dxyz_vector[l + dst_num] = X2_DISCRETE_DST[l];
+        dxyz_vector[l + (dst_num << 1)] = X3_DISCRETE_DST[l];
+    }
+    kbcov_test(ball_stat_value, p_value, dxyz_vector, &k, &n, &R, &dst, &nth);
+    EXPECT_LE(p_value[0], 0.05);
+    EXPECT_LE(p_value[1], 0.05);
+    EXPECT_LE(p_value[2], 0.05);
+    nth = 2;
+    kbcov_test(ball_stat_value, p_value, dxyz_vector, &k, &n, &R, &dst, &nth);
+    EXPECT_LE(p_value[0], 0.05);
+    EXPECT_LE(p_value[1], 0.05);
+    EXPECT_LE(p_value[2], 0.05);
+
+    // Continuous case:
+    nth = 1;
+    for (int l = 0; l < ((n * (n - 1))>>1); ++l) {
+        dxyz_vector[l] = X1_CONTINUOUS_DST[l];
+        dxyz_vector[l + dst_num] = X2_CONTINUOUS_DST[l];
+        dxyz_vector[l + (dst_num << 1)] = X3_CONTINUOUS_DST[l];
+    }
+    kbcov_test(ball_stat_value, p_value, dxyz_vector, &k, &n, &R, &dst, &nth);
+    EXPECT_NEAR(p_value[0], 0.05, 0.05);
+    EXPECT_NEAR(p_value[1], 0.05, 0.05);
+    EXPECT_NEAR(p_value[2], 0.05, 0.05);
+    nth = 2;
+    kbcov_test(ball_stat_value, p_value, dxyz_vector, &k, &n, &R, &dst, &nth);
+    EXPECT_NEAR(p_value[0], 0.05, 0.05);
+    EXPECT_NEAR(p_value[1], 0.05, 0.05);
+    EXPECT_NEAR(p_value[2], 0.05, 0.05);
+}

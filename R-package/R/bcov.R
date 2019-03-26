@@ -294,15 +294,15 @@ bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, we
 kbcov_test_internal <- function(x, num.permutations = 99, distance = FALSE, weight = FALSE, 
                                 seed = 4, method = 'permute', num.threads)
 {
-  x <- lapply(x, as.matrix)
-  size_list <- sapply(x, nrow)
-  num <- unique(size_list)
-  if(length(num) > 1) {
-    stop("sample sizes in each list must equal!")
-  }
   ############################################################
   #################### R Version (1.1.0) #####################
   ############################################################
+  # x <- lapply(x, as.matrix)
+  # size_list <- sapply(x, nrow)
+  # num <- unique(size_list)
+  # if(length(num) > 1) {
+    # stop("sample sizes of variables are not match!")
+  # }
   # if(distance) {
   #   
   # } else {
@@ -349,14 +349,30 @@ kbcov_test_internal <- function(x, num.permutations = 99, distance = FALSE, weig
   #################### C Version (1.2.0) #####################
   ############################################################
   var_num <- length(x)
-  if(distance) {
-    
-  } else {
-    x <- lapply(x, dist, diag = TRUE, upper = TRUE)
+  if ((!distance) && all(sapply(x, class) == "dist")) {
+    distance <- TRUE
   }
-  x <- lapply(x, as.matrix)
-  x <- unlist(lapply(x, as.vector))
+  if(distance) {
+    if (class(x[[1]]) != "dist") {
+      if (nrow(x[[1]]) != ncol(x[[1]])) {
+        stop("The elements of input list is not a distance matrix.")
+      }
+    }
+  } else {
+    x <- lapply(x, dist)
+  }
   distance <- TRUE
+  num <- ifelse(class(x[[1]]) == "dist", attr(x[[1]], "Size"), nrow(x[[1]]))
+  if (class(x[[1]]) == "dist") {
+    x <- lapply(x, as.vector)
+  } else {
+    x <- lapply(x, function(xx) { xx[lower.tri(xx)] })
+  }
+  if (length(unique(sapply(x, length))) != 1) {
+    stop("sample size of variables are not match!")
+  } else {
+    x <- unlist(x)
+  }
   #
   if(num.permutations == 0) {
     result <- kbcov_test_wrap_c(x = x, K = var_num, n = num, num.permutations = 0, 

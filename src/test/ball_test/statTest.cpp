@@ -112,14 +112,14 @@ TEST(KBD, multivariate_kbd_value) {
     EXPECT_NEAR(kbd_stat[0], 0.1372, ABSOLUTE_ERROR);
     EXPECT_NEAR(kbd_stat[2], 0.1042, ABSOLUTE_ERROR);
     EXPECT_NEAR(kbd_stat[4], 0.1042, ABSOLUTE_ERROR);
-//    nth = 2;
-//    KBD3(kbd_stat, pvalue, X1_X2_X3_CONTINUOUS_DST, size, &n, &k, &R, &nth);
-//    EXPECT_NEAR(kbd_stat[0], 0.1372, ABSOLUTE_ERROR);
-//    EXPECT_NEAR(kbd_stat[2], 0.1042, ABSOLUTE_ERROR);
-//    EXPECT_NEAR(kbd_stat[4], 0.1042, ABSOLUTE_ERROR);
+    nth = 2;
+    KBD3(kbd_stat, pvalue, X1_X2_X3_CONTINUOUS_DST, size, &n, &k, &R, &nth);
+    EXPECT_NEAR(kbd_stat[0], 0.1372, ABSOLUTE_ERROR);
+    EXPECT_NEAR(kbd_stat[2], 0.1042, ABSOLUTE_ERROR);
+    EXPECT_NEAR(kbd_stat[4], 0.1042, ABSOLUTE_ERROR);
 }
 
-TEST(KBCOV, kbcov_value) {
+TEST(KBCOV, multivariate_kbcov_value) {
     double ball_stat_value[3], ball_stat_value_golden[3], p_value[3];
     int n = 10, k = 3, R = 0, dst = 1, nth = 1, dst_num = n * (n - 1)>>1;;
     double ***dxyz = alloc_3d_matrix(n, n, k);

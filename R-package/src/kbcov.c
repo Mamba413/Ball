@@ -79,6 +79,9 @@ void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm
     free(p_k_array);
 }
 
+/**
+ * @deprecated
+ */
 void kbcov_test_single(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst) {
     int i, j, **i_perm, ***Rx;
     // create a 3D matrix to store distance matrix:
@@ -133,8 +136,8 @@ void kbcov_test_single(double *kbcov_stat, double *pvalue, double *x, int *k, in
     free_int_matrix(i_perm, *k, *n);
 }
 
-void kbcov_test_parallel(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst) {
-    int i, j, **i_perm, ***Rx;
+void KBCOV(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread) {
+    int **i_perm, ***Rx;
     // create a 3D matrix to store distance matrix:
     double ***Dx;
 
@@ -149,8 +152,8 @@ void kbcov_test_parallel(double *kbcov_stat, double *pvalue, double *x, int *k, 
     rank_matrix_3d(Dx, *n, *k, Rx);
 
     // create 2D permute index matrix:
-    for (j = 0; j < *k; j++) {
-        for (i = 0; i < *n; i++) { i_perm[j][i] = i; }
+    for (int j = 0; j < *k; j++) {
+        for (int i = 0; i < *n; i++) { i_perm[j][i] = i; }
     }
 
     // compute kbcov value
@@ -163,26 +166,54 @@ void kbcov_test_parallel(double *kbcov_stat, double *pvalue, double *x, int *k, 
         permuted_bcov_weight_prob = (double *) malloc(*R * sizeof(double));
         permuted_bcov_weight_hhg = (double *) malloc(*R * sizeof(double));
 
-#pragma omp parallel
-        {
-            int i_thread;
-            double bcov_tmp[3];
-#pragma omp for
-            for (i_thread = 0; i_thread < *R; i_thread++) {
-#pragma omp critical
-                {
-                    resample_matrix(i_perm, k, n);
-                }
-                K_Ball_Covariance(bcov_tmp, Dx, Rx, i_perm, n, k);
-                permuted_bcov_weight0[i_thread] = bcov_tmp[0];
-                permuted_bcov_weight_prob[i_thread] = bcov_tmp[1];
-                permuted_bcov_weight_hhg[i_thread] = bcov_tmp[2];
+        int not_parallel = *thread == 1 ? 1 : 0;
+#ifdef Ball_OMP_H_
+        if (not_parallel != 1) {
+            omp_set_dynamic(0);
+            if (*thread < 0) {
+                omp_set_num_threads(omp_get_num_procs());
+            } else {
+                omp_set_num_threads(*thread);
             }
         }
+#endif
+        int r;
+        if (not_parallel) {
+            double bcov_tmp[3];
+            for (r = 0; r < *R; r++) {
+                // stop permutation if user stop it manually:
+                if (pending_interrupt()) {
+                    print_stop_message();
+                    break;
+                }
+                resample_matrix(i_perm, k, n);
+                K_Ball_Covariance(bcov_tmp, Dx, Rx, i_perm, n, k);
+                permuted_bcov_weight0[r] = bcov_tmp[0];
+                permuted_bcov_weight_prob[r] = bcov_tmp[1];
+                permuted_bcov_weight_hhg[r] = bcov_tmp[2];
+            }
+        } else {
+            int ***i_perm_3d_matrix = alloc_3d_int_matrix(*R, *k, *n);
+            resample_matrix_3d(i_perm_3d_matrix, i_perm, R, k, n);
+#pragma omp parallel
+            {
+                int i_thread;
+                double bcov_tmp[3];
+#pragma omp for
+                for (i_thread = 0; i_thread < *R; i_thread++) {
+                    K_Ball_Covariance(bcov_tmp, Dx, Rx, i_perm_3d_matrix[i_thread], n, k);
+                    permuted_bcov_weight0[i_thread] = bcov_tmp[0];
+                    permuted_bcov_weight_prob[i_thread] = bcov_tmp[1];
+                    permuted_bcov_weight_hhg[i_thread] = bcov_tmp[2];
+                }
+            }
+            free_3d_int_matrix(i_perm_3d_matrix, *R, *k);
+            r = *R;
+        }
 
-        pvalue[0] = compute_pvalue(kbcov_stat[0], permuted_bcov_weight0, *R);
-        pvalue[1] = compute_pvalue(kbcov_stat[1], permuted_bcov_weight_prob, *R);
-        pvalue[2] = compute_pvalue(kbcov_stat[2], permuted_bcov_weight_hhg, *R);
+        pvalue[0] = compute_pvalue(kbcov_stat[0], permuted_bcov_weight0, r);
+        pvalue[1] = compute_pvalue(kbcov_stat[1], permuted_bcov_weight_prob, r);
+        pvalue[2] = compute_pvalue(kbcov_stat[2], permuted_bcov_weight_hhg, r);
 
         free(permuted_bcov_weight0);
         free(permuted_bcov_weight_prob);
@@ -193,14 +224,17 @@ void kbcov_test_parallel(double *kbcov_stat, double *pvalue, double *x, int *k, 
     free_int_matrix(i_perm, *k, *n);
 }
 
-void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread) {
-#ifdef Ball_OMP_H_
-    omp_set_num_threads(*thread);
-#endif
+/**
+ * @todo
+ */
+void UKBCOV(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread) {
 
-    if (*thread > 1) {
-        kbcov_test_parallel(kbcov_stat, pvalue, x, k, n, R, dst);
+}
+
+void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread) {
+    if (*dst == 1) {
+        KBCOV(kbcov_stat, pvalue, x, k, n, R, dst, thread);
     } else {
-        kbcov_test_single(kbcov_stat, pvalue, x, k, n, R, dst);
+        UKBCOV(kbcov_stat, pvalue, x, k, n, R, dst, thread);
     }
 }

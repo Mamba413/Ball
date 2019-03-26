@@ -63,6 +63,7 @@ void shuffle_indicator_inv_matrix(int **i_perm_matrix, int **i_perm_matrix_inv, 
 void resample_matrix(int **i_perm, int *r, int *c);
 void resample2(int *i_perm, int *n);
 void resample2_matrix(int **i_perm, int *init_perm, int num_permutation, int n);
+void resample_matrix_3d(int ***i_perm, int **init_perm, int *h, int *r, int *c);
 void resample_indicator_label(int *i_perm, int *i_perm_tmp, int n, int *n1);
 void resample_indicator_label_matrix(int **i_perm_matrix, int **i_perm_tmp_matrix,
                                      int *init_perm, int *init_perm_tmp, int num_permutation, int n, int *n1);

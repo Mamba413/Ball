@@ -13,18 +13,142 @@ extern "C" {
 #include "kbd.h"
 }
 
-//TEST(utilities, quick_sort_macro) {
-//    double x[5] = {5.0, 4.0, 3.0, 2.0, 1.0};
-//    int x_ind[5] = {0, 1, 2, 3, 4};
-//    int num = 5;
-//    quick_sort_macro(x, x_ind, num);
-//    double true_x[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
-//    int true_x_ind[5] = {4, 3, 2, 1, 0};
-//    for (int i = 0; i < 5; ++i) {
-//        EXPECT_EQ(true_x[i], x[i]);
-//        EXPECT_EQ(true_x_ind[i], x_ind[i]);
-//    }
-//}
+#include <iostream>
+#include <cmath>
+#include <queue>
+
+#define eps 1e-8
+using namespace std;
+
+
+void merge2(double *arr, int start, int mid, int end, int *weight, int *order, int *left_smaller, queue<int> *q) {
+    //double *arr = a[0];
+    int len1 = mid - start + 1;
+    int len2 = end - mid;
+    double *tmp;
+    int *order_tmp, *weight_tmp;
+    tmp = new double[len1 + len2];
+    order_tmp = new int[len1 + len2];
+    weight_tmp = new int[len1 + len2];
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    int left_merged = 0;
+    queue<int> queue_tmp;
+    while (i < len1 && j < len2) {
+        if (arr[start + i] <= arr[mid + 1 + j] - eps) {
+            tmp[k] = arr[i + start];
+            order_tmp[k] = order[i + start];
+            queue_tmp.push(order[i + start]);
+            weight_tmp[k] = weight[i + start];
+            left_merged += weight[i + start];
+            k++;
+            i++;
+        } else {
+            left_smaller[order[j + mid + 1]] += left_merged;
+            for (int l = 0; l < queue_tmp.size(); l++) {
+                q[order[j + mid + 1]].push(queue_tmp.front());
+                queue_tmp.push(queue_tmp.front());
+                queue_tmp.pop();
+            }
+            tmp[k] = arr[j + mid + 1];
+            order_tmp[k] = order[j + mid + 1];
+            weight_tmp[k] = weight[j + mid + 1];
+            k++;
+            j++;
+        }
+    }
+    while (i < len1) {
+        tmp[k] = arr[i + start];
+        order_tmp[k] = order[i + start];
+        weight_tmp[k] = weight[i + start];
+        k++;
+        i++;
+    }
+    while (j < len2) {
+        left_smaller[order[j + mid + 1]] += left_merged;
+        for (int l = 0; l < queue_tmp.size(); l++) {
+            q[order[j + mid + 1]].push(queue_tmp.front());
+            queue_tmp.push(queue_tmp.front());
+            queue_tmp.pop();
+        }
+        tmp[k] = arr[j + mid + 1];
+        order_tmp[k] = order[j + mid + 1];
+        weight_tmp[k] = weight[j + mid + 1];
+        k++;
+        j++;
+    }
+    for (i = 0; i < len1 + len2; i++) {
+        arr[i + start] = tmp[i];
+        order[i + start] = order_tmp[i];
+        weight[i + start] = weight_tmp[i];
+    }
+}
+
+void mergesort2(double *arr, int start, int end, int *weight, int *order, int *left_smaller, queue<int> *q) {
+    if (start == end)
+        return;
+    else {
+        int len = end - start + 1;
+        int mid = (len >> 1) + start - 1;
+        mergesort2(arr, start, mid, weight, order, left_smaller, q);
+        mergesort2(arr, mid + 1, end, weight, order, left_smaller, q);
+        merge2(arr, start, mid, end, weight, order, left_smaller, q);
+    }
+}
+
+int vector_compare(int *a, int *b, int d) {
+    int positive_num = 0, negative_num = 0;
+    for (int i = 0; i < d; ++i) {
+        positive_num += (a[i] < b[i]);
+    }
+    for (int i = 0; i < d; ++i) {
+        negative_num += (a[i] > b[i]);
+    }
+    if (positive_num == d) {
+        return 1;
+    } else if (negative_num == d) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
+void merge_sort_recursive(int **arr, int **reg, int start, int end) {
+    if (start >= end)
+        return;
+    int len = end - start, mid = (len >> 1) + start;
+    int compare;
+    int start1 = start, end1 = mid;
+    int start2 = mid + 1, end2 = end;
+    merge_sort_recursive(arr, reg, start1, end1);
+    merge_sort_recursive(arr, reg, start2, end2);
+    int k = start;
+    while (start1 <= end1 && start2 <= end2) {
+        compare = vector_compare(arr[start1], arr[start2], 2);
+        if (compare == -1) {
+            reg[k++] = arr[start2++];
+        } else {
+            reg[k++] = arr[start1++];
+        }
+    }
+    while (start1 <= end1) {
+        reg[k++] = arr[start1++];
+    }
+    while (start2 <= end2) {
+        reg[k++] = arr[start2++];
+    }
+    for (k = start; k <= end; k++) {
+        arr[k] = reg[k];
+    }
+}
+
+void merge_sort(int **arr, const int len) {
+    int **reg;
+    reg = alloc_int_matrix(len, 2);
+    merge_sort_recursive(arr, reg, 0, len - 1);
+}
+
 
 TEST(utilities, quicksort) {
     double x[9] = {5.0, 4.0, 3.0, 2.0, 1.0, 6.0, 7.0, 10.0, 8.0};
@@ -518,4 +642,72 @@ TEST(KBD, permute_bd_value) {
     double kbd_stat_tmp[6];
     k_ball_divergence_from_by_sample_ball_divergence(kbd_stat_tmp, bd_stat_array, bd_stat_number, k);
     EXPECT_NEAR(kbd_stat_tmp[0], 0.1284, ABSOLUTE_ERROR);
+}
+
+TEST(utilities, count_of_vector_after_self) {
+    int n = 5;
+    double a[2][5] = {
+            {1, 3, 5, 5, 3},
+            {1, 4, 3, 5, 4}
+    };
+    int *weight = new int[n];
+    int *order = new int[n];
+    int *left_smaller = new int[n];
+    queue<int> *q = new queue<int>[n];
+    for (int i = 0; i < n; i++) {
+        weight[i] = 1;
+        order[i] = i;
+        left_smaller[i] = 0;
+    }
+    mergesort2(a[0], 0, n - 1, weight, order, left_smaller, q);
+    for (int i = 0; i < n; i++) {
+        int size = (int) q[i].size();
+        for (int j = 0; j < size; j++) {
+            if (a[1][q[i].front()] > a[1][i])
+                left_smaller[i]--;
+            q[i].pop();
+        }
+    }
+    for (int i = 0; i < n; i++) {
+        left_smaller[i]++;
+        cout << endl << left_smaller[i];
+    }
+}
+
+/**
+ * Still in issue
+ */
+TEST(utilities, merge_sort_multidimension) {
+//    int a[6] = {1, 2, 0, 3, 5, 4};
+//    int sorted_a[6] = {0, 1, 2, 3, 4, 5};
+//    merge_sort(a, 6);
+//    for (int i = 0; i < 6; ++i) {
+//        EXPECT_EQ(sorted_a[i], a[i]);
+//    }
+    const int row_num = 8;
+    int a[row_num][2] = {
+            {1, 1}, {3, 4}, {7, 3}, {5, 3}, {5, 5}, {3, 5}, {3, 4}, {3, 7}
+    };
+    int **aa;
+    aa = alloc_int_matrix(row_num, 2);
+    for (int i = 0; i < row_num; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            aa[i][j] = a[i][j];
+        }
+    }
+    printf("\n");
+    for (int i = 0; i < row_num; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            printf("%d, ", aa[i][j]);
+        }
+        printf("\n");
+    }
+    merge_sort(aa, row_num);
+    printf("\n");
+    for (int i = 0; i < row_num; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            printf("%d, ", aa[i][j]);
+        }
+        printf("\n");
+    }
 }
