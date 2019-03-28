@@ -18,13 +18,14 @@
 
 #define MAX(a,b) (((a)>(b))?(a):(b));
 void swap(double *x, double *y);
+void count_smaller_number_after_self_solution(double *vector, int *number, int num);
 void find_group_relative_location(int *group_relative_location, int *group, int *cumsum_size, int num, int K);
 void compute_cumsum_size(int *cumulate_size, int *size, int *k);
 void quick_sort_recursive(double *arr, int start, int end);
 void quick_sort(double *arr, int len);
 double compute_pvalue(double ball_stat_value, double *permuted_stat, int R);
 void Merge(int *permutation, int *source, int *inversion_count, int dim, int n);
-int Inversions(int *permutation, int *source, int *inversion_count, int dim, int n);
+void Inversions(int *permutation, int *source, int *inversion_count, int dim, int n);
 void sort(int *n, int *zidx, double *z, int **dzidx);
 void createidx(int *n, int *zidx, double *z, int **lowzidx, int **higzidx);
 void ranksort2(int n, int **Rxy, double **Dxy, int **Ixy);

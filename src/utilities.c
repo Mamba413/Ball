@@ -29,6 +29,64 @@
 
 #endif
 
+void merge(double *vector, int *index, int *number, int start, int mid, int end) {
+    const int left_size = mid - start + 1, right_size = end - mid;
+    double left[left_size], right[right_size];
+    int left_index[left_size], right_index[right_size];
+    int left_merged = 0, right_merged = 0, total_merged = 0;
+    for (int i = start; i <= mid; ++i) {
+        left[i - start] = vector[i];
+        left_index[i - start] = index[i];
+    }
+    for (int i = mid + 1; i <= end; ++i) {
+        right[i - mid - 1] = vector[i];
+        right_index[i - mid - 1] = index[i];
+    }
+    while (left_merged < left_size && right_merged < right_size) {
+        if (left[left_merged] < right[right_merged]) {
+            number[left_index[left_merged]] += right_merged;
+            vector[start + total_merged] = left[left_merged];
+            index[start + total_merged] = left_index[left_merged];
+            ++left_merged;
+            ++total_merged;
+        } else {
+            vector[start + total_merged] = right[right_merged];
+            index[start + total_merged] = right_index[right_merged];
+            ++right_merged;
+            ++total_merged;
+        }
+    }
+    while (left_merged < left_size) {
+        number[left_index[left_merged]] += right_merged;
+        vector[start + total_merged] = left[left_merged];
+        index[start + total_merged] = left_index[left_merged];
+        ++left_merged;
+        ++total_merged;
+    }
+    while (right_merged < right_size) {
+        vector[start + total_merged] = right[right_merged];
+        index[start + total_merged] = right_index[right_merged];
+        ++right_merged;
+        ++total_merged;
+    }
+}
+
+void merge_sort(double *vector, int *index, int *number, int start, int end) {
+    if (end - start < 1) return;
+    int mid = (start + end) >> 1;
+    merge_sort(vector, index, number, start, mid);
+    merge_sort(vector, index, number, mid + 1, end);
+    merge(vector, index, number, start, mid, end);
+}
+
+void count_smaller_number_after_self_solution(double *vector, int *number, const int num) {
+    int index[num];
+    for (int i = 0; i < num; ++i) {
+        index[i] = i;
+    }
+    merge_sort(vector, index, number, 0, num - 1);
+}
+
 void swap(double *x, double *y) {
     double t = *x;
     *x = *y;
@@ -100,7 +158,6 @@ void quick_sort(double *arr, int len) {
     quick_sort_recursive(arr, 0, len - 1);
 }
 
-
 double compute_pvalue(double ball_stat_value, double *permuted_stat, int R) {
     double larger_num = 0.0;
     for (int i = 0; i < R; i++) {
@@ -118,7 +175,7 @@ void Merge(int *permutation, int *source, int *inversion_count, int dim, int n) 
     int *left_source = (int *) malloc(n * sizeof(int));
     int *right_source = (int *) malloc(n * sizeof(int));
     int left_index = 0, right_index = 0;
-    int i, half_dim = dim / 2, nleft = half_dim, nright = dim - half_dim;
+    int i, half_dim = dim >> 1, nleft = half_dim, nright = dim - half_dim;
     for (i = 0; i < half_dim; i++) {
         left[i] = permutation[i];
         left_source[i] = source[i];
@@ -133,7 +190,7 @@ void Merge(int *permutation, int *source, int *inversion_count, int dim, int n) 
 
     for (i = 0; i < dim; i++) {
         if ((left_index < half_dim) && (right_index < dim - half_dim)) {
-            if (left[left_index] <= right[right_index]) { // I added "=" in order to support ties
+            if (left[left_index] <= right[right_index]) {
                 permutation[i] = left[left_index];
                 source[i] = left_source[left_index];
                 left_index++;
@@ -149,7 +206,6 @@ void Merge(int *permutation, int *source, int *inversion_count, int dim, int n) 
                 source[i] = left_source[left_index];
                 left_index++;
             }
-
             if (right_index < dim - half_dim) {
                 permutation[i] = right[right_index];
                 source[i] = right_source[right_index];
@@ -163,18 +219,15 @@ void Merge(int *permutation, int *source, int *inversion_count, int dim, int n) 
     free(right_source);
 }
 
-
-int Inversions(int *permutation, int *source, int *inversion_count, int dim, int n) {
-    if (dim == 1)
-        return 0;
-    else {
-        Inversions(permutation, source, inversion_count, dim / 2, n);
-        Inversions(&permutation[dim / 2], &source[dim / 2], inversion_count, dim - dim / 2, n);
+void Inversions(int *permutation, int *source, int *inversion_count, int dim, int n) {
+    if (dim == 1) {
+        return;
+    } else {
+        Inversions(permutation, source, inversion_count, dim >> 1, n);
+        Inversions(&permutation[dim >> 1], &source[dim >> 1], inversion_count, dim - (dim >> 1), n);
         Merge(permutation, source, inversion_count, dim, n);
     }
-    return 0;
 }
-
 
 /*
 The algorithm like the quick-sort. It finds the upper and lower in turn.
@@ -285,7 +338,6 @@ void createidx(int *n, int *zidx, double *z, int **lowzidx, int **higzidx) {
     }
 }
 
-
 void sort(int *n, int *zidx, double *z, int **dzidx) {
     // the z[i] is the center
     int i, j, zi, ileft, iright, lastpos;
@@ -354,7 +406,6 @@ void ranksort2(int n, int **Rxy, double **Dxy, int **Ixy) {
     }
 }
 
-
 /*
 This function try to derive the rank of Rx belong to group 1.
 tmp, lastpos, lastval are introduced to resolve the situtation when ties appear
@@ -421,14 +472,12 @@ void Findx2(int *Rxy, int *Ixy, int *i_perm, int *n1, int *n2, int *Rx) {
     }
 }
 
-
 void Findx(int **Rxy, int **Ixy, int *i_perm, int *n1, int *n2, int **Rx) {
     int i, n;
     n = *n1 + *n2;
     for (i = 0; i < n; i++)
         Findx2(Rxy[i], Ixy[i], i_perm, n1, n2, Rx[i]);
 }
-
 
 void ranksort3(int n, int *xyidx, double *xy, int **Rxy, int **Ixy) {
     int i, j, ileft, iright, lastpos;
@@ -474,7 +523,6 @@ void ranksort3(int n, int *xyidx, double *xy, int **Rxy, int **Ixy) {
             Rxy[xyidx[i]][xyidx[i]] = 0;
     }
 }
-
 
 /*
 The rank computation (initRank, computeRank) is refer to: http://www.jmlr.org/papers/volume17/14-441/14-441.pdf [section 3.1.2]
@@ -689,7 +737,7 @@ int ***alloc_3d_int_matrix(int r, int c, int h) {
     return arr3D;
 }
 
-int ***alloc_int_square_matrix_list(int* size, int number) {
+int ***alloc_int_square_matrix_list(int *size, int number) {
     int ***arr3D = (int ***) malloc(number * sizeof(int **));
     for (int i = 0; i < number; ++i) {
         arr3D[i] = alloc_int_matrix(size[i], size[i]);
@@ -739,7 +787,7 @@ void free_3d_int_matrix(int ***arr3D, int r, int c) {
     free(arr3D);
 }
 
-void free_int_square_matrix_list(int ***arr3d, int* size, int num) {
+void free_int_square_matrix_list(int ***arr3d, int *size, int num) {
     for (int i = 0; i < num; ++i) {
         free_int_matrix(arr3d[i], size[i], size[i]);
     }

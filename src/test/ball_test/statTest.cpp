@@ -96,7 +96,6 @@ TEST(BCOV, multivariate_bcov_value) {
     bcov_test(ball_stat_value, p_value, X1_DISCRETE_DST, X2_DISCRETE_DST, &n, &R, &dst, &nth);
     EXPECT_NEAR(ball_stat_value[0], ball_stat_value_golden[0], ABSOLUTE_ERROR);
 
-    // Continuous case:
     distance2matrix(X1_CONTINUOUS_DST, dx, n);
     distance2matrix(X2_CONTINUOUS_DST, dy, n);
     Ball_Covariance_Crude(ball_stat_value_golden, dx, dy, n);

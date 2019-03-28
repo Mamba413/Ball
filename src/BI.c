@@ -22,11 +22,60 @@
 #include "BI.h"
 #include "Ball_omp.h"
 
+void Ball_Information_NoTies(double *bcov_stat, int *n, int **y_within_ball,
+                             int **xidx, double **Dy, int *i_perm) {
+    double px, py, pxy, n_prop = 1.0 / *n;
+    int sorted_j, *inv_count = malloc(*n * sizeof(int));
+    int *y_count_vec = malloc(*n * sizeof(int));
+    double *dy_vec = malloc(*n * sizeof(double)), *dy_vec_tmp = malloc(*n * sizeof(double));
+    double bcov_fixed_ball, bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0;
+    double hhg_ball_num = 0.0, minor_ball_prop = 2.0 / (*n);
+
+    for (int i = 0; i < *n; ++i) {
+        int ith_perm = i_perm[i];
+        for (int j = 0; j < *n; ++j) {
+            y_count_vec[j] = y_within_ball[ith_perm][i_perm[j]];
+            dy_vec_tmp[j] = Dy[ith_perm][i_perm[j]];
+            inv_count[j] = 0;
+        }
+        for (int j = 0; j < *n; ++j) {
+            dy_vec[j] = dy_vec_tmp[xidx[i][j]];
+        }
+        // Count of the number after self:
+        count_smaller_number_after_self_solution(dy_vec, inv_count, *n);
+        // Compute Ball Covariance:
+        for (int j = 0; j < *n; ++j) {
+            sorted_j = xidx[i][j];
+            px = (j + 1) * n_prop;
+            py = y_count_vec[sorted_j];
+            pxy = (py - inv_count[j]) * n_prop;
+            py *= n_prop;
+            bcov_fixed_ball = pxy - px * py;
+            bcov_fixed_ball *= bcov_fixed_ball;
+            bcov_weight0 += bcov_fixed_ball;
+            bcov_weight_prob += bcov_fixed_ball / (px * py);
+            if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1) {
+                bcov_weight_hhg += bcov_fixed_ball /
+                                   ((px - minor_ball_prop) * (1.0 - px + minor_ball_prop) * (py - minor_ball_prop) *
+                                    (1.0 - py + minor_ball_prop));
+                hhg_ball_num += 1.0;
+            }
+        }
+    }
+    bcov_stat[0] = bcov_weight0 / (1.0 * (*n) * (*n));
+    bcov_stat[1] = bcov_weight_prob / (1.0 * (*n) * (*n));
+    bcov_stat[2] = bcov_weight_hhg / (hhg_ball_num);
+    free(inv_count);
+    free(dy_vec);
+    free(dy_vec_tmp);
+    free(y_count_vec);
+}
+
 void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm,
                       int *i_perm_inv) {
     int i, j, k, pi, src, lastpos, *yrank, *isource, *icount, *xy_index, *xy_temp, **xyidx;
     double pxy, px, py, lastval, *xx_cpy, *yy_cpy;
-    double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, bcov_fixed_ball = 0.0;
+    double bcov_fixed_ball, bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0;
     double hhg_ball_num = 0.0, minor_ball_prop = 2.0 / (*n);
 
     yrank = (int *) malloc(*n * sizeof(int));
@@ -71,7 +120,7 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
 
         for (j = 0, k = 0; j < *n - 1; ++j, ++k) {
             k += (xyidx[i][k] == i);
-            src = xyidx[i][k]; // NOTE: k may be different than from the line above
+            src = xyidx[i][k];
             src -= (src > i);
             xy_index[j] = yrank[src];
             isource[j] = j;
@@ -95,7 +144,8 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
             px /= (*n);
             py /= (*n);
             pxy /= (*n);
-            bcov_fixed_ball = pow(pxy - px * py, 2);
+            bcov_fixed_ball = pxy - px * py;
+            bcov_fixed_ball *= bcov_fixed_ball;
             bcov_weight0 += bcov_fixed_ball;
             bcov_weight_prob += bcov_fixed_ball / (px * py);
             if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1) {
@@ -115,13 +165,15 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
                     pxy += 1;
                     py += 1;
                 }
-            } else if (Dy[pi][i_perm[xidx[i][j]]] == 0)
+            } else if (Dy[pi][i_perm[xidx[i][j]]] == 0) {
                 py += 1;
+            }
         }
         px /= (*n);
         py /= (*n);
         pxy /= (*n);
-        bcov_fixed_ball = pow(pxy - px * py, 2);
+        bcov_fixed_ball = pxy - px * py;
+        bcov_fixed_ball *= bcov_fixed_ball;
         bcov_weight0 += bcov_fixed_ball;
         bcov_weight_prob += bcov_fixed_ball / (px * py);
         if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1) {
@@ -295,7 +347,8 @@ void Ball_Information_wrapper(double *bcov_stat, int *n, double **Dx, double **D
 
 void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *thread) {
     /*  computes RCT(x,y)  */
-    int i, j, **xidx, **yidx, *i_perm, *i_perm_inv;
+    int i, j, **xidx, **yidx, *i_perm, *i_perm_inv, ties = 0;
+    int **y_within_ball = alloc_int_matrix(*n, *n);
     double **Dx, **Dy, *x_cpy, *y_cpy;
 
     Dx = alloc_matrix(*n, *n);
@@ -328,11 +381,28 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
         memcpy(y_cpy, Dy[i], *n * sizeof(double));
         quicksort(x_cpy, xidx[i], 0, *n - 1);
         quicksort(y_cpy, yidx[i], 0, *n - 1);
+        if (!ties) {
+            for (j = 1; j < *n; ++j) {
+                if (x_cpy[j] == x_cpy[j - 1] && y_cpy[j] == y_cpy[j - 1]) {
+                    ties = 1;
+                }
+            }
+        }
     }
     free(x_cpy);
     free(y_cpy);
 
-    Ball_Information(bcov, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv);
+    if (ties) {
+        Ball_Information(bcov, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv);
+    } else {
+        for (i = 0; i < *n; ++i) {
+            for (j = 0; j < *n; ++j) {
+                y_within_ball[i][yidx[i][j]] = j + 1;
+            }
+        }
+        Ball_Information_NoTies(bcov, n, y_within_ball, xidx, Dy, i_perm);
+    }
+
     if (*R > 0) {
         double *permuted_bcov_weight0, *permuted_bcov_weight_prob, *permuted_bcov_weight_hhg;
         permuted_bcov_weight0 = (double *) malloc(*R * sizeof(double));
@@ -342,49 +412,87 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
 #ifdef Ball_OMP_H_
         if (not_parallel != 1) {
             omp_set_dynamic(0);
-            if (*thread < 0) {
+            if (*thread <= 0) {
                 omp_set_num_threads(omp_get_num_procs());
             } else {
                 omp_set_num_threads(*thread);
             }
         }
 #endif
-        if (not_parallel) {
-            double bcov_tmp[3];
-            for (i = 0; i < *R; i++) {
-                // stop permutation if user stop it manually:
-                if (pending_interrupt()) {
-                    print_stop_message();
-                    break;
+
+        if (ties) {
+            if (not_parallel) {
+                double bcov_tmp[3];
+                for (i = 0; i < *R; i++) {
+                    // stop permutation if user stop it manually:
+                    if (pending_interrupt()) {
+                        print_stop_message();
+                        break;
+                    }
+                    resample(i_perm, i_perm_inv, n);
+                    Ball_Information(bcov_tmp, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv);
+                    permuted_bcov_weight0[i] = bcov_tmp[0];
+                    permuted_bcov_weight_prob[i] = bcov_tmp[1];
+                    permuted_bcov_weight_hhg[i] = bcov_tmp[2];
                 }
-                resample(i_perm, i_perm_inv, n);
-                Ball_Information(bcov_tmp, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv);
-                permuted_bcov_weight0[i] = bcov_tmp[0];
-                permuted_bcov_weight_prob[i] = bcov_tmp[1];
-                permuted_bcov_weight_hhg[i] = bcov_tmp[2];
+            } else {
+                int **i_perm_matrix, **i_perm_inv_matrix;
+                i_perm_matrix = alloc_int_matrix(*R, *n);
+                i_perm_inv_matrix = alloc_int_matrix(*R, *n);
+                shuffle_indicator_inv_matrix(i_perm_matrix, i_perm_inv_matrix, i_perm, i_perm_inv, *R, *n);
+#pragma omp parallel
+                {
+                    int i_thread;
+                    double bcov_tmp_thread[3];
+#pragma omp for
+                    for (i_thread = 0; i_thread < (*R); i_thread++) {
+                        Ball_Information(bcov_tmp_thread, n, Dx, Dy, xidx, yidx,
+                                         i_perm_matrix[i_thread], i_perm_inv_matrix[i_thread]);
+                        permuted_bcov_weight0[i_thread] = bcov_tmp_thread[0];
+                        permuted_bcov_weight_prob[i_thread] = bcov_tmp_thread[1];
+                        permuted_bcov_weight_hhg[i_thread] = bcov_tmp_thread[2];
+                    }
+                }
+                i = *R;
+                free_int_matrix(i_perm_matrix, *R, *n);
+                free_int_matrix(i_perm_inv_matrix, *R, *n);
             }
         } else {
-            int **i_perm_matrix, **i_perm_inv_matrix;
-            i_perm_matrix = alloc_int_matrix(*R, *n);
-            i_perm_inv_matrix = alloc_int_matrix(*R, *n);
-            shuffle_indicator_inv_matrix(i_perm_matrix, i_perm_inv_matrix, i_perm, i_perm_inv, *R, *n);
-#pragma omp parallel
-            {
-                int i_thread;
-                double bcov_tmp_thread[3];
-#pragma omp for
-                for (i_thread = 0; i_thread < (*R); i_thread++) {
-                    Ball_Information(bcov_tmp_thread, n, Dx, Dy, xidx, yidx,
-                                     i_perm_matrix[i_thread], i_perm_inv_matrix[i_thread]);
-                    permuted_bcov_weight0[i_thread] = bcov_tmp_thread[0];
-                    permuted_bcov_weight_prob[i_thread] = bcov_tmp_thread[1];
-                    permuted_bcov_weight_hhg[i_thread] = bcov_tmp_thread[2];
+            if (not_parallel) {
+                double bcov_tmp[3];
+                for (i = 0; i < *R; i++) {
+                    // stop permutation if user stop it manually:
+                    if (pending_interrupt()) {
+                        print_stop_message();
+                        break;
+                    }
+                    resample2(i_perm, n);
+                    Ball_Information_NoTies(bcov_tmp, n, y_within_ball, xidx, Dy, i_perm);
+                    permuted_bcov_weight0[i] = bcov_tmp[0];
+                    permuted_bcov_weight_prob[i] = bcov_tmp[1];
+                    permuted_bcov_weight_hhg[i] = bcov_tmp[2];
                 }
+            } else {
+                int **i_perm_matrix;
+                i_perm_matrix = alloc_int_matrix(*R, *n);
+                resample2_matrix(i_perm_matrix, i_perm, *R, *n);
+#pragma omp parallel
+                {
+                    int i_thread;
+                    double bcov_tmp_thread[3];
+#pragma omp for
+                    for (i_thread = 0; i_thread < (*R); i_thread++) {
+                        Ball_Information_NoTies(bcov_tmp_thread, n, y_within_ball, xidx, Dy, i_perm_matrix[i_thread]);
+                        permuted_bcov_weight0[i_thread] = bcov_tmp_thread[0];
+                        permuted_bcov_weight_prob[i_thread] = bcov_tmp_thread[1];
+                        permuted_bcov_weight_hhg[i_thread] = bcov_tmp_thread[2];
+                    }
+                }
+                i = *R;
+                free_int_matrix(i_perm_matrix, *R, *n);
             }
-            i = *R;
-            free_int_matrix(i_perm_matrix, *R, *n);
-            free_int_matrix(i_perm_inv_matrix, *R, *n);
         }
+
         pvalue[0] = compute_pvalue(bcov[0], permuted_bcov_weight0, i);
         pvalue[1] = compute_pvalue(bcov[1], permuted_bcov_weight_prob, i);
         pvalue[2] = compute_pvalue(bcov[2], permuted_bcov_weight_hhg, i);
@@ -400,6 +508,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
     free_int_matrix(yidx, *n, *n);
     free(i_perm);
     free(i_perm_inv);
+    free_int_matrix(y_within_ball, *n, *n);
 }
 
 /**
@@ -625,7 +734,7 @@ void UBI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int
 #ifdef Ball_OMP_H_
         if (not_parallel != 1) {
             omp_set_dynamic(0);
-            if (*thread < 0) {
+            if (*thread <= 0) {
                 omp_set_num_threads(omp_get_num_procs());
             } else {
                 omp_set_num_threads(*thread);
