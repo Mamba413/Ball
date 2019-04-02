@@ -180,7 +180,8 @@ examine_R_arguments <- function(R) {
 #' 
 examine_threads_arguments <- function(num.threads) {
   if(is.null(num.threads) | (num.threads < 1)) {
-    stop("num.threads arguments is invalid!")
+    num.threads <<- 0;
+    # stop("num.threads arguments is invalid!")
   }
 }
 

@@ -79,63 +79,6 @@ void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm
     free(p_k_array);
 }
 
-/**
- * @deprecated
- */
-void kbcov_test_single(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst) {
-    int i, j, **i_perm, ***Rx;
-    // create a 3D matrix to store distance matrix:
-    double ***Dx;
-
-    Dx = alloc_3d_matrix(*n, *n, *k);
-    Rx = alloc_3d_int_matrix(*n, *n, *k);
-    i_perm = alloc_int_matrix(*k, *n);
-
-    // convert x to 3D distance matrix:
-    if (*dst == 1) { distance2matrix3d(x, Dx, *n, *k); }
-
-    // compute rank 3D distance matrix row by row and one by one
-    rank_matrix_3d(Dx, *n, *k, Rx);
-
-    // create 2D permute index matrix:
-    for (j = 0; j < *k; j++) {
-        for (i = 0; i < *n; i++) { i_perm[j][i] = i; }
-    }
-
-    K_Ball_Covariance(kbcov_stat, Dx, Rx, i_perm, n, k);
-
-    if (*R > 0) {
-        double bcov_tmp[3], *permuted_bcov_weight0, *permuted_bcov_weight_prob, *permuted_bcov_weight_hhg;
-        permuted_bcov_weight0 = (double *) malloc(*R * sizeof(double));
-        permuted_bcov_weight_prob = (double *) malloc(*R * sizeof(double));
-        permuted_bcov_weight_hhg = (double *) malloc(*R * sizeof(double));
-
-        for (i = 0; i < *R; i++) {
-            // stop permutation if user stop it manually:
-            if (pending_interrupt()) {
-                print_stop_message();
-                break;
-            }
-            resample_matrix(i_perm, k, n);
-            K_Ball_Covariance(bcov_tmp, Dx, Rx, i_perm, n, k);
-            permuted_bcov_weight0[i] = bcov_tmp[0];
-            permuted_bcov_weight_prob[i] = bcov_tmp[1];
-            permuted_bcov_weight_hhg[i] = bcov_tmp[2];
-        }
-        pvalue[0] = compute_pvalue(kbcov_stat[0], permuted_bcov_weight0, i);
-        pvalue[1] = compute_pvalue(kbcov_stat[1], permuted_bcov_weight_prob, i);
-        pvalue[2] = compute_pvalue(kbcov_stat[2], permuted_bcov_weight_hhg, i);
-
-        free(permuted_bcov_weight0);
-        free(permuted_bcov_weight_prob);
-        free(permuted_bcov_weight_hhg);
-    }
-
-    free_3d_matrix(Dx, *n, *n);
-    free_3d_int_matrix(Rx, *n, *n);
-    free_int_matrix(i_perm, *k, *n);
-}
-
 void KBCOV(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread) {
     int **i_perm, ***Rx;
     // create a 3D matrix to store distance matrix:
@@ -167,16 +110,6 @@ void KBCOV(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R
         permuted_bcov_weight_hhg = (double *) malloc(*R * sizeof(double));
 
         int not_parallel = *thread == 1 ? 1 : 0;
-#ifdef Ball_OMP_H_
-        if (not_parallel != 1) {
-            omp_set_dynamic(0);
-            if (*thread < 0) {
-                omp_set_num_threads(omp_get_num_procs());
-            } else {
-                omp_set_num_threads(*thread);
-            }
-        }
-#endif
         int r;
         if (not_parallel) {
             double bcov_tmp[3];
@@ -232,6 +165,18 @@ void UKBCOV(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *
 }
 
 void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread) {
+    int not_parallel = *thread == 1 ? 1 : 0;
+#ifdef Ball_OMP_H_
+    if (not_parallel != 1) {
+        omp_set_dynamic(0);
+        if (*thread <= 0) {
+            omp_set_num_threads(omp_get_num_procs());
+        } else {
+            omp_set_num_threads(*thread);
+        }
+    }
+#endif
+
     if (*dst == 1) {
         KBCOV(kbcov_stat, pvalue, x, k, n, R, dst, thread);
     } else {

@@ -44,8 +44,8 @@ void ball_divergence2(double *bd_stat, int **full_rank, int **sub_rank1, int **s
  * @param num : 13
  * @param max_k : 2
  */
-void sub_rank_finder(int ***sub_rank, double **distance_matrix, int **index_matrix, int *label,
-                     int *group_relative_location, int *cumsum_size, int num, int max_k) {
+void sub_rank_finder(int ***sub_rank, double **distance_matrix, int **index_matrix, const int *label,
+                     const int *group_relative_location,const int *cumsum_size, int num, int max_k) {
     /*
      * g_index: indicator for group
      * s_index: indicator for order
@@ -259,17 +259,6 @@ void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *
         permuted_kbd_maxsum_w1 = (double *) malloc(*R * sizeof(double));
 
         int not_parallel = *thread == 1 ? 1 : 0;
-#ifdef Ball_OMP_H_
-        if (not_parallel != 1) {
-            omp_set_dynamic(0);
-            if (*thread < 0) {
-                omp_set_num_threads(omp_get_num_procs());
-            } else {
-                omp_set_num_threads(*thread);
-            }
-        }
-#endif
-
         int r;
         if (not_parallel) {
             for (r = 0; r < *R; ++r) {
