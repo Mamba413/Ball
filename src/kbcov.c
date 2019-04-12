@@ -37,7 +37,7 @@ void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm
                     compute_joint_index = p_k_array[var_index] == at_least_point_number ? 0 : 1;
                 }
             }
-            // to compute P_{i, j}^{\mu_{1}, ..., \mu_{*k}} (joint):
+            // Compute P_{i, j}^{\mu_{1}, ..., \mu_{*k}} (joint), O(n^3):
             if (compute_joint_index) {
                 for (t = 0; t < (*n); t++) {
                     for (var_index = 0; var_index < (*k); var_index++) {

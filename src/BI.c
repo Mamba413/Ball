@@ -197,7 +197,6 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
 }
 
 void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *thread) {
-    /*  computes RCT(x,y)  */
     int i, j, **xidx, **yidx, *i_perm, *i_perm_inv, ties = 0;
     int **y_within_ball = alloc_int_matrix(*n, *n);
     double **Dx, **Dy, *x_cpy, *y_cpy;
@@ -224,8 +223,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
         i_perm_inv[i] = i;
     }
 
-    // sort each row of Dx and Dy
-    // computational complexity: O(n^2 * logn)
+    // sort each row of Dx and Dy, time complexity: O(n^2 * log{n})
     // xidx, yidx is index of each row after sorted
     for (i = 0; i < (*n); i++) {
         memcpy(x_cpy, Dx[i], *n * sizeof(double));
@@ -234,7 +232,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
         quicksort(y_cpy, yidx[i], 0, *n - 1);
         if (!ties) {
             for (j = 1; j < *n; ++j) {
-                if (x_cpy[j] == x_cpy[j - 1] && y_cpy[j] == y_cpy[j - 1]) {
+                if (x_cpy[j] == x_cpy[j - 1] || y_cpy[j] == y_cpy[j - 1]) {
                     ties = 1;
                 }
             }

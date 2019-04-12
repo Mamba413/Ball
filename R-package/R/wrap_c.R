@@ -131,10 +131,10 @@ bd_test_wrap_c <- function(xy, size, num.permutations, weight, distance, num.thr
 #' @noRd
 #' 
 bcov_test_wrap_c <- function(x, y, n, num.permutations, distance, num.threads) {
-  distance <- as.integer(distance)
   x <- as.double(x)
   y <- as.double(y)
   n <- as.integer(n)
+  distance <- as.integer(distance)
   num.threads <- as.integer(num.threads)
   r <- as.integer(num.permutations)
   #

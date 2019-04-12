@@ -414,31 +414,6 @@ void Findx2(int *Rxy, int *Ixy, int *i_perm, int *n1, int *n2, int *Rx) {
     int j, lastpos, lastval, n, tmp;
     n = *n1 + *n2;
 
-    //printf("---------------\n");
-    //for (int i = 0; i < n; i++)
-    //{
-    //	printf("%d ", Rxy[i]);
-    //}
-    //printf("\n");
-
-    //for (int i = 0; i < n; i++)
-    //{
-    //	printf("%d ", Ixy[i]);
-    //}
-    //printf("\n");
-
-    //for (int i = 0; i < n; i++)
-    //{
-    //	printf("%d ", i_perm[i]);
-    //}
-    //printf("\n");
-
-    //for (int i = 0; i < n; i++)
-    //{
-    //	printf("%d ", Rx[i]);
-    //}
-    //printf("\n");
-
     lastpos = *n1 - 1;
     Rx[Ixy[n - 1]] = lastpos;
     if (i_perm[Ixy[n - 1]] == 1) {
@@ -450,11 +425,6 @@ void Findx2(int *Rxy, int *Ixy, int *i_perm, int *n1, int *n2, int *Rx) {
     }
 
     for (j = n - 2; j >= 0; j--) {
-        //for (int i = 0; i < n; i++)
-        //{
-        //	printf("%d ", Rx[i]);
-        //}
-        //printf("\n");
         if (i_perm[Ixy[j]] == 1) {
             if (lastval != Rxy[Ixy[j]]) {
                 lastpos -= tmp;

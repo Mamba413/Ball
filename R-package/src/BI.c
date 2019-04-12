@@ -234,7 +234,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
         quicksort(y_cpy, yidx[i], 0, *n - 1);
         if (!ties) {
             for (j = 1; j < *n; ++j) {
-                if (x_cpy[j] == x_cpy[j - 1] && y_cpy[j] == y_cpy[j - 1]) {
+                if (x_cpy[j] == x_cpy[j - 1] || y_cpy[j] == y_cpy[j - 1]) {
                     ties = 1;
                 }
             }
