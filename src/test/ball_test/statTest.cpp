@@ -6,6 +6,9 @@
 
 static double ABSOLUTE_ERROR = 0.000001;
 
+#include<fstream>
+#include <iostream>
+
 extern "C" {
 #include "test_setting.h"
 #include "BD.h"
@@ -221,7 +224,7 @@ TEST(BCov, bcor_value) {
 TEST(BD, bd_gwas) {
     double ball_stat_value[4], permuted_stat_value[2], p_value[4];
     int snp1[40] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
-                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     int nth, p = 2, n = 20, R = 0;
     nth = 1;
     bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp1, &n, &p, &R, &nth);
@@ -240,4 +243,61 @@ TEST(BD, bd_gwas) {
     nth = 2;
     bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
     EXPECT_NEAR(ball_stat_value[1], 1.384989, ABSOLUTE_ERROR);
+}
+
+TEST(BD, bd_gwas_real) {
+    std::vector<double> index;
+    std::ifstream infile;
+    infile.open("D:/ball/src/test/ball_test/img.txt");
+    double value;
+    while (!infile.eof()) {
+        if (infile.eof()) {
+            break;
+        }
+        infile >> value;
+        index.push_back(value);
+    }
+    infile.close();
+    int n = 835, d = 132, snp_num = 10;
+    int data_len = (int) index.size();
+    double* x = new double[data_len];
+    double** dx = alloc_matrix(n, n);
+    for (int j = 0; j < data_len; ++j) {
+        x[j] = index[j];
+    }
+    Euclidean_distance(x, dx, n, d);
+    double *xy = (double *) malloc(((n * (n - 1)) >> 1) * sizeof(double));
+    int s = 0;
+    for (int i = 0; i < n; ++i) {
+        for (int j = (i + 1); j < n; ++j) {
+            xy[s++] = dx[i][j];
+        }
+    }
+    infile.open("D:/ball/src/test/ball_test/snp.txt");
+
+    int int_value;
+    std::vector<std::vector<int> > snp_matrix((size_t) n, std::vector<int>((size_t) snp_num));
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < snp_num; ++j) {
+            infile >> int_value;
+            snp_matrix[i][j] = int_value;
+        }
+    }
+    int snp[n * snp_num];
+    s = 0;
+    for (int i = 0; i < snp_num; ++i) {
+        for (int j = 0; j < n; ++j) {
+            snp[s++] = snp_matrix[j][i];
+        }
+    }
+
+    double ball_stat_value[20], permuted_stat_value[199], p_value[20];
+    int nth, R = 0;
+    nth = 1;
+    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, xy, snp, &n, &snp_num, &R, &nth);
+    EXPECT_LE(p_value[0], 0.05);
+
+    delete[] x;
+    delete[] dx;
+
 }

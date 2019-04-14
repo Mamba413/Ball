@@ -45,25 +45,23 @@ void ball_divergence2(double *bd_stat, int **full_rank, int **sub_rank1, int **s
  * @param max_k : 2
  */
 void sub_rank_finder(int ***sub_rank, double **distance_matrix, int **index_matrix, const int *label,
-                     const int *group_relative_location, const int *cumsum_size, int num, int max_k) {
+                     const int *group_relative_location, const int *cumsum_size, const int *size,
+                     int num, int max_k) {
     /*
      * g_index: indicator for group
      * s_index: indicator for order
      */
     int s_index, g_index;
-    int *init_sub_rank;
-    init_sub_rank = (int *) malloc((max_k + 1) * sizeof(int));
     for (int i = 0; i < num; ++i) {
-        for (int k = 0; k < (max_k + 1); ++k) {
-            init_sub_rank[k] = 1;
-        }
+        int i_index = label[i], i_cumsum_size = cumsum_size[i_index];
+        int i_group_relative_location = group_relative_location[i];
+        int rank_value = 1;
         for (int j = 0; j < num; ++j) {
             s_index = index_matrix[i][j];
             g_index = label[s_index];
-            if (label[i] == g_index) {
-                sub_rank[g_index][group_relative_location[i] - cumsum_size[g_index]][group_relative_location[s_index] -
-                                                                                     cumsum_size[g_index]] = init_sub_rank[g_index];
-                init_sub_rank[g_index] += 1;
+            if (i_index == g_index) {
+                sub_rank[i_index][i_group_relative_location - i_cumsum_size][group_relative_location[s_index] - i_cumsum_size] = rank_value;
+                rank_value++;
             }
         }
     }
@@ -283,7 +281,8 @@ void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *
     free(distance_matrix_copy);
 
     double **bd_stat_array = alloc_matrix(bd_stat_number, 2);
-    sub_rank_finder(sub_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, *n, *k - 1);
+    sub_rank_finder(sub_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, size, *n,
+                    *k - 1);
     full_rank_finder(full_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, size, *n,
                      *k - 1);
     ball_divergence_array(bd_stat_array, full_rank, sub_rank, size, *k);
@@ -306,7 +305,7 @@ void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *
                 resample2(label, n);
                 find_group_relative_location(group_relative_location, label, cumsum_size, *n, *k);
                 sub_rank_finder(sub_rank, distance_matrix, index_matrix, label, group_relative_location,
-                                cumsum_size, *n, *k - 1);
+                                cumsum_size, size, *n, *k - 1);
                 full_rank_finder(full_rank, distance_matrix, index_matrix, label, group_relative_location,
                                  cumsum_size, size, *n, *k - 1);
                 ball_divergence_array(bd_stat_array, full_rank, sub_rank, size, *k);
@@ -336,7 +335,7 @@ void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *
                 for (j_thread = 0; j_thread < (*R); j_thread++) {
                     sub_rank_finder(sub_rank_thread, distance_matrix, index_matrix,
                                     label_matrix[j_thread], group_relative_location_matrix[j_thread],
-                                    cumsum_size, *n, *k - 1);
+                                    cumsum_size, size, *n, *k - 1);
                     full_rank_finder(full_rank_thread, distance_matrix, index_matrix,
                                      label_matrix[j_thread], group_relative_location_matrix[j_thread],
                                      cumsum_size, size, *n, *k - 1);
@@ -465,11 +464,11 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
             sub_rank = alloc_int_square_matrix_list(size_list[i_thread], k_vector[i_thread]);
             full_rank = alloc_int_square_matrix_list(pairwise_size[i_thread], bd_stat_number_vector[i_thread]);
             sub_rank_finder(sub_rank, distance_matrix, index_matrix, snp_matrix[i_thread],
-                            snp_group_relative_location[i_thread], cumsum_size_list[i_thread], *n,
-                            k_vector[i_thread] - 1);
+                            snp_group_relative_location[i_thread], cumsum_size_list[i_thread], size_list[i_thread],
+                            *n, k_vector[i_thread] - 1);
             full_rank_finder(full_rank, distance_matrix, index_matrix, snp_matrix[i_thread],
-                             snp_group_relative_location[i_thread], cumsum_size_list[i_thread], size_list[i_thread], *n,
-                             k_vector[i_thread] - 1);
+                             snp_group_relative_location[i_thread], cumsum_size_list[i_thread], size_list[i_thread],
+                             *n, k_vector[i_thread] - 1);
             asymptotic_ball_divergence(asymptotic_bd_stat_array[i_thread], full_rank, sub_rank, size_list[i_thread],
                                        k_vector[i_thread], bd_stat_number_vector[i_thread]);
             free_int_square_matrix_list(sub_rank, size_list[i_thread], k_vector[i_thread]);
@@ -574,7 +573,7 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
                                                      permuted_cumsum_size, *n, permuted_k);
                         sub_rank_finder(sub_rank_thread, distance_matrix, index_matrix, label_matrix[r_thread],
                                         group_relative_location_matrix[r_thread],
-                                        permuted_cumsum_size, *n, permuted_k - 1);
+                                        permuted_cumsum_size, permuted_size, *n, permuted_k - 1);
                         full_rank_finder(full_rank_thread, distance_matrix, index_matrix, label_matrix[r_thread],
                                          group_relative_location_matrix[r_thread],
                                          permuted_cumsum_size, permuted_size, *n, permuted_k - 1);

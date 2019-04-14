@@ -90,7 +90,8 @@ TEST(KBD, sub_rank_finder) {
     }
     free(distance_matrix_copy);
     int ***sub_rank = alloc_int_square_matrix_list(size, k);
-    sub_rank_finder(sub_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, n, k - 1);
+    sub_rank_finder(sub_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, size, n,
+                    k - 1);
 
     int true_rank[300] = {1, 5, 3, 10, 6, 2, 7, 9, 8, 4, 7, 1, 9, 10, 2, 8, 3, 6, 4, 5, 3, 5, 1, 10, 6, 2, 7, 9, 8, 4,
                           8, 6, 10, 1, 5, 9, 4, 2, 3, 7, 7, 2, 9, 10, 1, 8, 3, 5, 4, 6, 3, 5, 2, 10, 6, 1, 7, 9, 8, 4,
@@ -113,7 +114,8 @@ TEST(KBD, sub_rank_finder) {
 
     int label_new[30] = {0, 1, 1, 2, 0, 2, 2, 1, 1, 0, 0, 0, 1, 0, 1, 2, 2, 2, 1, 0, 0, 2, 2, 0, 2, 1, 2, 1, 0, 1};
     find_group_relative_location(group_relative_location, label_new, cumsum_size, n, k);
-    sub_rank_finder(sub_rank, distance_matrix, index_matrix, label_new, group_relative_location, cumsum_size, n, k - 1);
+    sub_rank_finder(sub_rank, distance_matrix, index_matrix, label_new, group_relative_location, cumsum_size, size,
+                    n, k - 1);
 
     int true_rank_new[300] = {1, 4, 3, 10, 5, 9, 6, 8, 7, 2, 7, 1, 5, 8, 2, 10, 3, 4, 9, 6, 3, 4, 1, 9, 5, 10, 6, 7, 8,
                               2, 8, 5, 6, 1, 4, 10, 3, 2, 9, 7, 7, 2, 5, 8, 1, 10, 3, 4, 9, 6, 3, 6, 5, 10, 7, 1, 8, 9,
@@ -173,7 +175,8 @@ TEST(KBD, sub_rank_finder_imbalanced_multiple_group) {
     free(distance_matrix_copy);
 
     int ***sub_rank = alloc_int_square_matrix_list(size, k);
-    sub_rank_finder(sub_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, n, k - 1);
+    sub_rank_finder(sub_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, size,
+                    n, k - 1);
 
     int true_rank[] = {1, 4, 3, 6, 5, 2, 3, 1, 5, 6, 2, 4, 3, 4, 1, 6, 5, 2, 4, 3, 6, 1, 2, 5, 3, 2, 5, 6, 1, 4, 3, 4,
                        2, 6, 5, 1, 1, 3, 2, 4, 5, 3, 1, 2, 5, 4, 2, 3, 1, 4, 5, 2, 4, 3, 1, 5, 4, 2, 3, 5, 1, 1, 4, 5,
@@ -529,7 +532,8 @@ TEST(KBD, permute_bd_value) {
     }
 
     int ***sub_rank = alloc_int_square_matrix_list(size, k);
-    sub_rank_finder(sub_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, n, k - 1);
+    sub_rank_finder(sub_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, size,
+                    n, k - 1);
     int ***full_rank = alloc_int_square_matrix_list(pairwise_size, bd_stat_number);
     full_rank_finder(full_rank, distance_matrix, index_matrix, label, group_relative_location,
                      cumsum_size, size, n, k - 1);

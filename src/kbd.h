@@ -8,7 +8,7 @@
 #include "stdlib.h"
 
 void sub_rank_finder(int ***sub_rank, double **distance_matrix, int **index_matrix, int *label,
-                     int *group_relative_location, int *cumsum_size, int num, int max_k);
+                     int *group_relative_location, int *cumsum_size, int *size, int num, int max_k);
 
 void full_rank_finder(int ***full_rank, double **distance_matrix, int **index_matrix, int *label,
                       int *group_relative_location, int *cumsum_size, int *size, int num, int k_max);
