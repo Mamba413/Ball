@@ -6,6 +6,7 @@
 #include "stdlib.h"
 #include "stdio.h"
 #include "utilities.h"
+#include "Ball_omp.h"
 
 void ball_divergence2(double *bd_stat, int **full_rank, int **sub_rank1, int **sub_rank2, int n1, int n2) {
     double pxx, pxy, pyx, pyy, diff;
