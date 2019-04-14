@@ -120,13 +120,13 @@ TEST(KBD, multivariate_kbd_value) {
 
 TEST(KBCOV, multivariate_kbcov_value) {
     double ball_stat_value[3], ball_stat_value_golden[3], p_value[3];
-    int n = 10, k = 3, R = 0, dst = 1, nth = 1, dst_num = n * (n - 1)>>1;;
+    int n = 10, k = 3, R = 0, dst = 1, nth = 1, dst_num = n * (n - 1) >> 1;;
     double ***dxyz = alloc_3d_matrix(n, n, k);
     double **dx = alloc_matrix(n, n);
     double **dy = alloc_matrix(n, n);
     double **dz = alloc_matrix(n, n);
     double *dxyz_vector;
-    dxyz_vector = (double *) malloc((k * ((n * (n - 1))>>1)) * sizeof(double));
+    dxyz_vector = (double *) malloc((k * ((n * (n - 1)) >> 1)) * sizeof(double));
 
     // Discrete case:
     distance2matrix(X1_DISCRETE_DST, dx, n);
@@ -142,7 +142,7 @@ TEST(KBCOV, multivariate_kbcov_value) {
     K_Ball_Covariance_Crude(ball_stat_value_golden, dxyz, n, k);
     // Software of R output result (Ball_1.0.0.tar.gz, bcov function: 0.0789831
     EXPECT_NEAR(ball_stat_value_golden[0], 0.0789831, ABSOLUTE_ERROR);
-    for (int l = 0; l < ((n * (n - 1))>>1); ++l) {
+    for (int l = 0; l < ((n * (n - 1)) >> 1); ++l) {
         dxyz_vector[l] = X1_DISCRETE_DST[l];
         dxyz_vector[l + dst_num] = X2_DISCRETE_DST[l];
         dxyz_vector[l + (dst_num << 1)] = X3_DISCRETE_DST[l];
@@ -164,7 +164,7 @@ TEST(KBCOV, multivariate_kbcov_value) {
     K_Ball_Covariance_Crude(ball_stat_value_golden, dxyz, n, k);
     // Software of R output result (Ball_1.0.0.tar.gz, bcov function: 0.01611825
     EXPECT_NEAR(ball_stat_value_golden[0], 0.01611825, ABSOLUTE_ERROR);
-    for (int l = 0; l < ((n * (n - 1))>>1); ++l) {
+    for (int l = 0; l < ((n * (n - 1)) >> 1); ++l) {
         dxyz_vector[l] = X1_CONTINUOUS_DST[l];
         dxyz_vector[l + dst_num] = X2_CONTINUOUS_DST[l];
         dxyz_vector[l + (dst_num << 1)] = X3_CONTINUOUS_DST[l];
@@ -216,4 +216,28 @@ TEST(BCov, bcor_value) {
     EXPECT_NEAR(ball_stat_value[0], 1, ABSOLUTE_ERROR);;
     EXPECT_NEAR(ball_stat_value[1], 1, ABSOLUTE_ERROR);;
     EXPECT_NEAR(ball_stat_value[2], 1, ABSOLUTE_ERROR);;
+}
+
+TEST(BD, bd_gwas) {
+    double ball_stat_value[4], permuted_stat_value[2], p_value[4];
+    int snp1[40] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    int nth, p = 2, n = 20, R = 0;
+    nth = 1;
+    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp1, &n, &p, &R, &nth);
+    EXPECT_NEAR(ball_stat_value[1], 0.0614 * 10 * 10 / (20), ABSOLUTE_ERROR);
+
+    nth = 2;
+    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp1, &n, &p, &R, &nth);
+    EXPECT_NEAR(ball_stat_value[1], 0.0614 * 10 * 10 / (20), ABSOLUTE_ERROR);
+
+    int snp2[40] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
+                    0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2};
+    nth = 1;
+    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
+    EXPECT_NEAR(ball_stat_value[1], 1.384989, ABSOLUTE_ERROR);
+
+    nth = 2;
+    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
+    EXPECT_NEAR(ball_stat_value[1], 1.384989, ABSOLUTE_ERROR);
 }

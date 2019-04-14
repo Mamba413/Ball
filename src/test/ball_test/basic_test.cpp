@@ -539,3 +539,12 @@ TEST(KBD, permute_bd_value) {
     k_ball_divergence_from_by_sample_ball_divergence(kbd_stat_tmp, bd_stat_array, bd_stat_number, k);
     EXPECT_NEAR(kbd_stat_tmp[0], 0.1284, ABSOLUTE_ERROR);
 }
+
+TEST(KBD, sort_ints) {
+    int array[10] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0};
+    sort_ints(array, 10);
+    int sorted_array[10] = {0, 0, 0, 0, 1, 1, 1, 2, 2, 2};
+    for (int i = 0; i < 10; ++i) {
+        EXPECT_EQ(sorted_array[i], array[i]);
+    }
+}

@@ -4,6 +4,8 @@
 
 #include "gtest/gtest.h"
 
+static double ABSOLUTE_ERROR = 0.000001;
+
 extern "C" {
 #include "test_setting.h"
 #include "BD.h"
@@ -176,4 +178,33 @@ TEST(KBCOV, mutual_independence_test_multivariate) {
     EXPECT_NEAR(p_value[0], 0.05, 0.05);
     EXPECT_NEAR(p_value[1], 0.05, 0.05);
     EXPECT_NEAR(p_value[2], 0.05, 0.05);
+}
+
+TEST(BD, bd_gwas_test) {
+    double ball_stat_value[4], permuted_stat_value[398], p_value[4];
+    int snp[40] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    int nth, p = 2, n = 20, R = 199;
+    nth = 1;
+    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp, &n, &p, &R, &nth);
+    EXPECT_GE(p_value[1], 0.05);
+
+    nth = 2;
+    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp, &n, &p, &R, &nth);
+    EXPECT_GE(p_value[1], 0.05);
+
+    int snp2[40] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
+                    0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2};
+    nth = 1;
+    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
+    EXPECT_GE(p_value[1], 0.05);
+
+    nth = 2;
+    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
+    EXPECT_GE(p_value[1], 0.05);
+
+    R = 49999;
+    double permuted_stat_value2[99999];
+    bd_gwas_test(ball_stat_value, permuted_stat_value2, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
+    EXPECT_GE(p_value[1], 0.05);
 }
