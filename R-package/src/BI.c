@@ -22,8 +22,8 @@
 #include "BI.h"
 #include "Ball_omp.h"
 
-void Ball_Information_NoTies(double *bcov_stat, int *n, int **y_within_ball,
-                             int **xidx, double **Dy, int *i_perm) {
+void Ball_Information_NoTies(double *bcov_stat, const int *n, int **y_within_ball,
+                             int **xidx, double **Dy, const int *i_perm) {
     double px, py, pxy, n_prop = 1.0 / *n;
     int sorted_j, *inv_count = malloc(*n * sizeof(int));
     int *y_count_vec = malloc(*n * sizeof(int));
@@ -197,7 +197,6 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
 }
 
 void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *thread) {
-    /*  computes RCT(x,y)  */
     int i, j, **xidx, **yidx, *i_perm, *i_perm_inv, ties = 0;
     int **y_within_ball = alloc_int_matrix(*n, *n);
     double **Dx, **Dy, *x_cpy, *y_cpy;
@@ -224,8 +223,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
         i_perm_inv[i] = i;
     }
 
-    // sort each row of Dx and Dy
-    // computational complexity: O(n^2 * logn)
+    // sort each row of Dx and Dy, time complexity: O(n^2 * log{n})
     // xidx, yidx is index of each row after sorted
     for (i = 0; i < (*n); i++) {
         memcpy(x_cpy, Dx[i], *n * sizeof(double));

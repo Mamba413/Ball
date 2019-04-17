@@ -22,8 +22,8 @@
 #include "BI.h"
 #include "Ball_omp.h"
 
-void Ball_Information_NoTies(double *bcov_stat, int *n, int **y_within_ball,
-                             int **xidx, double **Dy, int *i_perm) {
+void Ball_Information_NoTies(double *bcov_stat, const int *n, int **y_within_ball,
+                             int **xidx, double **Dy, const int *i_perm) {
     double px, py, pxy, n_prop = 1.0 / *n;
     int sorted_j, *inv_count = malloc(*n * sizeof(int));
     int *y_count_vec = malloc(*n * sizeof(int));
