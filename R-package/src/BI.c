@@ -303,8 +303,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
                     permuted_bcov_weight_hhg[i] = bcov_tmp[2];
                 }
             } else {
-                int **i_perm_matrix;
-                i_perm_matrix = alloc_int_matrix(*R, *n);
+                int **i_perm_matrix = alloc_int_matrix(*R, *n);
                 resample2_matrix(i_perm_matrix, i_perm, *R, *n);
 #pragma omp parallel
                 {
@@ -426,9 +425,8 @@ void UBI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int
                 permuted_bcov_weight_hhg[j] = bcov_tmp[2];
             }
         } else {
-            int **i_perm_thread;
-            i_perm_thread = alloc_int_matrix(*R, *n);
-            shuffle_indicator_matrix(i_perm_thread, i_perm, *R, *n);
+            int **i_perm_thread = alloc_int_matrix(*R, *n);
+            resample2_matrix(i_perm_thread, i_perm, *R, *n);
 #pragma omp parallel
             {
                 int j_thread, **Rank_thread;
@@ -445,7 +443,7 @@ void UBI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int
                 }
                 free_int_matrix(Rank_thread, (*n) + 1, (*n) + 1);
             }
-            free(i_perm_thread);
+            free_int_matrix(i_perm_thread, *R, *n);
             j = *R;
         }
 

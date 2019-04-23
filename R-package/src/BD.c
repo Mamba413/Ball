@@ -638,7 +638,7 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
             free(new_xy);
         } else {
             int **index_matrix = alloc_int_matrix(*R, *n);
-            shuffle_indicator_matrix(index_matrix, index, *R, *n);
+            resample2_matrix(index_matrix, index, *R, *n);
 #pragma omp parallel
             {
                 int j_thread;

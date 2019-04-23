@@ -10,8 +10,14 @@
 void sub_rank_finder(int ***sub_rank, double **distance_matrix, int **index_matrix, int *label,
                      int *group_relative_location, int *cumsum_size, int *size, int num, int max_k);
 
+void sub_rank_finder_tie(int ***sub_rank, double **distance_matrix, int **index_matrix, const int *label,
+                         int *group_relative_location, int *cumsum_size, int *size, int num, int k_max);
+
 void full_rank_finder(int ***full_rank, double **distance_matrix, int **index_matrix, int *label,
                       int *group_relative_location, int *cumsum_size, int *size, int num, int k_max);
+
+void full_rank_finder_tie(int ***full_rank, double **distance_matrix, int **index_matrix, int *label,
+                          int *group_relative_location, int *cumsum_size, int *size, int num, int k_max);
 
 void ball_divergence_array(double **bd_stat_array, int ***full_rank, int ***sub_rank, int *size, int K);
 

@@ -29,6 +29,114 @@
 
 #endif
 
+void swap(double *x, double *y) {
+    double t = *x;
+    *x = *y;
+    *y = t;
+}
+
+/**
+ *
+ * @param group_relative_location : [0, 2, 4, 1, 3, 5]
+ * @param group :  [0, 1, 2, 0, 1, 2]
+ * @param K : 3
+ */
+void find_group_relative_location(int *group_relative_location, int *group, int *cumsum_size, int num, int K) {
+    int *init_group_relative_location = (int *) malloc(K * sizeof(int));
+    for (int k = 0; k < K; ++k) {
+        init_group_relative_location[k] = 0;
+    }
+    for (int i = 0; i < num; ++i) {
+        for (int j = 0; j < K; ++j) {
+            if (group[i] == j) {
+                group_relative_location[i] = cumsum_size[j] + init_group_relative_location[j];
+                init_group_relative_location[j] += 1;
+                break;
+            }
+        }
+    }
+}
+
+/**
+ * Coupute the cumulative sample size vector
+ * @param size: an array contain sample size in each group
+ * @param cumulate_size: the cumulative sums to be computed
+ * @param k: group number
+ * @example : Input : size = [15, 25, 10], k = 3
+ * @example : Outpur : cumsum_size = [0, 15, 40]
+ */
+void compute_cumsum_size(int *cumsum_size, int *size, int *k) {
+    int i;
+    for (i = 0; i < (*k); i++) {
+        if (i == 0) {
+            cumsum_size[i] = 0;
+        } else {
+            cumsum_size[i] = cumsum_size[i - 1] + size[i - 1];
+        }
+    }
+}
+
+void quick_sort_recursive(double *arr, int start, int end) {
+    if (start >= end)
+        return;
+    double mid = arr[end];
+    int left = start, right = end - 1;
+    while (left < right) {
+        while (arr[left] < mid && left < right)
+            left++;
+        while (arr[right] >= mid && left < right)
+            right--;
+        swap(&arr[left], &arr[right]);
+    }
+    if (arr[left] >= arr[end])
+        swap(&arr[left], &arr[end]);
+    else
+        left++;
+    if (left)
+        quick_sort_recursive(arr, start, left - 1);
+    quick_sort_recursive(arr, left + 1, end);
+}
+
+/**
+ * quick sort array with size n
+*/
+void quick_sort(double *array, int n) {
+    quick_sort_recursive(array, 0, n - 1);
+}
+
+double compute_pvalue(double ball_stat_value, double *permuted_stat, int R) {
+    double larger_num = 0.0;
+    for (int i = 0; i < R; i++) {
+        if (permuted_stat[i] >= ball_stat_value) {
+            larger_num += 1.0;
+        }
+    }
+    double p_value = (1.0 + larger_num) / (1.0 + R);
+    return p_value;
+}
+
+void compute_batch_pvalue(double *ball_stat, const double *permuted_stat, double *p_value,
+                          int batch_num, int R) {
+    int all_stat_num = R + batch_num;
+    int *rank_all = (int *) calloc((size_t) all_stat_num, sizeof(int));
+    int *rank_batch = (int *) calloc((size_t) batch_num, sizeof(int));
+    memset(rank_all, all_stat_num, sizeof(int));
+    memset(rank_batch, batch_num, sizeof(int));
+    double *all_stat = (double *) calloc((size_t) all_stat_num, sizeof(double));
+    for (int i = 0; i < batch_num; ++i) {
+        all_stat[i] = ball_stat[i];
+    }
+    for (int i = 0; i < R; ++i) {
+        all_stat[batch_num + i] = permuted_stat[i];
+    }
+    quick_rank_min(all_stat, rank_all, all_stat_num);
+    quick_rank_min(ball_stat, rank_batch, batch_num);
+    double all_prop = 1.0 / (1.0 + R);
+    for (int i = 0; i < batch_num; i++) {
+        p_value[i] = (1.0 + (R + batch_num - rank_all[i]) - (batch_num - rank_batch[i])) * all_prop;
+    }
+}
+
 void merge(double *vector, int *index, int *number, int start, int mid, int end) {
     const int left_size = mid - start + 1, right_size = end - mid;
     double left[left_size], right[right_size];
@@ -85,110 +193,6 @@ void count_smaller_number_after_self_solution(double *vector, int *number, const
         index[i] = i;
     }
     merge_sort(vector, index, number, 0, num - 1);
-}
-
-void swap(double *x, double *y) {
-    double t = *x;
-    *x = *y;
-    *y = t;
-}
-
-/**
- *
- * @param group_relative_location : [0, 2, 4, 1, 3, 5]
- * @param group :  [0, 1, 2, 0, 1, 2]
- * @param K : 3
- */
-void find_group_relative_location(int *group_relative_location, int *group, int *cumsum_size, int num, int K) {
-    int *init_group_relative_location = (int *) malloc(K * sizeof(int));
-    for (int k = 0; k < K; ++k) {
-        init_group_relative_location[k] = 0;
-    }
-    for (int i = 0; i < num; ++i) {
-        for (int j = 0; j < K; ++j) {
-            if (group[i] == j) {
-                group_relative_location[i] = cumsum_size[j] + init_group_relative_location[j];
-                init_group_relative_location[j] += 1;
-                break;
-            }
-        }
-    }
-}
-
-// input:
-// size: an array contain sample size in each group
-// cumulate_size: the cumulative sums of size vector
-// k: group number
-void compute_cumsum_size(int *cumulate_size, int *size, int *k) {
-    int i;
-    for (i = 0; i < (*k); i++) {
-        if (i == 0) {
-            cumulate_size[i] = 0;
-        } else {
-            cumulate_size[i] = cumulate_size[i - 1] + size[i - 1];
-        }
-    }
-}
-
-void quick_sort_recursive(double *arr, int start, int end) {
-    if (start >= end)
-        return;
-    double mid = arr[end];
-    int left = start, right = end - 1;
-    while (left < right) {
-        while (arr[left] < mid && left < right)
-            left++;
-        while (arr[right] >= mid && left < right)
-            right--;
-        swap(&arr[left], &arr[right]);
-    }
-    if (arr[left] >= arr[end])
-        swap(&arr[left], &arr[end]);
-    else
-        left++;
-    if (left)
-        quick_sort_recursive(arr, start, left - 1);
-    quick_sort_recursive(arr, left + 1, end);
-}
-
-/*
-quick sort function for finding Max K-1 two sample ball divergence value
-*/
-void quick_sort(double *arr, int len) {
-    quick_sort_recursive(arr, 0, len - 1);
-}
-
-double compute_pvalue(double ball_stat_value, double *permuted_stat, int R) {
-    double larger_num = 0.0;
-    for (int i = 0; i < R; i++) {
-        if (permuted_stat[i] >= ball_stat_value) {
-            larger_num += 1.0;
-        }
-    }
-    double p_value = (1.0 + larger_num) / (1.0 + R);
-    return p_value;
-}
-
-void compute_batch_pvalue(double *ball_stat, const double *permuted_stat, double *p_value,
-                          int batch_num, int R) {
-    int all_stat_num = R + batch_num;
-    int *rank_all = (int *) calloc((size_t) all_stat_num, sizeof(int));
-    int *rank_batch = (int *) calloc((size_t) batch_num, sizeof(int));
-    memset(rank_all, all_stat_num, sizeof(int));
-    memset(rank_batch, batch_num, sizeof(int));
-    double *all_stat = (double *) calloc((size_t) all_stat_num, sizeof(double));
-    for (int i = 0; i < batch_num; ++i) {
-        all_stat[i] = ball_stat[i];
-    }
-    for (int i = 0; i < R; ++i) {
-        all_stat[batch_num + i] = permuted_stat[i];
-    }
-    quick_rank_min(all_stat, rank_all, all_stat_num);
-    quick_rank_min(ball_stat, rank_batch, batch_num);
-    double all_prop = 1.0 / (1.0 + R);
-    for (int i = 0; i < batch_num; i++) {
-        p_value[i] = (1.0 + (R + batch_num - rank_all[i]) - (batch_num - rank_batch[i])) * all_prop;
-    }
 }
 
 void Merge(int *permutation, int *source, int *inversion_count, int dim, int n) {
@@ -251,20 +255,25 @@ void Inversions(int *permutation, int *source, int *inversion_count, int dim, in
     }
 }
 
-/*
-The algorithm like the quick-sort. It finds the upper and lower in turn.
-For each i, the computation complexity is O(n);
-Thus, this function take O(n^2) times.
-
-Algorithm detail:
-For i=1, ..., n, carry out:
-init the low and upper index: l=1, u=N
-while (l <= u):
-if (z[u] - z[i]) >= (z[i] - z[l]) ==> for pair (i, u), upper index: u, lower index: l ==> update upper index: u = u - 1
-if (z[u] - z[i]) < (z[i] - z[l]) ==> for pair (i, l), upper index: u, lower index: l ==> update lower index: l = l - 1
-
-Input: n=6, z = [1, 2, 3, 4, 5, 5], zidx = [3, 1, 5, 2, 6, 4], lowzidx = [], higzidx = [];
-Output: lowzidx, higzidx;
+/**
+ * Give an univariate array, compute the lower and upper boundary of each ball.
+ * @param n : size of array
+ * @param zidx : zidx[i] = j means the i-smallest element of z is z[j]
+ * @param z : an value array
+ * @param lowzidx : the lower boundary to be computed
+ * @param higzidx : the upper boundary to be computed
+ *
+ * @details:
+ * The algorithm like the quick-sort. It finds the upper and lower in turn.
+ * For each i, the computation complexity is O(n); Thus, this function take O(n^2) times.
+ * Algorithm detail:
+ * For i=1, ..., n, carry out:
+ * init the low and upper index: l=1, u=N
+ * while (l <= u):
+ * if (z[u] - z[i]) >= (z[i] - z[l]) ==> for pair (i, u), upper index: u, lower index: l ==> update upper index: u = u - 1
+ * if (z[u] - z[i]) < (z[i] - z[l]) ==> for pair (i, l), upper index: u, lower index: l ==> update lower index: l = l - 1
+ *
+ * @refitem https://arxiv.org/pdf/1811.03750.pdf, Section 3.3, Algorithm 2
 */
 void createidx(int *n, int *zidx, double *z, int **lowzidx, int **higzidx) {
     int i, zi, ileft, iright, jleft, jright, lowpos, higpos;
@@ -414,20 +423,6 @@ void sort(int *n, int *zidx, double *z, int **dzidx) {
     }
 }
 
-void ranksort2(int n, int **Rxy, double **Dxy, int **Ixy) {
-    int i, j, lastpos = n - 1;
-    double lastval;
-    for (i = 0; i < n; i++) {
-        lastval = -1;
-        for (j = n - 1; j >= 0; j--) {
-            if (lastval != Dxy[i][j])
-                lastpos = j;
-            lastval = Dxy[i][j];
-            Rxy[i][Ixy[i][j]] = lastpos;
-        }
-    }
-}
-
 /*
 This function try to derive the rank of Rx belong to group 1.
 tmp, lastpos, lastval are introduced to resolve the situtation when ties appear
@@ -516,128 +511,225 @@ void ranksort3(int n, int *xyidx, double *xy, int **Rxy, int **Ixy) {
     }
 }
 
-/*
-The rank computation (initRank, computeRank) is refer to: http://www.jmlr.org/papers/volume17/14-441/14-441.pdf [section 3.1.2]
+/**
+ * The rank computation for univariate Ball Covariance
+ * @refitem: http://www.jmlr.org/papers/volume17/14-441/14-441.pdf [section 3.1.2]
 */
 void computeRank(int n, int **Rank) {
     int i, j;
-    for (i = 1; i < n; i++)
-        for (j = 1; j < n; j++)
+    for (i = 1; i < n; i++) {
+        for (j = 1; j < n; j++) {
             Rank[i][j] += (Rank[i][j - 1] + Rank[i - 1][j] - Rank[i - 1][j - 1]);
+        }
+    }
 }
 
+/**
+ * The rank computation for univariate Ball Covariance
+ * @refitem: http://www.jmlr.org/papers/volume17/14-441/14-441.pdf [section 3.1.2]
+*/
 void initRank(int n, int **Rank, int *xrank, int *yrank, int *i_perm) {
     int i, j;
-    for (i = 0; i < n + 1; i++)
-        for (j = 0; j < n + 1; j++)
+    for (i = 0; i < n + 1; i++) {
+        for (j = 0; j < n + 1; j++) {
             Rank[i][j] = 0;
-    for (i = 0; i < n; i++)
+        }
+    }
+    for (i = 0; i < n; i++) {
         Rank[xrank[i] + 1][yrank[i_perm[i]] + 1] += 1;
+    }
     computeRank(n + 1, Rank);
 }
 
 void initRank_bcor(int n, int **Rank, int *xrank, int *yrank) {
     int i, j;
-    for (i = 0; i < n + 1; i++)
-        for (j = 0; j < n + 1; j++)
+    for (i = 0; i < n + 1; i++) {
+        for (j = 0; j < n + 1; j++) {
             Rank[i][j] = 0;
-    for (i = 0; i < n; i++)
+        }
+    }
+    for (i = 0; i < n; i++) {
         Rank[xrank[i] + 1][yrank[i] + 1] += 1;
+    }
     computeRank(n + 1, Rank);
 }
 
-//void initRank_surv(int n, int **Rank, int *xrank, int *yrank, int *i_perm)
-//{
-//	int i, j, old_x_rank = -1, old_t_rank = -1;
-//	for (i = 0; i < n + 1; i++)
-//		for (j = 0; j < n + 1; j++)
-//			Rank[i][j] = 0;
-//	//
-//	for (i = 0; i < n; i++)
-//	{
-//		if (old_x_rank != (xrank[i] + 1) & old_t_rank != (yrank[i_perm[i]] + 1))
-//		{
-//			Rank[xrank[i] + 1][yrank[i_perm[i]] + 1] += 1;
-//			old_x_rank = xrank[i] + 1;
-//			old_t_rank = yrank[i_perm[i]] + 1;
-//		}
-//		else {
-//			Rank[old_x_rank][old_t_rank] += 1;
-//		}
-//	}
-//	printf("\n");
-//	for (i = n - 1; i >= 0; i--)
-//	{
-//		for (int j = 0; j < (n); j++)
-//			printf("%d ", Rank[i][j]);
-//		printf("\n");
-//	}
-//	printf("\n");
-//	computeRank(n + 1, Rank);
-//}
+/**
+ * Rank a value vector in a max manner
+ * @param x value vector
+ * @param r save the rank result
+ * @param n the size of vector
+ * @example
+ * x = {1.2, 1.3, 1.3, 1.3, 1.3, 0.9};
+ * r ={0, 0, 0, 0, 0, 0};
+ * quick_rank_max(x, r, 6);
+ * r = {2, 6, 6, 6, 6, 1};
+ */
+void quick_rank_max(const double *x, int *r, int n) {
+    int *x_index, rank_value = n, i_loc, tmp = 1;
+    double *x_cpy;
+    x_index = (int *) malloc(n * sizeof(int));
+    x_cpy = (double *) malloc(n * sizeof(double));
+    for (int j = 0; j < n; j++) { x_index[j] = j; }
+    for (int j = 0; j < n; j++) { x_cpy[j] = x[j]; }
+    quicksort(x_cpy, x_index, 0, n - 1);
+    r[x_index[n - 1]] = rank_value;
+    for (int i = n - 2; 0 <= i; i--) {
+        i_loc = x_index[i];
+        if (x[i_loc] == x[x_index[i + 1]]) {
+            r[i_loc] = rank_value;
+            tmp++;
+        } else {
+            rank_value = rank_value - tmp;
+            r[i_loc] = rank_value;
+            tmp = 1;
+        }
+    }
+    free(x_index);
+    free(x_cpy);
+}
 
+/**
+ * Rank a value vector in a max manner
+ * @param x value vector
+ * @param r save the rank result
+ * @param n the size of vector
+ * @example
+ * x = {1.2, 1.3, 1.3, 1.3, 1.3, 0.9};
+ * r ={0, 0, 0, 0, 0, 0};
+ * quick_rank_min(x, r, 6);
+ * r = {2, 3, 3, 3, 3, 1}
+ */
+void quick_rank_min(const double *x, int *r, int n) {
+    int *x_index, rank_value = 1, i_loc, tmp = 1;
+    double *x_cpy;
+    x_index = (int *) malloc(n * sizeof(int));
+    x_cpy = (double *) malloc(n * sizeof(double));
+    for (int j = 0; j < n; j++) {
+        x_index[j] = j;
+        x_cpy[j] = x[j];
+    }
+    quicksort(x_cpy, x_index, 0, n - 1);
+    r[x_index[0]] = 1;
+    for (int i = 1; i < n; i++) {
+        i_loc = x_index[i];
+        if (x[i_loc] == x[x_index[i - 1]]) {
+            r[i_loc] = rank_value;
+            tmp++;
+        } else {
+            rank_value = rank_value + tmp;
+            r[i_loc] = rank_value;
+            tmp = 1;
+        }
+    }
+    free(x_index);
+    free(x_cpy);
+}
 
-/*
-Input: n=6, zrank = []; z = [1, 2, 3, 4, 5, 5], zidx = [3, 1, 5, 2, 6, 4];
-Output: zrank = [2, 4, 1, 5, 3, 5];
+/**
+ * compute the rank
+ * @param n : the size of zrank
+ * @param zrank : a empty array to be computed
+ * @param z :
+ * @param zidx : the same as the zidx in createidx function
+ * @example : Input: n=6, zrank = []; z = [1, 2, 3, 4, 5, 5], zidx = [3, 1, 5, 2, 6, 4];
+ * @example : Output: zrank = [2, 4, 1, 5, 3, 5];
 */
 void ranksort(int *n, int *zrank, double *z, int *zidx) {
-    int i, lastpos = 0;
-    double lastval = -1.0;
+    int i, last_position = 0;
+    double last_value = -1.0;
 
     for (i = *n - 1; i >= 0; i--) {
-        if (lastval != z[i])
-            lastpos = i;
-        lastval = z[i];
-        zrank[zidx[i]] = lastpos;
+        if (last_value != z[i]) {
+            last_position = i;
+        }
+        last_value = z[i];
+        zrank[zidx[i]] = last_position;
     }
 }
 
-/*
-Apply quicksort algorithm to a, and the index exchange result is recorded in idx.
+/**
+ * A matrix version for ranksort
+ * @param n the size of
+ * @param Rxy a empty 2D array to be computed
+ * @param Dxy a 2D value array
+ * @param Ixy : Ixy[i][j] = q means the j-smallest value of the Dxy[i] is Dxy[i][j]
+ */
+void ranksort2(int n, int **Rxy, double **Dxy, int **Ixy) {
+    int i, j, lastpos = n - 1;
+    double lastval;
+    for (i = 0; i < n; i++) {
+        lastval = -1;
+        for (j = n - 1; j >= 0; j--) {
+            if (lastval != Dxy[i][j]) {
+                lastpos = j;
+            }
+            lastval = Dxy[i][j];
+            Rxy[i][Ixy[i][j]] = lastpos;
+        }
+    }
+}
+
+void rank_matrix_3d(double ***Dx, int n, int k, int ***Rx) {
+    int i, j, h, *x_part_rank;
+    double *x_part;
+    x_part = (double *) malloc(n * sizeof(double));
+    x_part_rank = (int *) malloc(n * sizeof(int));
+    for (h = 0; h < k; h++) {
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                x_part[j] = Dx[i][j][h];
+            }
+            quick_rank_max(x_part, x_part_rank, n);
+            for (j = 0; j < n; j++) {
+                Rx[i][j][h] = x_part_rank[j];
+            }
+        }
+    }
+    free(x_part);
+    free(x_part_rank);
+}
+
+/**
+ * Apply quicksort algorithm to a, and the index exchange result is recorded in idx.
+ * @param array an array to be sort in ascending order
+ * @param idx an order index array. idx[i] = j means the i smallest value of array is a[j].
 */
-void quicksort(double *a, int *idx, int l, int u) {
+void quicksort(double *array, int *idx, int l, int u) {
     int i, m, idx_temp;
     double a_temp;
     if (l >= u)
         return;
     m = l;
     for (i = l + 1; i <= u; i++) {
-        if (a[i] < a[l]) {
+        if (array[i] < array[l]) {
             ++m;
             idx_temp = idx[m];
             idx[m] = idx[i];
             idx[i] = idx_temp;
 
-            a_temp = a[m];
-            a[m] = a[i];
-            a[i] = a_temp;
+            a_temp = array[m];
+            array[m] = array[i];
+            array[i] = a_temp;
         }
     }
     idx_temp = idx[l];
     idx[l] = idx[m];
     idx[m] = idx_temp;
 
-    a_temp = a[l];
-    a[l] = a[m];
-    a[m] = a_temp;
+    a_temp = array[l];
+    array[l] = array[m];
+    array[m] = a_temp;
 
-    quicksort(a, idx, l, m - 1);
-    quicksort(a, idx, m + 1, u);
+    quicksort(array, idx, l, m - 1);
+    quicksort(array, idx, m + 1, u);
 }
 
-/*
-Apply quicksort algorithm to a and b
-After sorted, a is increasing while b is decreasing, and idx recode the index exchange result
-Example:
-Input:
-a = [2, 2, 1, 3]
-b = [1, 2, 3, 4]
-idex = [1, 2, 3, 4]
-Output:
-a = [1, 2, 2, 3]
-b = [3, 1, 2, 4]
-c = [3, 1, 2, 4]
+/**
+ * Apply quicksort algorithm to a and b. After sorted, a is increasing while b is decreasing.
+ * idx recode the index exchange result
+ * @example : Input a = [2, 2, 1, 3], b = [1, 2, 3, 4], idx = [1, 2, 3, 4];
+ * @example : Output a = [1, 2, 2, 3], b = [3, 1, 2, 4], idx = [3, 1, 2, 4]
 */
 void quicksort2(double *a, double *b, int *idx, int l, int u) {
     int i, m, idx_temp;
@@ -681,9 +773,9 @@ double **alloc_matrix(int r, int c) {
     /* allocate a matrix with r rows and c columns */
     int i;
     double **matrix;
-    matrix = (double **) calloc(r, sizeof(double *));
+    matrix = (double **) calloc((size_t) r, sizeof(double *));
     for (i = 0; i < r; i++)
-        matrix[i] = (double *) calloc(c, sizeof(double));
+        matrix[i] = (double *) calloc((size_t) c, sizeof(double));
     return matrix;
 }
 
@@ -707,9 +799,9 @@ int **alloc_int_matrix(int r, int c) {
     /* allocate a matrix with r rows and c columns */
     int i;
     int **matrix;
-    matrix = (int **) calloc(r, sizeof(int *));
+    matrix = (int **) calloc((size_t) r, sizeof(int *));
     for (i = 0; i < r; i++)
-        matrix[i] = (int *) calloc(c, sizeof(int));
+        matrix[i] = (int *) calloc((size_t) c, sizeof(int));
     return matrix;
 }
 
@@ -831,78 +923,6 @@ void vector2matrix3d(double *x, double ***y, int r, int c, int h, int isroworder
     }
 }
 
-/**
- * Rank a value vector in a max manner
- * @param x value vector
- * @param r save the rank result
- * @param n the size of vector
- * @example
- * x = {1.2, 1.3, 1.3, 1.3, 1.3, 0.9};
- * r ={0, 0, 0, 0, 0, 0};
- * quick_rank_max(x, r, 6);
- * r = {2, 6, 6, 6, 6, 1};
- */
-void quick_rank_max(const double *x, int *r, int n) {
-    int *x_index, rank_value = n, i_loc, tmp = 1;
-    double *x_cpy;
-    x_index = (int *) malloc(n * sizeof(int));
-    x_cpy = (double *) malloc(n * sizeof(double));
-    for (int j = 0; j < n; j++) { x_index[j] = j; }
-    for (int j = 0; j < n; j++) { x_cpy[j] = x[j]; }
-    quicksort(x_cpy, x_index, 0, n - 1);
-    r[x_index[n - 1]] = rank_value;
-    for (int i = n - 2; 0 <= i; i--) {
-        i_loc = x_index[i];
-        if (x[i_loc] == x[x_index[i + 1]]) {
-            r[i_loc] = rank_value;
-            tmp++;
-        } else {
-            rank_value = rank_value - tmp;
-            r[i_loc] = rank_value;
-            tmp = 1;
-        }
-    }
-    free(x_index);
-    free(x_cpy);
-}
-
-/**
- * Rank a value vector in a max manner
- * @param x value vector
- * @param r save the rank result
- * @param n the size of vector
- * @example
- * x = {1.2, 1.3, 1.3, 1.3, 1.3, 0.9};
- * r ={0, 0, 0, 0, 0, 0};
- * quick_rank_min(x, r, 6);
- * r = {2, 3, 3, 3, 3, 1}
- */
-void quick_rank_min(const double *x, int *r, int n) {
-    int *x_index, rank_value = 1, i_loc, tmp = 1;
-    double *x_cpy;
-    x_index = (int *) malloc(n * sizeof(int));
-    x_cpy = (double *) malloc(n * sizeof(double));
-    for (int j = 0; j < n; j++) {
-        x_index[j] = j;
-        x_cpy[j] = x[j];
-    }
-    quicksort(x_cpy, x_index, 0, n - 1);
-    r[x_index[0]] = 1;
-    for (int i = 1; i < n; i++) {
-        i_loc = x_index[i];
-        if (x[i_loc] == x[x_index[i - 1]]) {
-            r[i_loc] = rank_value;
-            tmp++;
-        } else {
-            rank_value = rank_value + tmp;
-            r[i_loc] = rank_value;
-            tmp = 1;
-        }
-    }
-    free(x_index);
-    free(x_cpy);
-}
-
 void distance2matrix3d(double *distance, double ***distance_matrix3d, int n, int v) {
     int s = 0;
     for (int k = 0; k < v; ++k) {
@@ -914,26 +934,6 @@ void distance2matrix3d(double *distance, double ***distance_matrix3d, int n, int
             }
         }
     }
-}
-
-void rank_matrix_3d(double ***Dx, int n, int k, int ***Rx) {
-    int i, j, h, *x_part_rank;
-    double *x_part;
-    x_part = (double *) malloc(n * sizeof(double));
-    x_part_rank = (int *) malloc(n * sizeof(int));
-    for (h = 0; h < k; h++) {
-        for (i = 0; i < n; i++) {
-            for (j = 0; j < n; j++) {
-                x_part[j] = Dx[i][j][h];
-            }
-            quick_rank_max(x_part, x_part_rank, n);
-            for (j = 0; j < n; j++) {
-                Rx[i][j][h] = x_part_rank[j];
-            }
-        }
-    }
-    free(x_part);
-    free(x_part_rank);
 }
 
 void Euclidean_distance(double *x, double **Dx, int n, int d) {
@@ -979,9 +979,12 @@ void distance(double *x, double *Dx, int *n, int *d) {
     }
 }
 
-/*
-i_perm takes value 1 to n, i.e., index of sample
-This function permute i_perm array to achieve permutation
+/**
+ * shuffle i_perm and preserve the inversion in i_perm
+ * @param i_perm : array to be shuffled
+ * @param i_perm : array convert i_perm to {0, 1, ..., n - 1}
+ * @param n : size of i_perm
+ *
 */
 void resample(int *i_perm, int *i_perm_inv, int *n) {
     int i, j, temp;
@@ -1143,34 +1146,6 @@ void resample2_matrix(int **i_perm, int *init_perm, int num_permutation, int n) 
 #endif
 }
 
-void shuffle_indicator_matrix(int **i_perm_matrix, int *init_perm, int num_permutation, int num) {
-    int k, temp;
-#ifdef R_BUILD
-    GetRNGstate();
-    for (int i = 0; i < num_permutation; i++) {
-        for (int j = num - 1; j > 0; --j) {
-            k = ((int) round(RAND_MAX * unif_rand())) % (j + 1);
-            temp = init_perm[k];
-            init_perm[k] = init_perm[j];
-            init_perm[j] = temp;
-        }
-        memcpy(i_perm_matrix[i], init_perm, num * sizeof(int));
-    }
-    PutRNGstate();
-#else
-    srand((unsigned) time(NULL));
-    for (int i = 0; i < num_permutation; i++) {
-        for (int j = num - 1; j > 0; --j) {
-            k = rand() % (j + 1);
-            temp = init_perm[k];
-            init_perm[k] = init_perm[j];
-            init_perm[j] = temp;
-        }
-        memcpy(i_perm_matrix[i], init_perm, num * sizeof(int));
-    }
-#endif
-}
-
 /*
  * permute group index: i_perm
  */
@@ -1253,31 +1228,6 @@ void resample_indicator_label_matrix(int **i_perm_matrix, int **i_perm_tmp_matri
 #endif
 }
 
-int random_index_thread_wrap(int i) {
-    return random_index_thread(i);
-}
-
-void resample3_thread(int *permuted_arr, int *i_perm, int *i_perm_tmp, int n, int *n1) {
-    int i, j, temp, tmp0, tmp1;
-    for (i = n - 1; i > 0; --i) {
-        j = permuted_arr[i];
-        temp = i_perm[j];
-        i_perm[j] = i_perm[i];
-        i_perm[i] = temp;
-    }
-
-    tmp0 = 0;
-    tmp1 = 0;
-    for (i = 0; i < n; i++) {
-        if (i_perm[i] == 1) {
-            i_perm_tmp[tmp0++] = i;
-        } else {
-            i_perm_tmp[*n1 + tmp1] = i;
-            tmp1++;
-        }
-    }
-}
-
 /* Arrange the N elements of ARRAY in random order.
  Only effective if N is much smaller than RAND_MAX;
  if this may not be the case, use a better random
@@ -1296,7 +1246,7 @@ void shuffle(int *array, int *N) {
 #else
     srand((unsigned) time(NULL));
     for (int i = 0; i < *N - 1; i++) {
-        j = random_index(*N, i);
+        j = i + rand() / (RAND_MAX / (*N - i) + 1);
         tmp = array[j];
         array[j] = array[i];
         array[i] = tmp;
@@ -1319,7 +1269,7 @@ void shuffle_value(double *array, int *N) {
 #else
     srand((unsigned) time(NULL));
     for (int i = 0; i < *N - 1; i++) {
-        j = random_index(*N, i);
+        j = i + rand() / (RAND_MAX / (*N - i) + 1);
         tmp = array[j];
         array[j] = array[i];
         array[i] = tmp;
@@ -1347,7 +1297,7 @@ void shuffle_value_matrix(double **value_matrix, double *init_value, int num_per
     srand((unsigned) time(NULL));
     for (k = 0; k < num_permutation; ++k) {
         for (i = 0; i < num - 1; i++) {
-            j = random_index(num, i);
+            j = i + rand() / (RAND_MAX / (num - i) + 1);
             tmp = init_value[j];
             init_value[j] = init_value[i];
             init_value[i] = tmp;

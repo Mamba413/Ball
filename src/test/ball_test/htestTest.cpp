@@ -18,7 +18,7 @@ extern "C" {
 #include "kbd.h"
 }
 
-TEST(BD, two_sample_test_univariate) {
+TEST(BDTEST, two_sample_test_univariate) {
     double ball_stat_value[2], p_value[2];
     int size[2] = {10, 10};
     int nth, k = 2, n = 20, dst = 0, R = 299;
@@ -52,7 +52,7 @@ TEST(BD, two_sample_test_univariate) {
     free(xy);
 }
 
-TEST(BD, two_sample_test_multivariate) {
+TEST(BDTEST, two_sample_test_multivariate) {
     double ball_stat_value[2], p_value[2];
     int size[2] = {10, 10};
     int nth, k = 2, n = 20, dst = 1, R = 299;
@@ -73,15 +73,15 @@ TEST(BD, two_sample_test_multivariate) {
     EXPECT_LE(p_value[0], 0.05);
 }
 
-TEST(BD, k_sample_test_univariate) {
+TEST(BDTEST, k_sample_test_univariate) {
     // TODO:
 }
 
-TEST(BD, k_sample_test_multivariate) {
+TEST(BDTEST, k_sample_test_multivariate) {
     // TODO:
 }
 
-TEST(KBD, k_sample_test_multivariate) {
+TEST(KBDTEST, k_sample_test_multivariate) {
     double kbd_stat[6], pvalue[6];
     int n = 30, k = 3, R = 199, nth = 1, size[3] = {10, 10, 10};
     KBD3(kbd_stat, pvalue, X1_X2_X3_CONTINUOUS_DST, size, &n, &k, &R, &nth);
@@ -95,7 +95,7 @@ TEST(KBD, k_sample_test_multivariate) {
     EXPECT_GE(pvalue[4], 0.05);
 }
 
-TEST(BCOV, independence_test_univariate) {
+TEST(BCOVTEST, independence_test_univariate) {
     double ball_stat_value[3], p_value[3];
     double *x, *y;
     int nth, n = 10, R = 299, dst = 0;
@@ -141,7 +141,7 @@ TEST(BCOV, independence_test_univariate) {
     free(y);
 }
 
-TEST(BCOV, independence_test_multivariate) {
+TEST(BCOVTEST, independence_test_multivariate) {
     double ball_stat_value[3], p_value[3];
     int nth, n = 10, R = 299, dst = 1;
 
@@ -161,7 +161,7 @@ TEST(BCOV, independence_test_multivariate) {
     EXPECT_LE(p_value[0], 0.05);
 }
 
-TEST(KBCOV, mutual_independence_test_multivariate) {
+TEST(KBCOVTEST, mutual_independence_test_multivariate) {
     double ball_stat_value[3], p_value[3];
     int nth, n = 10, k = 3, R = 299, dst = 1, dst_num = n * (n - 1)>>1;;
     double *dxyz_vector;
@@ -202,7 +202,7 @@ TEST(KBCOV, mutual_independence_test_multivariate) {
     EXPECT_NEAR(p_value[2], 0.05, 0.05);
 }
 
-TEST(BD, bd_gwas_test) {
+TEST(BDTEST, bd_gwas_test) {
     double ball_stat_value[4], permuted_stat_value[398], p_value[4];
     int snp[40] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};

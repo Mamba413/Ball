@@ -47,7 +47,7 @@ void ball_divergence2(double *bd_stat, int **full_rank, int **sub_rank1, int **s
  */
 void sub_rank_finder(int ***sub_rank, double **distance_matrix, int **index_matrix, const int *label,
                      const int *group_relative_location, const int *cumsum_size, const int *size,
-                     int num, int max_k) {
+                     int num, int k_max) {
     /*
      * g_index: indicator for group
      * s_index: indicator for order
@@ -69,12 +69,42 @@ void sub_rank_finder(int ***sub_rank, double **distance_matrix, int **index_matr
     }
 }
 
+void sub_rank_finder_tie(int ***sub_rank, double **distance_matrix, int **index_matrix, const int *label,
+                         const int *group_relative_location, const int *cumsum_size, const int *size,
+                         int num, int k_max) {
+    int s_index, g_index;
+    for (int i = 0; i < num; ++i) {
+        int i_index = label[i], i_cumsum_size = cumsum_size[i_index];
+        int i_group_relative_location = group_relative_location[i];
+        int rank_value = size[i_index];
+        double tmp = -1;
+        int tmp_rank = 0;
+        for (int j = 0; j < num; ++j) {
+            s_index = index_matrix[i][num - j - 1];
+            g_index = label[s_index];
+            if (i_index == g_index) {
+                if (distance_matrix[i][s_index] != tmp) {
+                    sub_rank[i_index][i_group_relative_location - i_cumsum_size][group_relative_location[s_index] -
+                                                                                 i_cumsum_size] = rank_value;
+                    tmp_rank = rank_value;
+                } else {
+                    sub_rank[i_index][i_group_relative_location - i_cumsum_size][group_relative_location[s_index] -
+                                                                                 i_cumsum_size] = tmp_rank;
+                }
+                tmp = distance_matrix[i][s_index];
+                rank_value--;
+            }
+        }
+    }
+}
+
 /**
  * @inherit sub_rank_finder
  * @param size : [4, 5, 4]
  */
 void full_rank_finder(int ***full_rank, double **distance_matrix, int **index_matrix, const int *label,
-                      const int *group_relative_location, const int *cumsum_size, const int *size, int num, int k_max) {
+                      const int *group_relative_location, const int *cumsum_size, const int *size,
+                      int num, int k_max) {
     /*
      * s_index and g_index have the same meanings in full_rank_finder function
      * row_index: indicator for row
@@ -126,6 +156,81 @@ void full_rank_finder(int ***full_rank, double **distance_matrix, int **index_ma
                         col_index = group_relative_location[s_index] - cumsum_size[g_index] + size[l_index];
                         full_rank[lower_index][row_index][col_index] = init_full_rank[lower_index];
                         init_full_rank[lower_index] += 1;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void full_rank_finder_tie(int ***full_rank, double **distance_matrix, int **index_matrix, const int *label,
+                          const int *group_relative_location, const int *cumsum_size, const int *size,
+                          int num, int k_max) {
+    int s_index, g_index, row_index, col_index, i_g_index, upper_index, lower_index;
+    int full_rank_matrix_num = ((k_max + 1) * (k_max)) >> 1;
+    int *init_full_rank;
+    double *tmp;
+    int *tmp_rank;
+    init_full_rank = (int *) malloc(full_rank_matrix_num * sizeof(int));
+    tmp = (double *) malloc(full_rank_matrix_num * sizeof(double));
+    tmp_rank = (int *) malloc(full_rank_matrix_num * sizeof(int));
+    for (int i = 0; i < num; ++i) {
+        i_g_index = label[i];
+        for (int g = 0; g < k_max; ++g) {
+            for (int l = g + 1; l <= k_max; ++l) {
+                init_full_rank[(l - g) + (((((k_max + 1) << 1) - 1 - g) * (g)) >> 1) - 1] = size[g] + size[l];
+                tmp[(l - g) + (((((k_max + 1) << 1) - 1 - g) * (g)) >> 1) - 1] = -1;
+                tmp_rank[(l - g) + (((((k_max + 1) << 1) - 1 - g) * (g)) >> 1) - 1] = 0;
+            }
+        }
+        for (int j = 0; j < num; ++j) {
+            s_index = index_matrix[i][num - j - 1];
+            g_index = label[s_index];
+            // update pairwise upper rank matrix
+            if ((g_index + 1) <= k_max) {
+                for (int l_index = (g_index + 1); l_index <= k_max; ++l_index) {
+                    if (i_g_index == g_index) {
+                        row_index = group_relative_location[i] - cumsum_size[g_index];
+                    } else if (i_g_index == l_index) {
+                        row_index = group_relative_location[i] - cumsum_size[l_index] + size[g_index];
+                    } else {
+                        row_index = -1;
+                    }
+                    if (row_index != -1) {
+                        upper_index = (l_index - g_index) + (((((k_max + 1) << 1) - 1 - g_index) * (g_index)) >> 1) - 1;
+                        col_index = group_relative_location[s_index] - cumsum_size[g_index];
+                        if (distance_matrix[i][s_index] != tmp[upper_index]) {
+                            full_rank[upper_index][row_index][col_index] = init_full_rank[upper_index];
+                            tmp_rank[upper_index] = init_full_rank[upper_index];
+                        } else {
+                            full_rank[upper_index][row_index][col_index] = tmp_rank[upper_index];
+                        }
+                        tmp[upper_index] = distance_matrix[i][s_index];
+                        init_full_rank[upper_index] -= 1;
+                    }
+                }
+            }
+            // update pairwise lower rank matrix
+            if ((g_index - 1) >= 0) {
+                for (int l_index = 0; l_index <= (g_index - 1); ++l_index) {
+                    if (i_g_index == l_index) {
+                        row_index = group_relative_location[i] - cumsum_size[l_index];
+                    } else if (i_g_index == g_index) {
+                        row_index = group_relative_location[i] - cumsum_size[g_index] + size[l_index];
+                    } else {
+                        row_index = -1;
+                    }
+                    if (row_index != -1) {
+                        lower_index = (g_index - l_index) + (((((k_max + 1) << 1) - 1 - l_index) * (l_index)) >> 1) - 1;
+                        col_index = group_relative_location[s_index] - cumsum_size[g_index] + size[l_index];
+                        if (distance_matrix[i][s_index] != tmp[lower_index]) {
+                            full_rank[lower_index][row_index][col_index] = init_full_rank[lower_index];
+                            tmp_rank[lower_index] = init_full_rank[lower_index];
+                        } else {
+                            full_rank[lower_index][row_index][col_index] = tmp_rank[lower_index];
+                        }
+                        tmp[lower_index] = distance_matrix[i][s_index];
+                        init_full_rank[lower_index] -= 1;
                     }
                 }
             }
@@ -277,28 +382,47 @@ void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *
         }
     }
     double *distance_matrix_copy = (double *) malloc(*n * sizeof(double));
+    int ties = 0;
     for (int i = 0; i < *n; i++) {
         memcpy(distance_matrix_copy, distance_matrix[i], *n * sizeof(double));
         quicksort(distance_matrix_copy, index_matrix[i], 0, *n - 1);
+        if (!ties) {
+            for (int j = 1; j < *n; ++j) {
+                if (distance_matrix_copy[j] == distance_matrix_copy[j - 1]) {
+                    ties = 1;
+                }
+            }
+        }
     }
     free(distance_matrix_copy);
 
+    void (*sub_rank_finder_point)(int ***, double **, int **, const int *, const int *, const int *,
+                                  const int *, int, int);
+    void (*full_rank_finder_point)(int ***, double **, int **, const int *, const int *, const int *,
+                                   const int *, int, int);
+    if (ties) {
+        sub_rank_finder_point = &sub_rank_finder_tie;
+        full_rank_finder_point = &full_rank_finder_tie;
+    } else {
+        sub_rank_finder_point = &sub_rank_finder;
+        full_rank_finder_point = &full_rank_finder;
+    }
+
     double **bd_stat_array = alloc_matrix(bd_stat_number, 2);
-    sub_rank_finder(sub_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, size, *n,
-                    *k - 1);
-    full_rank_finder(full_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, size, *n,
-                     *k - 1);
+    sub_rank_finder_point(sub_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, size,
+                          *n, *k - 1);
+    full_rank_finder_point(full_rank, distance_matrix, index_matrix, label, group_relative_location, cumsum_size, size,
+                           *n, *k - 1);
     ball_divergence_array(bd_stat_array, full_rank, sub_rank, size, *k);
     k_ball_divergence_from_by_sample_ball_divergence(kbd_stat, bd_stat_array, bd_stat_number, *k);
 
     if (*R > 0) {
-        double *permuted_kbd_sum_w0, *permuted_kbd_sum_w1, *permuted_kbd_max_w0, *permuted_kbd_max_w1, *permuted_kbd_maxsum_w0, *permuted_kbd_maxsum_w1;
-        permuted_kbd_sum_w0 = (double *) malloc(*R * sizeof(double));
-        permuted_kbd_sum_w1 = (double *) malloc(*R * sizeof(double));
-        permuted_kbd_max_w0 = (double *) malloc(*R * sizeof(double));
-        permuted_kbd_max_w1 = (double *) malloc(*R * sizeof(double));
-        permuted_kbd_maxsum_w0 = (double *) malloc(*R * sizeof(double));
-        permuted_kbd_maxsum_w1 = (double *) malloc(*R * sizeof(double));
+        double *permuted_kbd_sum_w0 = (double *) malloc(*R * sizeof(double));
+        double *permuted_kbd_sum_w1 = (double *) malloc(*R * sizeof(double));
+        double *permuted_kbd_max_w0 = (double *) malloc(*R * sizeof(double));
+        double *permuted_kbd_max_w1 = (double *) malloc(*R * sizeof(double));
+        double *permuted_kbd_maxsum_w0 = (double *) malloc(*R * sizeof(double));
+        double *permuted_kbd_maxsum_w1 = (double *) malloc(*R * sizeof(double));
 
         int not_parallel = *thread == 1 ? 1 : 0;
         int r;
@@ -307,10 +431,10 @@ void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *
                 double kbd_stat_tmp[6];
                 resample2(label, n);
                 find_group_relative_location(group_relative_location, label, cumsum_size, *n, *k);
-                sub_rank_finder(sub_rank, distance_matrix, index_matrix, label, group_relative_location,
-                                cumsum_size, size, *n, *k - 1);
-                full_rank_finder(full_rank, distance_matrix, index_matrix, label, group_relative_location,
-                                 cumsum_size, size, *n, *k - 1);
+                sub_rank_finder_point(sub_rank, distance_matrix, index_matrix, label, group_relative_location,
+                                      cumsum_size, size, *n, *k - 1);
+                full_rank_finder_point(full_rank, distance_matrix, index_matrix, label, group_relative_location,
+                                       cumsum_size, size, *n, *k - 1);
                 ball_divergence_array(bd_stat_array, full_rank, sub_rank, size, *k);
                 k_ball_divergence_from_by_sample_ball_divergence(kbd_stat_tmp, bd_stat_array, bd_stat_number, *k);
                 permuted_kbd_sum_w0[r] = kbd_stat_tmp[0];
@@ -336,12 +460,12 @@ void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *
                 double **bd_stat_array_thread = alloc_matrix(bd_stat_number, 2);
 #pragma omp for
                 for (j_thread = 0; j_thread < (*R); j_thread++) {
-                    sub_rank_finder(sub_rank_thread, distance_matrix, index_matrix,
-                                    label_matrix[j_thread], group_relative_location_matrix[j_thread],
-                                    cumsum_size, size, *n, *k - 1);
-                    full_rank_finder(full_rank_thread, distance_matrix, index_matrix,
-                                     label_matrix[j_thread], group_relative_location_matrix[j_thread],
-                                     cumsum_size, size, *n, *k - 1);
+                    sub_rank_finder_point(sub_rank_thread, distance_matrix, index_matrix,
+                                          label_matrix[j_thread], group_relative_location_matrix[j_thread],
+                                          cumsum_size, size, *n, *k - 1);
+                    full_rank_finder_point(full_rank_thread, distance_matrix, index_matrix,
+                                           label_matrix[j_thread], group_relative_location_matrix[j_thread],
+                                           cumsum_size, size, *n, *k - 1);
                     ball_divergence_array(bd_stat_array_thread, full_rank_thread, sub_rank_thread, size, *k);
                     k_ball_divergence_from_by_sample_ball_divergence(kbd_stat_thread, bd_stat_array_thread,
                                                                      bd_stat_number, *k);
