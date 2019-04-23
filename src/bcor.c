@@ -245,15 +245,6 @@ void U_Ball_Correlation(double *bcor_stat, int *n, double *x, int *yrank, int **
 
 void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *f_number,
                 int *n, int *p, int *nthread) {
-#ifdef Ball_OMP_H_
-    omp_set_dynamic(0);
-    if (*nthread <= 0) {
-        omp_set_num_threads(omp_get_num_procs());
-    } else {
-        omp_set_num_threads(*nthread);
-    }
-#endif
-
     int i, j, **yidx;
     double **Dy, *y_cpy;
 
@@ -309,16 +300,7 @@ void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *f_n
     }
 }
 
-void _fast_bcor_test(double *bcor_stat, double *y, double *x, int *f_number, int *n, int *nthread) {
-#ifdef Ball_OMP_H_
-    omp_set_dynamic(0);
-    if (*nthread <= 0) {
-        omp_set_num_threads(omp_get_num_procs());
-    } else {
-        omp_set_num_threads(*nthread);
-    }
-#endif
-
+void _u_bcor_test(double *bcor_stat, double *y, double *x, int *f_number, int *n, int *nthread) {
     int i, *yidx, *yrank, **lowyidx, **higyidx;
 
     yidx = (int *) malloc(*n * sizeof(int));
@@ -534,7 +516,6 @@ void _bcor_stat(double *bcor_stat, double *y, double *x, const int *n) {
     free_int_matrix(xyidx, *n, *n);
 }
 
-
 /**
  * R API function
  * @param bcorsis_stat : bcor statistics or p-value for screening
@@ -552,6 +533,15 @@ void _bcor_stat(double *bcor_stat, double *y, double *x, const int *n) {
  */
 void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f_number, int *size,
                int *n, int *p, int *k, int *dst_y, int *dst_x, int *nthread) {
+#ifdef Ball_OMP_H_
+    omp_set_dynamic(0);
+    if (*nthread <= 0) {
+        omp_set_num_threads(omp_get_num_procs());
+    } else {
+        omp_set_num_threads(*nthread);
+    }
+#endif
+
     if (*dst_y == 1) {
         if (*dst_x == 0) {
             _bcor_test(bcorsis_stat, y, x, x_number, f_number, n, p, nthread);
@@ -572,7 +562,7 @@ void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f
                 //bcor_k_sample(bcorsis_stat, x, x_number, size, n, k, nthread);
             }
         } else {
-            _fast_bcor_test(bcorsis_stat, y, x, f_number, n, nthread);
+            _u_bcor_test(bcorsis_stat, y, x, f_number, n, nthread);
         }
     }
 }

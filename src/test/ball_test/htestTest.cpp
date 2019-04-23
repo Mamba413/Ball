@@ -24,26 +24,32 @@ TEST(BD, two_sample_test_univariate) {
     int nth, k = 2, n = 20, dst = 0, R = 299;
     double *xy;
     xy = (double *) malloc(20 * sizeof(double));
-
-    memcpy(xy, X1_X2_CONTINUOUS, 20 * sizeof(double));
+    memmove(xy, X1_X2_CONTINUOUS, 20 * sizeof(double));
     nth = 1;
     bd_test(ball_stat_value, p_value, xy, size, &n, &k, &dst, &R, &nth);
     EXPECT_GE(p_value[0], 0.05);
+    free(xy);
 
-    memcpy(xy, X1_X2_CONTINUOUS, 20 * sizeof(double));
+    xy = (double *) malloc(20 * sizeof(double));
+    memmove(xy, X1_X2_CONTINUOUS, 20 * sizeof(double));
     nth = 2;
     bd_test(ball_stat_value, p_value, xy, size, &n, &k, &dst, &R, &nth);
     EXPECT_GE(p_value[0], 0.05);
+    free(xy);
 
-    memcpy(xy, X1_X2_DISCRETE, 20 * sizeof(double));
+    xy = (double *) malloc(20 * sizeof(double));
+    memmove(xy, X1_X2_DISCRETE, 20 * sizeof(double));
     nth = 1;
     bd_test(ball_stat_value, p_value, xy, size, &n, &k, &dst, &R, &nth);
     EXPECT_LE(p_value[0], 0.05);
+    free(xy);
 
-    memcpy(xy, X1_X2_DISCRETE, 20 * sizeof(double));
+    xy = (double *) malloc(20 * sizeof(double));
+    memmove(xy, X1_X2_DISCRETE, 20 * sizeof(double));
     nth = 2;
     bd_test(ball_stat_value, p_value, xy, size, &n, &k, &dst, &R, &nth);
     EXPECT_LE(p_value[0], 0.05);
+    free(xy);
 }
 
 TEST(BD, two_sample_test_multivariate) {
@@ -89,34 +95,50 @@ TEST(KBD, k_sample_test_multivariate) {
     EXPECT_GE(pvalue[4], 0.05);
 }
 
-TEST(BCov, independence_test_univariate) {
+TEST(BCOV, independence_test_univariate) {
     double ball_stat_value[3], p_value[3];
     double *x, *y;
     int nth, n = 10, R = 299, dst = 0;
+
     x = (double *) malloc(n * sizeof(double));
     y = (double *) malloc(n * sizeof(double));
-
-    memcpy(x, X1_CONTINUOUS, n * sizeof(double));
-    memcpy(y, X2_CONTINUOUS, n * sizeof(double));
+    memmove(x, X1_CONTINUOUS, n * sizeof(double));
+    memmove(y, X2_CONTINUOUS, n * sizeof(double));
     nth = 1;
     bcov_test(ball_stat_value, p_value, x, y, &n, &R, &dst, &nth);
     EXPECT_GE(p_value[0], 0.05);
-    memcpy(x, X1_CONTINUOUS, n * sizeof(double));
-    memcpy(y, X2_CONTINUOUS, n * sizeof(double));
+    free(x);
+    free(y);
+
+    x = (double *) malloc(n * sizeof(double));
+    y = (double *) malloc(n * sizeof(double));
+    memmove(x, X1_CONTINUOUS, n * sizeof(double));
+    memmove(y, X2_CONTINUOUS, n * sizeof(double));
     nth = 2;
     bcov_test(ball_stat_value, p_value, x, y, &n, &R, &dst, &nth);
     EXPECT_GE(p_value[0], 0.05);
+    free(x);
+    free(y);
 
-    memcpy(x, X1_DISCRETE, n * sizeof(double));
-    memcpy(y, X2_DISCRETE, n * sizeof(double));
+    x = (double *) malloc(n * sizeof(double));
+    y = (double *) malloc(n * sizeof(double));
+    memmove(x, X1_DISCRETE, n * sizeof(double));
+    memmove(y, X2_DISCRETE, n * sizeof(double));
     nth = 1;
     bcov_test(ball_stat_value, p_value, x, y, &n, &R, &dst, &nth);
     EXPECT_LE(p_value[0], 0.05);
-    memcpy(x, X1_DISCRETE, n * sizeof(double));
-    memcpy(y, X2_DISCRETE, n * sizeof(double));
+    free(x);
+    free(y);
+
+    x = (double *) malloc(n * sizeof(double));
+    y = (double *) malloc(n * sizeof(double));
+    memmove(x, X1_DISCRETE, n * sizeof(double));
+    memmove(y, X2_DISCRETE, n * sizeof(double));
     nth = 2;
     bcov_test(ball_stat_value, p_value, x, y, &n, &R, &dst, &nth);
     EXPECT_LE(p_value[0], 0.05);
+    free(x);
+    free(y);
 }
 
 TEST(BCOV, independence_test_multivariate) {
@@ -188,23 +210,28 @@ TEST(BD, bd_gwas_test) {
     nth = 1;
     bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp, &n, &p, &R, &nth);
     EXPECT_GE(p_value[1], 0.05);
+    EXPECT_GE(p_value[3], 0.05);
 
     nth = 2;
     bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp, &n, &p, &R, &nth);
     EXPECT_GE(p_value[1], 0.05);
+    EXPECT_GE(p_value[3], 0.05);
 
     int snp2[40] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
                     0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2};
     nth = 1;
     bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
     EXPECT_GE(p_value[1], 0.05);
+    EXPECT_GE(p_value[3], 0.05);
 
     nth = 2;
     bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
     EXPECT_GE(p_value[1], 0.05);
+    EXPECT_GE(p_value[3], 0.05);
 
     R = 49999;
     double permuted_stat_value2[99999];
     bd_gwas_test(ball_stat_value, permuted_stat_value2, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
     EXPECT_GE(p_value[1], 0.05);
+    EXPECT_GE(p_value[3], 0.05);
 }

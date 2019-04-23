@@ -156,7 +156,7 @@ void K_Ball_Covariance_Crude(double *kbcov_stat, double ***Dx, int n, int k) {
     }
     kbcov_stat[0] = bcov_weight0 / (1.0 * (n) * (n));
     kbcov_stat[1] = bcov_weight_prob / (1.0 * (n) * (n));
-    kbcov_stat[2] = bcov_weight_hhg / (hhg_ball_num);
+    kbcov_stat[2] = hhg_ball_num > 0 ? (bcov_weight_hhg / hhg_ball_num) : 0.0;
 
     free(p_k_array);
 }

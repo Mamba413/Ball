@@ -25,6 +25,33 @@ TEST(utilities, quicksort) {
     }
 }
 
+TEST(utilities, batch_pvalue) {
+    double stat[100], p_value[100], true_p_value[100];
+    double permuted_stat[1000];
+    for (int i = 0; i < 100; ++i) {
+        stat[i] = i / 100.0;
+    }
+    for (int i = 0; i < 1000; ++i) {
+        permuted_stat[i] = i / 1000.0;
+    }
+    compute_batch_pvalue(stat, permuted_stat, p_value, 100, 1000);
+    for (int i = 0; i < 100; ++i) {
+        true_p_value[i] = compute_pvalue(stat[i], permuted_stat, 1000);
+    }
+    for (int i = 0; i < 100; ++i) {
+        EXPECT_NEAR(true_p_value[i], p_value[i], ABSOLUTE_ERROR);
+    }
+}
+
+TEST(utilities, quick_rank_min) {
+    double x[6] = {1.2, 1.3, 1.3, 1.3, 1.3, 0.9};
+    int r[6] ={0, 0, 0, 0, 0, 0}, true_r[6] = {2, 3, 3, 3, 3, 1};
+    quick_rank_min(x, r, 6);
+    for (int i = 0; i < 6; ++i) {
+        EXPECT_EQ(r[i], true_r[i]);
+    }
+}
+
 TEST(utilities, count_of_number_before_self) {
     const int num = 7;
     int yrank[num] = {5, 3, 6, 2, 4, 1, 7};

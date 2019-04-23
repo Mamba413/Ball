@@ -483,20 +483,8 @@ void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *
     }
 #endif
     if ((*dst)) {
-#ifdef R_BUILD
-        int single_thread = 1;
-        if ((*R) < 100 && *n < 50) {
-            *thread = single_thread;
-        }
-#endif
         BI(bcov, pvalue, x, y, n, R, thread);
     } else {
-#ifdef R_BUILD
-        int single_thread = 1;
-        if ((*R) < 100 && *n < 100) {
-            *thread = single_thread;
-        }
-#endif
         UBI(bcov, pvalue, x, y, n, R, thread);
     }
 }

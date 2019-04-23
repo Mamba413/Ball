@@ -9,11 +9,11 @@ void K_U_Ball_Covariance(double *kbcov_stat, double **x, int **i_perm, int *n, i
     // TODO...
 }
 
-void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm, int *n, int *k) {
+void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm, const int *n, const int *k) {
     int i, j, t, var_index, compute_joint_index;
     double p_all, p_prod, p_inv_prod, at_least_point_number;
     double *p_k_array;
-    double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, bcov_fixed_ball = 0.0;
+    double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, bcov_fixed_ball;
     int hhg_include_ball_index;
     double hhg_ball_num = 0.0, pow_n_k = pow(*n, *k);
 
@@ -55,7 +55,7 @@ void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm
             for (var_index = 0; var_index < (*k); var_index++) {
                 p_prod *= p_k_array[var_index];
                 if (hhg_include_ball_index == 1) {
-                    hhg_include_ball_index = (p_k_array[var_index] > 2 && p_k_array[var_index] < *n) ? 1 : 0;
+                    hhg_include_ball_index = (p_k_array[var_index] < *n) ? 1 : 0;
                 }
                 p_inv_prod *= (*n - p_k_array[var_index]);
             }
@@ -74,12 +74,12 @@ void K_Ball_Covariance(double *kbcov_stat, double ***Dx, int ***Rx, int **i_perm
     }
     kbcov_stat[0] = bcov_weight0 / (1.0 * (*n) * (*n));
     kbcov_stat[1] = bcov_weight_prob / (1.0 * (*n) * (*n));
-    kbcov_stat[2] = bcov_weight_hhg / (hhg_ball_num);
+    kbcov_stat[2] = hhg_ball_num > 0 ? (bcov_weight_hhg / hhg_ball_num) : 0.0;
 
     free(p_k_array);
 }
 
-void KBCOV(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread) {
+void KBCOV(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, const int *thread) {
     int **i_perm, ***Rx;
     // create a 3D matrix to store distance matrix:
     double ***Dx;
@@ -89,7 +89,7 @@ void KBCOV(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R
     i_perm = alloc_int_matrix(*k, *n);
 
     // convert x to 3D distance matrix:
-    if (*dst == 1) { distance2matrix3d(x, Dx, *n, *k); }
+    distance2matrix3d(x, Dx, *n, *k);
 
     // compute rank 3D distance matrix row by row and one by one
     rank_matrix_3d(Dx, *n, *k, Rx);
@@ -160,11 +160,12 @@ void KBCOV(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R
 /**
  * @todo
  */
-void UKBCOV(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread) {
+void UKBCOV(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *thread) {
 
 }
 
-void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread) {
+void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, const int *dst,
+                int *thread) {
     int not_parallel = *thread == 1 ? 1 : 0;
 #ifdef Ball_OMP_H_
     if (not_parallel != 1) {
@@ -178,8 +179,8 @@ void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, i
 #endif
 
     if (*dst == 1) {
-        KBCOV(kbcov_stat, pvalue, x, k, n, R, dst, thread);
+        KBCOV(kbcov_stat, pvalue, x, k, n, R, thread);
     } else {
-        UKBCOV(kbcov_stat, pvalue, x, k, n, R, dst, thread);
+        UKBCOV(kbcov_stat, pvalue, x, k, n, R, thread);
     }
 }

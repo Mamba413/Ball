@@ -638,7 +638,7 @@ void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int
             free(new_xy);
         } else {
             int **index_matrix = alloc_int_matrix(*R, *n);
-            shuffle_indicator_matrix(index_matrix, index, *R, *n);
+            resample2_matrix(index_matrix, index, *R, *n);
 #pragma omp parallel
             {
                 int j_thread;
@@ -933,10 +933,6 @@ void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, in
  * R function call this function to execute Two sample ball divergence test
  */
 void bd_test(double *bd, double *pvalue, double *xy, int *size, int *n, int *k, int *dst, int *R, int *nthread) {
-    int single_thread = 1;
-    if ((*R) <= 200) {
-        *nthread = single_thread;
-    }
     int not_parallel = (*nthread == 1 ? 1 : *nthread);
 #ifdef Ball_OMP_H_
     if (not_parallel != 1) {

@@ -28,8 +28,7 @@ void Ball_Information_NoTies(double *bcov_stat, const int *n, int **y_within_bal
     int sorted_j, *inv_count = malloc(*n * sizeof(int));
     int *y_count_vec = malloc(*n * sizeof(int));
     double *dy_vec = malloc(*n * sizeof(double)), *dy_vec_tmp = malloc(*n * sizeof(double));
-    double bcov_fixed_ball, bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0;
-    double hhg_ball_num = 0.0, minor_ball_prop = 2.0 / (*n);
+    double bcov_fixed_ball, bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, hhg_ball_num = 0.0;
 
     for (int i = 0; i < *n; ++i) {
         int ith_perm = i_perm[i];
@@ -54,17 +53,15 @@ void Ball_Information_NoTies(double *bcov_stat, const int *n, int **y_within_bal
             bcov_fixed_ball *= bcov_fixed_ball;
             bcov_weight0 += bcov_fixed_ball;
             bcov_weight_prob += bcov_fixed_ball / (px * py);
-            if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1) {
-                bcov_weight_hhg += bcov_fixed_ball /
-                                   ((px - minor_ball_prop) * (1.0 - px + minor_ball_prop) * (py - minor_ball_prop) *
-                                    (1.0 - py + minor_ball_prop));
-                hhg_ball_num += 1.0;
+            if (px != 1 && py != 1) {
+                bcov_weight_hhg += bcov_fixed_ball / ((px) * (1.0 - px) * (py) * (1.0 - py));
+                hhg_ball_num += 1;
             }
         }
     }
     bcov_stat[0] = bcov_weight0 / (1.0 * (*n) * (*n));
     bcov_stat[1] = bcov_weight_prob / (1.0 * (*n) * (*n));
-    bcov_stat[2] = bcov_weight_hhg / (hhg_ball_num);
+    bcov_stat[2] = hhg_ball_num > 0 ? (bcov_weight_hhg / hhg_ball_num) : 0.0;
     free(inv_count);
     free(dy_vec);
     free(dy_vec_tmp);
@@ -75,8 +72,7 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
                       int *i_perm_inv) {
     int i, j, k, pi, src, lastpos, *yrank, *isource, *icount, *xy_index, *xy_temp, **xyidx;
     double pxy, px, py, lastval, *xx_cpy, *yy_cpy;
-    double bcov_fixed_ball, bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0;
-    double hhg_ball_num = 0.0, minor_ball_prop = 2.0 / (*n);
+    double bcov_fixed_ball, bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, hhg_ball_num = 0.0;
 
     yrank = (int *) malloc(*n * sizeof(int));
     isource = (int *) malloc(*n * sizeof(int));
@@ -148,11 +144,9 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
             bcov_fixed_ball *= bcov_fixed_ball;
             bcov_weight0 += bcov_fixed_ball;
             bcov_weight_prob += bcov_fixed_ball / (px * py);
-            if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1) {
-                bcov_weight_hhg += bcov_fixed_ball /
-                                   ((px - minor_ball_prop) * (1.0 - px + minor_ball_prop) * (py - minor_ball_prop) *
-                                    (1.0 - py + minor_ball_prop));
-                hhg_ball_num += 1.0;
+            if (px != 1 && py != 1) {
+                bcov_weight_hhg += bcov_fixed_ball / ((px) * (1.0 - px) * (py) * (1.0 - py));
+                hhg_ball_num += 1;
             }
         }
         pxy = 0;
@@ -176,16 +170,14 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
         bcov_fixed_ball *= bcov_fixed_ball;
         bcov_weight0 += bcov_fixed_ball;
         bcov_weight_prob += bcov_fixed_ball / (px * py);
-        if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1) {
-            bcov_weight_hhg += bcov_fixed_ball /
-                               ((px - minor_ball_prop) * (1.0 - px + minor_ball_prop) * (py - minor_ball_prop) *
-                                (1.0 - py + minor_ball_prop));
-            hhg_ball_num += 1.0;
+        if (px != 1 && py != 1) {
+            bcov_weight_hhg += bcov_fixed_ball / ((px) * (1.0 - px) * (py) * (1.0 - py));
+            hhg_ball_num += 1;
         }
     }
     bcov_stat[0] = bcov_weight0 / (1.0 * (*n) * (*n));
     bcov_stat[1] = bcov_weight_prob / (1.0 * (*n) * (*n));
-    bcov_stat[2] = bcov_weight_hhg / (hhg_ball_num);
+    bcov_stat[2] = hhg_ball_num > 0 ? (bcov_weight_hhg / hhg_ball_num) : 0.0;
 
     // free memory
     free(isource);
@@ -311,8 +303,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
                     permuted_bcov_weight_hhg[i] = bcov_tmp[2];
                 }
             } else {
-                int **i_perm_matrix;
-                i_perm_matrix = alloc_int_matrix(*R, *n);
+                int **i_perm_matrix = alloc_int_matrix(*R, *n);
                 resample2_matrix(i_perm_matrix, i_perm, *R, *n);
 #pragma omp parallel
                 {
@@ -355,7 +346,7 @@ void U_Ball_Information(double *bcov_stat, int *n, int **Rank,
     int i, j, pi, pj;
     double px, py, pxy;
     double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, bcov_fixed_ball = 0.0;
-    double hhg_ball_num = 0.0, minor_ball_prop = 2.0 / (*n);
+    double hhg_ball_num = 0.0;
     for (i = 0; i < *n; i++) {
         for (j = 0; j < *n; j++) {
             pi = i_perm[i];
@@ -371,17 +362,15 @@ void U_Ball_Information(double *bcov_stat, int *n, int **Rank,
             bcov_fixed_ball = pow(pxy - px * py, 2);
             bcov_weight0 += bcov_fixed_ball;
             bcov_weight_prob += bcov_fixed_ball / (px * py);
-            if (px > minor_ball_prop && py > minor_ball_prop && px != 1 && py != 1) {
-                bcov_weight_hhg += bcov_fixed_ball /
-                                   ((px - minor_ball_prop) * (1.0 - px + minor_ball_prop) * (py - minor_ball_prop) *
-                                    (1.0 - py + minor_ball_prop));
+            if (px != 1 && py != 1) {
+                bcov_weight_hhg += bcov_fixed_ball / ((px) * (1.0 - px) * (py) * (1.0 - py));
                 hhg_ball_num += 1;
             }
         }
     }
     bcov_stat[0] = bcov_weight0 / (1.0 * (*n) * (*n));
     bcov_stat[1] = bcov_weight_prob / (1.0 * (*n) * (*n));
-    bcov_stat[2] = bcov_weight_hhg / hhg_ball_num;
+    bcov_stat[2] = hhg_ball_num > 0 ? (bcov_weight_hhg / hhg_ball_num) : 0.0;
 }
 
 void UBI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *thread) {
@@ -436,9 +425,8 @@ void UBI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int
                 permuted_bcov_weight_hhg[j] = bcov_tmp[2];
             }
         } else {
-            int **i_perm_thread;
-            i_perm_thread = alloc_int_matrix(*R, *n);
-            shuffle_indicator_matrix(i_perm_thread, i_perm, *R, *n);
+            int **i_perm_thread = alloc_int_matrix(*R, *n);
+            resample2_matrix(i_perm_thread, i_perm, *R, *n);
 #pragma omp parallel
             {
                 int j_thread, **Rank_thread;
@@ -455,7 +443,7 @@ void UBI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int
                 }
                 free_int_matrix(Rank_thread, (*n) + 1, (*n) + 1);
             }
-            free(i_perm_thread);
+            free_int_matrix(i_perm_thread, *R, *n);
             j = *R;
         }
 
@@ -493,20 +481,8 @@ void bcov_test(double *bcov, double *pvalue, double *x, double *y, int *n, int *
     }
 #endif
     if ((*dst)) {
-#ifdef R_BUILD
-        int single_thread = 1;
-        if ((*R) < 100 && *n < 50) {
-            *thread = single_thread;
-        }
-#endif
         BI(bcov, pvalue, x, y, n, R, thread);
     } else {
-#ifdef R_BUILD
-        int single_thread = 1;
-        if ((*R) < 100 && *n < 100) {
-            *thread = single_thread;
-        }
-#endif
         UBI(bcov, pvalue, x, y, n, R, thread);
     }
 }
