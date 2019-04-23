@@ -161,12 +161,34 @@ void quick_sort(double *arr, int len) {
 double compute_pvalue(double ball_stat_value, double *permuted_stat, int R) {
     double larger_num = 0.0;
     for (int i = 0; i < R; i++) {
-        if (permuted_stat[i] > ball_stat_value) {
+        if (permuted_stat[i] >= ball_stat_value) {
             larger_num += 1.0;
         }
     }
     double p_value = (1.0 + larger_num) / (1.0 + R);
     return p_value;
+}
+
+void compute_batch_pvalue(double *ball_stat, const double *permuted_stat, double *p_value,
+                          int batch_num, int R) {
+    int all_stat_num = R + batch_num;
+    int *rank_all = (int *) calloc((size_t) all_stat_num, sizeof(int));
+    int *rank_batch = (int *) calloc((size_t) batch_num, sizeof(int));
+    memset(rank_all, all_stat_num, sizeof(int));
+    memset(rank_batch, batch_num, sizeof(int));
+    double *all_stat = (double *) calloc((size_t) all_stat_num, sizeof(double));
+    for (int i = 0; i < batch_num; ++i) {
+        all_stat[i] = ball_stat[i];
+    }
+    for (int i = 0; i < R; ++i) {
+        all_stat[batch_num + i] = permuted_stat[i];
+    }
+    quick_rank_min(all_stat, rank_all, all_stat_num);
+    quick_rank_min(ball_stat, rank_batch, batch_num);
+    double all_prop = 1.0 / (1.0 + R);
+    for (int i = 0; i < batch_num; i++) {
+        p_value[i] = (1.0 + (R + batch_num - rank_all[i]) - (batch_num - rank_batch[i])) * all_prop;
+    }
 }
 
 void Merge(int *permutation, int *source, int *inversion_count, int dim, int n) {
@@ -414,31 +436,6 @@ void Findx2(int *Rxy, int *Ixy, int *i_perm, int *n1, int *n2, int *Rx) {
     int j, lastpos, lastval, n, tmp;
     n = *n1 + *n2;
 
-    //printf("---------------\n");
-    //for (int i = 0; i < n; i++)
-    //{
-    //	printf("%d ", Rxy[i]);
-    //}
-    //printf("\n");
-
-    //for (int i = 0; i < n; i++)
-    //{
-    //	printf("%d ", Ixy[i]);
-    //}
-    //printf("\n");
-
-    //for (int i = 0; i < n; i++)
-    //{
-    //	printf("%d ", i_perm[i]);
-    //}
-    //printf("\n");
-
-    //for (int i = 0; i < n; i++)
-    //{
-    //	printf("%d ", Rx[i]);
-    //}
-    //printf("\n");
-
     lastpos = *n1 - 1;
     Rx[Ixy[n - 1]] = lastpos;
     if (i_perm[Ixy[n - 1]] == 1) {
@@ -450,11 +447,6 @@ void Findx2(int *Rxy, int *Ixy, int *i_perm, int *n1, int *n2, int *Rx) {
     }
 
     for (j = n - 2; j >= 0; j--) {
-        //for (int i = 0; i < n; i++)
-        //{
-        //	printf("%d ", Rx[i]);
-        //}
-        //printf("\n");
         if (i_perm[Ixy[j]] == 1) {
             if (lastval != Rxy[Ixy[j]]) {
                 lastpos -= tmp;
@@ -823,7 +815,6 @@ void distance2matrix(double *distance, double **distance_matrix, int n) {
     }
 }
 
-
 void vector2matrix3d(double *x, double ***y, int r, int c, int h, int isroworder) {
     /* copy a d-variate sample into a matrix, N samples in rows */
     int i, j, k;
@@ -838,6 +829,78 @@ void vector2matrix3d(double *x, double ***y, int r, int c, int h, int isroworder
             }
         }
     }
+}
+
+/**
+ * Rank a value vector in a max manner
+ * @param x value vector
+ * @param r save the rank result
+ * @param n the size of vector
+ * @example
+ * x = {1.2, 1.3, 1.3, 1.3, 1.3, 0.9};
+ * r ={0, 0, 0, 0, 0, 0};
+ * quick_rank_max(x, r, 6);
+ * r = {2, 6, 6, 6, 6, 1};
+ */
+void quick_rank_max(const double *x, int *r, int n) {
+    int *x_index, rank_value = n, i_loc, tmp = 1;
+    double *x_cpy;
+    x_index = (int *) malloc(n * sizeof(int));
+    x_cpy = (double *) malloc(n * sizeof(double));
+    for (int j = 0; j < n; j++) { x_index[j] = j; }
+    for (int j = 0; j < n; j++) { x_cpy[j] = x[j]; }
+    quicksort(x_cpy, x_index, 0, n - 1);
+    r[x_index[n - 1]] = rank_value;
+    for (int i = n - 2; 0 <= i; i--) {
+        i_loc = x_index[i];
+        if (x[i_loc] == x[x_index[i + 1]]) {
+            r[i_loc] = rank_value;
+            tmp++;
+        } else {
+            rank_value = rank_value - tmp;
+            r[i_loc] = rank_value;
+            tmp = 1;
+        }
+    }
+    free(x_index);
+    free(x_cpy);
+}
+
+/**
+ * Rank a value vector in a max manner
+ * @param x value vector
+ * @param r save the rank result
+ * @param n the size of vector
+ * @example
+ * x = {1.2, 1.3, 1.3, 1.3, 1.3, 0.9};
+ * r ={0, 0, 0, 0, 0, 0};
+ * quick_rank_min(x, r, 6);
+ * r = {2, 3, 3, 3, 3, 1}
+ */
+void quick_rank_min(const double *x, int *r, int n) {
+    int *x_index, rank_value = 1, i_loc, tmp = 1;
+    double *x_cpy;
+    x_index = (int *) malloc(n * sizeof(int));
+    x_cpy = (double *) malloc(n * sizeof(double));
+    for (int j = 0; j < n; j++) {
+        x_index[j] = j;
+        x_cpy[j] = x[j];
+    }
+    quicksort(x_cpy, x_index, 0, n - 1);
+    r[x_index[0]] = 1;
+    for (int i = 1; i < n; i++) {
+        i_loc = x_index[i];
+        if (x[i_loc] == x[x_index[i - 1]]) {
+            r[i_loc] = rank_value;
+            tmp++;
+        } else {
+            rank_value = rank_value + tmp;
+            r[i_loc] = rank_value;
+            tmp = 1;
+        }
+    }
+    free(x_index);
+    free(x_cpy);
 }
 
 void distance2matrix3d(double *distance, double ***distance_matrix3d, int n, int v) {
@@ -863,7 +926,7 @@ void rank_matrix_3d(double ***Dx, int n, int k, int ***Rx) {
             for (j = 0; j < n; j++) {
                 x_part[j] = Dx[i][j][h];
             }
-            quick_rank(x_part, x_part_rank, n);
+            quick_rank_max(x_part, x_part_rank, n);
             for (j = 0; j < n; j++) {
                 Rx[i][j][h] = x_part_rank[j];
             }
@@ -871,35 +934,6 @@ void rank_matrix_3d(double ***Dx, int n, int k, int ***Rx) {
     }
     free(x_part);
     free(x_part_rank);
-}
-
-/*
- * double aaa[6] = {1.2, 1.3, 1.3, 1.3, 1.3, 0.9};
- * int aaa_r[6] = {0, 0, 0, 0, 0, 0};
- * quick_rank(aaa, aaa_r, 6);
- */
-void quick_rank(double *x, int *r, int n) {
-    int *x_index, rank_value = n, i_loc, tmp = 1;
-    double *x_cpy;
-    x_index = (int *) malloc(n * sizeof(int));
-    x_cpy = (double *) malloc(n * sizeof(double));
-    for (int j = 0; j < n; j++) { x_index[j] = j; }
-    for (int j = 0; j < n; j++) { x_cpy[j] = x[j]; }
-    quicksort(x_cpy, x_index, 0, n - 1);
-    r[x_index[n - 1]] = rank_value;
-    for (int i = n - 2; 0 <= i; i--) {
-        i_loc = x_index[i];
-        if (x[i_loc] == x[x_index[i + 1]]) {
-            r[i_loc] = rank_value;
-            tmp++;
-        } else {
-            rank_value = rank_value - tmp;
-            r[i_loc] = rank_value;
-            tmp = 1;
-        }
-    }
-    free(x_index);
-    free(x_cpy);
 }
 
 void Euclidean_distance(double *x, double **Dx, int n, int d) {

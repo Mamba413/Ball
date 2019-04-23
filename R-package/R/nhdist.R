@@ -6,7 +6,7 @@
 #' 
 #' @param x a numeric matrix, data frame or numeric array of dimension \eqn{k \times m \times n} 
 #' containing \eqn{n} samples in \eqn{k \times m} dimension.
-#' @param method the distance measure to be used. This must be one of "geodesic", "compositional", "riemann". 
+#' @param method the distance measure to be used. This must be one of \code{"geodesic"}, \code{"compositional"}, or \code{"riemann"}. 
 #' Any unambiguous substring can be given.
 #'
 #' @details Available distance measures are geodesic, compositional and riemann.
@@ -16,7 +16,7 @@
 #' geodesic:
 #' 
 #' The shortest route between two points on the Earth's surface, namely, a segment of a great circle.
-#' \deqn{acos(x^{T}y), \|x\|_{2} = \|y\|_{2} = 1}
+#' \deqn{\acos(x^{T}y), \|x\|_{2} = \|y\|_{2} = 1}
 #' 
 #' compositional:
 #' 

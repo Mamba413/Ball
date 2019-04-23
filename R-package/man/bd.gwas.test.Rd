@@ -2,10 +2,10 @@
 % Please edit documentation in R/gwas.R
 \name{bd.gwas.test}
 \alias{bd.gwas.test}
-\title{Fast Two Ball Divergence test for gwas data}
+\title{Fast K-sample Ball Divergence Test for GWAS Data}
 \usage{
-bd.gwas.test(x, snp, num.permutations, distance = FALSE, seed = 1,
-  num.threads = 0, ...)
+bd.gwas.test(x, snp, method = c("permute", "spectrum"), num.permutations,
+  distance = FALSE, seed = 1, num.threads = 0, ...)
 }
 \arguments{
 \item{x}{a numeric vector, matrix, data.frame, dist object}
@@ -13,36 +13,42 @@ bd.gwas.test(x, snp, num.permutations, distance = FALSE, seed = 1,
 \item{snp}{SNP data}
 
 \item{num.permutations}{the number of permutation replications, when \code{num.permutations} equals to 0, the function returns
-the sample version of ball divergence. Default: \code{num.permutations = 99}}
+the sample version of ball divergence. Default: \code{num.permutations = 99}.}
 
-\item{distance}{if \code{distance = TRUE}, \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}}
+\item{distance}{if \code{distance = TRUE}, the elements of \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}.}
 
-\item{seed}{the random seed.}
+\item{seed}{the random seed. Default \code{seet = 1}.}
 
-\item{num.threads}{Number of threads. Default \code{num.threads = 1}.}
+\item{num.threads}{Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
 
 \item{...}{further arguments to be passed to or from methods.}
 }
 \value{
 bd.gwas.test returns a list containing the following components:
-\item{\code{statistic}}{ball divergence statistic.}            
-\item{\code{permuted_statistic}}{a data.frame containing permuted ball divergence statistic.}            
-\item{\code{p.value}}{the p-value for the test.}
+\item{\code{statistic}}{ball divergence statistics vector.}            
+\item{\code{permuted.statistic}}{a data.frame containing permuted ball divergence statistic.}            
+\item{\code{p.value}}{the p-values for the ball divergence test.}
 }
 \description{
-Fast Two Ball Divergence test for gwas data
+Fast K-sample Ball Divergence Test for GWAS Data
 }
 \examples{
-set.seed(1)
-num <- 200
+\dontrun{
+
+set.seed(12)
+num <- 600
 snp_num <- 10000
 p <- 5
 x <- matrix(rnorm(num * p), nrow = num)
 snp <- sapply(1:snp_num, function(i) {
-  sample(0:2, size = num, replace = TRUE)
+  sample(0:1, size = num, replace = TRUE, prob = c(5/6, 1/6))
 })
-res <- bd.gwas.test(x = x, snp = snp, num.permutations = 29999, num.threads = 1)
+res <- bd.gwas.test(x = x, snp = snp, num.permutations = 19999)
 mean(res[["p.value"]] < 0.05)
 mean(res[["p.value"]] < 0.005)
 mean(res[["p.value"]] < 0.0005)
+}
+}
+\seealso{
+\code{\link{bd}}, \code{\link{bd.test}}
 }

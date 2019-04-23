@@ -143,7 +143,7 @@ bcov_test_wrap_c <- function(x, y, n, num.permutations, distance, num.threads) {
   res <- .C("bcov_test", bcov, p_value, x, y, n, r, distance, num.threads)
   bcov <- res[[1]]
   p_value <- res[[2]]
-  names(bcov) <- c("bcov", "bcov.prob", "bcov.chisq")
+  names(bcov) <- BCOV_WEIGHT_STATS
   names(p_value) <- paste0(names(bcov), ".pvalue")
   list('statistic' = bcov, 'p.value' = p_value,
        'info' = list("N" = res[[5]], "num.permutations" = res[[6]]))
@@ -173,7 +173,7 @@ kbcov_test_wrap_c <- function(x, K, n, num.permutations, distance, num.threads) 
   res <- .C("kbcov_test", kbcov, p_value, x, K, n, r, distance, num.threads)
   bcov <- res[[1]]
   p_value <- res[[2]]
-  names(bcov) <- c("bcov", "bcov.prob", "bcov.chisq")
+  names(bcov) <- BCOV_WEIGHT_STATS
   names(p_value) <- paste0(names(bcov), ".pvalue")
   list('statistic' = bcov, 'p.value' = p_value,
        'info' = list("N" = res[[5]], "num.permutations" = res[[6]]))
@@ -207,7 +207,7 @@ apply_bcor_wrap <- function(x, y, n, p, distance, weight, method, num.threads) {
   #
   res <- .C("bcor_test", bcor_stat, y, x, x_number, f_number, size_num, num, p, k, dst_y, dst_x, nth)[[1]]
   bcor_stat <- matrix(res, ncol = 3, byrow = TRUE)
-  colnames(bcor_stat) <- c("bcor", "bcor.prob", "bcor.chisq")
+  colnames(bcor_stat) <- BCOR_WEIGHT_STATS
   screening_bcor_stat <- select_ball_stat(bcor_stat, weight = weight, fun_name = "bcorsis")
   if (method %in% c("interaction", "standard"))
   {

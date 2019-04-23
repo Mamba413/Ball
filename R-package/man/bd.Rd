@@ -5,23 +5,22 @@
 \title{Ball Divergence}
 \usage{
 bd(x, y = NULL, distance = FALSE, size = NULL, num.threads = 1,
-  kbd.type = "sum")
+  kbd.type = c("sum", "maxsum", "max"))
 }
 \arguments{
-\item{x}{a numeric vector, matrix, data.frame, \code{dist} object or list containing vector, matrix, or data.frame.}
+\item{x}{a numeric vector, matrix, data.frame, or a list containing numeric vector, matrix, data.frame.}
 
-\item{y}{a numeric vector, matrix or data.frame.}
+\item{y}{a numeric vector, matrix, data.frame.}
 
-\item{distance}{if \code{distance = TRUE}, \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}}
+\item{distance}{if \code{distance = TRUE}, the elements of \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}.}
 
-\item{size}{a vector record sample size of each group.}
+\item{size}{a vector recording sample size of each group.}
 
-\item{num.threads}{Number of threads. Default \code{num.threads = 1}.}
+\item{num.threads}{Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
 
-\item{kbd.type}{a character value controlling the output information. 
-Setting \code{kdb.type = "sum"}, \code{kdb.type = "summax"}, or \code{kdb.type = "max"}, 
-the corresponding statistics value and \eqn{p}-value of \eqn{K}-sample test procedure are demonstrated. 
-Note that this arguments actually only influences the printed result in R console. Default: \code{kdb.type = "sum"}}
+\item{kbd.type}{a character string specifying the \eqn{K}-sample Ball Divergence test statistic, 
+must be one of \code{"sum"}, \code{"summax"}, or \code{"max"}. Any unambiguous substring can be given. 
+Default \code{kbd.type = "sum"}.}
 }
 \value{
 \item{\code{bd }}{ sample version of ball divergence}
@@ -63,10 +62,18 @@ represent the corresponding proportions located in the ball \eqn{\bar{B}(Y_k,\rh
 we can define sample version ball divergence as:
 \deqn{D_{n,m}=A_{n,m}+C_{n,m}}
 
-BD can be generalized to the \emph{K}-sample problem, i.e. if we 
-have \eqn{K} group samples, each group include \eqn{n^{(k)}, k=1,...,K} samples, 
-then we can define sample version of generalized ball divergence for \emph{K}-sample problem:
-\deqn{\sum_{1 \leq k < l \leq K}{D_{n^{(k)},n^{(l)}}}}
+BD can be generalized to the \emph{K}-sample problem. Suppose we 
+have \eqn{K} group samples, each group include \eqn{n_{k}, k=1,...,K} samples. 
+The definition of \eqn{K}-sample ball divergence statistic could be 
+to directly sum up the two-sample ball divergence statistics of all sample pairs (\code{kbd.type = "sum"})
+\deqn{\sum_{1 \leq k < l \leq K}{D_{n_{k},n_{l}}},}
+or to find one sample with the largest difference to the others (\code{kbd.type = "maxsum"})
+\deqn{\max_{t}{\sum_{s=1, s \neq t}^{K}{D_{n_{s}, n_{t}}},}}
+to aggregate the \eqn{K-1} most significant different two-sample ball divergence statistics (\code{kbd.type = "max"})
+\deqn{\sum_{k=1}^{K-1}{D_{(k)}},}
+where \eqn{D_{(1)}, \ldots, D_{(K-1)}} are the largest \eqn{K-1} two-sample ball divergence statistics among 
+\eqn{\{D_{n_s, n_t}| 1 \leq s < t \leq K\}}. When \eqn{K=2},
+the three types of ball divergence statistics degenerate into two-sample ball divergence statistic.
 
 See \code{\link{bd.test}} for a test of multivariate independence based on the 
 ball divergence.
@@ -78,7 +85,7 @@ y <- rnorm(50)
 bd(x, y)
 }
 \references{
-Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. (2017) Ball divergence: nonparametric two sample test, \emph{The Annals of Statistics}, to appear
+Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
 }
 \seealso{
 \code{\link{bd.test}}

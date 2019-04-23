@@ -9,32 +9,29 @@
 bcov.test(x, ...)
 
 \method{bcov.test}{default}(x, y = NULL, num.permutations = 99,
-  distance = FALSE, weight = FALSE, seed = 4, num.threads = 1, ...)
+  distance = FALSE, weight = c("constant", "probability", "chisquare"),
+  seed = 1, num.threads = 0, ...)
 
 \method{bcov.test}{formula}(formula, data, subset, na.action, ...)
 }
 \arguments{
-\item{x}{a numeric vector, matirx, data.frame or \code{dist} object or list containing numeric vector, matrix, data.frame, or \code{dist} object.}
+\item{x}{a numeric vector, matirx, data.frame, or a list containing numeric vector, matrix, data.frame.}
 
 \item{...}{further arguments to be passed to or from methods.}
 
-\item{y}{a numeric vector, matirx, data.frame or \code{dist} object.}
+\item{y}{a numeric vector, matirx, or data.frame.}
 
 \item{num.permutations}{the number of permutation replications, when \code{num.permutations} equals to 0, the function returns
-the sample version of ball divergence. Default: \code{num.permutations = 99}}
+the sample version of ball divergence. Default: \code{num.permutations = 99}.}
 
-\item{distance}{if \code{distance = TRUE}, \code{x} and \code{y} will be considered as a distance matrix. Default: \code{distance = FALSE}}
+\item{distance}{if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.}
 
-\item{weight}{a logical or character value used to choose the form of weight. 
-If \code{weight = FALSE}, the ball covariance / correlation with constant weight is used. 
-Alternatively, \code{weight = TRUE} and \code{weight = "prob"} indicates the probability weight is chosen 
-while setting \code{weight = "chisq"} means select the Chi-square weight. 
-Note that this arguments actually only influences the printed result in R console and is 
-only available for the \code{bcov.test} function at present. Default: \code{weight = FALSE}}
+\item{weight}{a character value used to choose the form of the weight of Ball Covariance. 
+This must be one of "constant", "probability", or "chisquare". Any unambiguous substring can be given. Default: \code{weight = "constant"}.}
 
-\item{seed}{the random seed.}
+\item{seed}{the random seed. Default \code{seet = 1}.}
 
-\item{num.threads}{Number of threads. Default \code{num.threads = 1}.}
+\item{num.threads}{Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
 
 \item{formula}{a formula of the form \code{~ u + v}, where each of \code{u} and \code{v} are numeric variables giving the data values for one sample. The samples must be of the same length.}
 
@@ -45,18 +42,20 @@ only available for the \code{bcov.test} function at present. Default: \code{weig
 \item{na.action}{a function which indicates what should happen when the data contain \code{NA}s. Defaults to \code{getOption("na.action")}.}
 }
 \value{
-bcov.test returns a list with class "htest" containing the following components:
+If \code{num.permutations > 0}, \code{bcov.test} returns a \code{htest} class object containing the following components:
 \item{\code{statistic}}{ball covariance or ball correlation statistic.}            
 \item{\code{p.value}}{the p-value for the test.}  
 \item{\code{replicates}}{permutation replications of the test statistic.}
 \item{\code{size}}{sample size.} 
-\item{\code{complete.info}}{a \code{list} containing multiple statistics value and their corresponding $p$ value.}
+\item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the ball covariance statistics 
+with different weights, the second is the \eqn{p}-values of weighted ball covariance tests.}
 \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 \item{\code{method}}{a character string indicating what type of test was performed.}
 \item{\code{data.name}}{description of data.}
+If \code{num.permutations = 0}, \code{bcov.test} returns a statistic value.
 }
 \description{
-Ball covariance test of multivariate independence. 
+Ball Covariance test of multivariate independence. 
 Ball covariance are generic multivariate measures of dependence in Banach space.
 }
 \details{
@@ -77,7 +76,12 @@ coefficient of ball covariance. (See the manual page for \code{\link{bcov}} or \
 
 For the general problem of testing independence when the distributions of \eqn{X} and 
 \eqn{Y} are unknown, the test based on \code{bcov} can be implemented as a permutation test.
-See (Jin et al 2018) for theoretical properties of the test, including statistical consistency.
+See Pan et al 2018 for theoretical properties of the test, including statistical consistency.
+}
+\note{
+Actually, \code{bcov.test} simultaneously computing multiple weighted version of Ball Covariance statistics.
+Users can get other weighted ball covariance statistics and their corresponding
+\eqn{p}-values in the \code{complete.info} of output.
 }
 \examples{
 set.seed(1)
@@ -110,7 +114,7 @@ data("ArcticLake")
 Dy <- nhdist(ArcticLake[["x"]], method = "compositional")
 Dx <- dist(ArcticLake[["depth"]])
 # hypothesis test with weighted BCov:
-bcov.test(x = Dx, y = Dy, distance = TRUE, weight = TRUE)
+bcov.test(x = Dx, y = Dy, distance = TRUE, weight = "prob")
 
 ################# Mutual Independence Test #################
 x <- rnorm(30)
@@ -126,11 +130,15 @@ bcov.test(meteorology)
 ################  Formula interface  ################
 ## independence test:
 bcov.test(~ CONT + INTG, data = USJudgeRatings)
+## independence test with chisquare weight:
+bcov.test(~ CONT + INTG, data = USJudgeRatings, weight = "chi")
 ## mutual independence test:
 bcov.test(~ CONT + INTG + DMNR, data = USJudgeRatings)
 }
 \references{
-Jin, Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. URL http://arxiv.org/abs/1811.03750.
+Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu & Jin Zhu (2019) Ball Covariance: A Generic Measure of Dependence in Banach Space, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1543600
+
+Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. http://arxiv.org/abs/1811.03750
 }
 \seealso{
 \code{\link{bcov}}, \code{\link{bcor}}

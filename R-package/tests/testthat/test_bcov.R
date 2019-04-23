@@ -5,7 +5,7 @@ skip_on_cran()
 
 test_that("Error if computation result for ball covariance is wrong!", {
   target_value <- 0.034214
-  names(target_value) <- "bcov"
+  names(target_value) <- "bcov.constant"
   expect_equal(bcov(1:10, 1:10), target_value)
   expect_equal(bcov.test(1:10, 1:10, num.permutations = 0), target_value)
   dx <- dist(1:10)

@@ -61,7 +61,8 @@ void sub_rank_finder(int ***sub_rank, double **distance_matrix, int **index_matr
             s_index = index_matrix[i][j];
             g_index = label[s_index];
             if (i_index == g_index) {
-                sub_rank[i_index][i_group_relative_location - i_cumsum_size][group_relative_location[s_index] - i_cumsum_size] = rank_value;
+                sub_rank[i_index][i_group_relative_location - i_cumsum_size][group_relative_location[s_index] -
+                                                                             i_cumsum_size] = rank_value;
                 rank_value++;
             }
         }
@@ -246,7 +247,8 @@ void sort_ints(int *a, size_t n) {
     qsort(a, n, sizeof *a, &compare_ints);
 }
 
-void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *k, const int *R, const int *thread) {
+void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *k,
+          const int *R, const int *thread) {
     int s, bd_stat_number = (((*k - 1) * (*k)) >> 1);
     int *cumsum_size = (int *) malloc(*k * sizeof(int));
     compute_cumsum_size(cumsum_size, size, k);
@@ -496,7 +498,6 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
         int *k_vector_tmp = (int *) malloc(*p * sizeof(int));
         memcpy(k_vector_tmp, k_vector, *p * sizeof(int));
         sort_ints(k_vector_tmp, (size_t) *p);
-        int min_k = k_vector_tmp[0];
         int unique_k_num = 1;
         for (int i = 1; i < *p; ++i) {
             if (k_vector_tmp[i] != k_vector_tmp[i - 1]) {
@@ -504,11 +505,22 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
             }
         }
         int *unique_k_vector = (int *) malloc(unique_k_num * sizeof(int));
+        int *each_k_num = (int *) malloc(unique_k_num * sizeof(int));
         unique_k_vector[0] = k_vector_tmp[0];
-        s = 1;
-        for (int i = 1; i < *p; ++i) {
-            if (k_vector_tmp[i] != k_vector_tmp[i - 1]) {
-                unique_k_vector[s++] = k_vector_tmp[i];
+        if (unique_k_num == 1) {
+            each_k_num[0] = *p;
+        } else {
+            s = 1;
+            for (int i = 1; i < *p; ++i) {
+                if (k_vector_tmp[i] != k_vector_tmp[i - 1]) {
+                    unique_k_vector[s] = k_vector_tmp[i];
+                    if (s == 1) {
+                        each_k_num[0] = i;
+                    } else {
+                        each_k_num[s - 1] = i - each_k_num[s - 2];
+                    }
+                    s++;
+                }
             }
         }
         free(k_vector_tmp);
@@ -587,7 +599,8 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
                 int start = round * fix_batch_size;
                 for (int r = 0; r < batch_size; ++r) {
                     permuted_asymptotic_bd_stat_matrix[row_index][r + start] = permuted_asymptotic_bd_stat_batch[r][0];
-                    permuted_asymptotic_bd_stat_matrix[row_index + 1][r + start] = permuted_asymptotic_bd_stat_batch[r][1];
+                    permuted_asymptotic_bd_stat_matrix[row_index + 1][r +
+                                                                      start] = permuted_asymptotic_bd_stat_batch[r][1];
                     permuted_bd_stat[(row_index * *R) + start + r] = permuted_asymptotic_bd_stat_batch[r][0];
                     permuted_bd_stat[((row_index + 1) * *R) + start + r] = permuted_asymptotic_bd_stat_batch[r][1];
                 }
@@ -600,18 +613,45 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
         free_matrix(permuted_asymptotic_bd_stat_batch, batch_size, 2);
         free_int_matrix(label_matrix, batch_size, *n);
         free_int_matrix(group_relative_location_matrix, batch_size, *n);
-        free(unique_k_vector);
         free(label);
 
         // compute p-value
-        for (int i = 0; i < *p; ++i) {
-            int row_index = 2 * (k_vector[i] - min_k);
-            pvalue[i] = compute_pvalue(asymptotic_bd_stat_array[i][0], permuted_asymptotic_bd_stat_matrix[row_index],
-                                       *R);
-            pvalue[*p + i] = compute_pvalue(asymptotic_bd_stat_array[i][1],
-                                            permuted_asymptotic_bd_stat_matrix[row_index + 1], *R);
+        for (int i = 0; i < unique_k_num; ++i) {
+            int row_index = 2 * i, k_num = each_k_num[i], k_value = unique_k_vector[i];
+            int *stats_index1 = (int *) calloc((size_t) k_num, sizeof(int));
+            int *stats_index2 = (int *) calloc((size_t) k_num, sizeof(int));
+            double *stats_value1 = (double *) calloc((size_t) k_num, sizeof(double));
+            double *stats_value2 = (double *) calloc((size_t) k_num, sizeof(double));
+            double *p_value1 = (double *) calloc((size_t) k_num, sizeof(double));
+            double *p_value2 = (double *) calloc((size_t) k_num, sizeof(double));
+            s = 0;
+            for (int j = 0; j < *p; ++j) {
+                if (k_vector[j] == k_value) {
+                    stats_index1[s] = j;
+                    stats_index2[s] = j + *p;
+                    stats_value1[s] = bd_stat[j];
+                    stats_value2[s] = bd_stat[j + *p];
+                    s++;
+                }
+            }
+            compute_batch_pvalue(stats_value1, permuted_asymptotic_bd_stat_matrix[row_index], p_value1,
+                                 k_num, *R);
+            compute_batch_pvalue(stats_value2, permuted_asymptotic_bd_stat_matrix[row_index + 1], p_value2,
+                                 k_num, *R);
+            for (int j = 0; j < k_num; ++j) {
+                pvalue[stats_index1[j]] = p_value1[j];
+                pvalue[stats_index2[j]] = p_value2[j];
+            }
+            free(stats_index1);
+            free(stats_index2);
+            free(stats_value1);
+            free(stats_value2);
+            free(p_value1);
+            free(p_value2);
         }
         free_matrix(permuted_asymptotic_bd_stat_matrix, (unique_k_num << 1), *R);
+        free(unique_k_vector);
+        free(each_k_num);
     }
 
     free_matrix(distance_matrix, *n, *n);

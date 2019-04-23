@@ -9,33 +9,32 @@
 bd.test(x, ...)
 
 \method{bd.test}{default}(x, y = NULL, num.permutations = 99,
-  distance = FALSE, size = NULL, seed = 4, num.threads = 1,
-  kbd.type = "sum", ...)
+  distance = FALSE, size = NULL, seed = 1, num.threads = 0,
+  kbd.type = c("sum", "maxsum", "max"), ...)
 
 \method{bd.test}{formula}(formula, data, subset, na.action, ...)
 }
 \arguments{
-\item{x}{a numeric vector, matrix, data.frame, \code{dist} object or list containing vector, matrix, or data.frame.}
+\item{x}{a numeric vector, matrix, data.frame, or a list containing numeric vector, matrix, data.frame.}
 
 \item{...}{further arguments to be passed to or from methods.}
 
-\item{y}{a numeric vector, matrix or data.frame.}
+\item{y}{a numeric vector, matrix, data.frame.}
 
 \item{num.permutations}{the number of permutation replications, when \code{num.permutations} equals to 0, the function returns
-the sample version of ball divergence. Default: \code{num.permutations = 99}}
+the sample version of ball divergence. Default: \code{num.permutations = 99}.}
 
-\item{distance}{if \code{distance = TRUE}, \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}}
+\item{distance}{if \code{distance = TRUE}, the elements of \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}.}
 
-\item{size}{a vector record sample size of each group.}
+\item{size}{a vector recording sample size of each group.}
 
-\item{seed}{the random seed.}
+\item{seed}{the random seed. Default \code{seet = 1}.}
 
-\item{num.threads}{Number of threads. Default \code{num.threads = 1}.}
+\item{num.threads}{Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
 
-\item{kbd.type}{a character value controlling the output information. 
-Setting \code{kdb.type = "sum"}, \code{kdb.type = "summax"}, or \code{kdb.type = "max"}, 
-the corresponding statistics value and \eqn{p}-value of \eqn{K}-sample test procedure are demonstrated. 
-Note that this arguments actually only influences the printed result in R console. Default: \code{kdb.type = "sum"}}
+\item{kbd.type}{a character string specifying the \eqn{K}-sample Ball Divergence test statistic, 
+must be one of \code{"sum"}, \code{"summax"}, or \code{"max"}. Any unambiguous substring can be given. 
+Default \code{kbd.type = "sum"}.}
 
 \item{formula}{a formula of the form \code{response ~ group} where \code{response} gives the data values and \code{group} a vector or factor of the corresponding groups.}
 
@@ -46,22 +45,24 @@ Note that this arguments actually only influences the printed result in R consol
 \item{na.action}{a function which indicates what should happen when the data contain \code{NA}s. Defaults to \code{getOption("na.action")}.}
 }
 \value{
-bd.test returns a list with class "htest" containing the following components:
+If \code{num.permutations > 0}, \code{bd.test} returns a \code{htest} class object containing the following components:
 \item{\code{statistic}}{ball divergence statistic.}            
 \item{\code{p.value}}{the p-value for the test.}
 \item{\code{replicates}}{permutation replications of the test statistic.}
 \item{\code{size}}{sample sizes.}
-\item{\code{complete.info}}{a \code{list} containing multiple statistics value and their corresponding $p$ value.}
+\item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the ball divergence statistics 
+with different weights, the second is the \eqn{p}-values of weighted ball divergence tests.}
 \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 \item{\code{method}}{a character string indicating what type of test was performed.}
 \item{\code{data.name}}{description of data.}
+If \code{num.permutations = 0}, \code{bd.test} returns a statistic value.
 }
 \description{
 Performs the nonparametric two-sample or \eqn{K}-sample ball divergence test for
 equality of multivariate distributions
 }
 \details{
-\code{bd.test} are ball divergence based multivariate nonparametric tests of two-sample or 
+\code{bd.test} are ball divergence based nonparametric tests of two-sample or 
 K-sample problem. If only \code{x} is given, the statistic is 
 computed from the original pooled samples, stacked in 
 matrix where each row is a multivariate observation, or from the distance matrix 
@@ -72,7 +73,8 @@ and hence have to be numeric data vectors, matrix or data.frame.
 
 Based on sample version ball divergence (see \code{\link{bd}}), the test is implemented by 
 permutation with \code{num.permutations} times. The function simply returns the test statistic 
-when \code{num.permutations = 0}.
+when \code{num.permutations = 0}. The time complexity of \code{bd.test} is \eqn{O(R \times n^2)},
+where \eqn{R} is permutation replication and \eqn{n} is sample size.
 }
 \examples{
 ################# Quick Start #################
@@ -123,15 +125,16 @@ bd.test(x)
 bd.test(extra ~ group, data = sleep)
 ## K-sample test
 bd.test(Sepal.Width ~ Species, data = iris)
+bd.test(Sepal.Width ~ Species, data = iris, kbd.type = "max")
 }
 \references{
-Pan, Wenliang; Tian, Yuan; Wang, Xueqin; Zhang, Heping. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
+Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
 
-Jin, Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. URL http://arxiv.org/abs/1811.03750.
+Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. http://arxiv.org/abs/1811.03750
 }
 \seealso{
-\code{\link{bd}}
+\code{\link{bd}}, \code{\link{bd.gwas.test}}
 }
 \author{
-Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang
+Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang, Jin Zhu
 }

@@ -62,7 +62,7 @@ test_that("Ball Correlation based iterative SIS with probability weight is unrea
   y <- 3*x[, 1] + 5*(x[, 3])^2 + error
   res <- bcorsis(y = y, x = x, weight = "prob")
   expect_true(all(c(1, 3) %in% head(res[["ix"]])))
-  expect_equal("prob", res[["weight"]])
+  expect_equal("probability", res[["weight"]])
 })
 
 test_that("Ball Correlation based SIS with Chi-square weight is unreasonable!", {
@@ -74,5 +74,5 @@ test_that("Ball Correlation based SIS with Chi-square weight is unreasonable!", 
   y <- 3*x[, 1] + 5*(x[, 3])^2 + error
   res <- bcorsis(y = y, x = x, weight = "chisq")
   expect_true(all(c(1, 3) %in% head(res[["ix"]])))
-  expect_equal("chisq", res[["weight"]])
+  expect_equal("chisquare", res[["weight"]])
 })

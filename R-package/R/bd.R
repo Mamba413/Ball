@@ -5,21 +5,19 @@
 #' 
 #' @aliases bd.test
 #' 
-#' @author Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang
+#' @author Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang, Jin Zhu
 #' 
-#' @param x a numeric vector, matrix, data.frame, \code{dist} object or list containing vector, matrix, or data.frame.
-#' @param y a numeric vector, matrix or data.frame.
+#' @param x a numeric vector, matrix, data.frame, or a list containing numeric vector, matrix, data.frame.
+#' @param y a numeric vector, matrix, data.frame.
 #' @param num.permutations the number of permutation replications, when \code{num.permutations} equals to 0, the function returns
-#' the sample version of ball divergence. Default: \code{num.permutations = 99}
-#' @param distance if \code{distance = TRUE}, \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}
-#' @param size a vector record sample size of each group.
-#' @param seed the random seed. 
-#' @param num.threads Number of threads. Default \code{num.threads = 1}.
-#' @param kbd.type a character value controlling the output information. 
-#' Setting \code{kdb.type = "sum"}, \code{kdb.type = "summax"}, or \code{kdb.type = "max"}, 
-#' the corresponding statistics value and \eqn{p}-value of \eqn{K}-sample test procedure are demonstrated. 
-#' Note that this arguments actually only influences the printed result in R console. Default: \code{kdb.type = "sum"}
-#' 
+#' the sample version of ball divergence. Default: \code{num.permutations = 99}.
+#' @param distance if \code{distance = TRUE}, the elements of \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}.
+#' @param size a vector recording sample size of each group.
+#' @param seed the random seed. Default \code{seet = 1}.
+#' @param num.threads Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.
+#' @param kbd.type a character string specifying the \eqn{K}-sample Ball Divergence test statistic, 
+#' must be one of \code{"sum"}, \code{"summax"}, or \code{"max"}. Any unambiguous substring can be given. 
+#' Default \code{kbd.type = "sum"}.
 #' @param ... further arguments to be passed to or from methods.
 #' 
 ## @param weight not available now
@@ -27,20 +25,22 @@
 ## if \code{ method = 'approx'}, the p-values based on approximate Ball Divergence
 ## distribution are given.
 #' 
-#' @return bd.test returns a list with class "htest" containing the following components:
+#' @return If \code{num.permutations > 0}, \code{bd.test} returns a \code{htest} class object containing the following components:
 #' \item{\code{statistic}}{ball divergence statistic.}            
 #' \item{\code{p.value}}{the p-value for the test.}
 #' \item{\code{replicates}}{permutation replications of the test statistic.}
 #' \item{\code{size}}{sample sizes.}
-#' \item{\code{complete.info}}{a \code{list} containing multiple statistics value and their corresponding $p$ value.}
+#' \item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the ball divergence statistics 
+#' with different weights, the second is the \eqn{p}-values of weighted ball divergence tests.}
 #' \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 #' \item{\code{method}}{a character string indicating what type of test was performed.}
 #' \item{\code{data.name}}{description of data.}
+#' If \code{num.permutations = 0}, \code{bd.test} returns a statistic value.
 #' 
 #' @rdname bd.test
 #' 
 #' @details 
-#' \code{bd.test} are ball divergence based multivariate nonparametric tests of two-sample or 
+#' \code{bd.test} are ball divergence based nonparametric tests of two-sample or 
 #' K-sample problem. If only \code{x} is given, the statistic is 
 #' computed from the original pooled samples, stacked in 
 #' matrix where each row is a multivariate observation, or from the distance matrix 
@@ -51,13 +51,14 @@
 #' 
 #' Based on sample version ball divergence (see \code{\link{bd}}), the test is implemented by 
 #' permutation with \code{num.permutations} times. The function simply returns the test statistic 
-#' when \code{num.permutations = 0}.
+#' when \code{num.permutations = 0}. The time complexity of \code{bd.test} is \eqn{O(R \times n^2)},
+#' where \eqn{R} is permutation replication and \eqn{n} is sample size.
 #' 
 #' @seealso
-#' \code{\link{bd}}
+#' \code{\link{bd}}, \code{\link{bd.gwas.test}}
 #' 
-#' @references Pan, Wenliang; Tian, Yuan; Wang, Xueqin; Zhang, Heping. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
-#' @references Jin, Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. URL http://arxiv.org/abs/1811.03750.
+#' @references Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
+#' @references Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. http://arxiv.org/abs/1811.03750
 #' 
 #' @export
 #' @examples
@@ -110,11 +111,12 @@ bd.test <- function(x, ...) UseMethod("bd.test")
 #' @export
 #' @method bd.test default
 bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE,
-                            size = NULL, seed = 4, num.threads = 1, 
-                            kbd.type = "sum", ...) {
-  weight = FALSE
-  method = 'permute'
+                            size = NULL, seed = 1, num.threads = 0, 
+                            kbd.type = c("sum", "maxsum", "max"), ...) {
+  weight <- FALSE
+  method <- 'permute'
   data_name <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
+  kbd.type <- match.arg(kbd.type)
   if (length(data_name) > 1) {
     data_name <- ""
   }
@@ -243,23 +245,25 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE
   if (result[["info"]][["K"]] == 2) {
     stat <- result[["statistic"]][1]
     pvalue <- result[["p.value"]][1]
-    stat_message <- ""
   } else if (kbd.type == "sum") {
     stat <- result[["statistic"]][1]
     pvalue <- result[["p.value"]][1]
-    stat_message <- " (Summation Version)"
+    stat_message <- "sum"
   } else if (kbd.type == "max") {
     stat <- result[["statistic"]][2]
     pvalue <- result[["p.value"]][2]
-    stat_message <- " (Maximum Version)"
+    stat_message <- "max"
   } else {
     stat <- result[["statistic"]][3]
     pvalue <- result[["p.value"]][3]
-    stat_message <- " (Maximum-Summation Version)"
+    stat_message <- "maxsum"
   }
   data_name <- paste(data_name, sprintf("\nnumber of observations = %s,", result[["info"]][["N"]]))
   data_name <- paste(data_name, "group sizes:", paste0(result[["info"]][["size"]], collapse = " "))
   data_name <- paste0(data_name, "\nreplicates = ", num.permutations)
+  if (result[["info"]][["K"]] == 3) {
+    data_name <- paste0(data_name, ", kbd.type: ", stat_message)
+  }
   # data_name <- paste0(data_name, ", Weighted Ball Divergence = ", result[["info"]][["weight"]])
   alternative_message <- "distributions of samples are distinct"
   
@@ -271,7 +275,7 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE
     size = result[["info"]][["size"]],
     complete.info = result,
     alternative = alternative_message,
-    method = sprintf("%s-sample Ball Divergence Test%s", result[["info"]][["K"]], stat_message),
+    method = sprintf("%s-sample Ball Divergence Test", result[["info"]][["K"]]),
     data.name = data_name
   )
   class(e) <- "htest"
@@ -294,6 +298,7 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE
 #' bd.test(extra ~ group, data = sleep)
 #' ## K-sample test
 #' bd.test(Sepal.Width ~ Species, data = iris)
+#' bd.test(Sepal.Width ~ Species, data = iris, kbd.type = "max")
 bd.test.formula <- function(formula, data, subset, na.action, ...) {
   if(missing(formula)
      || (length(formula) != 3L)
@@ -364,10 +369,18 @@ bd.test.formula <- function(formula, data, subset, na.action, ...) {
 #' we can define sample version ball divergence as:
 #' \deqn{D_{n,m}=A_{n,m}+C_{n,m}}
 #' 
-#' BD can be generalized to the \emph{K}-sample problem, i.e. if we 
-#' have \eqn{K} group samples, each group include \eqn{n^{(k)}, k=1,...,K} samples, 
-#' then we can define sample version of generalized ball divergence for \emph{K}-sample problem:
-#' \deqn{\sum_{1 \leq k < l \leq K}{D_{n^{(k)},n^{(l)}}}}
+#' BD can be generalized to the \emph{K}-sample problem. Suppose we 
+#' have \eqn{K} group samples, each group include \eqn{n_{k}, k=1,...,K} samples. 
+#' The definition of \eqn{K}-sample ball divergence statistic could be 
+#' to directly sum up the two-sample ball divergence statistics of all sample pairs (\code{kbd.type = "sum"})
+#' \deqn{\sum_{1 \leq k < l \leq K}{D_{n_{k},n_{l}}},}
+#' or to find one sample with the largest difference to the others (\code{kbd.type = "maxsum"})
+#' \deqn{\max_{t}{\sum_{s=1, s \neq t}^{K}{D_{n_{s}, n_{t}}},}}
+#' to aggregate the \eqn{K-1} most significant different two-sample ball divergence statistics (\code{kbd.type = "max"})
+#' \deqn{\sum_{k=1}^{K-1}{D_{(k)}},}
+#' where \eqn{D_{(1)}, \ldots, D_{(K-1)}} are the largest \eqn{K-1} two-sample ball divergence statistics among 
+#' \eqn{\{D_{n_s, n_t}| 1 \leq s < t \leq K\}}. When \eqn{K=2},
+#' the three types of ball divergence statistics degenerate into two-sample ball divergence statistic.
 #' 
 #' See \code{\link{bd.test}} for a test of multivariate independence based on the 
 #' ball divergence.
@@ -376,14 +389,14 @@ bd.test.formula <- function(formula, data, subset, na.action, ...) {
 #' \code{\link{bd.test}}
 #' @export
 #' 
-#' @references Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. (2017) Ball divergence: nonparametric two sample test, \emph{The Annals of Statistics}, to appear
+#' @references Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
 #' 
 #' @examples
 #' ############# Ball Divergence #############
 #' x <- rnorm(50)
 #' y <- rnorm(50)
 #' bd(x, y)
-bd <- function(x, y = NULL, distance = FALSE, size = NULL, num.threads = 1, kbd.type = "sum") {
+bd <- function(x, y = NULL, distance = FALSE, size = NULL, num.threads = 1, kbd.type = c("sum", "maxsum", "max")) {
   res <- bd.test(x = x, y = y, distance = distance, size = size, num.permutations = 0, kbd.type = kbd.type)
   res
 }

@@ -6,14 +6,16 @@
 \alias{Ball-package}
 \title{Ball: Statistical Inference and Sure Independence Screening via Ball Statistics}
 \description{
-Hypothesis tests and sure independence screening (SIS) procedure based on ball statistics, including ball divergence <doi:10.1214/17-AOS1579>, ball covariance <doi:10.1080/01621459.2018.1543600>, and ball correlation <doi:10.1080/01621459.2018.1462709>, are developed to analyze complex data. The ball divergence and ball covariance based distribution-free tests are implemented to detecting distribution difference and association in metric spaces <arXiv:1811.03750>. Furthermore, a generic non-parametric SIS procedure based on ball correlation and all of its variants are implemented to tackle the challenge in the context of ultra high dimensional data.
+Hypothesis tests and sure independence screening (SIS) procedure based on ball statistics, including ball divergence <doi:10.1214/17-AOS1579>, ball covariance <doi:10.1080/01621459.2018.1543600>, and ball correlation <doi:10.1080/01621459.2018.1462709>, are developed to analyze complex data in metric spaces, e.g, shape, directional, compositional and SPD matrix data. The ball divergence and ball covariance based distribution-free tests are implemented to detecting distribution difference and association in metric spaces <arXiv:1811.03750>. Furthermore, several generic non-parametric feature selection procedures based on ball correlation, BCor-SIS and all of its variants, are implemented to tackle the challenge in the context of ultra high dimensional data.
 }
 \references{
-Pan, Wenliang; Tian, Yuan; Wang, Xueqin; Zhang, Heping. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
+Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
 
 Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) A Generic Sure Independence Screening Procedure, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709
 
-Jin, Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. URL http://arxiv.org/abs/1811.03750.
+Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu & Jin Zhu (2019) Ball Covariance: A Generic Measure of Dependence in Banach Space, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1543600
+
+Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R Package for Detecting Distribution Difference and Association in Metric Spaces. arXiv preprint arXiv:1811.03750. http://arxiv.org/abs/1811.03750
 }
 \seealso{
 Useful links:

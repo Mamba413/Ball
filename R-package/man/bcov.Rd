@@ -5,23 +5,21 @@
 \alias{bcov}
 \title{Ball Correlation and Covariance Statistics}
 \usage{
-bcor(x, y, distance = FALSE, weight = FALSE)
+bcor(x, y, distance = FALSE, weight = c("constant", "probability",
+  "chisquare"))
 
-bcov(x, y, distance = FALSE, weight = FALSE)
+bcov(x, y, distance = FALSE, weight = c("constant", "probability",
+  "chisquare"))
 }
 \arguments{
-\item{x}{a numeric vector, matirx, data.frame or \code{dist} object or list containing numeric vector, matrix, data.frame, or \code{dist} object.}
+\item{x}{a numeric vector, matirx, data.frame, or a list containing numeric vector, matrix, data.frame.}
 
-\item{y}{a numeric vector, matirx, data.frame or \code{dist} object.}
+\item{y}{a numeric vector, matirx, or data.frame.}
 
-\item{distance}{if \code{distance = TRUE}, \code{x} and \code{y} will be considered as a distance matrix. Default: \code{distance = FALSE}}
+\item{distance}{if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.}
 
-\item{weight}{a logical or character value used to choose the form of weight. 
-If \code{weight = FALSE}, the ball covariance / correlation with constant weight is used. 
-Alternatively, \code{weight = TRUE} and \code{weight = "prob"} indicates the probability weight is chosen 
-while setting \code{weight = "chisq"} means select the Chi-square weight. 
-Note that this arguments actually only influences the printed result in R console and is 
-only available for the \code{bcov.test} function at present. Default: \code{weight = FALSE}}
+\item{weight}{a character value used to choose the form of the weight of Ball Covariance. 
+This must be one of "constant", "probability", or "chisquare". Any unambiguous substring can be given. Default: \code{weight = "constant"}.}
 }
 \value{
 \item{\code{bcor }}{ sample version of ball correlation.}
@@ -29,11 +27,11 @@ only available for the \code{bcov.test} function at present. Default: \code{weig
 \item{\code{bcov }}{ sample version of ball covariance.}
 }
 \description{
-Computes ball covariance and ball correlation statistics, 
-which are multivariate measures of dependence in Banach space.
+Computes Ball Covariance and Ball Correlation statistics, 
+which are generic dependence measures in Banach space.
 }
 \details{
-\code{bcov} and \code{bcor} compute ball covariance and ball correlation statistics.
+\code{bcov} and \code{bcor} compute Ball Covariance and ball correlation statistics.
 
 The sample sizes (number of rows or length of the vector) of the two variables must agree, 
 and samples must not contain missing values. 
@@ -41,7 +39,7 @@ If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{di
 symmetric numeric matrix recording distance between samples; 
 otherwise, these arguments are treated as data.
 
-Ball covariance is a generic non-parametric dependence measure in Banach space, introduced by Pan et al(2017). 
+Ball Covariance is a generic non-parametric dependence measure in Banach space, introduced by Pan et al (2018). 
 It is noteworthy that ball covariance enjoys the following properties: 
 
 (i) It is nonnegative, and holds the Cauchy-Schwartz type inequality; 
@@ -64,7 +62,7 @@ Suppose, we are given pairs of independent observations
 \eqn{\{(x_1, y_1),...,(x_n,y_n)\}}, where \eqn{x_i} and \eqn{y_i} can be of any dimension 
 and the dimensionality of \eqn{x_i} and \eqn{y_i} need not be the same.
 Then, we define sample version ball covariance as:
-\deqn{\mathbf{BCor}_{\omega, n}^{2}(X, Y)=\frac{1}{n^{2}}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{X,Y}-\Delta_{ij,n}^{X}\Delta_{ij,n}^{Y})^{2}} }
+\deqn{\mathbf{BCov}_{\omega, n}^{2}(X, Y)=\frac{1}{n^{2}}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{X,Y}-\Delta_{ij,n}^{X}\Delta_{ij,n}^{Y})^{2}} }
 where:
 \deqn{ \Delta_{ij,n}^{X,Y}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{X} \delta_{ij,k}^{Y}}, 
 \Delta_{ij,n}^{X}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{X}}, 
@@ -99,17 +97,22 @@ num <- 50
 x <- 1:num
 y <- 1:num
 bcor(x, y)
-bcor(x, y, weight = TRUE)
 bcor(x, y, weight = "prob")
 bcor(x, y, weight = "chisq")
 ############# Ball Covariance #############
-n <- 50
-x <- rnorm(n)
-y <- rnorm(n)
+num <- 50
+x <- rnorm(num)
+y <- rnorm(num)
 bcov(x, y)
-bcov(x, y, weight = TRUE)
 bcov(x, y, weight = "prob")
 bcov(x, y, weight = "chisq")
+}
+\references{
+Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu & Jin Zhu (2019) Ball Covariance: A Generic Measure of Dependence in Banach Space, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1543600
+
+Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) A Generic Sure Independence Screening Procedure, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709
+
+Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. http://arxiv.org/abs/1811.03750
 }
 \seealso{
 \code{\link{bcov.test}}, \code{\link{bcorsis}}

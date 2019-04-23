@@ -1,3 +1,9 @@
+WEIGHT_TYPE <- c("constant", "probability", "chisquare")
+
+BCOR_WEIGHT_STATS <- c("bcor.constant", "bcor.probability", "bcor.chisquare")
+
+BCOV_WEIGHT_STATS <- c("bcov.constant", "bcov.probability", "bcov.chisquare")
+
 #' calculate Pvalue
 #'
 #' @param statValue Statistic Value
@@ -106,15 +112,10 @@ examine_seed_arguments <- function(seed) {
 #' @return A integer number
 #' @noRd
 #'
-examine_weight_arguments <- function(weight) {
-  WEIGHT_METHODS <- c(TRUE, FALSE, "none", "chisq", "prob")
-  method <- pmatch(weight, WEIGHT_METHODS)
-  if (is.na(method)) 
+examine_weight_arguments <- function(weight = c("constant", "probability", "chisquare")) {
+  method <- match.arg(weight)
+  if (is.na(method)) {
     stop("invalid weight method")
-  if (weight == TRUE) {
-    weight <- "prob"
-  } else if (weight == FALSE) {
-    weight <- "none"
   }
   return(weight)
 }
@@ -123,24 +124,24 @@ examine_weight_arguments <- function(weight) {
 select_ball_stat <- function(ball_stat, weight, type = "bcov", fun_name = "bcov") {
   if (fun_name == "bcorsis") 
   {
-    if (weight == "none") {
+    if (weight == "constant") {
       ball_stat <- ball_stat[, 1]
-    } else if (weight == "bcov") {
+    } else if (weight == "probability") {
       ball_stat <- ball_stat[, 2]
-    } else {
+    } else if (weight == "chisquare") {
       ball_stat <- ball_stat[, 3]
     }
   } else {
-    if (weight == "none")
+    if (weight == "constant")
     {
       ball_stat <- ball_stat[1]
-      names(ball_stat) <- ifelse(type == "bcov", "bcov", "bcor")
-    } else if (weight == "prob") {
+      names(ball_stat) <- ifelse(type == "bcov", BCOV_WEIGHT_STATS[1], BCOR_WEIGHT_STATS[1])
+    } else if (weight == "probability") {
       ball_stat <- ball_stat[2]
-      names(ball_stat) <- ifelse(type == "bcov", "bcov.prob", "bcor.prob")
-    } else {
+      names(ball_stat) <- ifelse(type == "bcov", BCOV_WEIGHT_STATS[2], BCOR_WEIGHT_STATS[2])
+    } else if (weight == "chisquare") {
       ball_stat <- ball_stat[3]
-      names(ball_stat) <- ifelse(type == "bcov", "bcov.chisq", "bcor.chisq")
+      names(ball_stat) <- ifelse(type == "bcov", BCOV_WEIGHT_STATS[3], BCOR_WEIGHT_STATS[3])
     }
   }
   return(ball_stat)

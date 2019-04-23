@@ -1,32 +1,29 @@
 #' @title Ball Covariance Test
 #' @author Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu, Jin Zhu
-#' @description Ball covariance test of multivariate independence. 
+#' @description Ball Covariance test of multivariate independence. 
 #' Ball covariance are generic multivariate measures of dependence in Banach space.
 #' 
 #' @inheritParams bd.test
-#' @param x a numeric vector, matirx, data.frame or \code{dist} object or list containing numeric vector, matrix, data.frame, or \code{dist} object.
-#' @param y a numeric vector, matirx, data.frame or \code{dist} object.
-#' @param distance if \code{distance = TRUE}, \code{x} and \code{y} will be considered as a distance matrix. Default: \code{distance = FALSE}
-#' @param weight a logical or character value used to choose the form of weight. 
-#' If \code{weight = FALSE}, the ball covariance / correlation with constant weight is used. 
-#' Alternatively, \code{weight = TRUE} and \code{weight = "prob"} indicates the probability weight is chosen 
-#' while setting \code{weight = "chisq"} means select the Chi-square weight. 
-#' Note that this arguments actually only influences the printed result in R console and is 
-#' only available for the \code{bcov.test} function at present. Default: \code{weight = FALSE}
+#' @param x a numeric vector, matirx, data.frame, or a list containing numeric vector, matrix, data.frame.
+#' @param y a numeric vector, matirx, or data.frame.
+#' @param distance if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.
+#' @param weight a character value used to choose the form of the weight of Ball Covariance. 
+#' This must be one of "constant", "probability", or "chisquare". Any unambiguous substring can be given. Default: \code{weight = "constant"}.
 ## @param type If \code{type = 'bcor'}, ball correlation will be used instead of ball covariance.(default \code{type = 'bcov'})
 ## @param method if \code{method = 'permute'}, a permutation procedure will be carried out;
 ## if \code{method = 'approx'}, the p-values based on approximate Ball Covariance distribution are given.(Test arguments)
-#' @param num.threads Number of threads. Default \code{num.threads = 1}.
 #' 
-#' @return bcov.test returns a list with class "htest" containing the following components:
+#' @return If \code{num.permutations > 0}, \code{bcov.test} returns a \code{htest} class object containing the following components:
 #' \item{\code{statistic}}{ball covariance or ball correlation statistic.}            
 #' \item{\code{p.value}}{the p-value for the test.}  
 #' \item{\code{replicates}}{permutation replications of the test statistic.}
 #' \item{\code{size}}{sample size.} 
-#' \item{\code{complete.info}}{a \code{list} containing multiple statistics value and their corresponding $p$ value.}
+#' \item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the ball covariance statistics 
+#' with different weights, the second is the \eqn{p}-values of weighted ball covariance tests.}
 #' \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 #' \item{\code{method}}{a character string indicating what type of test was performed.}
 #' \item{\code{data.name}}{description of data.}
+#' If \code{num.permutations = 0}, \code{bcov.test} returns a statistic value.
 #' 
 #' @details 
 #' \code{bcov.test} are non-parametric tests of multivariate independence in Banach space. 
@@ -46,9 +43,14 @@
 #' 
 #' For the general problem of testing independence when the distributions of \eqn{X} and 
 #' \eqn{Y} are unknown, the test based on \code{bcov} can be implemented as a permutation test.
-#' See (Jin et al 2018) for theoretical properties of the test, including statistical consistency.
+#' See Pan et al 2018 for theoretical properties of the test, including statistical consistency.
 #' 
-#' @references Jin, Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. URL http://arxiv.org/abs/1811.03750.
+#' @note Actually, \code{bcov.test} simultaneously computing multiple weighted version of Ball Covariance statistics.
+#' Users can get other weighted ball covariance statistics and their corresponding
+#' \eqn{p}-values in the \code{complete.info} of output.
+#' 
+#' @references Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu & Jin Zhu (2019) Ball Covariance: A Generic Measure of Dependence in Banach Space, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1543600
+#' @references Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. http://arxiv.org/abs/1811.03750
 #' 
 #' @rdname bcov.test
 #' 
@@ -86,7 +88,7 @@
 #' Dy <- nhdist(ArcticLake[["x"]], method = "compositional")
 #' Dx <- dist(ArcticLake[["depth"]])
 #' # hypothesis test with weighted BCov:
-#' bcov.test(x = Dx, y = Dy, distance = TRUE, weight = TRUE)
+#' bcov.test(x = Dx, y = Dy, distance = TRUE, weight = "prob")
 #' 
 #' ################# Mutual Independence Test #################
 #' x <- rnorm(30)
@@ -105,11 +107,12 @@ bcov.test <- function(x, ...) UseMethod("bcov.test")
 #' @export
 #' @method bcov.test default
 bcov.test.default <- function(x, y = NULL, num.permutations = 99, 
-                              distance = FALSE, weight = FALSE, 
-                              seed = 4, num.threads = 1, ...)
+                              distance = FALSE, weight = c("constant", "probability", "chisquare"), 
+                              seed = 1, num.threads = 0, ...)
 {
   method = 'permute'
   data_name <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
+  weight <- match.arg(weight)
   if (length(data_name) > 1) {
     data_name <- ""
   }
@@ -118,7 +121,7 @@ bcov.test.default <- function(x, y = NULL, num.permutations = 99,
   if(class(x) == "list") {
     data_name <- gsub(x = data_name, pattern = " and NULL", replacement = "")
   }
-  weight <- examine_weight_arguments(weight)
+  weight <- match.arg(weight)
   result <- bcov_test_internal_wrap(x = x, y = y, num.permutations = num.permutations, distance = distance, weight = weight, 
                                     seed = seed, method = method, type = type, 
                                     num.threads = num.threads)
@@ -126,18 +129,18 @@ bcov.test.default <- function(x, y = NULL, num.permutations = 99,
   if(num.permutations == 0) {
     return(result)
   } else {
-    if (weight == "none") {
+    if (weight == "constant") {
       stat <- result[["statistic"]][1]
       pvalue <- result[["p.value"]][1]
-      weight_name <- "Constant"
-    } else if (weight == "prob") {
+      weight_name <- "constant"
+    } else if (weight == "probability") {
       stat <- result[["statistic"]][2]
       pvalue <- result[["p.value"]][2]
-      weight_name <- "Probability"
-    } else {
+      weight_name <- "probability"
+    } else if (weight == "chisquare") {
       stat <- result[["statistic"]][3]
       pvalue <- result[["p.value"]][3]
-      weight_name <- "Chisquare"
+      weight_name <- "chisquare"
     } 
     
     data_name <- paste0(data_name,"\nnumber of observations = ", result[["info"]][["N"]])
@@ -185,6 +188,8 @@ bcov.test.default <- function(x, y = NULL, num.permutations = 99,
 #' ################  Formula interface  ################
 #' ## independence test:
 #' bcov.test(~ CONT + INTG, data = USJudgeRatings)
+#' ## independence test with chisquare weight:
+#' bcov.test(~ CONT + INTG, data = USJudgeRatings, weight = "chi")
 #' ## mutual independence test:
 #' bcov.test(~ CONT + INTG + DMNR, data = USJudgeRatings)
 bcov.test.formula <- function(formula, data, subset, na.action, ...) {
@@ -271,11 +276,11 @@ bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, we
       pvalue <- calculatePvalue(result[["statistic"]] * result[["info"]][["N"]], 
                                 BITestNullDistribution)
     } else {
-      if (weight == "none") {
+      if (weight == WEIGHT_TYPE[1]) {
         return(result[[1]][1])
-      } else if (weight == "prob") {
+      } else if (weight == WEIGHT_TYPE[2]) {
         return(result[[1]][2])
-      } else {
+      } else if (weight == WEIGHT_TYPE[3]) {
         return(result[[1]][3])
       }
     }
@@ -292,7 +297,7 @@ bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, we
 #' @inherit return
 #' @noRd
 kbcov_test_internal <- function(x, num.permutations = 99, distance = FALSE, weight = FALSE, 
-                                seed = 4, method = 'permute', num.threads)
+                                seed = 1, method = 'permute', num.threads)
 {
   ############################################################
   #################### R Version (1.1.0) #####################
@@ -459,7 +464,7 @@ kbcov_stat <- function(x, num, var_num, weight, type) {
   stat_value_prob <- stat_value_prob / (num)^2
   stat_value_hhg <- stat_value_hhg / (hhg_ball_num)^2
   # 
-  c("bcov" = stat_value, "bcov.prob" = stat_value_prob, "bcov.chisq" = stat_value_hhg)
+  c("bcov.constant" = stat_value, "bcov.probability" = stat_value_prob, "bcov.chisquare" = stat_value_hhg)
 }
 
 
@@ -491,13 +496,13 @@ bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, se
 
 
 #' @title Ball Correlation and Covariance Statistics
-#' @description Computes ball covariance and ball correlation statistics, 
-#' which are multivariate measures of dependence in Banach space.
+#' @description Computes Ball Covariance and Ball Correlation statistics, 
+#' which are generic dependence measures in Banach space.
 #' @inheritParams bcov.test
 #' @rdname bcov
 #' 
 #' @details 
-#' \code{bcov} and \code{bcor} compute ball covariance and ball correlation statistics.
+#' \code{bcov} and \code{bcor} compute Ball Covariance and ball correlation statistics.
 #' 
 #' The sample sizes (number of rows or length of the vector) of the two variables must agree, 
 #' and samples must not contain missing values. 
@@ -505,7 +510,7 @@ bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, se
 #' symmetric numeric matrix recording distance between samples; 
 #' otherwise, these arguments are treated as data.
 #' 
-#' Ball covariance is a generic non-parametric dependence measure in Banach space, introduced by Pan et al(2017). 
+#' Ball Covariance is a generic non-parametric dependence measure in Banach space, introduced by Pan et al (2018). 
 #' It is noteworthy that ball covariance enjoys the following properties: 
 #' 
 #' (i) It is nonnegative, and holds the Cauchy-Schwartz type inequality; 
@@ -528,7 +533,7 @@ bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, se
 #' \eqn{\{(x_1, y_1),...,(x_n,y_n)\}}, where \eqn{x_i} and \eqn{y_i} can be of any dimension 
 #' and the dimensionality of \eqn{x_i} and \eqn{y_i} need not be the same.
 #' Then, we define sample version ball covariance as:
-#' \deqn{\mathbf{BCor}_{\omega, n}^{2}(X, Y)=\frac{1}{n^{2}}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{X,Y}-\Delta_{ij,n}^{X}\Delta_{ij,n}^{Y})^{2}} }
+#' \deqn{\mathbf{BCov}_{\omega, n}^{2}(X, Y)=\frac{1}{n^{2}}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{X,Y}-\Delta_{ij,n}^{X}\Delta_{ij,n}^{Y})^{2}} }
 #' where:
 #' \deqn{ \Delta_{ij,n}^{X,Y}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{X} \delta_{ij,k}^{Y}}, 
 #' \Delta_{ij,n}^{X}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{X}}, 
@@ -563,19 +568,22 @@ bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, se
 #' \code{\link{bcov.test}}, \code{\link{bcorsis}}
 #' @export
 #' 
+#' @references Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu & Jin Zhu (2019) Ball Covariance: A Generic Measure of Dependence in Banach Space, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1543600
+#' @references Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) A Generic Sure Independence Screening Procedure, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709
+#' @references Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. http://arxiv.org/abs/1811.03750
+#' 
 #' @examples
 #' ############# Ball Covariance #############
-#' n <- 50
-#' x <- rnorm(n)
-#' y <- rnorm(n)
+#' num <- 50
+#' x <- rnorm(num)
+#' y <- rnorm(num)
 #' bcov(x, y)
-#' bcov(x, y, weight = TRUE)
 #' bcov(x, y, weight = "prob")
 #' bcov(x, y, weight = "chisq")
-bcov <- function(x, y, distance = FALSE, weight = FALSE) {
-  weight <- examine_weight_arguments(weight)
-  res <- bcov_test_internal_wrap(x = x, y = y, num.permutations = 0, distance = distance, seed = 0,
-                                 weight = weight, method = "permute", num.threads = 1)
+bcov <- function(x, y, distance = FALSE, weight = c("constant", "probability", "chisquare")) {
+  weight <- match.arg(weight)
+  res <- bcov_test_internal_wrap(x = x, y = y, num.permutations = 0, distance = distance, seed = 1,
+                                 weight = weight, method = "permute", num.threads = 0)
   res
 }
 
