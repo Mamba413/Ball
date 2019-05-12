@@ -68,6 +68,100 @@ void Ball_Information_NoTies(double *bcov_stat, const int *n, int **y_within_bal
     free(y_count_vec);
 }
 
+void Ball_Information2(double *bcov_stat, int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm,
+                       int *i_perm_inv) {
+    int i, j, *xrank, *yrank, *xyidx;
+    double pxy, px, py, *xx_cpy, *yy_cpy;
+    double bcov_fixed_ball, bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, hhg_ball_num = 0.0;
+    double n_prob = 1.0 / (*n);
+
+    xrank = (int *) malloc(*n * sizeof(int));
+    yrank = (int *) malloc(*n * sizeof(int));
+    xyidx = (int *) malloc(*n * sizeof(int));
+    xx_cpy = (double *) malloc(*n * sizeof(double));
+    yy_cpy = (double *) malloc(*n * sizeof(double));
+
+    for (i = 0; i < *n; i++) {
+        xyidx[i] = i;
+    }
+
+    int *right_smaller = (int *) malloc(*n * sizeof(int));
+    int *order = (int *) malloc(*n * sizeof(int));
+    for (i = 0; i < (*n); i++) {
+        memcpy(xx_cpy, Dx[i], *n * sizeof(double));
+        for (j = 0; j < *n; j++) {
+            yy_cpy[j] = Dy[i_perm[i]][i_perm[j]];
+        }
+        quicksort2(xx_cpy, yy_cpy, xyidx, 0, *n - 1);
+
+        for (int k = 0; k < (*n); k++) {
+            order[k] = k;
+            right_smaller[k] = 0;
+        }
+        count_smaller_number_after_self_solution2(yy_cpy, order, right_smaller, *n);
+
+        double tmpx = -1, tmpx1 = -1;
+        double tmpy = -1, tmpy1 = -1;
+        int rank = (*n);
+        int tmpyrank = (*n);
+        int tmpxrank = (*n);
+        int smaller;
+        int tmpsmaller = right_smaller[*n - 1];
+        for (int ii = (*n) - 1; ii >= 0; ii--) {
+            if (yy_cpy[order[ii]] != tmpy) {
+                tmpy = yy_cpy[order[ii]];
+                yrank[order[ii]] = rank;
+                tmpyrank = rank;
+            } else {
+                yrank[order[ii]] = tmpyrank;
+            }
+            if (xx_cpy[ii] != tmpx) {
+                tmpx = xx_cpy[ii];
+                xrank[ii] = rank;
+                tmpxrank = rank;
+            } else {
+                xrank[ii] = tmpxrank;
+            }
+            rank--;
+
+            smaller = right_smaller[ii];
+            if (xx_cpy[ii] != tmpx1 || (xx_cpy[ii] == tmpx1 && yy_cpy[ii] != tmpy1)) {
+                tmpx1 = xx_cpy[ii];
+                tmpy1 = yy_cpy[ii];
+                tmpsmaller = smaller;
+            } else {
+                right_smaller[ii] = tmpsmaller;
+            }
+        }
+
+        for (int jj = 0; jj < (*n); jj++) {
+            px = xrank[jj] * n_prob;
+            py = yrank[jj] * n_prob;
+            pxy = (yrank[jj] - right_smaller[jj]) * n_prob;
+            bcov_fixed_ball = pxy - px * py;
+            bcov_fixed_ball *= bcov_fixed_ball;
+            bcov_weight0 += bcov_fixed_ball;
+            bcov_weight_prob += bcov_fixed_ball / (px * py);
+            if (xrank[jj] != (*n) && yrank[jj] != (*n)) {
+                bcov_weight_hhg += bcov_fixed_ball / ((px) * (1.0 - px) * (py) * (1.0 - py));
+                hhg_ball_num += 1;
+            }
+        }
+    }
+    free(order);
+    free(right_smaller);
+    free(xx_cpy);
+    free(yy_cpy);
+
+    bcov_stat[0] = bcov_weight0 / (1.0 * (*n) * (*n));
+    bcov_stat[1] = bcov_weight_prob / (1.0 * (*n) * (*n));
+    bcov_stat[2] = hhg_ball_num > 0 ? (bcov_weight_hhg / hhg_ball_num) : 0.0;
+
+    free(xrank);
+    free(yrank);
+    free(xyidx);
+}
+
 void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm,
                       int *i_perm_inv) {
     int i, j, k, pi, src, lastpos, *yrank, *isource, *icount, *xy_index, *xy_temp, **xyidx;
@@ -189,7 +283,7 @@ void Ball_Information(double *bcov_stat, int *n, double **Dx, double **Dy, int *
 }
 
 void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int *thread) {
-    int i, j, **xidx, **yidx, *i_perm, *i_perm_inv, ties = 0;
+    int i, j, **xidx, **yidx, *i_perm, *i_perm_inv, x_ties = 0, y_ties = 0, xy_ties = 0;
     int **y_within_ball = alloc_int_matrix(*n, *n);
     double **Dx, **Dy, *x_cpy, *y_cpy;
 
@@ -222,19 +316,37 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
         memcpy(y_cpy, Dy[i], *n * sizeof(double));
         quicksort(x_cpy, xidx[i], 0, *n - 1);
         quicksort(y_cpy, yidx[i], 0, *n - 1);
-        if (!ties) {
+        if (!x_ties) {
             for (j = 1; j < *n; ++j) {
-                if (x_cpy[j] == x_cpy[j - 1] || y_cpy[j] == y_cpy[j - 1]) {
-                    ties = 1;
+                if (x_cpy[j] == x_cpy[j - 1]) {
+                    x_ties = 1;
+                }
+            }
+        }
+        if (!y_ties) {
+            for (j = 1; j < *n; ++j) {
+                if (y_cpy[j] == y_cpy[j - 1]) {
+                    y_ties = 1;
                 }
             }
         }
     }
+    xy_ties = x_ties && y_ties;
     free(x_cpy);
     free(y_cpy);
 
-    if (ties) {
-        Ball_Information(bcov, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv);
+    if (xy_ties) {
+        Ball_Information2(bcov, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv);
+    } else if (x_ties) {
+        for (i = 0; i < *n; ++i) {
+            quick_rank_max_with_index(Dx[i], xidx[i], y_within_ball[i], *n);
+        }
+        Ball_Information_NoTies(bcov, n, y_within_ball, yidx, Dx, i_perm);
+    } else if (y_ties) {
+        for (i = 0; i < *n; ++i) {
+            quick_rank_max_with_index(Dy[i], yidx[i], y_within_ball[i], *n);
+        }
+        Ball_Information_NoTies(bcov, n, y_within_ball, xidx, Dy, i_perm);
     } else {
         for (i = 0; i < *n; ++i) {
             for (j = 0; j < *n; ++j) {
@@ -250,7 +362,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
         permuted_bcov_weight_prob = (double *) malloc(*R * sizeof(double));
         permuted_bcov_weight_hhg = (double *) malloc(*R * sizeof(double));
         int not_parallel = *thread == 1 ? 1 : 0;
-        if (ties) {
+        if (xy_ties) {
             if (not_parallel) {
                 double bcov_tmp[3];
                 for (i = 0; i < *R; i++) {
@@ -260,7 +372,7 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
                         break;
                     }
                     resample(i_perm, i_perm_inv, n);
-                    Ball_Information(bcov_tmp, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv);
+                    Ball_Information2(bcov_tmp, n, Dx, Dy, xidx, yidx, i_perm, i_perm_inv);
                     permuted_bcov_weight0[i] = bcov_tmp[0];
                     permuted_bcov_weight_prob[i] = bcov_tmp[1];
                     permuted_bcov_weight_hhg[i] = bcov_tmp[2];
@@ -276,8 +388,8 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
                     double bcov_tmp_thread[3];
 #pragma omp for
                     for (i_thread = 0; i_thread < (*R); i_thread++) {
-                        Ball_Information(bcov_tmp_thread, n, Dx, Dy, xidx, yidx,
-                                         i_perm_matrix[i_thread], i_perm_inv_matrix[i_thread]);
+                        Ball_Information2(bcov_tmp_thread, n, Dx, Dy, xidx, yidx,
+                                          i_perm_matrix[i_thread], i_perm_inv_matrix[i_thread]);
                         permuted_bcov_weight0[i_thread] = bcov_tmp_thread[0];
                         permuted_bcov_weight_prob[i_thread] = bcov_tmp_thread[1];
                         permuted_bcov_weight_hhg[i_thread] = bcov_tmp_thread[2];
@@ -297,7 +409,11 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
                         break;
                     }
                     resample2(i_perm, n);
-                    Ball_Information_NoTies(bcov_tmp, n, y_within_ball, xidx, Dy, i_perm);
+                    if (x_ties) {
+                        Ball_Information_NoTies(bcov_tmp, n, y_within_ball, yidx, Dx, i_perm);
+                    } else {
+                        Ball_Information_NoTies(bcov_tmp, n, y_within_ball, xidx, Dy, i_perm);
+                    }
                     permuted_bcov_weight0[i] = bcov_tmp[0];
                     permuted_bcov_weight_prob[i] = bcov_tmp[1];
                     permuted_bcov_weight_hhg[i] = bcov_tmp[2];
@@ -311,7 +427,13 @@ void BI(double *bcov, double *pvalue, double *x, double *y, int *n, int *R, int 
                     double bcov_tmp_thread[3];
 #pragma omp for
                     for (i_thread = 0; i_thread < (*R); i_thread++) {
-                        Ball_Information_NoTies(bcov_tmp_thread, n, y_within_ball, xidx, Dy, i_perm_matrix[i_thread]);
+                        if (x_ties) {
+                            Ball_Information_NoTies(bcov_tmp_thread, n, y_within_ball, yidx, Dx,
+                                                    i_perm_matrix[i_thread]);
+                        } else {
+                            Ball_Information_NoTies(bcov_tmp_thread, n, y_within_ball, xidx, Dy,
+                                                    i_perm_matrix[i_thread]);
+                        }
                         permuted_bcov_weight0[i_thread] = bcov_tmp_thread[0];
                         permuted_bcov_weight_prob[i_thread] = bcov_tmp_thread[1];
                         permuted_bcov_weight_hhg[i_thread] = bcov_tmp_thread[2];

@@ -112,15 +112,25 @@ TEST(BCOV, multivariate_bcov_value) {
     distance2matrix(X1_DISCRETE_DST, dx, n);
     distance2matrix(X2_DISCRETE_DST, dy, n);
     Ball_Covariance_Crude(ball_stat_value_golden, dx, dy, n);
-
     bcov_test(ball_stat_value, p_value, X1_DISCRETE_DST, X2_DISCRETE_DST, &n, &R, &dst, &nth);
     EXPECT_NEAR(ball_stat_value[0], ball_stat_value_golden[0], ABSOLUTE_ERROR);
 
     distance2matrix(X1_CONTINUOUS_DST, dx, n);
     distance2matrix(X2_CONTINUOUS_DST, dy, n);
     Ball_Covariance_Crude(ball_stat_value_golden, dx, dy, n);
-
     bcov_test(ball_stat_value, p_value, X1_CONTINUOUS_DST, X2_CONTINUOUS_DST, &n, &R, &dst, &nth);
+    EXPECT_NEAR(ball_stat_value[0], ball_stat_value_golden[0], ABSOLUTE_ERROR);
+
+    distance2matrix(X1_CONTINUOUS_DST, dx, n);
+    distance2matrix(X2_DISCRETE_DST, dy, n);
+    Ball_Covariance_Crude(ball_stat_value_golden, dx, dy, n);
+    bcov_test(ball_stat_value, p_value, X1_CONTINUOUS_DST, X2_DISCRETE_DST, &n, &R, &dst, &nth);
+    EXPECT_NEAR(ball_stat_value[0], ball_stat_value_golden[0], ABSOLUTE_ERROR);
+
+    distance2matrix(X1_DISCRETE_DST, dx, n);
+    distance2matrix(X2_CONTINUOUS_DST, dy, n);
+    Ball_Covariance_Crude(ball_stat_value_golden, dx, dy, n);
+    bcov_test(ball_stat_value, p_value, X1_DISCRETE_DST, X2_CONTINUOUS_DST, &n, &R, &dst, &nth);
     EXPECT_NEAR(ball_stat_value[0], ball_stat_value_golden[0], ABSOLUTE_ERROR);
 
     // Zero case:
@@ -230,46 +240,49 @@ TEST(KBCOV, multivariate_kbcov_value) {
 TEST(BCor, bcor_value) {
     double ball_stat_value[6];
     double x[20] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
-    double y[10] = {11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
     int x_number[2] = {1, 1};
-    int f_number = 2, n = 10, dst_y = 0, dst_x = 0, k = 0, p = 1, nth = 2, size = 2;
+    int f_number = 2, n = 10, dst_y = 0, dst_x = 0, k = 0, p = 1, nth = 1, size = 2;
 
     // univariate case:
-    bcor_test(ball_stat_value, y, x, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
-    EXPECT_NEAR(ball_stat_value[0], 1, ABSOLUTE_ERROR);;
-    EXPECT_NEAR(ball_stat_value[1], 1, ABSOLUTE_ERROR);;
-    EXPECT_NEAR(ball_stat_value[2], 1, ABSOLUTE_ERROR);;
-
-    EXPECT_NEAR(ball_stat_value[3], 1, ABSOLUTE_ERROR);;
-    EXPECT_NEAR(ball_stat_value[4], 1, ABSOLUTE_ERROR);;
-    EXPECT_NEAR(ball_stat_value[5], 1, ABSOLUTE_ERROR);;
+    bcor_test(ball_stat_value, X2_DISCRETE, x, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
+    EXPECT_NEAR(ball_stat_value[0], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[1], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[2], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[3], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[4], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[5], 1, ABSOLUTE_ERROR);
 
     // multivariate case:
-    double y_dst[100] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 3, 2,
-                         1, 0, 1, 2, 3, 4, 5, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 5, 4, 3,
-                         2, 1, 0, 1, 2, 3, 7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 8, 7, 6, 5, 4, 3, 2, 1, 0, 1, 9, 8, 7, 6, 5, 4,
-                         3, 2, 1, 0};
     dst_y = 1;
     p = 0;
-    bcor_test(ball_stat_value, y_dst, x, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
-    EXPECT_NEAR(ball_stat_value[0], 1, ABSOLUTE_ERROR);;
-    EXPECT_NEAR(ball_stat_value[1], 1, ABSOLUTE_ERROR);;
-    EXPECT_NEAR(ball_stat_value[2], 1, ABSOLUTE_ERROR);;
-
-    EXPECT_NEAR(ball_stat_value[3], 1, ABSOLUTE_ERROR);;
-    EXPECT_NEAR(ball_stat_value[4], 1, ABSOLUTE_ERROR);;
-    EXPECT_NEAR(ball_stat_value[5], 1, ABSOLUTE_ERROR);;
+    // Discrete case :
+    bcor_test(ball_stat_value, X1_DISCRETE_DST, x, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
+    EXPECT_NEAR(ball_stat_value[0], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[1], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[2], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[3], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[4], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[5], 1, ABSOLUTE_ERROR);
+    // Continuous case :
+    for (int i = 0; i < 10; ++i) {
+        x[i] = X2_CONTINUOUS[i];
+        x[i + 10] = X2_CONTINUOUS[i];
+    }
+    bcor_test(ball_stat_value, X2_CONTINUOUS_DST, x, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
+    EXPECT_NEAR(ball_stat_value[0], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[1], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[2], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[3], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[4], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[5], 1, ABSOLUTE_ERROR);
 
     // distance matrix case:
-    double x_dst[100] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 3, 2,
-                         1, 0, 1, 2, 3, 4, 5, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 5, 4, 3,
-                         2, 1, 0, 1, 2, 3, 7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 8, 7, 6, 5, 4, 3, 2, 1, 0, 1, 9, 8, 7, 6, 5, 4,
-                         3, 2, 1, 0};
     dst_x = 1;
-    bcor_test(ball_stat_value, y_dst, x_dst, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
-    EXPECT_NEAR(ball_stat_value[0], 1, ABSOLUTE_ERROR);;
-    EXPECT_NEAR(ball_stat_value[1], 1, ABSOLUTE_ERROR);;
-    EXPECT_NEAR(ball_stat_value[2], 1, ABSOLUTE_ERROR);;
+    bcor_test(ball_stat_value, X2_DISCRETE_DST, X2_DISCRETE_DST, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x,
+              &nth);
+    EXPECT_NEAR(ball_stat_value[0], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[1], 1, ABSOLUTE_ERROR);
+    EXPECT_NEAR(ball_stat_value[2], 1, ABSOLUTE_ERROR);
 }
 
 TEST(BCor, bcor_zero_value) {
@@ -290,13 +303,9 @@ TEST(BCor, bcor_zero_value) {
     EXPECT_NEAR(ball_stat_value[5], 1, ABSOLUTE_ERROR);
 
     // multivariate case:
-    double y_dst[100] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 2, 1, 0, 1, 2, 3, 4, 5, 6, 7, 3, 2,
-                         1, 0, 1, 2, 3, 4, 5, 6, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 6, 5, 4, 3,
-                         2, 1, 0, 1, 2, 3, 7, 6, 5, 4, 3, 2, 1, 0, 1, 2, 8, 7, 6, 5, 4, 3, 2, 1, 0, 1, 9, 8, 7, 6, 5, 4,
-                         3, 2, 1, 0};
     dst_y = 1;
     p = 0;
-    bcor_test(ball_stat_value, y_dst, x, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
+    bcor_test(ball_stat_value, X2_DISCRETE_DST, x, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
     EXPECT_NEAR(ball_stat_value[0], 0, ABSOLUTE_ERROR);
     EXPECT_NEAR(ball_stat_value[1], 0, ABSOLUTE_ERROR);
     EXPECT_NEAR(ball_stat_value[2], 0, ABSOLUTE_ERROR);
@@ -306,9 +315,9 @@ TEST(BCor, bcor_zero_value) {
     EXPECT_NEAR(ball_stat_value[5], 1, ABSOLUTE_ERROR);
 
     // distance matrix case:
-    double x_dst1[100];
-    memset(x_dst1, 0, sizeof(double) * 100);
-    bcor_test(ball_stat_value, y_dst, x_dst1, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
+    double x_dst1[45];
+    memset(x_dst1, 0, sizeof(double) * 45);
+    bcor_test(ball_stat_value, X2_DISCRETE_DST, x_dst1, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
     EXPECT_NEAR(ball_stat_value[0], 0, ABSOLUTE_ERROR);
     EXPECT_NEAR(ball_stat_value[1], 0, ABSOLUTE_ERROR);
     EXPECT_NEAR(ball_stat_value[2], 0, ABSOLUTE_ERROR);
@@ -354,7 +363,7 @@ TEST(BD, bd_gwas_real) {
     int n = 835, d = 132, snp_num = 10;
     int data_len = (int) index.size();
     double *x = new double[data_len];
-    double** dx = alloc_matrix(n, n);
+    double **dx = alloc_matrix(n, n);
     for (int j = 0; j < data_len; ++j) {
         x[j] = index[j];
     }

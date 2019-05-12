@@ -52,7 +52,7 @@ TEST(utilities, quick_rank_min) {
     }
 }
 
-TEST(utilities, count_of_number_before_self) {
+TEST(utilities, count_of_larger_number_before_self) {
     const int num = 7;
     int yrank[num] = {5, 3, 6, 2, 4, 1, 7};
     int isource[num] = {0, 1, 2, 3, 4, 5, 6};

@@ -195,6 +195,10 @@ void count_smaller_number_after_self_solution(double *vector, int *number, const
     merge_sort(vector, index, number, 0, num - 1);
 }
 
+void count_smaller_number_after_self_solution2(double *vector, int *index, int *number, const int num) {
+    merge_sort(vector, index, number, 0, num - 1);
+}
+
 void Merge(int *permutation, int *source, int *inversion_count, int dim, int n) {
     int *left = (int *) malloc(n * sizeof(int));
     int *right = (int *) malloc(n * sizeof(int));

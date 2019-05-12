@@ -19,6 +19,7 @@
 #define MAX(a,b) (((a)>(b))?(a):(b));
 void swap(double *x, double *y);
 void count_smaller_number_after_self_solution(double *vector, int *number, int num);
+void count_smaller_number_after_self_solution2(double *vector, int *index, int *number, int num);
 void find_group_relative_location(int *group_relative_location, int *group, int *cumsum_size, int num, int K);
 void compute_cumsum_size(int *cumsum_size, int *size, int *k);
 void quick_sort_recursive(double *arr, int start, int end);
