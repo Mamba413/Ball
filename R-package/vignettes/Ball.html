@@ -19,47 +19,277 @@
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
 </style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 </head>
 
@@ -69,7 +299,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 <h1 class="title toc-ignore">Ball: Statistical Inference and Sure Independence Screening via Ball Statistics</h1>
-<h4 class="author"><em>Jin Zhu, <a href="mailto:zhuj37@mail2.sysu.edu.cn">zhuj37@mail2.sysu.edu.cn</a></em></h4>
+<h4 class="author"><em>Jin Zhu, <a href="mailto:zhuj37@mail2.sysu.edu.cn" class="email">zhuj37@mail2.sysu.edu.cn</a></em></h4>
 <h4 class="date"><em>December 18, 2017</em></h4>
 
 
@@ -124,26 +354,26 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="cran-version" class="section level4">
 <h4>CRAN version</h4>
 <p>To install the Ball R package from CRAN, just run:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;Ball&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;Ball&quot;</span>)</a></code></pre></div>
 </div>
 <div id="github-version" class="section level4">
 <h4>Github version</h4>
 <p>To install the development version from GitHub, run:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(devtools)
-<span class="kw">install_github</span>(<span class="st">&quot;Mamba413/Ball&quot;</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">library</span>(devtools)</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="kw">install_github</span>(<span class="st">&quot;Mamba413/Ball&quot;</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p><em>Windows</em> user will need to install <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a> first.</p>
 </div>
 </div>
 <div id="quick-start-univariate-two-sample-test" class="section level3">
 <h3>Quick Start: Univariate Two-sample Test</h3>
 <p>In this example, we generate two normal random variables with different location parameter: <span class="math display">\[X \sim N(0,1), Y \sim N(1, 1)\]</span> <!-- In the mean time, we use the non-parametric kernel density estimation to plot the kernel density of two distribution: --></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">50</span>)
-y &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">50</span>, <span class="dt">mean =</span> <span class="dv">1</span>)
-<span class="co"># plot(density(x), xlim = c(-5, 5))</span>
-<span class="co"># lines(density(y), col = 'red')</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">x &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">50</span>)</a>
+<a class="sourceLine" id="cb3-2" title="2">y &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">50</span>, <span class="dt">mean =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="co"># plot(density(x), xlim = c(-5, 5))</span></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="co"># lines(density(y), col = &#39;red&#39;)</span></a></code></pre></div>
 <!-- ![](QuickStartUBD.png) -->
 <p>We use <strong>bd.test</strong> to perform the two-sample test to determine whether two samples come from the same distribution.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bd.test</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">bd.test</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)</a></code></pre></div>
 <pre><code># 
 #   2-sample Ball Divergence Test
 # 
@@ -157,18 +387,18 @@ y &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">5
 <div id="quick-start-multivariate-two-sample-test" class="section level3">
 <h3>Quick Start: Multivariate Two-sample Test</h3>
 <p>In this example, we will demonstrate how to perform a test of whether two multivariate distributions are identical. We generate two random samples of size 50, which are sampled from two different multivariate normal distributions: <span class="math display">\[X \sim N(\mu_{X},I_{2 \times 2}), Y \sim N(\mu_{Y}, I_{2 \times 2})\]</span> <span class="math display">\[\mu_{X} = (0,0), \mu_{Y} = (1,1)\]</span> <!-- Then we will show the difference between these two samples in the way of kernel density estimation: --></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>), <span class="dt">nrow =</span> <span class="dv">50</span>, <span class="dt">ncol =</span> <span class="dv">2</span>)
-y &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dt">mean =</span> <span class="dv">3</span>), <span class="dt">nrow =</span> <span class="dv">50</span>, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>), <span class="dt">nrow =</span> <span class="dv">50</span>, <span class="dt">ncol =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb6-2" title="2">y &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dt">mean =</span> <span class="dv">3</span>), <span class="dt">nrow =</span> <span class="dv">50</span>, <span class="dt">ncol =</span> <span class="dv">2</span>)</a></code></pre></div>
 <!-- ![](./QuickStartBD.png) -->
 <p>We use <strong>bd.test</strong> to test whether two multivariate random samples are identically distributed.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bd.test</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">bd.test</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)</a></code></pre></div>
 <pre><code># 
 #   2-sample Ball Divergence Test
 # 
 # data:  x and y 
 # number of observations = 100, group sizes: 50 50
 # replicates = 99
-# bd = 0.56837, p-value = 0.01
+# bd = 0.56664, p-value = 0.01
 # alternative hypothesis: distributions of samples are distinct</code></pre>
 <p>The result of <strong>bd.test</strong> is that <em>p</em>-value &lt; 0.05, so we conclude that two samples are not identically distributed.</p>
 </div>
@@ -176,42 +406,42 @@ y &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">
 <h3>Quick Start: Univariate Test of Independence</h3>
 <p>In this example, we will use the “W-shape” data from <a href="https://en.wikipedia.org/wiki/Correlation_and_dependence">WIKI</a> to demonstrate how to perform univariate test of independence with <strong>bcov.test</strong> .</p>
 <p>We generate a dataset containing 50 samples.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># generate random perturbation:</span>
-error &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">50</span>, <span class="dt">min =</span> <span class="op">-</span><span class="fl">0.3</span>, <span class="dt">max =</span> <span class="fl">0.3</span>)
-x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">50</span>, <span class="dv">0</span>, <span class="dv">4</span><span class="op">*</span>pi)
-y &lt;-<span class="st"> </span><span class="kw">cos</span>(x) <span class="op">+</span><span class="st"> </span>error
-<span class="co"># plot(x, y)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># generate random perturbation:</span></a>
+<a class="sourceLine" id="cb9-2" title="2">error &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">50</span>, <span class="dt">min =</span> <span class="fl">-0.3</span>, <span class="dt">max =</span> <span class="fl">0.3</span>)</a>
+<a class="sourceLine" id="cb9-3" title="3">x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">50</span>, <span class="dv">0</span>, <span class="dv">4</span><span class="op">*</span>pi)</a>
+<a class="sourceLine" id="cb9-4" title="4">y &lt;-<span class="st"> </span><span class="kw">cos</span>(x) <span class="op">+</span><span class="st"> </span>error</a>
+<a class="sourceLine" id="cb9-5" title="5"><span class="co"># plot(x, y)</span></a></code></pre></div>
 <!-- From the plot we can see that $X$ has complex non-linear relation with Y. -->
 <p>Obviously, <span class="math inline">\(X\)</span> is related to <span class="math inline">\(Y\)</span>, but the relationship is non-linear. We use <strong>bcov.test</strong> to perform the test of independence between <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bcov.test</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)</code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">bcov.test</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)</a></code></pre></div>
 <pre><code># 
 #   Ball Covariance test of independence
 # 
 # data:  x and y
 # number of observations = 50
-# replicates = 99, weight: Constant
-# bcov = 0.0022224, p-value = 0.01
+# replicates = 99, weight: constant
+# bcov.constant = 0.0025918, p-value = 0.01
 # alternative hypothesis: random variables are dependent</code></pre>
 <p>The result of <strong>bcov.test</strong> is that <em>p</em>-value &lt; 0.05, so we conclude that <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are not independent, which means there is some kind of correlation between X and Y.</p>
 </div>
 <div id="quick-start-multivariate-test-of-independence" class="section level3">
 <h3>Quick Start: Multivariate Test of Independence</h3>
 <p>For multivariate independence test, we will demonstrate the usage of <strong>bcov.test</strong> with the following example: <span class="math inline">\(X=(x_{1}, x_{2})\)</span> come from the bivariate normal distribution. The relation between <span class="math inline">\(Y\)</span> and <span class="math inline">\(X\)</span> is:<br />
-<span class="math display">\[Y=sin(x_{1}^{2} + x_{2})+ \epsilon, \quad \epsilon \sim Unif(-0.3, 0.3)\]</span></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">runif</span>(<span class="dv">50</span> <span class="op">*</span><span class="st"> </span><span class="dv">2</span>, <span class="op">-</span>pi, pi), <span class="dt">nrow =</span> <span class="dv">50</span>, <span class="dt">ncol =</span> <span class="dv">2</span>)
-error &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">50</span>, <span class="dt">min =</span> <span class="op">-</span><span class="fl">0.3</span>, <span class="dt">max =</span> <span class="fl">0.3</span>)
-y &lt;-<span class="st"> </span>(<span class="kw">sin</span>((x[,<span class="dv">1</span>])<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>x[,<span class="dv">2</span>])) <span class="op">+</span><span class="st"> </span>error</code></pre></div>
+<span class="math display">\[Y=2\sin(x_{1} + x_{2})+ \epsilon, \quad \epsilon \sim U(-0.1, 0.1)\]</span></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">runif</span>(<span class="dv">50</span> <span class="op">*</span><span class="st"> </span><span class="dv">2</span>, <span class="op">-</span>pi, pi), <span class="dt">nrow =</span> <span class="dv">50</span>, <span class="dt">ncol =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb12-2" title="2">error &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">50</span>, <span class="dt">min =</span> <span class="fl">-0.1</span>, <span class="dt">max =</span> <span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb12-3" title="3">y &lt;-<span class="st"> </span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(x[,<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>x[,<span class="dv">2</span>]) <span class="op">+</span><span class="st"> </span>error</a></code></pre></div>
 <!-- The following image shows the distribution of the data: -->
 <!-- ![](QuickStartBCov.png) -->
 <p>We use <strong>bcov.test</strong> to perform multivariate independence test:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bcov.test</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)</code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">bcov.test</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">weight =</span> <span class="st">&quot;prob&quot;</span>)</a></code></pre></div>
 <pre><code># 
 #   Ball Covariance test of independence
 # 
 # data:  x and y
 # number of observations = 50
-# replicates = 99, weight: Constant
-# bcov = 0.0014671, p-value = 0.0202
+# replicates = 99, weight: probability
+# bcov.probability = 0.035854, p-value = 0.02
 # alternative hypothesis: random variables are dependent</code></pre>
 <p>The result of <strong>bcov.test</strong> is that <em>p</em>-value &lt; 0.05, so we conclude that multivariate random variable <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are associated.</p>
 <!-- *** -->
@@ -274,49 +504,46 @@ y &lt;-<span class="st"> </span>(<span class="kw">sin</span>((x[,<span class="dv
 <p>During the scientific research, we always have to deal with Non-Hilbert space data. However, the traditional statistical inference methods usually depend on some assumptions, which are not able to perform statistical inference on this kind of data directly. Whereas ball divergence doesn’t depend on the assumptions needed in traditional statistical inference method, and it’s able to perform two-sample test for data from Non-Hilbert space. We will demonstrate how to use <strong>Ball</strong> package to perform statistical inference for data from Non-Hilbert space with three examples:</p>
 <div id="example-1-simulated-von-mises-fisher-distribution-data" class="section level4">
 <h4>Example 1: Simulated Von Mises-Fisher distribution data</h4>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load data:</span>
-<span class="kw">data</span>(<span class="st">&quot;bdvmf&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="co"># load data:</span></a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="kw">data</span>(<span class="st">&quot;bdvmf&quot;</span>)</a></code></pre></div>
 <p>The distribution of the data is shown in the following image:</p>
-<div class="figure">
-<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASsAAADpCAYAAAB88xG/AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAB9WSURBVHhe7Z2/cuO4ssbh+yTnVtkbTM0T2NE5mb3JRJtOZod2stmEk23iCe1s0o0mWTs7G9lP4Jpg7fw+hi8+CB/VhECJlEiKoL5fFUR0A2gAJLvFv9LRu8cJIcTE+Z+4FEKISaNgJYQoAgUrIUQRKFgJIYpAwUoIUQQKVkKIIlCwEkIUgYKVEKIIFKyEEEWgYCWEKAIFKyFEEShYCSGKQMFKCFEEClZCiCJQsBJCFIGClRCiCBSshBBFoGAlhCgCBSshRBEoWAkhikDBSghRBApWQogi0F9xHQhHR0cxJ6aGXLAdClYHAAOVNvW00Hbphk4DZwycAUnOMC20XbZDwWqm0BnkENNC22V7FKxmiL61p4m2y24oWM0IOIMcYnpou/SDgtVMoDPIIaaFtkt/KFjNAH1rTxNtl35RsCoYOIMcYnpouwyDglWh0BnkENNC22U4FKwKRN/a00TbZVgUrAoCziCHmB7aLuOgYFUIdAY5xLTQdhkPBasC0Lf2NNF2GRcFqwkDZyjaIfzYq5SSK8vpJkjx26VQ9KsLE6VvZ+jduWxAgd2cbPujnNYDTbqm+ntk8ttlxihYTZAhduBebSKAWFubZAI9YBnliJVqrRvqZ/sYkMlvl5mj08AJgR138jsvAoYdH2UsLZvkBJTCKlMNtDXtq9wGm31RxHY5ABSsJgKd4WAcIgk+XWaNurWAZVPPHNx2mTAKVhNgMt/auzp92ja1gzkiQd9ivmydWAmgdU5fjSHtewt0NDUtFKz2CJxhnw7B/pH8xzKYIEHOkZZRZjvCvLVt29m8BxLTRqJt01uepI+27Hu7iDwKVnuCzrDPQMX+MYIVt8a4mpydZUxWJsyjDNh6BHIsxycTaiAtSpbLFGOpGdtfC/a9XUQzClZ7YN/f2rn+IUOfA3om/7FQor21kZsPdNambRtJx5IfQaL3bSBnesxjx7CGdCxiWihYjQgdftIOAcc2zh3G65cYcwhoCyU+86Rzo2z1aA+Zdoy90NciWyPV5epUwLbpb9OYi9guQsFqLOgMk3QIjInOjHyUoQmjNWNeCVi2LbB6QNnq2YZ1APWpbltMf5UV6KiPTHq7iBoKViMwtW/tEHCs0/o8pDBC6JG6jBd1rT1AO5bUpi+HJqm1HAtI20CmLi0jsd/wacZQ5ViO/ptsiMmhYDUgcIapOgQDVkhRDs7P1BXbLmcDsu8rR20sPtXWF9vQJmTquDRYDaykMoBupR8xeRSsBoLOMFmHMOMLI8w4fuXspizMC5mmeUGP+mxj69mypH01FqvP1Kuw+phHj2ltyGEkSZ0g2XGKyaNgNQCT/9ZOgwDz1nFjHcwDWsxpY6AiLLdL2KN9ylgyb2FZyjq9paGOrRXyTf2LSaIXmXsEzgwms0qNEyJXjQv63Bit07aZw7r6uT421ScsszZYDtnmQdqW7aLelNaOvKC3cmVvRCb/xTYhFKx6YnI7HR2WWDktI036HOvskzZ1NmHbIE+8jl8OoGY11m8sN6BGru1YKFi1R8GqByYfqDxhjMhQn9bJtGmkqW5ODx3ZZL+prtUDX1at89hnNb8IW1AHeUPvSzaNs0cUrNqja1Y7gB2t2J2Njs401Bxgl2kdHAMTZGL1PlWByYwb24AtuLTbBTljURTI7IPV49Xylniazr69xVrdQXs4Q9Hfihg708jY7eA/qFzmMSbmczSMmy1CCdpvM7d1/Yq9MetghUB18XLrXv0Oy8Bi05efJ+7o6jHWbg8D1WTB2BKHC6Pta8wZ+10Cgw30SCuhIbXdgZXt0jCujT3sMAYxDDO+ZvXoro6+ug+vT+76OKpS3r65s5Of7sv7nTuPqnWEowBPMavMOBxyvY/bOnRL2yuBPtqoja+FXWsnt11SXagfcu2ojWdAVtaHaETXrFrCnaqoHQtjZRqCvuyn7SmvsYvtgG2SBiVCmXWCvMZeCmrStpgGMw5W5+7T5bO7+aP5NO/xjxv3fPrBnUS5iWpnF8OC4MDUEmyXddtmU3mK7VkBa1rM+sjq/O7dvX74Gna4XPr64dW9P127prNE1lOg2hG/DpmwLrFOLdU6ZtpA2+2S7SsuU6gPFpNxpDbEftBzVg20cYaSGHs+dPDQI/s1Tm/dPzuqhrGGecR8RVrX9IMyG2yqdWDrpKBOLGetodbd3PazIdE1qwzagVbBOmHaJCNh/YU16JehDhLWaVyv+Ax1jK4ilSO0G7BL2Camn6CNZewrjGWhWKZIZcXYq/oTe+ewgxXuBh5dOV7Vso52UMA5mTJwnViHb5JzQLtiGXVtf5CZEmrbBW1Yx8pYmjzqE9SmzPFWsE0EJaY01F2Win2i08BI5QwzpXF+ibOuOG/SjnKrJRr4vBdCAIA+4GXqw3INtFdrk5LokavaEC+nYwzEOqFNyC1gS6sL/fRMbSxiLQcfrLCziOlSCyrI2yWxss+HAOCz0IT2sc2KHnhdrZ6BUqy5gO16QsGqPTqy8kx5h7HBdJcxZucI2zmbRp+2o9y0ZB1QtYtywOqYb8DaDLDNuiWq+RRaGR3ywV7MW6p+jJ3YqgpUlU2QtN+FlTmKRnSBfaJgJ0YC2JmRKI9J2i9lOlgqW6APbVHGcsjUbQParlt6u7AMKfRv8hXIWxlQjm04OlsraSFGZsbBCq/bLJxlfbqK9acDxgUQABgMKDPfCwgYqT3KRs9+mdrINlUgz9QVb7eC7VNbyGMMIVvvI4xlkVmmaBNlyDEBLmmFS7E/Zn8aGF5mdg/u/a757T862BSwzm/H1KRvy9p2vqzC1oF+i776ohpzHAdkUukXQq1ObsSomZ1/xjap1TZ1tln/TVRzFBuZ/Wng+d2ru3252OnnYGYPnSV1GsgZJ+4KHJIpC/RMDaROXdniGO3YkU8TYT9MQbUIcCGZuovSBawTiO3EuOgCuyd1hH1ix5LmQdtxsj5Am41zRP1ceZM+Ie2PbBxHat/IrJsuY+HiaAl5037FfiToY76q73Vh4ZO1Gxbhcwnb5vrchabxilV0gX1i0Clt3sptoAMwsf1QNPWX09tyn1l1esgsN7BtSlqzZj8S2sZ8jk1lLIfVdXXFsChYTRA6HJ0Ocs5Rc+SculVb1EmcPMgb2jb1x7FbmvTrqNVHnmnNuNgP00pN2jCEfhIdgGZVK/aBgtVEgcMxDQqdFAl9pfKE8CNa4se3bt1U628hBB2ADSYLaqRl0DFRF5awh/UjRkXB6pBhQGJK5R1BsOCREY9yQBVksIy6ijgGW5f18QltKIlt2Ye1nwX1sAjZRRCrascyEuossoHQDm18CvK6fsRgKFjNDDqvJetc0EXnq4Dc0RGb+qM+LafMVPXJlLEHMFKrtW1hkynXFkCP8iiERWUTZVGmjomgfbARZTE+ClYzJA0IlZMORFN/1BPKK+WQmVqAdqltUtOnS5DrA7qoR81gP0hRjgnQkrEoRkLBaqbQoZHGYF1/1NtARahPydkBTfoVYBN1maijPgNGEUrMeCBDooYt8xbEkMw4WOF1mzNXexb08So4BtNBPygKhzVOGYDc4MhjYgNYtb2gD5olQW4ab6IPNheZIIPKJvpifzEBlDFPUlmMx+EcWSFQ/fgUdlqm7+6zAhYdFck4cl/YwEMgQ7+OtDzISMl4s7ZjPgX6EPiQINMm7IQaizphzH4Z6kApJsGBBKs39+3rvbv8VH8/8PjX35y7+SNKB4px2KEIzh+DSggmpq9UTkFZrRx5piAubDPV6nq5ShHaC/WiPrRDGfKUox3ILLO2lxbFWOialRgFGyQag8uWWNve6EKJJWSfggb9hQJkY/8xnyPV08buoxXbMvNg9exuTvAb68fu199O3f2P+n8Ivv31p3u+/BQlMRa14NInCDC0iSUCEgMM+vOLIMc6tn8bmsLYmI/LANuFTzE2B/AiMy60X7j7kD91t/Hv5MNPx7zcutena3diduC5Yp20L+zRxxDrr9OYMRbWjXkbqAJWb3SYBSQua2090BOr62POneZ44OhXFzyHsMP0PcfU3hDrsJNNX9dXruVDe8g5vdGlwSgEoiB5Yn1LzeaODLHe5oquWY0Jdnqmgsk5GOTUqQehzTrE2NJyL0NTG2PUAc4HMnKhLtK6fsSoHHawiv8bOArY6eEQTHKC7qxbhxnZaxbEdjbAIgixNgMtS61+2WJBkI0dMR46DfSEHXXI1RCdZYUm/QD0OccmW32vx5q9pnWV6iETr4cNC+ylOkB9rtz2ypK+5lmbo1jLwZ8GcsfM7cAiT86hJ+N0GAPG57McI8bFRJkgB7kav2lDgq2YlloxNrMPVrjrhx0xl/D0em4HFpuhgzMNvf5CsIh95bBjQcJ4OKamNmEOyKB+XIaAFNtxRtWS9cVemHWwqh5PiDtumr78PHFHV/VnrwbB9wVHqAEZerGRKvj4PJZV8InrMA1OFupswGJ9EOxBFxNAeUiUfdKW2j8zvmaF56u+ug/xuaosuMB+8tM9u/vsjt47xmF8hzEzDtZB+yC117d9AJugZjfqQgDx+qZx5PSE+lRXtYE+yha0osba3oV0nKIZPbowJtgpmQom52B09sHZYf1hjBw358BEGUvMYpS5iE7MOFidu0+Xz+7mj+bTvMc/btzz6YcozYvgdDH1TXB32N3RdtcxpvXTJWDAsUCGnuTaAdZjTbbB57L1Ui/GZdZHVud37+71w9ewE+bS1w+v7v3pOtaeD5hbcLqYIPcG1h2WcFikLW23HSPLbH1iZdaxdmw7wnK2tfUrUBazgDXyIxRjoeesPOkOXTJNc+lljnDsaKNmz+fhyG3ttx0jZSxTqF9XnmLrszxtm+orK6afnO1tsWMR69E1K5EFTsSUg07P8qEdDvaZLOjf6plvGjdgea5OqkcupKhjP2J8FKzECnBMOv06x2d5CXAOTXOxNM2plLnOFQWrmZELLm0clKBu6pSVTehTW9R3oGmMTcEgrU/Z1l/XnmUst7ZA2srWZxsuxf5QsJohcCw4HFOvjgZbcHamLW13HWNaH9ilbW/ltCztBxKspHoLytiX2B8KVjMFDsbUO7DJtANdx2jrpe0QTJjW2UuDDgPVij6Rxf5RsBI1mhx3XQDYBdhm2gTrcIxpG+g5znU207lYu2K6zD5YbXqRWaxigwHSUE5M20yQ28B6bJeyyS7L29K1vhiG/oNV7Y9Ekz8ZHZnJvMhcIHY9DUEuAECGvg25cXG/a7Kbs21rhrYxD5rsif2wU7CyRy3hKAUvBn/9YILDF/fz5MjtJx48uh/3p+72+7Vreo/5/Pdbd3r/I0pi6jQFqBzcL225bU89PmsByqfFvjtssBbd2TpYpUct4Sjl5E/3Wy04nLvfb0/d/ddvTidcok9sIEoDCvQ22FSBqal+XKZ6MS22DFY4anHu8ssyMIWjlJi3HP/y0bnnn+41yuNx2C8yTx0bRAiDzDpsOfLWji2Djok01cdnyJm6YnrsdBr48o85Xjq+dk/v392vUSRv/7w45wPCSZTH5FBfZC4FBg4mG2zWwXpsB9q0tfVB6BMZtMVYkIUsJsnWLzK/fTtzJzcf3cP7nT+GaWLxB6Mvt6/uqfEX8PZP2Gm3Ww3FUOIcu46ZgYhtrGxtVXrkQ25JqIPyDv3uQtc5HjJbH1kdXz+519sXd9F0xy/cFbxwPppNOlCJecAABGyQApRtnRDAsDTpkMDBBtYHU+4m2KLOlT/kmAY7nQYiYL2/N/xs8Pld2CHumg+79s+Y/xsoRiMEouiEFupBtYwJIGClbebI4qzIudtX3oR4cP6oY/KP8ewUrNryeDWd6FwjXGe7i4KYAwxICydcHi/V9FFnqYUo025+vLm//nx2p7ffzUHGubt7f3W3Lxfu6Gy6d+63vht41SYKhyOXI3dxH+UJkn7T9g7sMonewXaz244Byeopg6APuYWehKOqRXbmvLqfz859/CU9HTp210/v7uHjjTuZaMDa/sjq3kfhNU+ohwdG/bHms7vccBF+WDa9bsMd1u64veH78IaXCfKBYNfzUMA2thsTsX1CnxsDalMf6oTcQj9vTtyH0+ROvgF30EPAmuIpod9QW/L6fnsatu27u3yIOs/r7btfF6v6PfBw6cdweutHmieU+zHutBqaaLI5RF8tGGSODaR9te077DMxUW6iqczaCHVisrJdpmls9tHn6+2p7/fyvdk7H94vq3Wyrt647L6mHi7jpE7fLy+xEhb526YIMRpY4RvGEQLrYvy902RziL5asM0cF9tykdrSVHeTDduXTU00lVX6uLSytcl8kI1+bPbV7yJguffm4wkejEwnWPX0hxFv7tvZibvx58L+SMW9T+IW4J7/5BSnGDmbTfo+sac9sS+eMrUlrd+2fVO9de1RBtL+wLo2aVnVJnysnv5BX9csYP19kJuHyLPz3cDFsxgIVP4Y5dKfAIZrWVO4+7fn122wAybOEuShd0z2wZSOoQU5B4KcOn+f5PpLQf9M6XjSsaUyydkVzUzqTr7feFtizmtrx5JL/en+zwWrw91c4viQHwzYZhqapj68Pp37ISb/sbIuUnlfaTy8f7a5llxdey7+mhUDUvM1oXDxemKTbWLcnWVAmubRcX5N62Pdevrvf/8bcwsW236RctjyXD2rs2W2n7Qd5TTFwqVsUwPpfIagGtuolOu7W66tcqNzjv3sNAOQzKPmnB1J10lNpk2f4NRdHTtnuymxPO0nrUOsPpQxxbJNbDOfrlRj2xvTv5OfY5Q19nCpYDUacS7VnHaYW9hpY6ow+eDUHe03rWvbl00sI2m5LQOb9OsYOkiBTWMYlcneyc+jv4/38ILtbLAXl/ucF+xGe3///bf797//HfJWv4ncuubF8JzeB5DQT1rHytYm9TlS+5bafAbCjnM6TPFOfh4FK880d6L2pA462Fx8P3/74AFqjo3+W/aZW9ccv9UjePznP/+pdLk52na2fF2bFPQDhgxUuflNgcULzYhSuJPv3P19iFh7feNkLX4FHjwlrwaOPV0OQpPtjn2mY0xlno5ZfdO8oGciad7KlrJO+8x1pp2vAS/v2E/5Tn5KX2uyaPrbocaF407HP8R8KsdObW/ZF8bIRBnYQEUdsHli6+TqpzpLWYEKl5f8XGJgsfnuHNzdwHnR5041Jk3O2Od84NQrjg37TD2BPjgfjj+dh9XbRJ1dklTOzqdn7Lj6AQHGBJf4mth2gaTcO/l9rtGJkWxgUN39WKRRHgodCM4hR1/zGdqpSVM/uXlw3ixrygObB2PMJ+2zF1aCU2bfHogp3ckf5cf3JgF+ZvnHJ+xJVfruPhf5r8y4YMs5pBeRWbYrY9wdA136yV2oZt7OG/l0PRzu3b7dOL+bzsX2Gd8NtC8yL27P/vyS/MzykC8yDwCd1R8hhCXBXTOSlpVMOi/KnCNkqwf7mL/tf5D9KO6nX6q7dC1e0p8jCFbzxB4qL+6krJyqx8PrElbDGGP0jh5z/YAxM1nSftJ6qQxyOtCkB33PJ0eu397Z42nglJj5aeCzuznBW+PH7tffTt39j/r7429//emeLz9FabqMcXrR92kSx8zEo8K0n6Z6yINUBtRZbDmY1Wnf8S/uo3tx1Y97vv3jpY9u5ZeJ545f2TMH30L89l1+G4Xbs/FXRKe6GhZjbh4by3cZP44+hjiiSkEf6XjTelafJuq5TMvIEPNJyfU7NP09ulAueoLdM9o3ZAc2jSkt32YOQx19pGNBP7yuQz3qAMjMA8rrlk3M6mhqhcUfBi/+e2XCT5kPiIKVZ387YJ5N42kq7zKPIR0b4yD+KCcEKowrHR/rUWfbEbZjvol5ByoBDufRhRwT+5NTOMPQDgGnHjpQcfwMVKDNvGw582i3jqHnA/rdLrgzzV883fQrnF3qHgB+Axw8U1gNXcbQVHeTjb6u5aAfJgtl9tNUj1Bv66WJ2DwZ+toUyPW7C12uPek6VZ1+t0SB5BxjbLbpO22zyUafgYpLJoJ8rp+0HsjpCPXp0lJioPIhp/7IwdrXZrrUPQxmfxq41z853QDHsU3faGPn0mSjz9Mk9sMlE2T0AWw/HBtgPSbb1sIy6imT8k77DOkjB+kjCZYudQ+EWV9gR6C6eLl1r0/XLvdISih3D+EfecZcDXA2XMvxRwdRUwa8/pSO2+o5r6ZlDrYHts66NkNgxzHI/tDlSXQ9tb4KgtU8afGU756eYB+jP+/kMdcfGHea0A/zxJZbUnkTtv4Q80npOr7OdHkSXU+tr3DYdwNHZrDTC8OQp0kcN5Y44kHC0UhuPtD1Mc+iT/tEr8w4WO35T04T6AxDOgSdeijH5hywRJBioBrS0YecDxhju1R0eW1Gr9is4jfSrNn7n5x6hrYPxjpNYj9ch0wpqS5XZx3op2ubrgxtP4ceXdie8bfWBBlqp4XdoR0CTj1GoFoXPNbpu64DO58u7brQdUz9gmtPXC/1RxEQkOq/fd5c9xA5wNdtVu+qDHEaM+SpERn6Wg6x/aTz6nOe6XxK3S5iGHSBfQDmGqgA5oX5MQ0VqIag3+3S4VWY8FrXcp0dnX3zrUVXFKx6hDvjkIEKTj2GY6/rB/Nj2pUx5jPEdnm8OnE3Hx+CzYfLe3dxtSZcvf50z/gDUa63huf+xAb8yjt4+lgNY6zKMa5Ngan0M93tkjzztOFVmNVrUWIbdGTVA0MfTYExjqbAnPoZbLt0ehXmzf3zcup++1XHUrui37PybLtTox3wRwhhKfpl29dtJvXaTCx7OX12z/h3dnfqbg/5lZldQLCaM+H5FD/NXNrlOatt2nTl0E77Uqa6Xbq/NmPLUFePIWzDrE8DqxeZ/T7s57qSvvw8cUfrLow2oNO+7pR82vf27SzYDqnr/nJ87Z7e0yOpw/71hG2ZcbB6dD/u/SH39+Y7L+e/37rT+x9R2gx32CEDFZx6DMeeUz9Db5fj66dgOyT88aRehdkLusDeEjrD0IEKTj1GAJlLP2Nsl1Xq752Gd0wvP8XrVwn4J3D7HBYC2+lvTtfbt8Bv5Nmy6X2qUH56i708avKMsZoO/fpUjilsl2bavzZTfz9V16u2ZfZ3A3G94eQm3IZZwe9Q7un6uPEUAnow5CrC0QcY4ygHlNTPqNtl5Q5fDjy1fuIWu9Nh/h3WXvEb/ODJrYYxVo2OptYz3nbhUdL6ox57pL7pqF30j65ZZWj6Ru8TXs8Zmjn1M8R2Wdzpu3Avl5fuNOryxBs2vy+OpXhzpvu9ZLEthx2swgumy/8NhDMMHajg1GM49pz6GXS7/PIlPNry9PuGH2Hs9NS6GILDDlbhGZi7kKUzDBWoYJ9OPbRjz62fIbfL8fm5XiouhIM/DYQzEOSHSgCvgeTK+kxz6kcIy8EHK35j89t7qDRGH0hz6od99MVOT6KLvXOYwSpeq+LumneIDj+uViPfLtvHTj/K1qGfrecCxpqPZ9DtknkSvQt6an3/+A03U+xDe+tS/nb1trepO7V7uNz69neXfjqNKaFT2x3m4xvv9/GBDb9JBQbrW7RixsFqgd2p+CTx6eXlhh0TjtP+x9WWdGuHsW33o2xd+tl2LmCc+Qy/XVqQsbU6H/Tv96cWQVX0z+xPA8/vXt3ty4U7++aP34e+Td2p3Q4/ytaln11uuY81nyk8PhDvDNuTw/M7P6bazyWcuzueRurp9dE5gGtWx+76abHTTes29av7+ezcn595/eXMIZ6Wy/bz0eMDog0Hfzdwb4SjBOd++85v6i/u50nXi98TYm7zEZNjtsGq+Tb1o7s6uXX/F6Vd0I+yGfQjc2JgZhusxrhNvbcfZevSzy5jGms+bZnaeMS4eEc7MHBH51/v/7vhbo69i2jzm2jdDrf57RhwN+r09r3tvbQu4+tSN6V12x3nE2hxd2+XuYiyOcBg5Rn0NnVzu7SP3X6UrX0/288FjDUfjx4fEGvQX3EJIYpAdwOFEEWgYCWEKAIFKyFEEShYCSGKQMFKCFEEClZCiCJQsBJCFIGClRCiCBSshBBFoGAlhCgCBSshRBEoWAkhikDBSghRBApWQogiULASQhSBgpUQoggUrIQQRaBgJYQoAgUrIUQRKFgJIYpAwUoIUQQKVkKIIlCwEkIUgYKVEKIIFKyEEEWgYCWEKAIFq1J4++bOjo7c0dk39xZVlrdvZ+7Il189RoUltL1yuSIhSkHBqhSOr93Tw6Vzzzfu87ckXPlg9Pnm2Z3evrq786ireHRXJzfuOUpClIqCVUmc37lFvPrDHCW9uW+ffTC6fHBP18dRF3m88kdbF+4+ikKUjIJVYZzfPbhLH34u4vne27fP7ub50j2kh1QIVBf34WjrHRFOiMI5evfEvCgFXIPyp3Yfb2/dy41fPrxnTv8MIXA59/B+59ZVE2LK6MiqRI6v3ffbU3fvA5XLXqcSYn4oWBXJm/vrz8Ul8/r1KyHmi4JVgTxenbgbd+te3+vXr4SYMwpWpfF45S7unbv8cu2O3bm7w8Xz+wt3lj7OIMTMULAqCVxYD5HqYXmdqnqc4bNTvBJzRsGqGOLzVP7EL31MYfE4w7O7+Zx/ul2IOaBgVQQ+UJ2duJtnHFTlHj+Ip4PPN+5E16/ETNFzVkKIItCRlRCiCBSshBBFoGAlhCgCBSshRBEoWAkhikDBSghRBApWQogiULASQhSBgpUQoggUrIQQRaBgJYQoAgUrIUQRKFgJIYpAwUoIUQQKVkKIIlCwEkIUgYKVEKIIFKyEEAXg3P8DvRYxatidgoIAAAAASUVORK5CYII=" />
-
-</div>
+<p><img src="data:image/png;base64,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" /></p>
 <p>In the image, the black dots (<span class="math inline">\(X\)</span>) and red dots (<span class="math inline">\(Y\)</span>) respectively represent two group of simulative data with different distributions. The distributions are denoted by: <span class="math display">\[X \sim M(\mu_{X}, \kappa), Y \sim M(\mu_{Y}, \kappa)\]</span> Where <span class="math inline">\(M\)</span> denotes <a href="https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution">von Mises-Fisher distribution</a>, <span class="math inline">\(\mu_{X} = (1, 0, 0), \mu_{Y} = (1, 1, 1)\)</span> are the orientation parameter of von Mises-Fisher distribution, <span class="math inline">\(\kappa = 3\)</span> denotes aggregation parameter.</p>
 <p>We can tell from the image that, red dots and black dots are not identically distributed. However, it is a tough task for the traditional statistical method to distinguish distribution because it is not a conventional data in Hilbert space. Fortunately, since the computation for sample version of ball divergence (ball covaiance) only involves calculate distance matrix and counting the number of samples located in a ball, we can obtain empirical ball divergence so long as we can define the distance metric between observations. Therefore, ball divergence still work for this example.</p>
 <p>We apply ball divergence to this data by carrying out the following step. First, we calculate the geodesic distance matrix of the data, which have been implemented in function . Later, we pass the distance matrix to arguments  and let , , and . The detailed solution is demonstrated below:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate geodesic distance between samples:</span>
-Dmat &lt;-<span class="st"> </span><span class="kw">nhdist</span>(bdvmf[[<span class="st">&quot;x&quot;</span>]], <span class="dt">method =</span> <span class="st">&quot;geodesic&quot;</span>)
-<span class="co"># sample sizes in each group: 150, 150</span>
-<span class="co"># Two-Sample Test based on BD :</span>
-<span class="kw">bd.test</span>(<span class="dt">x =</span> Dmat, <span class="dt">size =</span> <span class="kw">c</span>(<span class="dv">150</span>, <span class="dv">150</span>), <span class="dt">R =</span> <span class="dv">99</span>, <span class="dt">dst =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="co"># calculate geodesic distance between samples:</span></a>
+<a class="sourceLine" id="cb16-2" title="2">Dmat &lt;-<span class="st"> </span><span class="kw">nhdist</span>(bdvmf[[<span class="st">&quot;x&quot;</span>]], <span class="dt">method =</span> <span class="st">&quot;geodesic&quot;</span>)</a>
+<a class="sourceLine" id="cb16-3" title="3"><span class="co"># sample sizes in each group: 150, 150</span></a>
+<a class="sourceLine" id="cb16-4" title="4"><span class="co"># Two-Sample Test based on BD :</span></a>
+<a class="sourceLine" id="cb16-5" title="5"><span class="kw">bd.test</span>(<span class="dt">x =</span> Dmat, <span class="dt">size =</span> <span class="kw">c</span>(<span class="dv">150</span>, <span class="dv">150</span>), <span class="dt">R =</span> <span class="dv">99</span>, <span class="dt">dst =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code># 
 #   2-sample Ball Divergence Test
 # 
 # data:  Dmat 
 # number of observations = 300, group sizes: 150 150
 # replicates = 99
-# bd = 0.14483, p-value = 0.01
+# bd = 0.15284, p-value = 0.01
 # alternative hypothesis: distributions of samples are distinct</code></pre>
 <p>In this example, we firstly calculate the geodesic distance matrix using <strong>nhdist</strong> function in <em>Ball</em> package. Then, pass <em>Dmat</em> to arguments <em>x</em> and set <em>dst = TRUE</em> to indicate that the <em>x</em> parameter is a distance matrix. Meanwhile, we set the size of each sample <em>size = c(150, 150)</em> and set the replication times <em>R = 99</em>. The result is that <em>p</em>-value &lt; 0.05, which means that red dots and black dots are not identically distributed.</p>
 </div>
 <div id="example-2-macaques-data" class="section level4">
 <h4>Example 2: Macaques Data</h4>
 <p>Based on Macaques data provided by dryden, scientists want to figure out whether there are differences in the shape of skull between Macaques of different genders. In a similar way, we can calculate the distance matrix of the data and transform this problem into two-sample test that can be solved by BD. Riemann shape distance is always used to describe the distance between shape data. By setting <em>method = “riemann”</em> in the <strong>nhdist</strong> function, we are able to calculate the riemann shape distance between shape data. The detailed procedure is demonstrated below:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load data:</span>
-<span class="kw">data</span>(<span class="st">&quot;macaques&quot;</span>)
-<span class="co"># number of femala and male Macaca fascicularis:</span>
-<span class="co"># table(macaques[[&quot;group&quot;]])  # f: 9; m: 9</span>
-<span class="co"># calculate Riemannian shape distance matrix:</span>
-Dmat &lt;-<span class="st"> </span><span class="kw">nhdist</span>(macaques[[<span class="st">&quot;x&quot;</span>]], <span class="dt">method =</span> <span class="st">&quot;riemann&quot;</span>)
-<span class="co"># hypothesis test with BD:</span>
-<span class="kw">bd.test</span>(<span class="dt">x =</span> Dmat, <span class="dt">R =</span> <span class="dv">99</span>, <span class="dt">size =</span> <span class="kw">c</span>(<span class="dv">9</span>, <span class="dv">9</span>), <span class="dt">dst =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1"><span class="co"># load data:</span></a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="kw">data</span>(<span class="st">&quot;macaques&quot;</span>)</a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="co"># number of femala and male Macaca fascicularis:</span></a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="co"># table(macaques[[&quot;group&quot;]])  # f: 9; m: 9</span></a>
+<a class="sourceLine" id="cb18-5" title="5"><span class="co"># calculate Riemannian shape distance matrix:</span></a>
+<a class="sourceLine" id="cb18-6" title="6">Dmat &lt;-<span class="st"> </span><span class="kw">nhdist</span>(macaques[[<span class="st">&quot;x&quot;</span>]], <span class="dt">method =</span> <span class="st">&quot;riemann&quot;</span>)</a>
+<a class="sourceLine" id="cb18-7" title="7"><span class="co"># hypothesis test with BD:</span></a>
+<a class="sourceLine" id="cb18-8" title="8"><span class="kw">bd.test</span>(<span class="dt">x =</span> Dmat, <span class="dt">R =</span> <span class="dv">99</span>, <span class="dt">size =</span> <span class="kw">c</span>(<span class="dv">9</span>, <span class="dv">9</span>), <span class="dt">dst =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code># 
 #   2-sample Ball Divergence Test
 # 
 # data:  Dmat 
 # number of observations = 18, group sizes: 9 9
 # replicates = 99
-# bd = 0.1922, p-value = 0.0202
+# bd = 0.21353, p-value = 0.06
 # alternative hypothesis: distributions of samples are distinct</code></pre>
 <p><em>p</em>-value is under 0.05, which means the skull shape differs between male macaques and female macaques.</p>
 </div>
@@ -324,20 +551,20 @@ Dmat &lt;-<span class="st"> </span><span class="kw">nhdist</span>(macaques[[<spa
 <h4>Example 3: ArcticLake Data</h4>
 <p><strong>bcov.test</strong> is related to calculating the distance between samples of two multivariate random variables. Therefore, we can examine independence assumption by employing <strong>bcov.test</strong> to non-Hilbert space real data so long as we obtain the distance matrix of the samples.</p>
 <p>We take a data in the Book, <strong>The Statistical Analysis of Compositional Data</strong>, as an example to demonstrate how to use <strong>bcov.test</strong> to determine the dependence of non-Hilbert space data. Scientists collect Sand, silt and clay compositions of 39 sediment samples of different water depth in an Arctic lake. They want to figure out whether the compositions of sediment samples of different water depth are identical or not. To achieve the goal, we use <strong>bcov.test</strong> to perform the test of independence. The detailed procedure is demonstrated below:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;ArcticLake&quot;</span>)
-<span class="co"># Distance matrix between y:</span>
-Dy &lt;-<span class="st"> </span><span class="kw">nhdist</span>(ArcticLake[[<span class="st">&quot;x&quot;</span>]], <span class="dt">method =</span> <span class="st">&quot;compositional&quot;</span>)
-<span class="co"># Distance matrix between x:</span>
-Dx &lt;-<span class="st"> </span><span class="kw">dist</span>(ArcticLake[[<span class="st">&quot;depth&quot;</span>]])
-<span class="co"># hypothesis test with BCov:</span>
-<span class="kw">bcov.test</span>(<span class="dt">x =</span> Dx, <span class="dt">y =</span> Dy, <span class="dt">R =</span> <span class="dv">99</span>, <span class="dt">dst =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="kw">data</span>(<span class="st">&quot;ArcticLake&quot;</span>)</a>
+<a class="sourceLine" id="cb20-2" title="2"><span class="co"># Distance matrix between y:</span></a>
+<a class="sourceLine" id="cb20-3" title="3">Dy &lt;-<span class="st"> </span><span class="kw">nhdist</span>(ArcticLake[[<span class="st">&quot;x&quot;</span>]], <span class="dt">method =</span> <span class="st">&quot;compositional&quot;</span>)</a>
+<a class="sourceLine" id="cb20-4" title="4"><span class="co"># Distance matrix between x:</span></a>
+<a class="sourceLine" id="cb20-5" title="5">Dx &lt;-<span class="st"> </span><span class="kw">dist</span>(ArcticLake[[<span class="st">&quot;depth&quot;</span>]])</a>
+<a class="sourceLine" id="cb20-6" title="6"><span class="co"># hypothesis test with BCov:</span></a>
+<a class="sourceLine" id="cb20-7" title="7"><span class="kw">bcov.test</span>(<span class="dt">x =</span> Dx, <span class="dt">y =</span> Dy, <span class="dt">R =</span> <span class="dv">99</span>, <span class="dt">dst =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code># 
 #   Ball Covariance test of independence
 # 
 # data:  Dx and Dy
 # number of observations = 39
-# replicates = 99, weight: Constant
-# bcov = 0.0083848, p-value = 0.01
+# replicates = 99, weight: constant
+# bcov.constant = 0.0085398, p-value = 0.01
 # alternative hypothesis: random variables are dependent</code></pre>
 <p>We first calculate the distance matrix <em>Dy</em> and <em>Dx</em>. Then, we pass <em>Dx</em> to arguments <em>x</em>, <em>Dy</em> to arguments <em>y</em>, and set the replication times <em>R = 99</em>, <em>dst = TRUE</em> to indicate that the <em>x</em> and <em>y</em> parameters are distance matrixs.<br />
 The result shows that <em>p</em>-value &lt; 0.05, so we conclude that the compositions of sediment is associated with the water depth.</p>
@@ -347,15 +574,15 @@ The result shows that <em>p</em>-value &lt; 0.05, so we conclude that the compos
 <div id="k-sample-test" class="section level2">
 <h2>K-Sample Test</h2>
 <p><strong>bd.test</strong> is also applicable for testing of multiple samples. We generate three random normal samples of size 50, which are sampled from the same normal distribution. As an example, we use <strong>bd.test</strong> to test whether these samples are identically distributed.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="dv">150</span>
-<span class="kw">bd.test</span>(<span class="kw">rnorm</span>(n), <span class="dt">size =</span> <span class="kw">rep</span>(<span class="dv">50</span>, <span class="dv">3</span>))</code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">n &lt;-<span class="st"> </span><span class="dv">150</span></a>
+<a class="sourceLine" id="cb22-2" title="2"><span class="kw">bd.test</span>(<span class="kw">rnorm</span>(n), <span class="dt">size =</span> <span class="kw">rep</span>(<span class="dv">50</span>, <span class="dv">3</span>))</a></code></pre></div>
 <pre><code># 
-#   3-sample Ball Divergence Test (Summation Version)
+#   3-sample Ball Divergence Test
 # 
 # data:  rnorm(n) 
 # number of observations = 150, group sizes: 50 50 50
-# replicates = 99
-# kbd.sum = 0.062061, p-value = 0.1515
+# replicates = 99, kbd.type: sum
+# kbd.sum = 0.0223, p-value = 0.91
 # alternative hypothesis: distributions of samples are distinct</code></pre>
 <p>As the result shown, <em>p</em>-value&gt;0.05, which means we can’t reject the null hypothesis.<br />
 We can also utilize <strong>bd.test</strong> to deal with <span class="math inline">\(K\)</span>-Sample problem in non-Hilbert space following the aforementioned procedure. At the same time, remember to assign size vector to parameter <em>size</em> arguments and set <em>dst = TRUE</em>.</p>
@@ -370,57 +597,57 @@ We can also utilize <strong>bd.test</strong> to deal with <span class="math inli
 <!-- $$\mathbf{BCov}^2_{\omega,n}(\mathbf{X},\mathbf{Y}):=\frac{1}{n^2}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{X,Y}-\Delta_{ij,n}^{X}\Delta_{ij,n}^{Y})^2\hat{\omega}_1(X_i,X_j)\hat{\omega}_2(Y_i,Y_j)}$$ -->
 <p>Pan et. al(2017) show that the weighted ball covariance based independence test is statistical consistent against all dependence alternatives without any moment conditions and some times superior to standard version of ball covariance.</p>
 <p>We have been implemented weighted ball covariance test in <strong>Ball</strong> package and we can employ it to data analysis by just setting <em>weight = TRUE</em> in <strong>bcov.test</strong>. Take <em>ArcticLake</em> data as example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;ArcticLake&quot;</span>)
-Dy &lt;-<span class="st"> </span><span class="kw">nhdist</span>(ArcticLake[[<span class="st">&quot;x&quot;</span>]], <span class="dt">method =</span> <span class="st">&quot;compositional&quot;</span>)
-Dx &lt;-<span class="st"> </span><span class="kw">dist</span>(ArcticLake[[<span class="st">&quot;depth&quot;</span>]])
-<span class="co"># hypothesis test with weighted BCov:</span>
-<span class="kw">bcov.test</span>(<span class="dt">x =</span> Dx, <span class="dt">y =</span> Dy, <span class="dt">R =</span> <span class="dv">99</span>, 
-          <span class="dt">dst =</span> <span class="ot">TRUE</span>, <span class="dt">weight =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="kw">data</span>(<span class="st">&quot;ArcticLake&quot;</span>)</a>
+<a class="sourceLine" id="cb24-2" title="2">Dy &lt;-<span class="st"> </span><span class="kw">nhdist</span>(ArcticLake[[<span class="st">&quot;x&quot;</span>]], <span class="dt">method =</span> <span class="st">&quot;compositional&quot;</span>)</a>
+<a class="sourceLine" id="cb24-3" title="3">Dx &lt;-<span class="st"> </span><span class="kw">dist</span>(ArcticLake[[<span class="st">&quot;depth&quot;</span>]])</a>
+<a class="sourceLine" id="cb24-4" title="4"><span class="co"># hypothesis test with weighted BCov:</span></a>
+<a class="sourceLine" id="cb24-5" title="5"><span class="kw">bcov.test</span>(<span class="dt">x =</span> Dx, <span class="dt">y =</span> Dy, <span class="dt">num.permutations =</span> <span class="dv">99</span>, </a>
+<a class="sourceLine" id="cb24-6" title="6">          <span class="dt">distance =</span> <span class="ot">TRUE</span>, <span class="dt">weight =</span> <span class="st">&quot;constant&quot;</span>)</a></code></pre></div>
 <pre><code># 
 #   Ball Covariance test of independence
 # 
 # data:  Dx and Dy
 # number of observations = 39
-# replicates = 99, weight: Probability
-# bcov.prob = 0.088597, p-value = 0.01
+# replicates = 99, weight: constant
+# bcov.constant = 0.0083848, p-value = 0.01
 # alternative hypothesis: random variables are dependent</code></pre>
 </div>
 <div id="ball-covariance-mutual-independence-test" class="section level2">
 <h2>Ball Covariance Mutual Independence Test</h2>
 <p>Apart from the relationships between two random variables, another important dependence concept for a set of variables is mutual (or joint) independence, which says that any two disjoint subsets of variables are independent from each other. For instance, we know to investigate whether air temperature, soil temperature, humidity, wind and evaporation are correlated.</p>
 <p>It is natural to extend ball covariance to measure mutual independence between <span class="math inline">\(K\)</span> random variables. <!-- as follows: --> <!-- $$\mathbf{BCor}_{\omega, n}^{2}(R_{1}, ..., R_{K})=\frac{1}{n^{2}}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{R_{1}, ..., R_{K}}-\prod_{k=1}^{K}\Delta_{ij,n}^{R_{k}})^{2}\prod_{k=1}^{K}{\hat{\omega}_{k}(R_{ki},R_{kj})}}$$ --> <!-- where $R_{k}, k=1,...K$ indicate random variables and $R_{ki}, i=1,...,n$ denote $n$ random samples of $R_{k}$.  --> More importantly, Mutual independence test based on ball covariance have been implemented in <strong>Ball</strong> package. We give two simply example in the following to demonstrate its usage.</p>
-<p>The first example, <span class="math inline">\(X, \epsilon_{1}, \epsilon_{2}\)</span> are independent from the standard normal distribution <span class="math inline">\(N(0,1)\)</span>, and <span class="math display">\[Y = max(X, 0) + \epsilon_{1}, \; Z = min(X, 0) + \epsilon_{2}\]</span></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">30</span>)
-y &lt;-<span class="st"> </span>(x <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) <span class="op">*</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">30</span>)
-z &lt;-<span class="st"> </span>(x <span class="op">&lt;=</span><span class="st"> </span><span class="dv">0</span>) <span class="op">*</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">30</span>)
-example1 &lt;-<span class="st"> </span><span class="kw">list</span>(x, y, z)</code></pre></div>
+<p>The first example, <span class="math inline">\(X, \epsilon_{1}, \epsilon_{2}\)</span> are independent from the standard normal distribution <span class="math inline">\(N(0,1)\)</span>, and <span class="math display">\[Y = \max(X, 0) + \epsilon_{1}, \; Z = \min(X, 0) + \epsilon_{2}\]</span></p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">x &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">50</span>)</a>
+<a class="sourceLine" id="cb26-2" title="2">y &lt;-<span class="st"> </span>(x <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) <span class="op">*</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">50</span>)</a>
+<a class="sourceLine" id="cb26-3" title="3">z &lt;-<span class="st"> </span>(x <span class="op">&lt;=</span><span class="st"> </span><span class="dv">0</span>) <span class="op">*</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">50</span>)</a>
+<a class="sourceLine" id="cb26-4" title="4">example1 &lt;-<span class="st"> </span><span class="kw">list</span>(x, y, z)</a></code></pre></div>
 <p>The Second example, <span class="math inline">\(W, X, Y, Z\)</span> are connected by a latent random variable <span class="math inline">\(H \sim N(0,1)\)</span>, and <span class="math display">\[W = H^{2}; X = |H|, Y = min(H, 0)\]</span> <span class="math display">\[Z = (Z_{1}, Z_{2}), Z_{1}=I(H&lt;0.5)H, Z_{2}=I(H&gt;-0.5)H\]</span></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">h &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">30</span>)
-w &lt;-<span class="st"> </span>(h)<span class="op">^</span><span class="dv">2</span>
-x &lt;-<span class="st"> </span><span class="kw">abs</span>(h)
-y &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span>(h <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>)
-z1 &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span>(h <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.5</span>)
-z2 &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span>(h <span class="op">&gt;</span><span class="st"> </span><span class="op">-</span><span class="fl">0.5</span>)
-z &lt;-<span class="st"> </span><span class="kw">cbind</span>(z1, z2)
-example2 &lt;-<span class="st"> </span><span class="kw">list</span>(w, x, y, z)</code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1">h &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">50</span>)</a>
+<a class="sourceLine" id="cb27-2" title="2">w &lt;-<span class="st"> </span>(h)<span class="op">^</span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb27-3" title="3">x &lt;-<span class="st"> </span><span class="kw">abs</span>(h)</a>
+<a class="sourceLine" id="cb27-4" title="4">y &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span>(h <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb27-5" title="5">z1 &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span>(h <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.5</span>)</a>
+<a class="sourceLine" id="cb27-6" title="6">z2 &lt;-<span class="st"> </span>h <span class="op">*</span><span class="st"> </span>(h <span class="op">&gt;</span><span class="st"> </span><span class="fl">-0.5</span>)</a>
+<a class="sourceLine" id="cb27-7" title="7">z &lt;-<span class="st"> </span><span class="kw">cbind</span>(z1, z2)</a>
+<a class="sourceLine" id="cb27-8" title="8">example2 &lt;-<span class="st"> </span><span class="kw">list</span>(w, x, y, z)</a></code></pre></div>
 <p>We bind these data to list <em>example1</em> and <em>example2</em> and pass them to arguments <em>x</em> in <strong>bcov.test</strong> to carry out ball covariance mutual independence test.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bcov.test</span>(<span class="dt">x =</span> example1)</code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="kw">bcov.test</span>(<span class="dt">x =</span> example1, <span class="dt">num.permutations =</span> <span class="dv">199</span>)</a></code></pre></div>
 <pre><code># 
 #   Ball Covariance test of mutual independence
 # 
 # data:  example1
-# number of observations = 30
-# replicates = 99, weight: Constant
-# bcov = 0.0046785, p-value = 0.01
+# number of observations = 50
+# replicates = 199, weight: constant
+# bcov.constant = 0.0014706, p-value = 0.035
 # alternative hypothesis: random variables are dependent</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bcov.test</span>(<span class="dt">x =</span> example2)</code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1"><span class="kw">bcov.test</span>(<span class="dt">x =</span> example2, <span class="dt">num.permutations =</span> <span class="dv">199</span>)</a></code></pre></div>
 <pre><code># 
 #   Ball Covariance test of mutual independence
 # 
 # data:  example2
-# number of observations = 30
-# replicates = 99, weight: Constant
-# bcov = 0.041936, p-value = 0.01
+# number of observations = 50
+# replicates = 199, weight: constant
+# bcov.constant = 0.036533, p-value = 0.005
 # alternative hypothesis: random variables are dependent</code></pre>
 <p>The hypothesis test result for two examples show that <em>p</em>-value &lt; 0.05, coinciding with the simulation setting.</p>
 </div>
@@ -433,15 +660,15 @@ example2 &lt;-<span class="st"> </span><span class="kw">list</span>(w, x, y, z)<
 <h3>BCor-SIS: Quick Start Example</h3>
 <p>In this example, we will utilize <strong>bcorsis</strong> function to carry out BCor-SIS procedure. We generate 150 high dimensional instances with 3000 independent standard gaussian explanatory variables <span class="math inline">\(X\)</span> and univariate response variable <span class="math inline">\(Y\)</span>. The relation between <span class="math inline">\(Y\)</span> and <span class="math inline">\(X\)</span> is:<br />
 <span class="math display">\[Y=3 X_{1} + 5 X_{3}^{2} + \epsilon, \quad \epsilon \sim N(0, 1)\]</span></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1</span>)
-n &lt;-<span class="st"> </span><span class="dv">150</span>
-p &lt;-<span class="st"> </span><span class="dv">3000</span>
-x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n <span class="op">*</span><span class="st"> </span>p), <span class="dt">nrow =</span> n)
-error &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n)
-y &lt;-<span class="st"> </span><span class="dv">3</span><span class="op">*</span>x[, <span class="dv">1</span>] <span class="op">+</span><span class="st"> </span><span class="dv">5</span><span class="op">*</span>(x[, <span class="dv">3</span>])<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>error</code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb32-2" title="2">n &lt;-<span class="st"> </span><span class="dv">150</span></a>
+<a class="sourceLine" id="cb32-3" title="3">p &lt;-<span class="st"> </span><span class="dv">3000</span></a>
+<a class="sourceLine" id="cb32-4" title="4">x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n <span class="op">*</span><span class="st"> </span>p), <span class="dt">nrow =</span> n)</a>
+<a class="sourceLine" id="cb32-5" title="5">error &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n)</a>
+<a class="sourceLine" id="cb32-6" title="6">y &lt;-<span class="st"> </span><span class="dv">3</span><span class="op">*</span>x[, <span class="dv">1</span>] <span class="op">+</span><span class="st"> </span><span class="dv">5</span><span class="op">*</span>(x[, <span class="dv">3</span>])<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>error</a></code></pre></div>
 <p>We perform BCor-SIS procedure and display the top 5 variables index selected by BCor-SIS.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res &lt;-<span class="st"> </span><span class="kw">bcorsis</span>(<span class="dt">y =</span> y, <span class="dt">x =</span> x)
-<span class="kw">head</span>(res[[<span class="dv">1</span>]], <span class="dt">n =</span> <span class="dv">5</span>)</code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1">res &lt;-<span class="st"> </span><span class="kw">bcorsis</span>(<span class="dt">y =</span> y, <span class="dt">x =</span> x)</a>
+<a class="sourceLine" id="cb33-2" title="2"><span class="kw">head</span>(res[[<span class="dv">1</span>]], <span class="dt">n =</span> <span class="dv">5</span>)</a></code></pre></div>
 <pre><code># [1]    3    1 1601   20  429</code></pre>
 <p>The <strong>bcorsis</strong> result shows that the first and the third variable are the two most important variables in 3000 explanatory variables which is consistent to simulation settings.</p>
 </div>
@@ -450,11 +677,11 @@ y &lt;-<span class="st"> </span><span class="dv">3</span><span class="op">*</spa
 <p>Survival analysis is a commonly used method for the analysis of censored data such as biological death and mechanical failure, which is usually subject to censoring. The main goal of survival analysis is to study the dependence of the survival time <span class="math inline">\(T\)</span> on covariate variables <span class="math inline">\(X, X \in R^{p}\)</span>.</p>
 <p>With the remarkable development of modern technology, a huge amount of covariate information such as microarray and SNP data are collected. Consequently, SIS procedure designed for censored survival data is in need. Pan et al(2017) proposed a extend BCor-SIS procedure which is able to selected the significant variables for censored data.</p>
 <p>We implement BCor-SIS procedure for survival data in <strong>Ball</strong> package and use a publicly lung cancer genomic data from the Chemores Cohort Study to demonstrate its usage. The data outcome was the “Disease-Free Survival Time”. Patients were followed until the first relapse occurred or administrative censoring. In this genomic dataset, the expression levels of mRNA, miRNA as well as clinical variables from the 123 samples were included. Moreover, this dataset include 944 biological covariates and 1056 artificial standard gaussian variables which are independence with response. We employ extension of Bcor-SIS on this data to hunt for efficient covariates and demonstrate detailed procedure in the following.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">result &lt;-<span class="st"> </span><span class="kw">bcorsis</span>(<span class="dt">x =</span> genlung[[<span class="st">&quot;covariate&quot;</span>]], 
-                  <span class="dt">y =</span> genlung[[<span class="st">&quot;survival&quot;</span>]], 
-                  <span class="dt">d =</span> <span class="st">&quot;small&quot;</span>, <span class="dt">method =</span> <span class="st">&quot;survival&quot;</span>)
-top_gene &lt;-<span class="st"> </span><span class="kw">colnames</span>(genlung[[<span class="st">&quot;covariate&quot;</span>]])[result[[<span class="st">&quot;ix&quot;</span>]]]
-<span class="kw">head</span>(top_gene, <span class="dt">n =</span> <span class="dv">1</span>)</code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1">result &lt;-<span class="st"> </span><span class="kw">bcorsis</span>(<span class="dt">x =</span> genlung[[<span class="st">&quot;covariate&quot;</span>]], </a>
+<a class="sourceLine" id="cb35-2" title="2">                  <span class="dt">y =</span> genlung[[<span class="st">&quot;survival&quot;</span>]], </a>
+<a class="sourceLine" id="cb35-3" title="3">                  <span class="dt">d =</span> <span class="st">&quot;small&quot;</span>, <span class="dt">method =</span> <span class="st">&quot;survival&quot;</span>)</a>
+<a class="sourceLine" id="cb35-4" title="4">top_gene &lt;-<span class="st"> </span><span class="kw">colnames</span>(genlung[[<span class="st">&quot;covariate&quot;</span>]])[result[[<span class="st">&quot;ix&quot;</span>]]]</a>
+<a class="sourceLine" id="cb35-5" title="5"><span class="kw">head</span>(top_gene, <span class="dt">n =</span> <span class="dv">1</span>)</a></code></pre></div>
 <pre><code># [1] &quot;hsa.miR.564&quot;</code></pre>
 <p>We first pass covariates and censored information to arugments <em>x</em> and <em>y</em>, and set the <em>method = “survival”</em> to indicate that the <em>y</em> should be considered as a survival status containing event time and censored status. BCor-SIS asserts that <em>hsa.miR.564</em>, corresponding to gene <em>MIR564</em>, is strongly relevant to disease-free survival status. The conclusion is highly coincident with the statement in other public literature.</p>
 <!-- ### Reference -->

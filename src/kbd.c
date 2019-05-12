@@ -115,6 +115,7 @@ void full_rank_finder(int ***full_rank, double **distance_matrix, int **index_ma
     int full_rank_matrix_num = ((k_max + 1) * (k_max)) >> 1;
     int *init_full_rank;
     init_full_rank = (int *) malloc(full_rank_matrix_num * sizeof(int));
+    int base_location = ((k_max + 1) << 1) - 1;
     for (int i = 0; i < num; ++i) {
         i_g_index = label[i];
         for (int k = 0; k < full_rank_matrix_num; ++k) {
@@ -123,41 +124,33 @@ void full_rank_finder(int ***full_rank, double **distance_matrix, int **index_ma
         for (int j = 0; j < num; ++j) {
             s_index = index_matrix[i][j];
             g_index = label[s_index];
-            // update pairwise upper rank matrix
-            if ((g_index + 1) <= k_max) {
+            if (g_index == i_g_index) {
                 for (int l_index = (g_index + 1); l_index <= k_max; ++l_index) {
-                    if (i_g_index == g_index) {
-                        row_index = group_relative_location[i] - cumsum_size[g_index];
-                    } else if (i_g_index == l_index) {
-                        row_index = group_relative_location[i] - cumsum_size[l_index] + size[g_index];
-                    } else {
-                        row_index = -1;
-                    }
-                    if (row_index != -1) {
-                        upper_index = (l_index - g_index) + (((((k_max + 1) << 1) - 1 - g_index) * (g_index)) >> 1) - 1;
-                        col_index = group_relative_location[s_index] - cumsum_size[g_index];
-                        full_rank[upper_index][row_index][col_index] = init_full_rank[upper_index];
-                        init_full_rank[upper_index] += 1;
-                    }
+                    row_index = group_relative_location[i] - cumsum_size[g_index];
+                    upper_index = (l_index - g_index) + (((base_location - g_index) * (g_index)) >> 1) - 1;
+                    col_index = group_relative_location[s_index] - cumsum_size[g_index];
+                    full_rank[upper_index][row_index][col_index] = init_full_rank[upper_index];
+                    init_full_rank[upper_index] += 1;
                 }
-            }
-            // update pairwise lower rank matrix
-            if ((g_index - 1) >= 0) {
                 for (int l_index = 0; l_index <= (g_index - 1); ++l_index) {
-                    if (i_g_index == l_index) {
-                        row_index = group_relative_location[i] - cumsum_size[l_index];
-                    } else if (i_g_index == g_index) {
-                        row_index = group_relative_location[i] - cumsum_size[g_index] + size[l_index];
-                    } else {
-                        row_index = -1;
-                    }
-                    if (row_index != -1) {
-                        lower_index = (g_index - l_index) + (((((k_max + 1) << 1) - 1 - l_index) * (l_index)) >> 1) - 1;
-                        col_index = group_relative_location[s_index] - cumsum_size[g_index] + size[l_index];
-                        full_rank[lower_index][row_index][col_index] = init_full_rank[lower_index];
-                        init_full_rank[lower_index] += 1;
-                    }
+                    row_index = group_relative_location[i] - cumsum_size[g_index] + size[l_index];
+                    lower_index = (g_index - l_index) + (((base_location - l_index) * (l_index)) >> 1) - 1;
+                    col_index = group_relative_location[s_index] - cumsum_size[g_index] + size[l_index];
+                    full_rank[lower_index][row_index][col_index] = init_full_rank[lower_index];
+                    init_full_rank[lower_index] += 1;
                 }
+            } else if (g_index < i_g_index) {
+                row_index = group_relative_location[i] - cumsum_size[i_g_index] + size[g_index];
+                upper_index = (i_g_index - g_index) + (((base_location - g_index) * (g_index)) >> 1) - 1;
+                col_index = group_relative_location[s_index] - cumsum_size[g_index];
+                full_rank[upper_index][row_index][col_index] = init_full_rank[upper_index];
+                init_full_rank[upper_index] += 1;
+            } else {
+                row_index = group_relative_location[i] - cumsum_size[i_g_index];
+                lower_index = (g_index - i_g_index) + (((base_location - i_g_index) * (i_g_index)) >> 1) - 1;
+                col_index = group_relative_location[s_index] - cumsum_size[g_index] + size[i_g_index];
+                full_rank[lower_index][row_index][col_index] = init_full_rank[lower_index];
+                init_full_rank[lower_index] += 1;
             }
         }
     }
@@ -560,12 +553,32 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
             index_matrix[i][j] = j;
         }
     }
+    int ties = 0;
     double *distance_matrix_copy = (double *) malloc(*n * sizeof(double));
     for (int i = 0; i < *n; i++) {
         memcpy(distance_matrix_copy, distance_matrix[i], *n * sizeof(double));
         quicksort(distance_matrix_copy, index_matrix[i], 0, *n - 1);
+        if (!ties) {
+            for (int j = 1; j < *n; ++j) {
+                if (distance_matrix_copy[j] == distance_matrix_copy[j - 1]) {
+                    ties = 1;
+                    break;
+                }
+            }
+        }
     }
     free(distance_matrix_copy);
+    void (*sub_rank_finder_point)(int ***, double **, int **, const int *, const int *, const int *,
+                                  const int *, int, int);
+    void (*full_rank_finder_point)(int ***, double **, int **, const int *, const int *, const int *,
+                                   const int *, int, int);
+    if (ties) {
+        sub_rank_finder_point = &sub_rank_finder_tie;
+        full_rank_finder_point = &full_rank_finder_tie;
+    } else {
+        sub_rank_finder_point = &sub_rank_finder;
+        full_rank_finder_point = &full_rank_finder;
+    }
 
     int *bd_stat_number_vector = (int *) malloc(*p * sizeof(int));
     int **pairwise_size = (int **) malloc(*p * sizeof(int *));
@@ -590,12 +603,12 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
         for (i_thread = 0; i_thread < *p; ++i_thread) {
             sub_rank = alloc_int_square_matrix_list(size_list[i_thread], k_vector[i_thread]);
             full_rank = alloc_int_square_matrix_list(pairwise_size[i_thread], bd_stat_number_vector[i_thread]);
-            sub_rank_finder(sub_rank, distance_matrix, index_matrix, snp_matrix[i_thread],
-                            snp_group_relative_location[i_thread], cumsum_size_list[i_thread], size_list[i_thread],
-                            *n, k_vector[i_thread] - 1);
-            full_rank_finder(full_rank, distance_matrix, index_matrix, snp_matrix[i_thread],
-                             snp_group_relative_location[i_thread], cumsum_size_list[i_thread], size_list[i_thread],
-                             *n, k_vector[i_thread] - 1);
+            sub_rank_finder_point(sub_rank, distance_matrix, index_matrix, snp_matrix[i_thread],
+                                  snp_group_relative_location[i_thread], cumsum_size_list[i_thread],
+                                  size_list[i_thread], *n, k_vector[i_thread] - 1);
+            full_rank_finder_point(full_rank, distance_matrix, index_matrix, snp_matrix[i_thread],
+                                   snp_group_relative_location[i_thread], cumsum_size_list[i_thread],
+                                   size_list[i_thread], *n, k_vector[i_thread] - 1);
             asymptotic_ball_divergence(asymptotic_bd_stat_array[i_thread], full_rank, sub_rank, size_list[i_thread],
                                        k_vector[i_thread], bd_stat_number_vector[i_thread]);
             free_int_square_matrix_list(sub_rank, size_list[i_thread], k_vector[i_thread]);
@@ -708,12 +721,12 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
                     for (r_thread = 0; r_thread < batch_size; ++r_thread) {
                         find_group_relative_location(group_relative_location_matrix[r_thread], label_matrix[r_thread],
                                                      permuted_cumsum_size, *n, permuted_k);
-                        sub_rank_finder(sub_rank_thread, distance_matrix, index_matrix, label_matrix[r_thread],
-                                        group_relative_location_matrix[r_thread],
-                                        permuted_cumsum_size, permuted_size, *n, permuted_k - 1);
-                        full_rank_finder(full_rank_thread, distance_matrix, index_matrix, label_matrix[r_thread],
-                                         group_relative_location_matrix[r_thread],
-                                         permuted_cumsum_size, permuted_size, *n, permuted_k - 1);
+                        sub_rank_finder_point(sub_rank_thread, distance_matrix, index_matrix, label_matrix[r_thread],
+                                              group_relative_location_matrix[r_thread], permuted_cumsum_size,
+                                              permuted_size, *n, permuted_k - 1);
+                        full_rank_finder_point(full_rank_thread, distance_matrix, index_matrix, label_matrix[r_thread],
+                                               group_relative_location_matrix[r_thread], permuted_cumsum_size,
+                                               permuted_size, *n, permuted_k - 1);
                         asymptotic_ball_divergence(permuted_asymptotic_bd_stat_batch[r_thread], full_rank_thread,
                                                    sub_rank_thread, permuted_size, permuted_k, permuted_bd_stat_number);
                     }
