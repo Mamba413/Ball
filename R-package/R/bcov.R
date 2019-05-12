@@ -1,14 +1,15 @@
 #' @title Ball Covariance Test
 #' @author Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu, Jin Zhu
 #' @description Ball Covariance test of multivariate independence. 
-#' Ball covariance are generic multivariate measures of dependence in Banach space.
+#' Ball covariance are generic multivariate measures of dependence in Banach spaces.
 #' 
 #' @inheritParams bd.test
 #' @param x a numeric vector, matirx, data.frame, or a list containing numeric vector, matrix, data.frame.
 #' @param y a numeric vector, matirx, or data.frame.
 #' @param distance if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.
-#' @param weight a character value used to choose the form of the weight of Ball Covariance. 
-#' This must be one of "constant", "probability", or "chisquare". Any unambiguous substring can be given. Default: \code{weight = "constant"}.
+#' @param weight a logical or character string used to choose the form of the weight of Ball Covariance. 
+#' If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, or \code{"chisquare"}. 
+#' Any unambiguous substring can be given. Default: \code{weight = FALSE}.
 ## @param type If \code{type = 'bcor'}, ball correlation will be used instead of ball covariance.(default \code{type = 'bcov'})
 ## @param method if \code{method = 'permute'}, a permutation procedure will be carried out;
 ## if \code{method = 'approx'}, the p-values based on approximate Ball Covariance distribution are given.(Test arguments)
@@ -26,7 +27,7 @@
 #' If \code{num.permutations = 0}, \code{bcov.test} returns a statistic value.
 #' 
 #' @details 
-#' \code{bcov.test} are non-parametric tests of multivariate independence in Banach space. 
+#' \code{bcov.test} are non-parametric tests of multivariate independence in Banach spaces. 
 #' The test decision is obtained via permutation, with \code{num.permutations} replicates.
 #' 
 #' If two samples are pass to arguments \code{x} and \code{y}, the sample sizes (i.e. number of rows or length of the vector) 
@@ -38,7 +39,7 @@
 #' otherwise, these arguments are treated as data.
 #' 
 #' The \code{bcov.test} statistic is \code{bcov} or \code{ bcor} which are dependence measure 
-#' in Banach space. The \code{bcor} test statistic is based on the normalized 
+#' in Banach spaces. The \code{bcor} test statistic is based on the normalized 
 #' coefficient of ball covariance. (See the manual page for \code{\link{bcov}} or \code{\link{bcor}}.)
 #' 
 #' For the general problem of testing independence when the distributions of \eqn{X} and 
@@ -69,9 +70,9 @@
 #' 
 #' ################# Quick Start #################
 #' x <- matrix(runif(50 * 2, -pi, pi), nrow = 50, ncol = 2)
-#' error <- runif(50, min = -0.3, max = 0.3)
-#' y <- (sin((x[,1])^2 + x[,2])) + error
-#' bcov.test(x = x, y = y)
+#' error <- runif(50, min = -0.1, max = 0.1)
+#' y <- sin(x[,1] + x[,2]) + error
+#' bcov.test(x = x, y = y, weight = "prob")
 #' 
 #' ################# Ball Covariance Test for Non-Hilbert Data #################
 #' # load data:
@@ -91,11 +92,16 @@
 #' bcov.test(x = Dx, y = Dy, distance = TRUE, weight = "prob")
 #' 
 #' ################# Mutual Independence Test #################
-#' x <- rnorm(30)
-#' y <- (x > 0) * x + rnorm(30)
-#' z <- (x <= 0) * x + rnorm(30)
+#' x <- rnorm(50)
+#' y <- (x > 0) * x + rnorm(50)
+#' z <- (x <= 0) * x + rnorm(50)
 #' data_list <- list(x, y, z)
 #' bcov.test(data_list)
+#' data_list <- lapply(data_list, function(x) {
+#'   as.matrix(dist(x))
+#' })
+#' bcov.test(data_list, distance = TRUE)
+#' bcov.test(data_list, distance = FALSE, weight = "chi")
 #' 
 #' ################# Mutual Independence Test for Meteorology data #################
 #' data("meteorology")
@@ -107,12 +113,11 @@ bcov.test <- function(x, ...) UseMethod("bcov.test")
 #' @export
 #' @method bcov.test default
 bcov.test.default <- function(x, y = NULL, num.permutations = 99, 
-                              distance = FALSE, weight = c("constant", "probability", "chisquare"), 
+                              distance = FALSE, weight = FALSE, 
                               seed = 1, num.threads = 0, ...)
 {
   method = 'permute'
   data_name <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
-  weight <- match.arg(weight)
   if (length(data_name) > 1) {
     data_name <- ""
   }
@@ -121,7 +126,7 @@ bcov.test.default <- function(x, y = NULL, num.permutations = 99,
   if(class(x) == "list") {
     data_name <- gsub(x = data_name, pattern = " and NULL", replacement = "")
   }
-  weight <- match.arg(weight)
+  weight <- examine_weight_arguments(weight)
   result <- bcov_test_internal_wrap(x = x, y = y, num.permutations = num.permutations, distance = distance, weight = weight, 
                                     seed = seed, method = method, type = type, 
                                     num.threads = num.threads)
@@ -286,7 +291,7 @@ bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, we
     }
   } else {
     set.seed(seed = examine_seed_arguments(seed))
-    result <- bcov_test_wrap_c(x = x, y = y, n = num, num.permutations = num.permutations, distance =  distance, num.threads = num.threads)
+    result <- bcov_test_wrap_c(x = x, y = y, n = num, num.permutations = num.permutations, distance = distance, num.threads = num.threads)
     return(result)
   }
 }
@@ -386,9 +391,9 @@ kbcov_test_internal <- function(x, num.permutations = 99, distance = FALSE, weig
       pvalue <- calculatePvalue(result[["statistic"]] * result[["info"]][["N"]], 
                                 BITestNullDistribution)
     } else {
-      if (weight == "none") {
+      if (weight == WEIGHT_TYPE[1]) {
         return(result[[1]][1])
-      } else if (weight == "prob") {
+      } else if (weight == WEIGHT_TYPE[2]) {
         return(result[[1]][2])
       } else {
         return(result[[1]][3])
@@ -497,7 +502,7 @@ bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, se
 
 #' @title Ball Correlation and Covariance Statistics
 #' @description Computes Ball Covariance and Ball Correlation statistics, 
-#' which are generic dependence measures in Banach space.
+#' which are generic dependence measures in Banach spaces.
 #' @inheritParams bcov.test
 #' @rdname bcov
 #' 
@@ -510,7 +515,7 @@ bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, se
 #' symmetric numeric matrix recording distance between samples; 
 #' otherwise, these arguments are treated as data.
 #' 
-#' Ball Covariance is a generic non-parametric dependence measure in Banach space, introduced by Pan et al (2018). 
+#' Ball Covariance is a generic non-parametric dependence measure in Banach spaces, introduced by Pan et al (2018). 
 #' It is noteworthy that ball covariance enjoys the following properties: 
 #' 
 #' (i) It is nonnegative, and holds the Cauchy-Schwartz type inequality; 
@@ -523,7 +528,7 @@ bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, se
 #' 
 #' Ball correlation, based on the normalized ball covariance, generalizes the idea of Pearson correlation in two fundamental ways: 
 #' 
-#' (i) Ball correlation, \eqn{ \mathbf{BCor}_{\omega}^{2}(X, Y) }, is defined for \eqn{X} and \eqn{Y} in arbitrary dimension in Banach space. 
+#' (i) Ball correlation, \eqn{ \mathbf{BCor}_{\omega}^{2}(X, Y) }, is defined for \eqn{X} and \eqn{Y} in arbitrary dimension in Banach spaces. 
 #' 
 #' (ii) Ball correlation satisfies \eqn{0 \le \mathbf{BCor}_{\omega}^{2}(X, Y) \le 1}, and \eqn{ \mathbf{BCor}_{\omega}^{2}(X, Y) } = 0 
 #' only if \eqn{X} and \eqn{Y} are independent.
@@ -580,8 +585,8 @@ bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, se
 #' bcov(x, y)
 #' bcov(x, y, weight = "prob")
 #' bcov(x, y, weight = "chisq")
-bcov <- function(x, y, distance = FALSE, weight = c("constant", "probability", "chisquare")) {
-  weight <- match.arg(weight)
+bcov <- function(x, y, distance = FALSE, weight = FALSE) {
+  weight <- examine_weight_arguments(weight)
   res <- bcov_test_internal_wrap(x = x, y = y, num.permutations = 0, distance = distance, seed = 1,
                                  weight = weight, method = "permute", num.threads = 0)
   res

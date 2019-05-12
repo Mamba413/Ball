@@ -5,11 +5,9 @@
 \alias{bcov}
 \title{Ball Correlation and Covariance Statistics}
 \usage{
-bcor(x, y, distance = FALSE, weight = c("constant", "probability",
-  "chisquare"))
+bcor(x, y, distance = FALSE, weight = FALSE)
 
-bcov(x, y, distance = FALSE, weight = c("constant", "probability",
-  "chisquare"))
+bcov(x, y, distance = FALSE, weight = FALSE)
 }
 \arguments{
 \item{x}{a numeric vector, matirx, data.frame, or a list containing numeric vector, matrix, data.frame.}
@@ -18,8 +16,9 @@ bcov(x, y, distance = FALSE, weight = c("constant", "probability",
 
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.}
 
-\item{weight}{a character value used to choose the form of the weight of Ball Covariance. 
-This must be one of "constant", "probability", or "chisquare". Any unambiguous substring can be given. Default: \code{weight = "constant"}.}
+\item{weight}{a logical or character string used to choose the form of the weight of Ball Covariance. 
+If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, or \code{"chisquare"}. 
+Any unambiguous substring can be given. Default: \code{weight = FALSE}.}
 }
 \value{
 \item{\code{bcor }}{ sample version of ball correlation.}
@@ -28,7 +27,7 @@ This must be one of "constant", "probability", or "chisquare". Any unambiguous s
 }
 \description{
 Computes Ball Covariance and Ball Correlation statistics, 
-which are generic dependence measures in Banach space.
+which are generic dependence measures in Banach spaces.
 }
 \details{
 \code{bcov} and \code{bcor} compute Ball Covariance and ball correlation statistics.
@@ -39,7 +38,7 @@ If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{di
 symmetric numeric matrix recording distance between samples; 
 otherwise, these arguments are treated as data.
 
-Ball Covariance is a generic non-parametric dependence measure in Banach space, introduced by Pan et al (2018). 
+Ball Covariance is a generic non-parametric dependence measure in Banach spaces, introduced by Pan et al (2018). 
 It is noteworthy that ball covariance enjoys the following properties: 
 
 (i) It is nonnegative, and holds the Cauchy-Schwartz type inequality; 
@@ -52,7 +51,7 @@ It is noteworthy that ball covariance enjoys the following properties:
 
 Ball correlation, based on the normalized ball covariance, generalizes the idea of Pearson correlation in two fundamental ways: 
 
-(i) Ball correlation, \eqn{ \mathbf{BCor}_{\omega}^{2}(X, Y) }, is defined for \eqn{X} and \eqn{Y} in arbitrary dimension in Banach space. 
+(i) Ball correlation, \eqn{ \mathbf{BCor}_{\omega}^{2}(X, Y) }, is defined for \eqn{X} and \eqn{Y} in arbitrary dimension in Banach spaces. 
 
 (ii) Ball correlation satisfies \eqn{0 \le \mathbf{BCor}_{\omega}^{2}(X, Y) \le 1}, and \eqn{ \mathbf{BCor}_{\omega}^{2}(X, Y) } = 0 
 only if \eqn{X} and \eqn{Y} are independent.

@@ -16,13 +16,13 @@
 #' @examples
 #' \dontrun{
 #' 
-#' set.seed(12)
-#' num <- 600
+#' set.seed(1)
+#' num <- 200
 #' snp_num <- 10000
 #' p <- 5
 #' x <- matrix(rnorm(num * p), nrow = num)
 #' snp <- sapply(1:snp_num, function(i) {
-#'   sample(0:1, size = num, replace = TRUE, prob = c(5/6, 1/6))
+#'   sample(0:1, size = num, replace = TRUE)
 #' })
 #' res <- bd.gwas.test(x = x, snp = snp, num.permutations = 19999)
 #' mean(res[["p.value"]] < 0.05)

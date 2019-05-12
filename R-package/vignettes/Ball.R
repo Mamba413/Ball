@@ -41,11 +41,11 @@ bcov.test(x = x, y = y)
 
 ## ------------------------------------------------------------------------
 x <- matrix(runif(50 * 2, -pi, pi), nrow = 50, ncol = 2)
-error <- runif(50, min = -0.3, max = 0.3)
-y <- (sin((x[,1])^2 + x[,2])) + error
+error <- runif(50, min = -0.1, max = 0.1)
+y <- 2 * sin(x[,1] + x[,2]) + error
 
 ## ------------------------------------------------------------------------
-bcov.test(x = x, y = y)
+bcov.test(x = x, y = y, weight = "prob")
 
 ## ------------------------------------------------------------------------
 # load data:
@@ -91,17 +91,17 @@ data("ArcticLake")
 Dy <- nhdist(ArcticLake[["x"]], method = "compositional")
 Dx <- dist(ArcticLake[["depth"]])
 # hypothesis test with weighted BCov:
-bcov.test(x = Dx, y = Dy, R = 99, 
-          dst = TRUE, weight = TRUE)
+bcov.test(x = Dx, y = Dy, num.permutations = 99, 
+          distance = TRUE, weight = "constant")
 
 ## ------------------------------------------------------------------------
-x <- rnorm(30)
-y <- (x > 0) * x + rnorm(30)
-z <- (x <= 0) * x + rnorm(30)
+x <- rnorm(50)
+y <- (x > 0) * x + rnorm(50)
+z <- (x <= 0) * x + rnorm(50)
 example1 <- list(x, y, z)
 
 ## ------------------------------------------------------------------------
-h <- rnorm(30)
+h <- rnorm(50)
 w <- (h)^2
 x <- abs(h)
 y <- h * (h < 0)
@@ -111,8 +111,8 @@ z <- cbind(z1, z2)
 example2 <- list(w, x, y, z)
 
 ## ------------------------------------------------------------------------
-bcov.test(x = example1)
-bcov.test(x = example2)
+bcov.test(x = example1, num.permutations = 199)
+bcov.test(x = example2, num.permutations = 199)
 
 ## ------------------------------------------------------------------------
 set.seed(1)

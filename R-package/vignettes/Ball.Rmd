@@ -140,12 +140,12 @@ The result of **bcov.test** is that *p*-value < 0.05, so we conclude that $X$ an
 For multivariate independence test, we will demonstrate the usage of **bcov.test**
 with the following example: $X=(x_{1}, x_{2})$ come from the bivariate normal distribution.
 The relation between $Y$ and $X$ is:      
-$$Y=sin(x_{1}^{2} + x_{2})+ \epsilon, \quad \epsilon \sim Unif(-0.3, 0.3)$$
+$$Y=2\sin(x_{1} + x_{2})+ \epsilon, \quad \epsilon \sim U(-0.1, 0.1)$$
 
 ```{r}
 x <- matrix(runif(50 * 2, -pi, pi), nrow = 50, ncol = 2)
-error <- runif(50, min = -0.3, max = 0.3)
-y <- (sin((x[,1])^2 + x[,2])) + error
+error <- runif(50, min = -0.1, max = 0.1)
+y <- 2 * sin(x[,1] + x[,2]) + error
 ```
         
 <!-- The following image shows the distribution of the data: -->
@@ -155,7 +155,7 @@ y <- (sin((x[,1])^2 + x[,2])) + error
 We use **bcov.test** to perform multivariate independence test:
         
 ```{r}
-bcov.test(x = x, y = y)
+bcov.test(x = x, y = y, weight = "prob")
 ```
           
 The result of **bcov.test** is that *p*-value < 0.05, so we conclude that multivariate random variable $X$ and $Y$ are associated.
@@ -364,8 +364,8 @@ data("ArcticLake")
 Dy <- nhdist(ArcticLake[["x"]], method = "compositional")
 Dx <- dist(ArcticLake[["depth"]])
 # hypothesis test with weighted BCov:
-bcov.test(x = Dx, y = Dy, R = 99, 
-          dst = TRUE, weight = TRUE)
+bcov.test(x = Dx, y = Dy, num.permutations = 99, 
+          distance = TRUE, weight = "constant")
 ```
 
 ## Ball Covariance Mutual Independence Test       
@@ -378,12 +378,12 @@ It is natural to extend ball covariance to measure mutual independence between $
 More importantly, Mutual independence test based on ball covariance have been implemented in  **Ball** package. We give two simply example in the following to demonstrate its usage.
 
 The first example, $X, \epsilon_{1}, \epsilon_{2}$ are independent from the standard normal distribution $N(0,1)$, and
-$$Y = max(X, 0) + \epsilon_{1}, \; Z = min(X, 0) + \epsilon_{2}$$
+$$Y = \max(X, 0) + \epsilon_{1}, \; Z = \min(X, 0) + \epsilon_{2}$$
 
 ```{r}
-x <- rnorm(30)
-y <- (x > 0) * x + rnorm(30)
-z <- (x <= 0) * x + rnorm(30)
+x <- rnorm(50)
+y <- (x > 0) * x + rnorm(50)
+z <- (x <= 0) * x + rnorm(50)
 example1 <- list(x, y, z)
 ```
 
@@ -392,7 +392,7 @@ $$W = H^{2}; X = |H|, Y = min(H, 0)$$
 $$Z = (Z_{1}, Z_{2}), Z_{1}=I(H<0.5)H, Z_{2}=I(H>-0.5)H$$
 
 ```{r}
-h <- rnorm(30)
+h <- rnorm(50)
 w <- (h)^2
 x <- abs(h)
 y <- h * (h < 0)
@@ -405,8 +405,8 @@ example2 <- list(w, x, y, z)
 We bind these data to list *example1* and *example2* and pass them to arguments *x* in **bcov.test** to carry out ball covariance mutual independence test.
 
 ```{r}
-bcov.test(x = example1)
-bcov.test(x = example2)
+bcov.test(x = example1, num.permutations = 199)
+bcov.test(x = example2, num.permutations = 199)
 ```
 
 The hypothesis test result for two examples show that *p*-value < 0.05, coinciding with the simulation setting.         

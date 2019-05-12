@@ -23,31 +23,13 @@
 #include "BI.h"
 #include "Ball_omp.h"
 
-void Ball_Correlation(double *bcor_stat, const int *n, const int *p, double *x, double **Dy, int **yidx) {
+void Ball_Correlation(double *bcor_stat, const int *n, double **Dx, double **Dy, int **xidx, int **yidx) {
     int i, j, k, pi, src, lastpos, *yrank, *isource, *icount, *xy_index, *xy_temp, **xyidx;
     double pxy, px, py, lastval, *xx_cpy, *yy_cpy;
     double bcov_fixed_ball, bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0;
     double bcov_weight0_x = 0.0, bcov_weight_prob_x = 0.0;
     double bcov_weight0_y = 0.0, bcov_weight_prob_y = 0.0;
     double hhg_ball_num = 0.0;
-
-    double **Dx, *x_cpy;
-    int **xidx;
-    Dx = alloc_matrix(*n, *n);
-    xidx = alloc_int_matrix(*n, *n);
-    x_cpy = (double *) malloc(*n * sizeof(double));
-
-    for (i = 0; i < *n; i++) {
-        for (j = 0; j < *n; j++) {
-            xidx[i][j] = j;
-        }
-    }
-    Euclidean_distance(x, Dx, *n, *p);
-    for (i = 0; i < (*n); i++) {
-        memcpy(x_cpy, Dx[i], *n * sizeof(double));
-        quicksort(x_cpy, xidx[i], 0, *n - 1);
-    }
-    free(x_cpy);
 
     yrank = (int *) malloc(*n * sizeof(int));
     isource = (int *) malloc(*n * sizeof(int));
@@ -170,15 +152,69 @@ void Ball_Correlation(double *bcor_stat, const int *n, const int *p, double *x, 
         bcor_stat[0] = bcor_stat[1] = bcor_stat[2] = 0;
     }
 
-    // free memory
-    free_matrix(Dx, *n, *n);
-    free_int_matrix(xidx, *n, *n);
     free_int_matrix(xyidx, *n, *n);
     free(isource);
     free(icount);
     free(xy_index);
     free(yrank);
     free(xy_temp);
+}
+
+void Ball_Correlation_NoTies(double *bcor_stat, const int *n, int **y_within_ball, int **xidx, double **Dy) {
+    double px, py, pxy, n_prop = 1.0 / *n;
+    double bcov_weight0_x = 0.0, bcov_weight_prob_x = 0.0;
+    double bcov_weight0_y = 0.0, bcov_weight_prob_y = 0.0;
+    int sorted_j, *inv_count = malloc(*n * sizeof(int));
+    int *y_count_vec = malloc(*n * sizeof(int));
+    double *dy_vec = malloc(*n * sizeof(double)), *dy_vec_tmp = malloc(*n * sizeof(double));
+    double bcov_fixed_ball, bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0, hhg_ball_num = 0.0;
+
+    for (int i = 0; i < *n; ++i) {
+        for (int j = 0; j < *n; ++j) {
+            y_count_vec[j] = y_within_ball[i][j];
+            dy_vec_tmp[j] = Dy[i][j];
+            inv_count[j] = 0;
+        }
+        for (int j = 0; j < *n; ++j) {
+            dy_vec[j] = dy_vec_tmp[xidx[i][j]];
+        }
+        // Count of the number after self:
+        count_smaller_number_after_self_solution(dy_vec, inv_count, *n);
+        // Compute Ball Covariance:
+        for (int j = 0; j < *n; ++j) {
+            sorted_j = xidx[i][j];
+            px = (j + 1) * n_prop;
+            py = y_count_vec[sorted_j];
+            pxy = (py - inv_count[j]) * n_prop;
+            py *= n_prop;
+            bcov_fixed_ball = pxy - px * py;
+            bcov_fixed_ball *= bcov_fixed_ball;
+            bcov_weight0 += bcov_fixed_ball;
+            bcov_weight_prob += bcov_fixed_ball / (px * py);
+            if (px != 1 && py != 1) {
+                bcov_weight_hhg += bcov_fixed_ball / ((px) * (1.0 - px) * (py) * (1.0 - py));
+                hhg_ball_num += 1;
+            }
+            // compute BCov(X, X)
+            bcov_weight_prob_x += (1.0 - px) * (1.0 - px);
+            bcov_weight0_x += px * px * (1.0 - px) * (1.0 - px);
+            // compute BCov(Y, Y)
+            bcov_weight_prob_y += (1.0 - py) * (1.0 - py);
+            bcov_weight0_y += py * py * (1.0 - py) * (1.0 - py);
+        }
+    }
+    if ((bcov_weight_prob_x * bcov_weight_prob_y) > 0) {
+        bcor_stat[0] = bcov_weight0 / (sqrt(bcov_weight0_x * bcov_weight0_y));
+        bcor_stat[1] = bcov_weight_prob / (sqrt(bcov_weight_prob_x * bcov_weight_prob_y));
+        bcor_stat[2] = bcov_weight_hhg / (hhg_ball_num);
+    } else {
+        bcor_stat[0] = bcor_stat[1] = bcor_stat[2] = 0;
+    }
+
+    free(inv_count);
+    free(dy_vec);
+    free(dy_vec_tmp);
+    free(y_count_vec);
 }
 
 void U_Ball_Correlation(double *bcor_stat, int *n, double *x, int *yrank, int **lowyidx, int **higyidx) {
@@ -243,21 +279,17 @@ void U_Ball_Correlation(double *bcor_stat, int *n, double *x, int *yrank, int **
     free_int_matrix(higxidx, *n, *n);
 }
 
-void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *f_number,
-                int *n, int *p, int *nthread) {
-    int i, j, **yidx;
-    double **Dy, *y_cpy;
-
-    Dy = alloc_matrix(*n, *n);
-    yidx = alloc_int_matrix(*n, *n);
-    y_cpy = (double *) malloc(*n * sizeof(double));
-
+void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *feature_number,
+                int *n, int *p) {
+    int i, j, y_ties = 0;
+    double **Dy = alloc_matrix(*n, *n);
     if (*p == 0) {
-        vector2matrix(y, Dy, *n, *n, 1);
+        distance2matrix(y, Dy, *n);
     } else {
         Euclidean_distance(y, Dy, *n, *p);
     }
 
+    int **yidx = alloc_int_matrix(*n, *n);
     for (i = 0; i < *n; i++) {
         for (j = 0; j < *n; j++) {
             yidx[i][j] = j;
@@ -265,42 +297,94 @@ void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *f_n
     }
 
     // sort distance matrix y:
+    double *y_cpy = (double *) malloc(*n * sizeof(double));
+    int **y_within_ball = alloc_int_matrix(*n, *n);
     for (i = 0; i < (*n); i++) {
         memcpy(y_cpy, Dy[i], *n * sizeof(double));
         quicksort(y_cpy, yidx[i], 0, *n - 1);
+        if (!y_ties) {
+            for (j = 1; j < *n; ++j) {
+                if (y_cpy[j] == y_cpy[j - 1]) {
+                    y_ties = 1;
+                }
+            }
+        }
     }
     free(y_cpy);
+    if (y_ties) {
+        for (i = 0; i < *n; ++i) {
+            quick_rank_max_with_index(Dy[i], yidx[i], y_within_ball[i], *n);
+        }
+    }
 
 #pragma omp parallel
     {
-        int f_thread, i_thread, k_thread, stop_index_thread, x_size_thread;
-        double *x_thread;
+        int i_feature_thread, i_thread, j_thread, k_thread, stop_index_thread, x_size_thread, x_ties = 0;
         double bcorsis_stat_tmp[3];
-
+        int **y_within_ball_thread, **xidx;
+        double **Dx, *x_cpy, *x_thread;
         // main loop for calculate bcor statistic
 #pragma omp for
-        for (f_thread = 0; f_thread < *f_number; f_thread++) {
+        for (i_feature_thread = 0; i_feature_thread < *feature_number; i_feature_thread++) {
             // extract value to x_thread
             k_thread = 0;
-            i_thread = (f_thread) * (*n);
-            x_size_thread = x_number[f_thread] * (*n);
-            stop_index_thread = (f_thread) * (*n) + x_size_thread;
+            i_thread = (i_feature_thread) * (*n);
+            x_size_thread = x_number[i_feature_thread] * (*n);
+            stop_index_thread = (i_feature_thread) * (*n) + x_size_thread;
             x_thread = (double *) malloc(x_size_thread * sizeof(double));
             while (i_thread < stop_index_thread) {
                 x_thread[k_thread] = x[i_thread];
                 k_thread++;
                 i_thread++;
             }
-            Ball_Correlation(bcorsis_stat_tmp, n, &x_number[f_thread], x_thread, Dy, yidx);
-            bcor_stat[3 * f_thread + 0] = bcorsis_stat_tmp[0];
-            bcor_stat[3 * f_thread + 1] = bcorsis_stat_tmp[1];
-            bcor_stat[3 * f_thread + 2] = bcorsis_stat_tmp[2];
+
+            Dx = alloc_matrix(*n, *n);
+            x_cpy = (double *) malloc(*n * sizeof(double));
+            xidx = alloc_int_matrix(*n, *n);
+            Euclidean_distance(x_thread, Dx, *n, x_number[i_feature_thread]);
+            for (i_thread = 0; i_thread < *n; i_thread++) {
+                for (j_thread = 0; j_thread < *n; j_thread++) {
+                    xidx[i_thread][j_thread] = j_thread;
+                }
+            }
+            for (i_thread = 0; i_thread < (*n); i_thread++) {
+                memcpy(x_cpy, Dx[i_thread], *n * sizeof(double));
+                quicksort(x_cpy, xidx[i_thread], 0, *n - 1);
+                if (!x_ties) {
+                    for (j_thread = 1; j_thread < *n; ++j_thread) {
+                        if (x_cpy[j_thread] == x_cpy[j_thread - 1]) {
+                            x_ties = 1;
+                        }
+                    }
+                }
+            }
             free(x_thread);
+            free(x_cpy);
+
+            if (y_ties) {
+                if (x_ties) {
+                    Ball_Correlation(bcorsis_stat_tmp, n, Dx, Dy, xidx, yidx);
+                } else {
+                    Ball_Correlation_NoTies(bcorsis_stat_tmp, n, y_within_ball, xidx, Dy);
+                }
+            } else {
+                y_within_ball_thread = alloc_int_matrix(*n, *n);
+                for (i_thread = 0; i_thread < *n; ++i_thread) {
+                    quick_rank_max_with_index(Dx[i_thread], xidx[i_thread], y_within_ball_thread[i_thread], *n);
+                }
+                Ball_Correlation_NoTies(bcorsis_stat_tmp, n, y_within_ball_thread, yidx, Dx);
+                free_int_matrix(y_within_ball_thread, *n, *n);
+            }
+            bcor_stat[3 * i_feature_thread + 0] = bcorsis_stat_tmp[0];
+            bcor_stat[3 * i_feature_thread + 1] = bcorsis_stat_tmp[1];
+            bcor_stat[3 * i_feature_thread + 2] = bcorsis_stat_tmp[2];
+            free_matrix(Dx, *n, *n);
+            free_int_matrix(xidx, *n, *n);
         }
     }
 }
 
-void _u_bcor_test(double *bcor_stat, double *y, double *x, int *f_number, int *n, int *nthread) {
+void _u_bcor_test(double *bcor_stat, double *y, double *x, int *f_number, int *n) {
     int i, *yidx, *yrank, **lowyidx, **higyidx;
 
     yidx = (int *) malloc(*n * sizeof(int));
@@ -356,8 +440,8 @@ void _bcor_stat(double *bcor_stat, double *y, double *x, const int *n) {
 
     x_cpy = (double *) malloc((*n) * sizeof(double));
     y_cpy = (double *) malloc((*n) * sizeof(double));
-    vector2matrix(x, Dx, *n, *n, 1);
-    vector2matrix(y, Dy, *n, *n, 1);
+    distance2matrix(x, Dx, *n);
+    distance2matrix(y, Dy, *n);
 
     int s, t;
     for (s = 0; s < *n; s++) {
@@ -544,7 +628,7 @@ void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f
 
     if (*dst_y == 1) {
         if (*dst_x == 0) {
-            _bcor_test(bcorsis_stat, y, x, x_number, f_number, n, p, nthread);
+            _bcor_test(bcorsis_stat, y, x, x_number, f_number, n, p);
         } else {
             _bcor_stat(bcorsis_stat, y, x, n);
         }
@@ -555,14 +639,12 @@ void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f
         if (*k > 1) {
             // TODO:
             if (*k == 2) {
-                //bcor_two_sample(bcorsis_stat, x, x_number, size, n, nthread);
-            }
-                // TODO:
-            else {
-                //bcor_k_sample(bcorsis_stat, x, x_number, size, n, k, nthread);
+                // bcor_two_sample(bcorsis_stat, x, x_number, size, n, nthread);
+            } else {
+                // bcor_k_sample(bcorsis_stat, x, x_number, size, n, k, nthread);
             }
         } else {
-            _u_bcor_test(bcorsis_stat, y, x, f_number, n, nthread);
+            _u_bcor_test(bcorsis_stat, y, x, f_number, n);
         }
     }
 }

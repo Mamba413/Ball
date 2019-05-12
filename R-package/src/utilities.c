@@ -554,6 +554,22 @@ void initRank_bcor(int n, int **Rank, int *xrank, int *yrank) {
     computeRank(n + 1, Rank);
 }
 
+void quick_rank_max_with_index(const double *x, const int *x_index, int *r, int n) {
+    int i_loc, rank_value = n, tmp = 1;
+    r[x_index[n - 1]] = rank_value;
+    for (int i = n - 2; 0 <= i; i--) {
+        i_loc = x_index[i];
+        if (x[i_loc] == x[x_index[i + 1]]) {
+            r[i_loc] = rank_value;
+            tmp++;
+        } else {
+            rank_value = rank_value - tmp;
+            r[i_loc] = rank_value;
+            tmp = 1;
+        }
+    }
+}
+
 /**
  * Rank a value vector in a max manner
  * @param x value vector

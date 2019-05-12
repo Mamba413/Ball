@@ -112,12 +112,17 @@ examine_seed_arguments <- function(seed) {
 #' @return A integer number
 #' @noRd
 #'
-examine_weight_arguments <- function(weight = c("constant", "probability", "chisquare")) {
-  method <- match.arg(weight)
-  if (is.na(method)) {
-    stop("invalid weight method")
+examine_weight_arguments <- function(weight) {
+  if (is.logical(weight) || is.character(weight)) {
+    if (is.logical(weight)) {
+      weight <- ifelse(weight, "probability", "constant")
+    } else {
+      weight <- match.arg(arg = weight, choices = WEIGHT_TYPE)
+    }
+    return(weight)
+  } else {
+    stop("The weight arguments is invalid!")
   }
-  return(weight)
 }
 
 

@@ -23,8 +23,8 @@
 //double bcor_value(double *x, double *y, int *n, int *weight, int *dst, int *thread);
 //void bcov_stat(double *bcor, double *x, double *y, int *n, int *weight, int *dst, int *type, int *thread);
 
-void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *f_number, int *n, int *p, int *nthread);
-void _u_bcor_test(double *bcor_stat, double *y, double *x, int *f_number, int *n, int *nthread);
+void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *feature_number, int *n, int *p);
+void _u_bcor_test(double *bcor_stat, double *y, double *x, int *f_number, int *n);
 
 // R API function:
 void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f_number, int *size, int *n, int *p, int *k, int *dst_y, int *dst_x, int *nthread);

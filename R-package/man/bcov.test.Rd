@@ -9,8 +9,7 @@
 bcov.test(x, ...)
 
 \method{bcov.test}{default}(x, y = NULL, num.permutations = 99,
-  distance = FALSE, weight = c("constant", "probability", "chisquare"),
-  seed = 1, num.threads = 0, ...)
+  distance = FALSE, weight = FALSE, seed = 1, num.threads = 0, ...)
 
 \method{bcov.test}{formula}(formula, data, subset, na.action, ...)
 }
@@ -26,8 +25,9 @@ the sample version of ball divergence. Default: \code{num.permutations = 99}.}
 
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.}
 
-\item{weight}{a character value used to choose the form of the weight of Ball Covariance. 
-This must be one of "constant", "probability", or "chisquare". Any unambiguous substring can be given. Default: \code{weight = "constant"}.}
+\item{weight}{a logical or character string used to choose the form of the weight of Ball Covariance. 
+If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, or \code{"chisquare"}. 
+Any unambiguous substring can be given. Default: \code{weight = FALSE}.}
 
 \item{seed}{the random seed. Default \code{seet = 1}.}
 
@@ -56,10 +56,10 @@ If \code{num.permutations = 0}, \code{bcov.test} returns a statistic value.
 }
 \description{
 Ball Covariance test of multivariate independence. 
-Ball covariance are generic multivariate measures of dependence in Banach space.
+Ball covariance are generic multivariate measures of dependence in Banach spaces.
 }
 \details{
-\code{bcov.test} are non-parametric tests of multivariate independence in Banach space. 
+\code{bcov.test} are non-parametric tests of multivariate independence in Banach spaces. 
 The test decision is obtained via permutation, with \code{num.permutations} replicates.
 
 If two samples are pass to arguments \code{x} and \code{y}, the sample sizes (i.e. number of rows or length of the vector) 
@@ -71,7 +71,7 @@ symmetric numeric matrix recording distance between samples;
 otherwise, these arguments are treated as data.
 
 The \code{bcov.test} statistic is \code{bcov} or \code{ bcor} which are dependence measure 
-in Banach space. The \code{bcor} test statistic is based on the normalized 
+in Banach spaces. The \code{bcor} test statistic is based on the normalized 
 coefficient of ball covariance. (See the manual page for \code{\link{bcov}} or \code{\link{bcor}}.)
 
 For the general problem of testing independence when the distributions of \eqn{X} and 
@@ -95,9 +95,9 @@ bcov.test(x, y)
 
 ################# Quick Start #################
 x <- matrix(runif(50 * 2, -pi, pi), nrow = 50, ncol = 2)
-error <- runif(50, min = -0.3, max = 0.3)
-y <- (sin((x[,1])^2 + x[,2])) + error
-bcov.test(x = x, y = y)
+error <- runif(50, min = -0.1, max = 0.1)
+y <- sin(x[,1] + x[,2]) + error
+bcov.test(x = x, y = y, weight = "prob")
 
 ################# Ball Covariance Test for Non-Hilbert Data #################
 # load data:
@@ -117,11 +117,16 @@ Dx <- dist(ArcticLake[["depth"]])
 bcov.test(x = Dx, y = Dy, distance = TRUE, weight = "prob")
 
 ################# Mutual Independence Test #################
-x <- rnorm(30)
-y <- (x > 0) * x + rnorm(30)
-z <- (x <= 0) * x + rnorm(30)
+x <- rnorm(50)
+y <- (x > 0) * x + rnorm(50)
+z <- (x <= 0) * x + rnorm(50)
 data_list <- list(x, y, z)
 bcov.test(data_list)
+data_list <- lapply(data_list, function(x) {
+  as.matrix(dist(x))
+})
+bcov.test(data_list, distance = TRUE)
+bcov.test(data_list, distance = FALSE, weight = "chi")
 
 ################# Mutual Independence Test for Meteorology data #################
 data("meteorology")

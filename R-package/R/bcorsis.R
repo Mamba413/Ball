@@ -11,7 +11,7 @@
 #' bcor(x, y)
 #' bcor(x, y, weight = "prob")
 #' bcor(x, y, weight = "chisq")
-bcor <- function(x, y, distance = FALSE, weight = c("constant", "probability", "chisquare")) {
+bcor <- function(x, y, distance = FALSE, weight = FALSE) {
   weight <- examine_weight_arguments(weight)
   x <- as.matrix(x)
   y <- as.matrix(y)
@@ -234,11 +234,11 @@ bcorsis <- function(x, y, d = "small", weight = c("constant", "probability", "ch
     # data prepare for screening:
     if(distance == FALSE) {
       if(y_p != 1) {
-        y <- as.vector(as.matrix(dist(y, diag = TRUE)))
+        y <- as.vector(dist(y))
         distance <- TRUE
       }
     } else {
-      y <- as.vector(y)
+      y <- y[lower.tri(y)]
     }
     # BCor-SIS:
     rcory_result <- apply_bcor_wrap(x = x, y = y, n = n, p = p, 

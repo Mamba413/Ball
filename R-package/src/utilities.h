@@ -39,6 +39,7 @@ void initRank_bcor(int n, int **Rank, int *xrank, int *yrank);
 void quicksort(double *array, int *idx, int l, int u);
 void quicksort2(double *a, double *b, int *idx, int l, int u);
 void rank_matrix_3d(double ***Dx, int n, int k, int ***Rx);
+void quick_rank_max_with_index(const double *x, const int *x_index, int *r, int n);
 void quick_rank_max(const double *x, int *r, int n);
 void quick_rank_min(const double *x, int *r, int n);
 double **alloc_matrix(int r, int c);
