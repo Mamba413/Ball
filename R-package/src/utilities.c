@@ -789,6 +789,44 @@ void quicksort2(double *a, double *b, int *idx, int l, int u) {
     quicksort2(a, b, idx, m + 1, u);
 }
 
+void quicksort3(double *a, double *b, int *idx, int l, int u) {
+    int i, m, idx_temp;
+    double a_temp;
+    if (l >= u)
+        return;
+    m = l;
+    for (i = l + 1; i <= u; i++) {
+        if (a[i] < a[l] || (a[i] == a[l] && b[i] < b[l])) {
+            ++m;
+            idx_temp = idx[m];
+            idx[m] = idx[i];
+            idx[i] = idx_temp;
+
+            a_temp = a[m];
+            a[m] = a[i];
+            a[i] = a_temp;
+
+            a_temp = b[m];
+            b[m] = b[i];
+            b[i] = a_temp;
+        }
+    }
+    idx_temp = idx[l];
+    idx[l] = idx[m];
+    idx[m] = idx_temp;
+
+    a_temp = a[l];
+    a[l] = a[m];
+    a[m] = a_temp;
+
+    a_temp = b[l];
+    b[l] = b[m];
+    b[m] = a_temp;
+
+    quicksort3(a, b, idx, l, m - 1);
+    quicksort3(a, b, idx, m + 1, u);
+}
+
 double **alloc_matrix(int r, int c) {
     /* allocate a matrix with r rows and c columns */
     int i;
