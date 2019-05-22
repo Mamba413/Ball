@@ -156,7 +156,9 @@ bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"),
     refine_snp_index <- which(screen_res[[3]][1:snp_num] < alpha)
     refine_snp_num <- length(refine_snp_index)
     if (refine_snp_num == 0) {
-      print("None of SNP pass the pre-screening process!")
+      if (verbose) {
+        print("None of SNP pass the pre-screening process!")
+      }
     } else {
       refine_snp_statistic <- as.double(screen_res[[1]][c(refine_snp_index, refine_snp_index + snp_num)])
       refine_permuted_statistic <- as.double(numeric(r * 2 * refine_snp_num))

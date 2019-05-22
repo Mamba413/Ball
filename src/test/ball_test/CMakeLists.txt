@@ -10,7 +10,7 @@ if (OPENMP_FOUND)
 endif ()
 
 add_executable(runBallTest statTest.cpp ../../BD.c ../../BI.c ../../kbcov.c ../../BD.h ../../kbd.h ../../kbd.c
-        ../../utilities.h ../../utilities.c ../../utilize_cross.h ../../utilize_cross.c ../../Ball_omp.h
+        ../../utilities.h ../../utilities.c ../../Ball_omp.h
         ../../bcor.h ../../bcor.c ../../kbcov.c ../../kbcov.h basic_test.cpp test_setting.h stats_crude.h stats_crude.c htestTest.cpp)
 
 target_link_libraries(runBallTest gtest gtest_main)

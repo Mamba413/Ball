@@ -1140,15 +1140,30 @@ void shuffle_indicator_inv_matrix(int **i_perm_matrix, int **i_perm_matrix_inv, 
 }
 
 void resample_matrix(int **i_perm, int *r, int *c) {
+#ifdef R_BUILD
+    GetRNGstate();
     int i, j, k, temp;
     for (k = 0; k < *r; k++) {
         for (i = *c - 1; i > 0; --i) {
-            j = random_index2(i);
+            j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
             temp = i_perm[k][j];
             i_perm[k][j] = i_perm[k][i];
             i_perm[k][i] = temp;
         }
     }
+    PutRNGstate();
+#else
+    srand((unsigned) time(NULL));
+    int i, j, k, temp;
+    for (k = 0; k < *r; k++) {
+        for (i = *c - 1; i > 0; --i) {
+            j = (rand()) % (i + 1);
+            temp = i_perm[k][j];
+            i_perm[k][j] = i_perm[k][i];
+            i_perm[k][i] = temp;
+        }
+    }
+#endif
 }
 
 void resample_matrix_3d(int ***i_perm, int **init_perm, int *h, int *r, int *c) {
@@ -1398,14 +1413,27 @@ void shuffle_value_matrix(double **value_matrix, double *init_value, int num_per
 #endif
 }
 
+#ifdef R_BUILD
+void R_CheckUserInterrupt_fn(void *dummy) {
+  R_CheckUserInterrupt();
+}
+#endif
+
 int pending_interrupt() {
     int interrupt_status = 0;
-    interrupt_status = pending_interrupt_status();
+#ifdef R_BUILD
+    interrupt_status = !(R_ToplevelExec(R_CheckUserInterrupt_fn, NULL));
+#endif
     return interrupt_status;
 }
 
 void print_stop_message() {
-    print_stop_message_internal();
+#ifdef R_BUILD
+    Rprintf("Process stop due to user interruption! \n");
+#else
+    printf("Process stop due to user interruption! \n");
+#endif
+
 }
 
 void declare_gwas_screening() {
@@ -1432,5 +1460,4 @@ void estimate_gwas_refining_time(int i, int refine_num, int start_time) {
 #else
     printf("Refining SNP... Progress: %d%%. \n", relative_progress_prop);
 #endif
-    printf("\n");
 }

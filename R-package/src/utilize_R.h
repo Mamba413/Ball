@@ -16,15 +16,6 @@
 #ifndef API_R_H_
 #define API_R_H_
 
-
-void print_stop_message_internal();
-void R_check_interrupt_fn(void *dummy);
-int pending_interrupt_status();
-int r_available_rand();
-int random_index(int n, int i);
-int random_index2(int i);
-int random_index_thread(int i);
-
 #endif /* API_R_H_ */
 
 #ifndef R_BUILD

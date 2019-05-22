@@ -11,7 +11,7 @@ test_that("Error if computation result for ball divergence is wrong! (two-sample
   snp <- sapply(1:snp_num, function(i) {
     sample(0:1, size = num, replace = TRUE)
   })
-  res <- bd.gwas.test(x = x, snp = snp, num.threads = 1, num.permutations = 0)
+  res <- bd.gwas.test(x = x, snp = snp, num.threads = 1, num.permutations = 0, verbose = FALSE)
   bd_gwas_stats <- res[["statistic"]]
   for(i in 1:snp_num) {
     label <- snp[, i]
@@ -30,7 +30,7 @@ test_that("Error if computation result for ball divergence is wrong! (K-sample)"
   snp <- sapply(1:snp_num, function(i) {
     sample(0:2, size = num, replace = TRUE)
   })
-  res <- bd.gwas.test(x = x, snp = snp, num.threads = 1, num.permutations = 0)
+  res <- bd.gwas.test(x = x, snp = snp, num.threads = 1, num.permutations = 0, verbose = FALSE)
   bd_gwas_stats <- res[["statistic"]]
   for(i in 1:snp_num) {
     label <- snp[, i]
