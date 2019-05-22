@@ -514,8 +514,9 @@ void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *
  * @param R : permutation replication
  * @param nthread : number of thread
  */
-void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, double *xy, const int *snp,
-                  const int *n, const int *p, const int *R, const int *nthread) {
+void bd_gwas_screening(double *bd_stat, double *permuted_bd_stat, double *pvalue, double *xy, const int *snp,
+                       const int *n, const int *p, const int *unique_k_num, const int *each_k_num,
+                       const int *R, const int *nthread) {
 #ifdef Ball_OMP_H_
     omp_set_dynamic(0);
     if (*nthread <= 0) {
@@ -653,27 +654,13 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
         int *k_vector_tmp = (int *) malloc(*p * sizeof(int));
         memcpy(k_vector_tmp, k_vector, *p * sizeof(int));
         sort_ints(k_vector_tmp, (size_t) *p);
-        int unique_k_num = 1;
-        for (int i = 1; i < *p; ++i) {
-            if (k_vector_tmp[i] != k_vector_tmp[i - 1]) {
-                unique_k_num++;
-            }
-        }
-        int *unique_k_vector = (int *) malloc(unique_k_num * sizeof(int));
-        int *each_k_num = (int *) malloc(unique_k_num * sizeof(int));
+        int *unique_k_vector = (int *) malloc(*unique_k_num * sizeof(int));
         unique_k_vector[0] = k_vector_tmp[0];
-        if (unique_k_num == 1) {
-            each_k_num[0] = *p;
-        } else {
-            s = 1;
+        s = 1;
+        if (*unique_k_num != 1) {
             for (int i = 1; i < *p; ++i) {
                 if (k_vector_tmp[i] != k_vector_tmp[i - 1]) {
                     unique_k_vector[s] = k_vector_tmp[i];
-                    if (s == 1) {
-                        each_k_num[0] = i;
-                    } else {
-                        each_k_num[s - 1] = i - each_k_num[s - 2];
-                    }
                     s++;
                 }
             }
@@ -695,11 +682,11 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
         int batch_round = (*R / batch_size) + add_round;
         int largeR = *R - (batch_round - add_round) * (batch_size);
         double **permuted_asymptotic_bd_stat_batch = alloc_matrix(batch_size, 2);
-        double **permuted_asymptotic_bd_stat_matrix = alloc_matrix((unique_k_num << 1), *R);
+        double **permuted_asymptotic_bd_stat_matrix = alloc_matrix((*unique_k_num << 1), *R);
         int *label = (int *) malloc(*n * sizeof(int));
         int **label_matrix = alloc_int_matrix(batch_size, *n);
         int **group_relative_location_matrix = alloc_int_matrix(batch_size, *n);
-        for (int k = 0; k < unique_k_num; ++k) {
+        for (int k = 0; k < *unique_k_num; ++k) {
             int row_index = 2 * k;
             int permuted_k = unique_k_vector[k], permuted_bd_stat_number = ((permuted_k - 1) * permuted_k) >> 1;
             int *permuted_size = (int *) malloc(permuted_k * sizeof(int));
@@ -771,7 +758,7 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
         free(label);
 
         // compute p-value
-        for (int i = 0; i < unique_k_num; ++i) {
+        for (int i = 0; i < *unique_k_num; ++i) {
             int row_index = 2 * i, k_num = each_k_num[i], k_value = unique_k_vector[i];
             int *stats_index1 = (int *) calloc((size_t) k_num, sizeof(int));
             int *stats_index2 = (int *) calloc((size_t) k_num, sizeof(int));
@@ -804,9 +791,8 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
             free(p_value1);
             free(p_value2);
         }
-        free_matrix(permuted_asymptotic_bd_stat_matrix, (unique_k_num << 1), *R);
+        free_matrix(permuted_asymptotic_bd_stat_matrix, (*unique_k_num << 1), *R);
         free(unique_k_vector);
-        free(each_k_num);
     }
 
     free_matrix(distance_matrix, *n, *n);

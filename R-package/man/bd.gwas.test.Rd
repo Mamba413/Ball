@@ -4,8 +4,8 @@
 \alias{bd.gwas.test}
 \title{Fast K-sample Ball Divergence Test for GWAS Data}
 \usage{
-bd.gwas.test(x, snp, method = c("permute", "spectrum"), num.permutations,
-  distance = FALSE, seed = 1, num.threads = 0, ...)
+bd.gwas.test(x, snp, screening.method = c("permute", "spectrum"),
+  num.permutations, distance = FALSE, seed = 1, num.threads = 0, ...)
 }
 \arguments{
 \item{x}{a numeric vector, matrix, data.frame, dist object}
@@ -41,9 +41,13 @@ snp_num <- 10000
 p <- 5
 x <- matrix(rnorm(num * p), nrow = num)
 snp <- sapply(1:snp_num, function(i) {
-  sample(0:1, size = num, replace = TRUE)
+  sample(0:2, size = num, replace = TRUE)
 })
-res <- bd.gwas.test(x = x, snp = snp, num.permutations = 19999)
+snp1 <- sapply(1:snp_num, function(i) {
+  sample(1:2, size = num, replace = TRUE)
+})
+snp <- cbind(snp, snp1)
+res <- Ball::bd.gwas.test(x = x, snp = snp, num.permutations = 19999)
 mean(res[["p.value"]] < 0.05)
 mean(res[["p.value"]] < 0.005)
 mean(res[["p.value"]] < 0.0005)

@@ -9,7 +9,7 @@ Check these declarations against the C/Fortran source code.
 extern void bcor_test(double *, double *, double *, int *, int *, int *, int *, int *, int *, int *, int *, int *);
 extern void bcov_test(double *, double *, double *, double *, int *, int *, int *, int *);
 extern void kbcov_test(double *, double *, double *, int *, int *, int *, int *, int *);
-extern void bd_gwas_test(double *, double *, double *, double *, int *, int *, int *, int *, int *);
+extern void bd_gwas_screening(double *, double *, double *, double *, int *, int *, int *, int *, int *, int *, int *);
 extern void bd_test(double *, double *, double *, int *, int *, int *, int *, int *, int *);
 extern void SRCT_new(double *, int *, int *, double *, int *, double *);
 
@@ -17,7 +17,7 @@ static const R_CMethodDef CEntries[] = {
   {"bcor_test", (DL_FUNC) &bcor_test, 12},
   {"bcov_test", (DL_FUNC) &bcov_test, 8},
   {"kbcov_test", (DL_FUNC) &kbcov_test, 8},
-  {"bd_gwas_test", (DL_FUNC) &bd_gwas_test, 9},
+  {"bd_gwas_screening", (DL_FUNC) &bd_gwas_screening, 11},
   {"bd_test",   (DL_FUNC) &bd_test,   9},
   {"SRCT_new",  (DL_FUNC) &SRCT_new,  6},
   {NULL, NULL, 0}
