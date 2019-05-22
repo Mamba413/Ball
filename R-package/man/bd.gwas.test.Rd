@@ -5,17 +5,25 @@
 \title{Fast K-sample Ball Divergence Test for GWAS Data}
 \usage{
 bd.gwas.test(x, snp, screening.method = c("permute", "spectrum"),
-  num.permutations, distance = FALSE, seed = 1, num.threads = 0, ...)
+  num.permutations, distance = FALSE, alpha, verbose = FALSE,
+  seed = 1, num.threads = 0, ...)
 }
 \arguments{
 \item{x}{a numeric vector, matrix, data.frame, dist object}
 
 \item{snp}{SNP data}
 
+\item{screening.method}{if \code{screening.method = "spectrum"}, the spectrum method is applied to 
+screening the candidate SNPs, or otherwise, the permutation method is applied.}
+
 \item{num.permutations}{the number of permutation replications, when \code{num.permutations} equals to 0, the function returns
 the sample version of ball divergence. Default: \code{num.permutations = 99}.}
 
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}.}
+
+\item{alpha}{the significance level.}
+
+\item{verbose}{Show computation status and estimated runtime. Default: \code{verbose = FALSE}.}
 
 \item{seed}{the random seed. Default \code{seet = 1}.}
 
@@ -48,6 +56,28 @@ snp1 <- sapply(1:snp_num, function(i) {
 })
 snp <- cbind(snp, snp1)
 res <- Ball::bd.gwas.test(x = x, snp = snp, num.permutations = 19999)
+mean(res[["p.value"]] < 0.05)
+mean(res[["p.value"]] < 0.005)
+mean(res[["p.value"]] < 0.0005)
+
+num <- 100
+snp_num <- 500
+x <- rbind(matrix(rnorm(num * p), nrow = num), 
+           matrix(rnorm(num * p, mean = 3), nrow = num), 
+           matrix(rnorm(num * p, mean = -3), nrow = num))
+snp <- sapply(1:snp_num, function(i) {
+  sample(0:2, size = 3 * num, replace = TRUE)
+})
+snp[, 300] <- rep(0:2, each = num)
+res <- Ball::bd.gwas.test(x = x, snp = snp)
+
+num <- 200
+snp_num <- 10000
+x <- matrix(rnorm(num * p), nrow = num)
+snp <- sapply(1:snp_num, function(i) {
+  sample(0:2, size = num, replace = TRUE, prob = c(1/2, 1/4, 1/4))
+})
+res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, num.permutations = 19999)
 mean(res[["p.value"]] < 0.05)
 mean(res[["p.value"]] < 0.005)
 mean(res[["p.value"]] < 0.0005)

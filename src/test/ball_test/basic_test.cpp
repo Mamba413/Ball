@@ -678,3 +678,25 @@ TEST(KBD, sort_ints) {
         EXPECT_EQ(sorted_array[i], array[i]);
     }
 }
+
+TEST(KBD, bd_gwas_refining) {
+    int R = 10;
+    double bd_stat[4], pvalue[4], permuted_bd_stat[40];
+    int refine_size[5] = {6, 7, 7, 10, 10};
+    int refine_k_num[2] = {3, 2};
+    int nth = 1, n = 20, refine_num = 2, verbose = 0;
+    bd_gwas_refining(bd_stat, permuted_bd_stat, pvalue, X1_X2_CONTINUOUS_DST, &n,
+                     &refine_num, refine_size, refine_k_num, &R, &nth, &verbose);
+    for (int i = 0; i < refine_num; ++i) {
+        EXPECT_EQ(pvalue[2 * i], 1.0);
+        EXPECT_EQ(pvalue[2 * i + 1], 1.0);
+    }
+
+    nth = 2;
+    bd_gwas_refining(bd_stat, permuted_bd_stat, pvalue, X1_X2_CONTINUOUS_DST, &n,
+                     &refine_num, refine_size, refine_k_num, &R, &nth, &verbose);
+    for (int i = 0; i < refine_num; ++i) {
+        EXPECT_EQ(pvalue[2 * i], 1.0);
+        EXPECT_EQ(pvalue[2 * i + 1], 1.0);
+    }
+}

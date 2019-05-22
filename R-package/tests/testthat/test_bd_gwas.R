@@ -57,8 +57,8 @@ test_that("Error if computation result for ball divergence is wrong when multi-t
   snp <- sapply(1:snp_num, function(i) {
     sample(0:2, size = num, replace = TRUE)
   })
-  res <- bd.gwas.test(x = x, snp = snp, num.threads = 1, num.permutations = 29999)
-  res1 <- bd.gwas.test(x = x, snp = snp, num.threads = 2, num.permutations = 29999)
+  res <- bd.gwas.test(x = x, snp = snp, num.threads = 1, num.permutations = 29999, verbose = FALSE)
+  res1 <- bd.gwas.test(x = x, snp = snp, num.threads = 2, num.permutations = 29999, verbose = FALSE)
   expect_equal(res[["statistic"]], res1[["statistic"]])
   expect_equal(res[["permuted_statistic"]], res1[["permuted_statistic"]])
   expect_equal(res[["p.value"]], res1[["p.value"]])

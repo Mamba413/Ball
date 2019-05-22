@@ -30,9 +30,10 @@ void KBD3(double *, double *, double *, int *, int *, int *, int *, int *);
 
 void bd_gwas_screening(double *bd_stat, double *permuted_bd_stat, double *pvalue, double *xy, int *snp,
                        int *n, int *p, int *unique_k_num, int *each_k_num,
-                       int *R, int *nthread);
+                       int *R, int *nthread, int *verbose_out);
 
 void bd_gwas_refining(double *bd_stat, double *refine_permuted_bd_stat, double *pvalue, double *xy,
-                      int *n, int *refine_num, int *refine_size, int *refine_k_num, int *R, int *nthread);
+                      int *n, int *refine_num, int *refine_size, int *refine_k_num, int *R, int *nthread,
+                      int *verbose_out);
 
 #endif //BALL_KBD_H

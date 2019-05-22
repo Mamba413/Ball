@@ -2,6 +2,10 @@
 #' @inheritParams bd.test
 #' @param x a numeric vector, matrix, data.frame, dist object 
 #' @param snp SNP data
+#' @param screening.method if \code{screening.method = "spectrum"}, the spectrum method is applied to 
+#' screening the candidate SNPs, or otherwise, the permutation method is applied.
+#' @param alpha the significance level.
+#' @param verbose Show computation status and estimated runtime. Default: \code{verbose = FALSE}.
 #' 
 #' @return bd.gwas.test returns a list containing the following components:
 #' \item{\code{statistic}}{ball divergence statistics vector.}            
@@ -11,6 +15,7 @@
 #' @export
 #' 
 #' @importFrom dplyr n_distinct
+#' @importFrom stats na.fail
 #' 
 #' @seealso 
 #' \code{\link{bd}}, \code{\link{bd.test}}
@@ -34,9 +39,31 @@
 #' mean(res[["p.value"]] < 0.05)
 #' mean(res[["p.value"]] < 0.005)
 #' mean(res[["p.value"]] < 0.0005)
+#' 
+#' num <- 100
+#' snp_num <- 500
+#' x <- rbind(matrix(rnorm(num * p), nrow = num), 
+#'            matrix(rnorm(num * p, mean = 3), nrow = num), 
+#'            matrix(rnorm(num * p, mean = -3), nrow = num))
+#' snp <- sapply(1:snp_num, function(i) {
+#'   sample(0:2, size = 3 * num, replace = TRUE)
+#' })
+#' snp[, 300] <- rep(0:2, each = num)
+#' res <- Ball::bd.gwas.test(x = x, snp = snp)
+#' 
+#' num <- 200
+#' snp_num <- 10000
+#' x <- matrix(rnorm(num * p), nrow = num)
+#' snp <- sapply(1:snp_num, function(i) {
+#'   sample(0:2, size = num, replace = TRUE, prob = c(1/2, 1/4, 1/4))
+#' })
+#' res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, num.permutations = 19999)
+#' mean(res[["p.value"]] < 0.05)
+#' mean(res[["p.value"]] < 0.005)
+#' mean(res[["p.value"]] < 0.0005)
 #' }
 bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"), 
-                         num.permutations, distance = FALSE, 
+                         num.permutations, distance = FALSE, alpha, verbose = FALSE,
                          seed = 1, num.threads = 0, ...) 
 {
   snp <- as.matrix(snp)
@@ -87,7 +114,7 @@ bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"),
   set.seed(seed)
   statistic <- as.double(numeric(snp_num * 2))
   permuted_statistic <- as.double(numeric(r * 2 * unique_class_num))
-  p_value <- as.double(numeric(snp_num * 2))
+  p_value <- as.double(numeric(snp_num * 2) + 1)
   x <- as.double(x)
   snp_vec <- as.integer(snp)
   num <- as.integer(num)
@@ -96,17 +123,69 @@ bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"),
   each_class_num <- as.integer(each_class_num)
   r <- as.integer(r)
   nth <- as.integer(num.threads)
+  verbose_out <- as.integer(verbose)
   
   screen_res <- .C("bd_gwas_screening", statistic, permuted_statistic, p_value, 
-                   x, snp_vec, num, snp_num, unique_class_num, each_class_num, r, nth)
+                   x, snp_vec, num, snp_num, unique_class_num, each_class_num, 
+                   r, nth, verbose_out)
   
+  statistic <- screen_res[[1]][1:snp_num]
+  permuted_statistic <- data.frame()
+  eigenvalue <- NULL
+  p_value <- NULL
   if (screening.method == "permute") {
-    permuted_statistic <- data.frame(matrix(screen_res[[2]], nrow = r))
-    permuted_statistic <- permuted_statistic[, seq(1, 2 * unique_class_num, by = 2), drop = FALSE]
-    colnames(permuted_statistic) <- paste0("g", sort(unique(snp_class_num)))
+    if (num.permutations > 0) {
+      permuted_statistic <- data.frame(matrix(screen_res[[2]], nrow = r))
+      permuted_statistic <- permuted_statistic[, seq(1, 2 * unique_class_num, by = 2), drop = FALSE]
+      colnames(permuted_statistic) <- paste0("g", sort(unique(snp_class_num)))
+      p_value <- screen_res[[3]][1:snp_num]
+    }
+  } else {
+    # TODO: save the eigenvalues of spectrum method
+    eigenvalue <- NULL
+    p_value <- NULL
+  }
+  
+  significant_snp <- NULL
+  refine_permuted_statistic <- data.frame()
+  refine_snp_index <- NULL
+  if (!is.null(p_value)) {
+    if (missing(alpha)) {
+      alpha <- 0.05 / snp_num;
+    }
+    refine_snp_index <- which(screen_res[[3]][1:snp_num] < alpha)
+    refine_snp_num <- length(refine_snp_index)
+    if (refine_snp_num == 0) {
+      print("None of SNP pass the pre-screening process!")
+    } else {
+      refine_snp_statistic <- as.double(screen_res[[1]][c(refine_snp_index, refine_snp_index + snp_num)])
+      refine_permuted_statistic <- as.double(numeric(r * 2 * refine_snp_num))
+      refine_p_value <- as.double(numeric(2 * refine_snp_num))
+      refine_snp_num <- as.integer(refine_snp_num)
+      refine_snp_size_vec <- as.integer(apply(snp[, refine_snp_index, drop = FALSE], 2, table))
+      refine_snp_class_num <- as.integer(snp_class_num[refine_snp_index])
+      
+      refine_res <- .C("bd_gwas_refining", refine_snp_statistic, refine_permuted_statistic, refine_p_value,
+                       x, num, refine_snp_num, refine_snp_size_vec, refine_snp_class_num,
+                       r, nth, verbose_out)
+      
+      refine_permuted_statistic <- data.frame(matrix(refine_res[[2]], nrow = r))
+      refine_permuted_statistic <- refine_permuted_statistic[, seq(1, 2 * refine_snp_num, by = 2), drop = FALSE]
+      colnames(refine_permuted_statistic) <- paste0("SNP", sort(unique(refine_snp_index)))
+      refine_p_value <- refine_res[[3]][1:refine_snp_num]
+      p_value[refine_snp_index] <- refine_p_value
+      if (any(refine_p_value < alpha)) {
+        significant_snp <- which(p_value < alpha)
+      }
+    }
   }
 
-  return(list("statistic" = screen_res[[1]][1:snp_num], 
+  
+  return(list("statistic" = statistic, 
               "permuted.statistic" = permuted_statistic, 
-              "p.value" = screen_res[[3]][1:snp_num]))
+              "eigenvalue" = eigenvalue,
+              "p.value" = p_value, 
+              "significant.snp" = significant_snp, 
+              "refined.snp" = refine_snp_index, 
+              "refined.permuted.statistic" = refine_permuted_statistic))
 }
