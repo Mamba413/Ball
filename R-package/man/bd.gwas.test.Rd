@@ -5,7 +5,7 @@
 \title{Fast K-sample Ball Divergence Test for GWAS Data}
 \usage{
 bd.gwas.test(x, snp, screening.method = c("permute", "spectrum"),
-  num.permutations, distance = FALSE, alpha, verbose = FALSE,
+  num.permutations, distance = FALSE, alpha, verbose = TRUE,
   seed = 1, num.threads = 0, ...)
 }
 \arguments{

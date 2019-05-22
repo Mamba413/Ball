@@ -529,6 +529,9 @@ void bd_gwas_screening(double *bd_stat, double *permuted_bd_stat, double *pvalue
         omp_set_num_threads(*nthread);
     }
 #endif
+    if (*verbose_out) {
+        declare_gwas_screening();
+    }
 
     int *k_vector = (int *) malloc(*p * sizeof(int));
     int *snp_vector = (int *) malloc(*n * sizeof(int)), *snp_index = (int *) malloc(*n * sizeof(int));
@@ -826,12 +829,9 @@ void bd_gwas_refining(const double *bd_stat, double *refine_permuted_bd_stat, do
         omp_set_num_threads(*nthread);
     }
 #endif
-
-#ifdef R_BUILD
-    Rprintf("=========== Refining the p-value of %d SNP ===========\n", *refine_num);
-#else
-    printf("=========== Refining the p-value of %d SNP ===========\n", *refine_num);
-#endif
+    if (*verbose_out) {
+        declare_gwas_refining(*refine_num);
+    }
 
     int **index_matrix = alloc_int_matrix(*n, *n);
     double **distance_matrix = alloc_matrix(*n, *n);
@@ -883,6 +883,9 @@ void bd_gwas_refining(const double *bd_stat, double *refine_permuted_bd_stat, do
     double **permuted_asymptotic_bd_stat_batch = alloc_matrix(batch_size, 2);
     double **permuted_asymptotic_bd_stat_matrix = alloc_matrix((*refine_num << 1), *R);
     for (int i = 0; i < *refine_num; ++i) {
+        if (*verbose_out) {
+            estimate_gwas_refining_time(i, *refine_num, 0);
+        }
         int row_index = 2 * i, permuted_k = refine_k_num[i];
         int *permuted_size = (int *) malloc(permuted_k * sizeof(int));
         int *permuted_cumsum_size = (int *) malloc(permuted_k * sizeof(int));

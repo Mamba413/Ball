@@ -63,7 +63,7 @@
 #' mean(res[["p.value"]] < 0.0005)
 #' }
 bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"), 
-                         num.permutations, distance = FALSE, alpha, verbose = FALSE,
+                         num.permutations, distance = FALSE, alpha, verbose = TRUE,
                          seed = 1, num.threads = 0, ...) 
 {
   snp <- as.matrix(snp)

@@ -1407,3 +1407,29 @@ int pending_interrupt() {
 void print_stop_message() {
     print_stop_message_internal();
 }
+
+void declare_gwas_screening() {
+#ifdef R_BUILD
+    Rprintf("=========== Pre-screening SNPs ===========\n");
+#else
+    printf("=========== Pre-screening SNPs ===========\n");
+#endif
+}
+
+void declare_gwas_refining(int refine_num) {
+#ifdef R_BUILD
+    Rprintf("=========== Refining the p-value of %d SNP ===========\n", refine_num);
+#else
+    printf("=========== Refining the p-value of %d SNP ===========\n", refine_num);
+#endif
+}
+
+void estimate_gwas_refining_time(int i, int refine_num, int start_time) {
+    double relative_progress = (double) i / (double) refine_num;
+    int relative_progress_prop = (int) round(100 * relative_progress);
+#ifdef R_BUILD
+    Rprintf("Refining SNP... Progress: %d%%. \n", relative_progress_prop);
+#else
+    printf("Refining SNP... Progress: %d%%. \n", relative_progress_prop);
+#endif
+}
