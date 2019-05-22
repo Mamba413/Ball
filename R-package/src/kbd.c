@@ -502,6 +502,18 @@ void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *
     free_matrix(bd_stat_array, bd_stat_number, 2);
 }
 
+/**
+ *
+ * @param bd_stat : a vector recording the Ball Divergence statistic values
+ * @param permuted_bd_stat : a vector recording the permuted statistic when sample size is balanced
+ * @param pvalue : a vector recording the p value of each SNP
+ * @param xy : the upper triangle of distance matrix
+ * @param snp : SNP data
+ * @param n : sample size
+ * @param p : SNP number
+ * @param R : permutation replication
+ * @param nthread : number of thread
+ */
 void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, double *xy, const int *snp,
                   const int *n, const int *p, const int *R, const int *nthread) {
 #ifdef Ball_OMP_H_
@@ -514,21 +526,26 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
 #endif
 
     int *k_vector = (int *) malloc(*p * sizeof(int));
-    int *snp_vector = (int *) malloc(*n * sizeof(int)), **snp_matrix = alloc_int_matrix(*p, *n);
+    int *snp_vector = (int *) malloc(*n * sizeof(int)), *snp_index = (int *) malloc(*n * sizeof(int));
+    int **snp_matrix = alloc_int_matrix(*p, *n);
     int **size_list = (int **) malloc(*p * sizeof(int *));
     int **cumsum_size_list = (int **) malloc(*p * sizeof(int *));
     int s = 0;
     for (int i = 0; i < *p; ++i) {
         for (int j = 0; j < *n; ++j) {
-            snp_matrix[i][j] = snp[s++];
+            snp_vector[j] = snp[s++];
+            snp_index[j] = j;
         }
-        memcpy(snp_vector, snp_matrix[i], *n * sizeof(int));
-        sort_ints(snp_vector, (size_t) *n);
+        quicksort_int(snp_vector, snp_index, 0, *n - 1);
         k_vector[i] = 1;
+        int u = 0;
+        snp_matrix[i][snp_index[0]] = u;
         for (int j = 1; j < *n; ++j) {
             if (snp_vector[j] != snp_vector[j - 1]) {
                 k_vector[i] += 1;
+                u++;
             }
+            snp_matrix[i][snp_index[j]] = u;
         }
         size_list[i] = (int *) malloc(k_vector[i] * sizeof(int));
         cumsum_size_list[i] = (int *) malloc(k_vector[i] * sizeof(int));
@@ -544,6 +561,7 @@ void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, dou
         size_list[i][k_vector[i] - 1] = *n - cumsum_size_list[i][k_vector[i] - 1];
     }
     free(snp_vector);
+    free(snp_index);
 
     int **index_matrix = alloc_int_matrix(*n, *n);
     double **distance_matrix = alloc_matrix(*n, *n);

@@ -37,6 +37,22 @@ bd.gwas.test <- function(x, snp, method = c("permute", "spectrum"),
   num <- nrow(snp)
   snp_num <- ncol(snp)
   
+  distance <- ifelse(class(x) == "dist", TRUE, FALSE)
+  if (distance) {
+    if (class(x) == "dist") {
+      x <- as.vector(x)
+    } else {
+      x <- x[lower.tri(x)]
+    }
+  } else {
+    x <- as.vector(dist(x))
+  }
+  if ((0.5 * num * (num - 1)) != length(x)) {
+    stop("sample size of x and snp are not match!")
+  }
+  x <- na.fail(x)
+  snp <- na.fail(snp)
+  
   if (length(method) > 1) {
     method <- "permute"
   } else {
@@ -51,20 +67,6 @@ bd.gwas.test <- function(x, snp, method = c("permute", "spectrum"),
     }
   } else {
     r <- 0
-  }
-
-  distance <- ifelse(class(x) == "dist", TRUE, FALSE)
-  if (distance) {
-    if (class(x) == "dist") {
-      x <- as.vector(x)
-    } else {
-      x <- x[lower.tri(x)]
-    }
-  } else {
-    x <- as.vector(dist(x))
-  }
-  if ((0.5 * num * (num - 1)) != length(x)) {
-    stop("sample size of x and snp are not match!")
   }
   
   set.seed(seed)

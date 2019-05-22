@@ -746,6 +746,39 @@ void quicksort(double *array, int *idx, int l, int u) {
 }
 
 /**
+ * @inherit quicksort
+*/
+void quicksort_int(int *array, int *idx, int l, int u) {
+    int i, m, idx_temp;
+    int a_temp;
+    if (l >= u)
+        return;
+    m = l;
+    for (i = l + 1; i <= u; i++) {
+        if (array[i] < array[l]) {
+            ++m;
+            idx_temp = idx[m];
+            idx[m] = idx[i];
+            idx[i] = idx_temp;
+
+            a_temp = array[m];
+            array[m] = array[i];
+            array[i] = a_temp;
+        }
+    }
+    idx_temp = idx[l];
+    idx[l] = idx[m];
+    idx[m] = idx_temp;
+
+    a_temp = array[l];
+    array[l] = array[m];
+    array[m] = a_temp;
+
+    quicksort_int(array, idx, l, m - 1);
+    quicksort_int(array, idx, m + 1, u);
+}
+
+/**
  * Apply quicksort algorithm to a and b. After sorted, a is increasing while b is decreasing.
  * idx recode the index exchange result
  * @example : Input a = [2, 2, 1, 3], b = [1, 2, 3, 4], idx = [1, 2, 3, 4];

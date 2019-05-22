@@ -38,6 +38,7 @@ void computeRank(int n, int **Rank);
 void initRank(int n, int **Rank, int *xrank, int *yrank, int *i_perm);
 void initRank_bcor(int n, int **Rank, int *xrank, int *yrank);
 void quicksort(double *array, int *idx, int l, int u);
+void quicksort_int(int *array, int *idx, int l, int u);
 void quicksort2(double *a, double *b, int *idx, int l, int u);
 void quicksort3(double *a, double *b, int *idx, int l, int u);
 void rank_matrix_3d(double ***Dx, int n, int k, int ***Rx);
