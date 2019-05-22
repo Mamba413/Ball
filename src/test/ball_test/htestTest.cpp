@@ -207,31 +207,38 @@ TEST(BDTEST, bd_gwas_test) {
     int snp[40] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     int nth, p = 2, n = 20, R = 199;
+    int unique_k_num = 1;
+    int each_k_num[10] = {3, 3};
     nth = 1;
-    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp, &n, &p, &R, &nth);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp, &n, &p,
+                      &unique_k_num, each_k_num, &R, &nth);
     EXPECT_GE(p_value[1], 0.05);
     EXPECT_GE(p_value[3], 0.05);
 
     nth = 2;
-    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp, &n, &p, &R, &nth);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp, &n, &p,
+                      &unique_k_num, each_k_num, &R, &nth);
     EXPECT_GE(p_value[1], 0.05);
     EXPECT_GE(p_value[3], 0.05);
 
     int snp2[40] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
                     0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2};
     nth = 1;
-    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p,
+                      &unique_k_num, each_k_num, &R, &nth);
     EXPECT_GE(p_value[1], 0.05);
     EXPECT_GE(p_value[3], 0.05);
 
     nth = 2;
-    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p,
+                      &unique_k_num, each_k_num, &R, &nth);
     EXPECT_GE(p_value[1], 0.05);
     EXPECT_GE(p_value[3], 0.05);
 
     R = 49999;
     double permuted_stat_value2[99999];
-    bd_gwas_test(ball_stat_value, permuted_stat_value2, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value2, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p,
+                      &unique_k_num, each_k_num, &R, &nth);
     EXPECT_GE(p_value[1], 0.05);
     EXPECT_GE(p_value[3], 0.05);
 }

@@ -28,7 +28,11 @@ void sort_ints(int *a, size_t n);
 
 void KBD3(double *, double *, double *, int *, int *, int *, int *, int *);
 
-void bd_gwas_test(double *bd_stat, double *permuted_bd_stat, double *pvalue, double *xy, const int *snp,
-                  const int *n, const int *p, int *R, int *nthread);
+void bd_gwas_screening(double *bd_stat, double *permuted_bd_stat, double *pvalue, double *xy, int *snp,
+                       int *n, int *p, int *unique_k_num, int *each_k_num,
+                       int *R, int *nthread);
+
+void bd_gwas_refining(double *bd_stat, double *refine_permuted_bd_stat, double *pvalue, double *xy,
+                      int *n, int *refine_num, int *refine_size, int *refine_k_num, int *R, int *nthread);
 
 #endif //BALL_KBD_H

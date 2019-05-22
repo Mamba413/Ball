@@ -328,22 +328,28 @@ TEST(BD, bd_gwas) {
     int snp1[40] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
     int nth, p = 2, n = 20, R = 0;
+    int unique_k_num = 1;
+    int each_k_num[10] = {3, 3};
     nth = 1;
-    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp1, &n, &p, &R, &nth);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp1, &n, &p,
+                      &unique_k_num, each_k_num, &R, &nth);
     EXPECT_NEAR(ball_stat_value[1], 0.0614 * 10 * 10 / (20), ABSOLUTE_ERROR);
 
     nth = 2;
-    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp1, &n, &p, &R, &nth);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp1, &n, &p,
+                      &unique_k_num, each_k_num, &R, &nth);
     EXPECT_NEAR(ball_stat_value[1], 0.0614 * 10 * 10 / (20), ABSOLUTE_ERROR);
 
     int snp2[40] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
                     0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2};
     nth = 1;
-    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p,
+                      &unique_k_num, each_k_num, &R, &nth);
     EXPECT_NEAR(ball_stat_value[1], 1.384989, ABSOLUTE_ERROR);
 
     nth = 2;
-    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p, &R, &nth);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p,
+                      &unique_k_num, each_k_num, &R, &nth);
     EXPECT_NEAR(ball_stat_value[1], 1.384989, ABSOLUTE_ERROR);
 }
 
@@ -394,9 +400,11 @@ TEST(BD, bd_gwas_real) {
     }
 
     double ball_stat_value[20], permuted_stat_value[199], p_value[20];
-    int nth, R = 0;
+    int nth, R = 0, unique_k_num = 1;
+    int each_k_num[10] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
     nth = 1;
-    bd_gwas_test(ball_stat_value, permuted_stat_value, p_value, xy, snp, &n, &snp_num, &R, &nth);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, xy, snp, &n, &snp_num, &unique_k_num, each_k_num,
+                      &R, &nth);
     EXPECT_LE(p_value[0], 0.05);
 
     free(xy);
