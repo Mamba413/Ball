@@ -79,7 +79,9 @@ void resample3(int *i_perm, int *i_perm_tmp, int n, int *n1);
 void ranksort(int *n, int *zrank, double *z, int *zidx);
 void distance2matrix3d(double *distance, double ***distance_matrix3d, int n, int v);
 void declare_gwas_screening();
-void declare_gwas_refining(int refine_num);
-void estimate_gwas_refining_time(int i, int refine_num, int start_time);
+void declare_gwas_refining(int i, int refine_num);
+void print_pvalue(double pvalue);
+void print_cost_time(int second);
+void beautify_time(char result[], int seconds);
 
 #endif /* UTILITIES_H_ */

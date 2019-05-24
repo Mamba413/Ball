@@ -7,6 +7,7 @@
 #include "stdio.h"
 #include "utilities.h"
 #include "Ball_omp.h"
+#include "time.h"
 
 #ifdef R_BUILD
 #include "R.h"
@@ -830,7 +831,7 @@ void bd_gwas_refining(const double *bd_stat, double *refine_permuted_bd_stat, do
     }
 #endif
     if (*verbose_out) {
-        declare_gwas_refining(*refine_num);
+        declare_gwas_refining(-1, *refine_num);
     }
 
     int **index_matrix = alloc_int_matrix(*n, *n);
@@ -883,8 +884,9 @@ void bd_gwas_refining(const double *bd_stat, double *refine_permuted_bd_stat, do
     double **permuted_asymptotic_bd_stat_batch = alloc_matrix(batch_size, 2);
     double **permuted_asymptotic_bd_stat_matrix = alloc_matrix((*refine_num << 1), *R);
     for (int i = 0; i < *refine_num; ++i) {
+        time_t time_start = time(NULL);
         if (*verbose_out) {
-            estimate_gwas_refining_time(i, *refine_num, 0);
+            declare_gwas_refining(i + 1, *refine_num);
         }
         int row_index = 2 * i, permuted_k = refine_k_num[i];
         int *permuted_size = (int *) malloc(permuted_k * sizeof(int));
@@ -954,6 +956,12 @@ void bd_gwas_refining(const double *bd_stat, double *refine_permuted_bd_stat, do
         pvalue[i] = compute_pvalue(bd_stat[i], permuted_asymptotic_bd_stat_matrix[2 * i], *R);
         pvalue[i + *refine_num] = compute_pvalue(bd_stat[i + *refine_num],
                                                  permuted_asymptotic_bd_stat_matrix[2 * i + 1], *R);
+        time_t time_end = time(NULL);
+        if (*verbose_out) {
+            print_pvalue(pvalue[i]);
+            print_cost_time((int) difftime(time_end, time_start));
+        }
+
     }
 
     free(label);

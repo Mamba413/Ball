@@ -85,6 +85,16 @@ TEST(utilities, count_smaller_number_after_self_solution) {
     }
 }
 
+TEST(utilities, beautify_time) {
+    char result1[200] = "";
+    int second = 100000;
+    beautify_time(result1, second);
+    char true_result1[200] = "1 day, 3 hours, 46 minutes, 40 seconds";
+    for (int i = 0; i < strlen(result1); ++i) {
+        EXPECT_EQ(true_result1[i], result1[i]);
+    }
+}
+
 TEST(KBD, sub_rank_finder) {
     int k = 3, n = 30, size[3] = {10, 10, 10}, cumsum_size[3] = {0, 10, 20}, label[30];
     double *x123_continuous, **distance_matrix;

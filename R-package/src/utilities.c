@@ -1444,20 +1444,95 @@ void declare_gwas_screening() {
 #endif
 }
 
-void declare_gwas_refining(int refine_num) {
+void declare_gwas_refining(int i, int refine_num) {
 #ifdef R_BUILD
-    Rprintf("=========== Refining the p-value of %d SNP ===========\n", refine_num);
+    if (i == -1) {
+        Rprintf("=========== Refining the p-value of %d SNP ===========\n", refine_num);
+    } else {
+        Rprintf("Refining SNP... Progress: %d/%d. \n", i, refine_num);
+    }
 #else
-    printf("=========== Refining the p-value of %d SNP ===========\n", refine_num);
+    if (i == -1) {
+        printf("=========== Refining the p-value of %d SNP ===========\n", refine_num);
+    } else {
+        printf("Refining SNP... Progress: %d/%d. \n", i, refine_num);
+    }
 #endif
 }
 
-void estimate_gwas_refining_time(int i, int refine_num, int start_time) {
-    double relative_progress = (double) i / (double) refine_num;
-    int relative_progress_prop = (int) round(100 * relative_progress);
+void print_pvalue(double pvalue) {
 #ifdef R_BUILD
-    Rprintf("Refining SNP... Progress: %d%%. \n", relative_progress_prop);
+    Rprintf("Refined p-value: %11.10f, ", pvalue);
 #else
-    printf("Refining SNP... Progress: %d%%. \n", relative_progress_prop);
+    printf("Refined p-value: %11.10f, ", pvalue);
 #endif
+}
+
+void print_cost_time(int second) {
+    char result[200] = "";
+    beautify_time(result, second);
+#ifdef R_BUILD
+    Rprintf("cost time: %s.\n", result);
+#else
+    printf("cost time: %s.\n", result);
+#endif
+}
+
+void int_to_string(char str[], int number) {
+    sprintf(str, "%d", number);
+}
+
+void beautify_time(char result[], int seconds) {
+    // Add seconds, minutes, hours, days if larger than zero
+    char second_str[] = " seconds";
+    char out_second_str[50] = "";
+    int out_seconds = seconds % 60;
+    int_to_string(out_second_str, out_seconds);
+    strcat(out_second_str, second_str);
+    int out_minutes = (seconds / 60) % 60;
+    char out_minutes_str[100] = "";
+    if (seconds / 60 == 0) {
+        strcat(result, out_second_str);
+        return;
+    } else if (out_minutes == 1) {
+        strcat(out_minutes_str, "1 minute, ");
+        strcat(out_minutes_str, out_second_str);
+    } else {
+        char minutes[] = " minutes, ";
+        strcat(out_minutes_str, "");
+        int_to_string(out_minutes_str, out_minutes);
+        strcat(minutes, out_second_str);
+        strcat(out_minutes_str, minutes);
+    }
+    int out_hours = (seconds / 3600) % 24;
+    char out_hours_str[150] = "";
+    if (seconds / 3600 == 0) {
+        strcat(result, out_minutes_str);
+        return;
+    } else if (out_hours == 1) {
+        strcat(out_hours_str, "1 hour, ");
+        strcat(out_hours_str, out_minutes_str);
+    } else {
+        char hours[] = " hours, ";
+        strcat(out_hours_str, "");
+        int_to_string(out_hours_str, out_hours);
+        strcat(hours, out_minutes_str);
+        strcat(out_hours_str, hours);
+    }
+    int out_days = (seconds / 86400);
+    char out_days_str[200] = "";
+    if (out_days == 0) {
+        strcat(result, out_hours_str);
+        return;
+    } else if (out_days == 1) {
+        strcat(out_days_str, "1 day, ");
+        strcat(out_days_str, out_hours_str);
+    } else {
+        char days[] = " days, ";
+        strcat(out_days_str, "");
+        int_to_string(out_days_str, out_days);
+        strcat(days, out_hours_str);
+        strcat(out_days_str, days);
+    }
+    strcat(result, out_days_str);
 }
