@@ -163,13 +163,13 @@ TEST(BCOVTEST, independence_test_multivariate) {
 
 TEST(KBCOVTEST, mutual_independence_test_multivariate) {
     double ball_stat_value[3], p_value[3];
-    int nth, n = 10, k = 3, R = 299, dst = 1, dst_num = n * (n - 1)>>1;;
+    int nth, n = 10, k = 3, R = 299, dst = 1, dst_num = n * (n - 1) >> 1;;
     double *dxyz_vector;
-    dxyz_vector = (double *) malloc((k * ((n * (n - 1))>>1)) * sizeof(double));
+    dxyz_vector = (double *) malloc((k * ((n * (n - 1)) >> 1)) * sizeof(double));
 
     // Discrete case:
     nth = 1;
-    for (int l = 0; l < ((n * (n - 1))>>1); ++l) {
+    for (int l = 0; l < ((n * (n - 1)) >> 1); ++l) {
         dxyz_vector[l] = X1_DISCRETE_DST[l];
         dxyz_vector[l + dst_num] = X2_DISCRETE_DST[l];
         dxyz_vector[l + (dst_num << 1)] = X3_DISCRETE_DST[l];
@@ -186,7 +186,7 @@ TEST(KBCOVTEST, mutual_independence_test_multivariate) {
 
     // Continuous case:
     nth = 1;
-    for (int l = 0; l < ((n * (n - 1))>>1); ++l) {
+    for (int l = 0; l < ((n * (n - 1)) >> 1); ++l) {
         dxyz_vector[l] = X1_CONTINUOUS_DST[l];
         dxyz_vector[l + dst_num] = X2_CONTINUOUS_DST[l];
         dxyz_vector[l + (dst_num << 1)] = X3_CONTINUOUS_DST[l];
@@ -204,18 +204,19 @@ TEST(KBCOVTEST, mutual_independence_test_multivariate) {
 
 TEST(BDTEST, bd_gwas_test) {
     double ball_stat_value[4], permuted_stat_value[398], p_value[4];
+    int *xy_index = (int *) malloc(400 * sizeof(int));
     int snp[40] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    int nth, p = 2, n = 20, R = 199, unique_k_num = 1, verbose = 0;
+    int ties = 0, nth, p = 2, n = 20, R = 199, unique_k_num = 1, verbose = 0;
     int each_k_num[10] = {3, 3};
     nth = 1;
-    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp, &n, &p,
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, xy_index, &ties, X1_X2_CONTINUOUS_DST, snp, &n, &p,
                       &unique_k_num, each_k_num, &R, &nth, &verbose);
     EXPECT_GE(p_value[1], 0.05);
     EXPECT_GE(p_value[3], 0.05);
 
     nth = 2;
-    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp, &n, &p,
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, xy_index, &ties, X1_X2_CONTINUOUS_DST, snp, &n, &p,
                       &unique_k_num, each_k_num, &R, &nth, &verbose);
     EXPECT_GE(p_value[1], 0.05);
     EXPECT_GE(p_value[3], 0.05);
@@ -223,21 +224,23 @@ TEST(BDTEST, bd_gwas_test) {
     int snp2[40] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
                     0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2};
     nth = 1;
-    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p,
-                      &unique_k_num, each_k_num, &R, &nth, &verbose);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, xy_index, &ties,
+                      X1_X2_CONTINUOUS_DST, snp2, &n, &p, &unique_k_num, each_k_num, &R, &nth, &verbose);
     EXPECT_GE(p_value[1], 0.05);
     EXPECT_GE(p_value[3], 0.05);
 
     nth = 2;
-    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p,
-                      &unique_k_num, each_k_num, &R, &nth, &verbose);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, xy_index, &ties,
+                      X1_X2_CONTINUOUS_DST, snp2, &n, &p, &unique_k_num, each_k_num, &R, &nth, &verbose);
     EXPECT_GE(p_value[1], 0.05);
     EXPECT_GE(p_value[3], 0.05);
 
     R = 49999;
     double permuted_stat_value2[99999];
-    bd_gwas_screening(ball_stat_value, permuted_stat_value2, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p,
-                      &unique_k_num, each_k_num, &R, &nth, &verbose);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value2, p_value, xy_index, &ties,
+                      X1_X2_CONTINUOUS_DST, snp2, &n, &p, &unique_k_num, each_k_num, &R, &nth, &verbose);
     EXPECT_GE(p_value[1], 0.05);
     EXPECT_GE(p_value[3], 0.05);
+
+    free(xy_index);
 }

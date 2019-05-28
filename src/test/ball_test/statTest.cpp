@@ -325,31 +325,33 @@ TEST(BCor, bcor_zero_value) {
 
 TEST(BD, bd_gwas) {
     double ball_stat_value[4], permuted_stat_value[2], p_value[4];
+    int *xy_index = (int *) malloc(400 * sizeof(int));
     int snp1[40] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    int nth, p = 2, n = 20, R = 0, unique_k_num = 1, verbose = 0;
+    int ties = 0, nth, p = 2, n = 20, R = 0, unique_k_num = 1, verbose = 0;
     int each_k_num[10] = {3, 3};
     nth = 1;
-    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp1, &n, &p,
-                      &unique_k_num, each_k_num, &R, &nth, &verbose);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, xy_index, &ties,
+                      X1_X2_CONTINUOUS_DST, snp1, &n, &p, &unique_k_num, each_k_num, &R, &nth, &verbose);
     EXPECT_NEAR(ball_stat_value[1], 0.0614 * 10 * 10 / (20), ABSOLUTE_ERROR);
 
     nth = 2;
-    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp1, &n, &p,
-                      &unique_k_num, each_k_num, &R, &nth, &verbose);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, xy_index, &ties,
+                      X1_X2_CONTINUOUS_DST, snp1, &n, &p, &unique_k_num, each_k_num, &R, &nth, &verbose);
     EXPECT_NEAR(ball_stat_value[1], 0.0614 * 10 * 10 / (20), ABSOLUTE_ERROR);
 
     int snp2[40] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
                     0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2};
     nth = 1;
-    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p,
-                      &unique_k_num, each_k_num, &R, &nth, &verbose);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, xy_index, &ties,
+                      X1_X2_CONTINUOUS_DST, snp2, &n, &p, &unique_k_num, each_k_num, &R, &nth, &verbose);
     EXPECT_NEAR(ball_stat_value[1], 1.384989, ABSOLUTE_ERROR);
 
     nth = 2;
-    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, X1_X2_CONTINUOUS_DST, snp2, &n, &p,
-                      &unique_k_num, each_k_num, &R, &nth, &verbose);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, xy_index, &ties,
+                      X1_X2_CONTINUOUS_DST, snp2, &n, &p, &unique_k_num, each_k_num, &R, &nth, &verbose);
     EXPECT_NEAR(ball_stat_value[1], 1.384989, ABSOLUTE_ERROR);
+    free(xy_index);
 }
 
 TEST(BD, bd_gwas_real) {
@@ -374,6 +376,7 @@ TEST(BD, bd_gwas_real) {
     }
     Euclidean_distance(x, dx, n, d);
     double *xy = (double *) malloc(((n * (n - 1)) >> 1) * sizeof(double));
+    int *xy_index = (int *) malloc((n * n) * sizeof(int));
     int s = 0;
     for (int i = 0; i < n; ++i) {
         for (int j = (i + 1); j < n; ++j) {
@@ -399,14 +402,15 @@ TEST(BD, bd_gwas_real) {
     }
 
     double ball_stat_value[20], permuted_stat_value[199], p_value[20];
-    int nth, R = 0, unique_k_num = 1, verbose = 0;
+    int ties = 0, nth, R = 0, unique_k_num = 1, verbose = 0;
     int each_k_num[10] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
     nth = 1;
-    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, xy, snp, &n, &snp_num, &unique_k_num, each_k_num,
-                      &R, &nth, &verbose);
+    bd_gwas_screening(ball_stat_value, permuted_stat_value, p_value, xy_index, &ties,
+                      xy, snp, &n, &snp_num, &unique_k_num, each_k_num, &R, &nth, &verbose);
     EXPECT_LE(p_value[0], 0.05);
 
     free(xy);
+    free(xy_index);
     delete[] x;
     delete[] dx;
 }

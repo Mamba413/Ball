@@ -49,11 +49,9 @@
 #'   sample(0:2, size = 3 * num, replace = TRUE)
 #' })
 #' snp[, 300] <- rep(0:2, each = num)
-#' res <- Ball::bd.gwas.test(x = x, snp = snp)
+#' res <- Ball::bd.gwas.test(x = x, snp = snp, num.permutations = 19999)
 #' 
-#' set.seed(1234)
 #' num <- 200
-#' p <- 5
 #' snp_num <- 10000
 #' x <- matrix(rnorm(num * p), nrow = num)
 #' snp <- sapply(1:snp_num, function(i) {
@@ -116,13 +114,15 @@ bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"), re
     r <- 0
   }
   
-  set.seed(seed)
   eigenvalue <- NULL
   p_value <- NULL
   if (is.null(screening.file)) {
+    set.seed(seed)
     statistic <- as.double(numeric(snp_num * 2))
     permuted_statistic <- as.double(numeric(r * 2 * unique_class_num))
     p_value <- as.double(numeric(snp_num * 2) + 1)
+    x_index <- as.integer(numeric(num * num))
+    ties <- integer(1)
     x <- as.double(x)
     snp_vec <- as.integer(snp)
     num <- as.integer(num)
@@ -133,12 +133,14 @@ bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"), re
     nth <- as.integer(num.threads)
     verbose_out <- as.integer(verbose)
     
-    screen_res <- .C("bd_gwas_screening", statistic, permuted_statistic, p_value, 
+    screen_res <- .C("bd_gwas_screening", statistic, permuted_statistic, p_value, x_index, ties,
                      x, snp_vec, num, snp_num, unique_class_num, each_class_num, 
                      r, nth, verbose_out)
     
     statistic <- screen_res[[1]][1:snp_num]
     permuted_statistic <- data.frame()
+    x_index <- screen_res[[4]]
+    ties <- screen_res[[5]]
     if (screening.method == "permute") {
       if (num.permutations > 0) {
         permuted_statistic <- data.frame(matrix(screen_res[[2]], nrow = r))
@@ -152,7 +154,7 @@ bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"), re
       p_value <- NULL
     }
     if (!is.null(save.screening)) {
-      save(statistic, permuted_statistic, p_value, file = save.screening)
+      save(statistic, permuted_statistic, p_value, x_index, ties, file = save.screening)
     }
   } else {
     if (file.exists(screening.file)) {
@@ -177,28 +179,35 @@ bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"), re
           print("None of SNP pass the pre-screening process!")
         }
       } else {
-        refine_snp_statistic <- as.double(c(statistic[refine_snp_index], statistic[refine_snp_index]))
-        refine_permuted_statistic <- as.double(numeric(r * 2 * refine_snp_num))
-        refine_p_value <- as.double(numeric(2 * refine_snp_num))
+        set.seed(seed)
+        refine_permuted_statistic_matirx <- matrix(nrow = r, ncol = refine_snp_num)
+        refine_p_value_vector <- numeric(refine_snp_num)
+        x_index <- as.integer(x_index)
+        ties <- as.integer(ties)
         x <- as.double(x)
         num <- as.integer(num)
+        refine_snp_num <- as.integer(refine_snp_num)
         r <- as.integer(r)
         nth <- as.integer(num.threads)
         verbose_out <- as.integer(verbose)
-        refine_snp_num <- as.integer(refine_snp_num)
-        refine_snp_size_vec <- as.integer(apply(snp[, refine_snp_index, drop = FALSE], 2, table))
-        refine_snp_class_num <- as.integer(snp_class_num[refine_snp_index])
+        for (i in 1:length(refine_snp_index)) {
+          refine_snp_statistic <- as.double(c(statistic[refine_snp_index[i]], statistic[refine_snp_index[i]]))
+          refine_permuted_statistic <- as.double(numeric(r * 2))
+          refine_p_value <- as.double(numeric(2))
+          refine_snp_size_vec <- as.integer(table(snp[, refine_snp_index[i]]))
+          refine_i_th <- as.integer(i)
+          refine_k_num <- as.integer(snp_class_num[refine_snp_index[i]])
+          
+          refine_res <- .C("bd_gwas_refining_single", refine_snp_statistic, refine_permuted_statistic, refine_p_value, x_index, ties,
+                           x, num, refine_snp_size_vec, refine_i_th, refine_k_num, 
+                           refine_snp_num, r, nth, verbose_out)
+          refine_permuted_statistic_matirx[, i] <- refine_res[[2]][seq(1, 2 * refine_snp_num, by = 2)]
+          refine_p_value_vector[i] <- refine_res[[3]][1]
+        }
         
-        refine_res <- .C("bd_gwas_refining", refine_snp_statistic, refine_permuted_statistic, refine_p_value,
-                         x, num, refine_snp_num, refine_snp_size_vec, refine_snp_class_num,
-                         r, nth, verbose_out)
-        
-        refine_permuted_statistic <- data.frame(matrix(refine_res[[2]], nrow = r))
-        refine_permuted_statistic <- refine_permuted_statistic[, seq(1, 2 * refine_snp_num, by = 2), drop = FALSE]
-        colnames(refine_permuted_statistic) <- paste0("SNP", sort(unique(refine_snp_index)))
-        refine_p_value <- refine_res[[3]][1:refine_snp_num]
-        p_value[refine_snp_index] <- refine_p_value
-        if (any(refine_p_value < alpha)) {
+        colnames(refine_permuted_statistic_matirx) <- paste0("SNP", refine_snp_index)
+        p_value[refine_snp_index] <- refine_p_value_vector
+        if (any(refine_p_value_vector < alpha)) {
           significant_snp <- which(p_value < alpha)
         }
       }

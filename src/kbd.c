@@ -539,6 +539,8 @@ void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *
  * @param bd_stat : a vector recording the Ball Divergence statistic values
  * @param permuted_bd_stat : a vector recording the permuted statistic when sample size is balanced
  * @param pvalue : a vector recording the p value of each SNP
+ * @param xy_index : the index of the each row of distance matrix
+ * @param ties : any ties in dataset
  * @param xy : the upper triangle of distance matrix
  * @param snp : SNP data
  * @param n : sample size
@@ -548,8 +550,9 @@ void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *
  * @param R : permutation replication
  * @param nthread : number of thread
  */
-void bd_gwas_screening(double *bd_stat, double *permuted_bd_stat, double *pvalue, double *xy, const int *snp,
-                       const int *n, const int *p, const int *unique_k_num, const int *each_k_num,
+void bd_gwas_screening(double *bd_stat, double *permuted_bd_stat, double *pvalue, int *xy_index, int *ties,
+                       double *xy, const int *snp, const int *n, const int *p,
+                       const int *unique_k_num, const int *each_k_num,
                        const int *R, const int *nthread, const int *verbose_out) {
 #ifdef Ball_OMP_H_
     omp_set_dynamic(0);
@@ -609,15 +612,18 @@ void bd_gwas_screening(double *bd_stat, double *permuted_bd_stat, double *pvalue
             index_matrix[i][j] = j;
         }
     }
-    int ties = 0;
     double *distance_matrix_copy = (double *) malloc(*n * sizeof(double));
+    s = 0;
     for (int i = 0; i < *n; i++) {
         memcpy(distance_matrix_copy, distance_matrix[i], *n * sizeof(double));
         quicksort(distance_matrix_copy, index_matrix[i], 0, *n - 1);
-        if (!ties) {
+        for (int j = 0; j < *n; ++j) {
+            xy_index[s++] = index_matrix[i][j];
+        }
+        if (!(*ties)) {
             for (int j = 1; j < *n; ++j) {
                 if (distance_matrix_copy[j] == distance_matrix_copy[j - 1]) {
-                    ties = 1;
+                    *ties = 1;
                     break;
                 }
             }
@@ -832,6 +838,158 @@ void bd_gwas_screening(double *bd_stat, double *permuted_bd_stat, double *pvalue
     free_int_matrix(index_matrix, *n, *n);
     free_matrix(asymptotic_bd_stat_array, *p, 2);
     free(k_vector);
+}
+
+/**
+ *
+ * @param bd_stat : a vector recording the Ball Divergence statistic values
+ * @param permuted_bd_stat : a vector recording the permuted statistic when sample size is balanced
+ * @param pvalue : a vector recording the p value of each SNP
+ * @param xy_index : the index of the each row of distance matrix
+ * @param ties : any ties in dataset
+ * @param xy : the upper triangle of distance matrix
+ * @param snp : SNP data
+ * @param n : sample size
+ * @param refine_size : the sample size of each group
+ * @param refine_i_th : the i-th SNP to refine p-value
+ * @param refine_snp_num : the total number of SNP to be refined
+ * @param refine_k_num : the number of groups
+ * @param R : permutation replication
+ * @param nthread : number of thread
+ * @param verbose_out : whether output the computational details
+ */
+void bd_gwas_refining_single(const double *bd_stat, double *refine_permuted_bd_stat, double *pvalue,
+                             const int *xy_index, const int *ties, double *xy, const int *n, const int *refine_size,
+                             const int *refine_i_th, const int *refine_k_num,
+                             const int *refine_snp_num, const int *R, const int *nthread, const int *verbose_out) {
+#ifdef Ball_OMP_H_
+    omp_set_dynamic(0);
+    if (*nthread <= 0) {
+        omp_set_num_threads(omp_get_num_procs());
+    } else {
+        omp_set_num_threads(*nthread);
+    }
+#endif
+
+    int **index_matrix = alloc_int_matrix(*n, *n);
+    double **distance_matrix = alloc_matrix(*n, *n);
+    distance2matrix(xy, distance_matrix, *n);
+    int s = 0;
+    for (int i = 0; i < *n; i++) {
+        for (int j = 0; j < *n; j++) {
+            index_matrix[i][j] = xy_index[s++];
+        }
+    }
+    void (*sub_rank_finder_point)(int ***, double **, int **, const int *, const int *, const int *,
+                                  const int *, int, int);
+    void (*full_rank_finder_point)(int ***, double **, int **, const int *, const int *, const int *,
+                                   const int *, int, int);
+    if (*ties) {
+        sub_rank_finder_point = &sub_rank_finder_tie;
+        full_rank_finder_point = &full_rank_finder_tie;
+    } else {
+        sub_rank_finder_point = &sub_rank_finder;
+        full_rank_finder_point = &full_rank_finder;
+    }
+
+    int batch_size = 20000;
+    if (*R < batch_size) {
+        batch_size = *R;
+    }
+    int fix_batch_size = batch_size;
+    int add_round = (*R % batch_size) == 0 ? 0 : 1;
+    int batch_round = (*R / batch_size) + add_round;
+    int largeR = *R - (batch_round - add_round) * (batch_size);
+    int *label = (int *) malloc(*n * sizeof(int));
+    int **label_matrix = alloc_int_matrix(batch_size, *n);
+    int **group_relative_location_matrix = alloc_int_matrix(batch_size, *n);
+    double **permuted_asymptotic_bd_stat_batch = alloc_matrix(batch_size, 2);
+    double **permuted_asymptotic_bd_stat_matrix = alloc_matrix(2, *R);
+
+    time_t time_start = time(NULL);
+    if (*verbose_out) {
+        declare_gwas_refining(*refine_i_th, *refine_snp_num);
+    }
+    int permuted_k = *refine_k_num;
+    int *permuted_size = (int *) malloc(permuted_k * sizeof(int));
+    int *permuted_cumsum_size = (int *) malloc(permuted_k * sizeof(int));
+    s = 0;
+    for (int j = 0; j < permuted_k; ++j) {
+        permuted_size[j] = refine_size[s++];
+    }
+    permuted_cumsum_size[0] = 0;
+    for (int j = 1; j < permuted_k; ++j) {
+        permuted_cumsum_size[j] = permuted_cumsum_size[j - 1] + permuted_size[j - 1];
+    }
+    int permuted_bd_stat_number = ((permuted_k - 1) * permuted_k) >> 1;
+    int *permuted_pairwise_size = (int *) malloc(permuted_bd_stat_number * sizeof(int));
+    compute_pairwise_size(permuted_pairwise_size, permuted_size, &permuted_k);
+    int t = 0;
+    for (int j = 0; j < permuted_k; ++j) {
+        for (int k = 0; k < permuted_size[j]; ++k) {
+            label[t++] = j;
+        }
+    }
+    // use several batch to conduct permutation to prevent memory insufficient
+    for (int round = 0; round < batch_round; ++round) {
+        if ((round == (batch_round - 1)) && (largeR > 0)) {
+            batch_size = largeR;
+        }
+        resample2_matrix(label_matrix, label, batch_size, *n);
+        for (int r = 0; r < batch_size; ++r) {
+            find_group_relative_location(group_relative_location_matrix[r], label_matrix[r],
+                                         permuted_cumsum_size, *n, permuted_k);
+        }
+#pragma omp parallel
+        {
+            int r_thread;
+            int ***sub_rank_thread = alloc_int_square_matrix_list(permuted_size, permuted_k);
+            int ***full_rank_thread = alloc_int_square_matrix_list(permuted_pairwise_size,
+                                                                   permuted_bd_stat_number);
+#pragma omp for
+            for (r_thread = 0; r_thread < batch_size; ++r_thread) {
+                find_group_relative_location(group_relative_location_matrix[r_thread], label_matrix[r_thread],
+                                             permuted_cumsum_size, *n, permuted_k);
+                sub_rank_finder_point(sub_rank_thread, distance_matrix, index_matrix, label_matrix[r_thread],
+                                      group_relative_location_matrix[r_thread], permuted_cumsum_size,
+                                      permuted_size, *n, permuted_k - 1);
+                full_rank_finder_point(full_rank_thread, distance_matrix, index_matrix, label_matrix[r_thread],
+                                       group_relative_location_matrix[r_thread], permuted_cumsum_size,
+                                       permuted_size, *n, permuted_k - 1);
+                asymptotic_ball_divergence(permuted_asymptotic_bd_stat_batch[r_thread], full_rank_thread,
+                                           sub_rank_thread, permuted_size, permuted_k,
+                                           permuted_bd_stat_number);
+            }
+            free_int_square_matrix_list(sub_rank_thread, permuted_size, permuted_k);
+            free_int_square_matrix_list(full_rank_thread, permuted_pairwise_size, permuted_bd_stat_number);
+        };
+        int start = round * fix_batch_size;
+        for (int r = 0; r < batch_size; ++r) {
+            permuted_asymptotic_bd_stat_matrix[0][r + start] = permuted_asymptotic_bd_stat_batch[r][0];
+            permuted_asymptotic_bd_stat_matrix[1][r + start] = permuted_asymptotic_bd_stat_batch[r][1];
+            refine_permuted_bd_stat[start + r] = permuted_asymptotic_bd_stat_batch[r][0];
+            refine_permuted_bd_stat[*R + start + r] = permuted_asymptotic_bd_stat_batch[r][1];
+        }
+    }
+    batch_size = fix_batch_size;
+    free(permuted_size);
+    free(permuted_cumsum_size);
+    free(permuted_pairwise_size);
+    pvalue[0] = compute_pvalue(bd_stat[0], permuted_asymptotic_bd_stat_matrix[0], *R);
+    pvalue[1] = compute_pvalue(bd_stat[1], permuted_asymptotic_bd_stat_matrix[1], *R);
+    time_t time_end = time(NULL);
+    if (*verbose_out) {
+        print_pvalue(pvalue[0]);
+        print_cost_time((int) difftime(time_end, time_start));
+    }
+
+    free(label);
+    free_int_matrix(label_matrix, batch_size, *n);
+    free_int_matrix(group_relative_location_matrix, batch_size, *n);
+    free_matrix(permuted_asymptotic_bd_stat_batch, batch_size, 2);
+    free_matrix(permuted_asymptotic_bd_stat_matrix, 2, *R);
+    free_matrix(distance_matrix, *n, *n);
+    free_int_matrix(index_matrix, *n, *n);
 }
 
 /**

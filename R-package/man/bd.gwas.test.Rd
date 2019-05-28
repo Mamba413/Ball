@@ -70,11 +70,9 @@ snp <- sapply(1:snp_num, function(i) {
   sample(0:2, size = 3 * num, replace = TRUE)
 })
 snp[, 300] <- rep(0:2, each = num)
-res <- Ball::bd.gwas.test(x = x, snp = snp)
+res <- Ball::bd.gwas.test(x = x, snp = snp, num.permutations = 19999)
 
-set.seed(1234)
 num <- 200
-p <- 5
 snp_num <- 10000
 x <- matrix(rnorm(num * p), nrow = num)
 snp <- sapply(1:snp_num, function(i) {
