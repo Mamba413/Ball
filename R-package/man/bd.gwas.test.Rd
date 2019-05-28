@@ -5,7 +5,8 @@
 \title{Fast K-sample Ball Divergence Test for GWAS Data}
 \usage{
 bd.gwas.test(x, snp, screening.method = c("permute", "spectrum"),
-  num.permutations, distance = FALSE, alpha, verbose = TRUE,
+  refine = TRUE, num.permutations, distance = FALSE, alpha,
+  save.screening = NULL, screening.file = NULL, verbose = TRUE,
   seed = 1, num.threads = 0, ...)
 }
 \arguments{
@@ -71,16 +72,20 @@ snp <- sapply(1:snp_num, function(i) {
 snp[, 300] <- rep(0:2, each = num)
 res <- Ball::bd.gwas.test(x = x, snp = snp)
 
+set.seed(1234)
 num <- 200
+p <- 5
 snp_num <- 10000
 x <- matrix(rnorm(num * p), nrow = num)
 snp <- sapply(1:snp_num, function(i) {
   sample(0:2, size = num, replace = TRUE, prob = c(1/2, 1/4, 1/4))
 })
-res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, num.permutations = 19999)
+res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, num.permutations = 19999, save.screening = "test.rda")
 mean(res[["p.value"]] < 0.05)
 mean(res[["p.value"]] < 0.005)
 mean(res[["p.value"]] < 0.0005)
+res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, num.permutations = 19999, screening.file = "test.rda")
+
 }
 }
 \seealso{

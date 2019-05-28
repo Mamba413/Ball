@@ -331,6 +331,33 @@ void compute_pairwise_size(int *pairwise_size, const int *size, const int *k) {
     }
 }
 
+void compute_optimized_permuted_size(int *permuted_size, const int *k_vector,
+                                     int **size_list, int n, int p, const int target_k) {
+    double tmp_size_vec[target_k], all_size_vec[target_k];
+    for (int i = 0; i < target_k; ++i) {
+        all_size_vec[i] = 0.0;
+    }
+    int target_k_num = 0;
+    for (int i = 0; i < p; ++i) {
+        if (k_vector[i] == target_k) {
+            target_k_num++;
+            for (int j = 0; j < target_k; ++j) {
+                tmp_size_vec[j] = size_list[i][j];
+            }
+            quick_sort(tmp_size_vec, target_k);
+            for (int j = 0; j < target_k; j++) {
+                all_size_vec[j] += tmp_size_vec[j];
+            }
+        }
+    }
+    int tmp_sum = 0;
+    for (int i = 0; i < target_k - 1; ++i) {
+        permuted_size[i] = (int) (all_size_vec[i] / (target_k_num));
+        tmp_sum += permuted_size[i];
+    }
+    permuted_size[target_k - 1] = n - tmp_sum;
+}
+
 /* Comparison function. Receives two generic (void) pointers to the items under comparison. */
 int compare_ints(const void *p, const void *q) {
     int x = *(const int *) p;
@@ -516,6 +543,8 @@ void KBD3(double *kbd_stat, double *pvalue, double *xy, int *size, int *n, int *
  * @param snp : SNP data
  * @param n : sample size
  * @param p : SNP number
+ * @param unique_k_num : the distinct k number
+ * @param each_k_num : the number of SNP with label k;
  * @param R : permutation replication
  * @param nthread : number of thread
  */
@@ -645,11 +674,9 @@ void bd_gwas_screening(double *bd_stat, double *permuted_bd_stat, double *pvalue
     free_int_matrix(snp_matrix, *p, *n);
     free_int_matrix(snp_group_relative_location, *p, *n);
     for (int i = 0; i < *p; ++i) {
-        free(size_list[i]);
         free(cumsum_size_list[i]);
         free(pairwise_size[i]);
     }
-    free(size_list);
     free(cumsum_size_list);
     free(pairwise_size);
     free(bd_stat_number_vector);
@@ -698,12 +725,7 @@ void bd_gwas_screening(double *bd_stat, double *permuted_bd_stat, double *pvalue
             int row_index = 2 * k;
             int permuted_k = unique_k_vector[k], permuted_bd_stat_number = ((permuted_k - 1) * permuted_k) >> 1;
             int *permuted_size = (int *) malloc(permuted_k * sizeof(int));
-            int tmp_cumsum_size = 0;
-            for (int j = 0; j < (permuted_k - 1); ++j) {
-                permuted_size[j] = *n / permuted_k;
-                tmp_cumsum_size += permuted_size[j];
-            }
-            permuted_size[permuted_k - 1] = *n - tmp_cumsum_size;
+            compute_optimized_permuted_size(permuted_size, k_vector, size_list, *n, *p, permuted_k);
             int *permuted_cumsum_size = (int *) malloc(permuted_k * sizeof(int));
             compute_cumsum_size(permuted_cumsum_size, permuted_size, &permuted_k);
             int *permuted_pairwise_size = (int *) malloc(permuted_bd_stat_number * sizeof(int));
@@ -802,7 +824,10 @@ void bd_gwas_screening(double *bd_stat, double *permuted_bd_stat, double *pvalue
         free_matrix(permuted_asymptotic_bd_stat_matrix, (*unique_k_num << 1), *R);
         free(unique_k_vector);
     }
-
+    for (int i = 0; i < *p; ++i) {
+        free(size_list[i]);
+    }
+    free(size_list);
     free_matrix(distance_matrix, *n, *n);
     free_int_matrix(index_matrix, *n, *n);
     free_matrix(asymptotic_bd_stat_array, *p, 2);
