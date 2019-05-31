@@ -1,54 +1,58 @@
 #' @title Ball Covariance Test
 #' @author Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu, Jin Zhu
-#' @description Ball Covariance test of multivariate independence. 
-#' Ball covariance are generic multivariate measures of dependence in Banach spaces.
+#' @description Ball Covariance test of independence. 
+#' Ball covariance are generic dependence measures in Banach spaces.
 #' 
 #' @inheritParams bd.test
-#' @param x a numeric vector, matirx, data.frame, or a list containing numeric vector, matrix, data.frame.
-#' @param y a numeric vector, matirx, or data.frame.
+#' @param x a numeric vector, matrix, data.frame, or a list containing at least two numeric vectors, matrices, or data.frames.
+#' @param y a numeric vector, matrix, or data.frame.
+#' @param num.permutations the number of permutation replications. When \code{num.permutations = 0}, the function just returns
+#' the Ball Covariance statistic. Default: \code{num.permutations = 99}.
 #' @param distance if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.
-#' @param weight a logical or character string used to choose the form of the weight of Ball Covariance. 
+#' @param weight a logical or character string used to choose the weight form of Ball Covariance statistic.. 
 #' If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, or \code{"chisquare"}. 
-#' Any unambiguous substring can be given. Default: \code{weight = FALSE}.
-## @param type If \code{type = 'bcor'}, ball correlation will be used instead of ball covariance.(default \code{type = 'bcov'})
+#' Any unambiguous substring can be given. 
+#' If input is a logical value, it is equivalent to \code{weight = "probability"} if \code{weight = TRUE} while 
+#' equivalent to \code{weight = "constant"} if \code{weight = FALSE}.
+#' Default: \code{weight = FALSE}.
+## @param type If \code{type = 'bcor'}, Ball Correlation will be used instead of Ball Covariance.(default \code{type = 'bcov'})
 ## @param method if \code{method = 'permute'}, a permutation procedure will be carried out;
 ## if \code{method = 'approx'}, the p-values based on approximate Ball Covariance distribution are given.(Test arguments)
 #' 
 #' @return If \code{num.permutations > 0}, \code{bcov.test} returns a \code{htest} class object containing the following components:
-#' \item{\code{statistic}}{ball covariance or ball correlation statistic.}            
+#' \item{\code{statistic}}{Ball Covariance statistic.}            
 #' \item{\code{p.value}}{the p-value for the test.}  
 #' \item{\code{replicates}}{permutation replications of the test statistic.}
 #' \item{\code{size}}{sample size.} 
-#' \item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the ball covariance statistics 
-#' with different weights, the second is the \eqn{p}-values of weighted ball covariance tests.}
+#' \item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the Ball Covariance statistics 
+#' with different weights, the second is the \eqn{p}-values of weighted Ball Covariance tests.}
 #' \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 #' \item{\code{method}}{a character string indicating what type of test was performed.}
 #' \item{\code{data.name}}{description of data.}
 #' If \code{num.permutations = 0}, \code{bcov.test} returns a statistic value.
 #' 
 #' @details 
-#' \code{bcov.test} are non-parametric tests of multivariate independence in Banach spaces. 
-#' The test decision is obtained via permutation, with \code{num.permutations} replicates.
+#' \code{bcov.test} are non-parametric tests of independence in Banach spaces. 
+#' It can detect the dependence between two random objects (variables) and 
+#' the mutual dependence among at least three random objects (variables).
 #' 
 #' If two samples are pass to arguments \code{x} and \code{y}, the sample sizes (i.e. number of rows or length of the vector) 
-#' of the two variables must agree. If a \code{\link{list}} object is passed to \code{x}, 
-#' each element must with same sample sizes. Moreover, data pass to \code{x} or \code{y} 
+#' of the two variables must agree. If a \code{\link{list}} object is passed to \code{x}, this \code{list} must contain at least
+#' two numeric vectors, matrices, or data.frames, and each element of this \code{list} 
+#' must with the same sample size. Moreover, data pass to \code{x} or \code{y} 
 #' must not contain missing or infinite values. 
-#' If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
-#' symmetric numeric matrix recording distance between samples; 
-#' otherwise, these arguments are treated as data.
+#' If \code{distance = TRUE}, \code{x} is considered as a distance matrix or a list containing distance matrices, 
+#' and \code{y} is considered as a distance matrix; otherwise, these arguments are treated as data.
 #' 
-#' The \code{bcov.test} statistic is \code{bcov} or \code{ bcor} which are dependence measure 
-#' in Banach spaces. The \code{bcor} test statistic is based on the normalized 
-#' coefficient of ball covariance. (See the manual page for \code{\link{bcov}} or \code{\link{bcor}}.)
+#' \code{bcov.test} utilizes the Ball Covariance statistics (see \code{\link{bcov}}) to measure dependence and 
+#' derives a \eqn{p}-value via replicating the random permutation \code{num.permutations} times.
 #' 
-#' For the general problem of testing independence when the distributions of \eqn{X} and 
-#' \eqn{Y} are unknown, the test based on \code{bcov} can be implemented as a permutation test.
 #' See Pan et al 2018 for theoretical properties of the test, including statistical consistency.
 #' 
-#' @note Actually, \code{bcov.test} simultaneously computing multiple weighted version of Ball Covariance statistics.
-#' Users can get other weighted ball covariance statistics and their corresponding
-#' \eqn{p}-values in the \code{complete.info} of output.
+#' @note Actually, \code{bcov.test} simultaneously computing Ball Covariance statistics with 
+#' \code{"constant"}, \code{"probability"}, and \code{"chisquare"} weights.
+#' Users can get other Ball Covariance statistics with different weight and their corresponding \eqn{p}-values 
+#' in the \code{complete.info} element of output. We give a quick example below to illustrate. 
 #' 
 #' @references Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu & Jin Zhu (2019) Ball Covariance: A Generic Measure of Dependence in Banach Space, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1543600
 #' @references Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. http://arxiv.org/abs/1811.03750
@@ -66,7 +70,12 @@
 #' x <- runif(50, 0, 4*pi)
 #' y <- cos(x) + error
 #' # plot(x, y)
-#' bcov.test(x, y)
+#' res <- bcov.test(x, y)
+#' res
+#' ## get all Ball Covariance statistics:
+#' res[["complete.info"]][["statistic"]]
+#' ## get all test result:
+#' res[["complete.info"]][["p.value"]]
 #' 
 #' ################# Quick Start #################
 #' x <- matrix(runif(50 * 2, -pi, pi), nrow = 50, ncol = 2)
@@ -415,9 +424,9 @@ kbcov_test_internal <- function(x, num.permutations = 99, distance = FALSE, weig
 #' @param num sample size
 #' @param var_num random variables number
 #' @param weight whether used weight
-#' @param type ball correlation or ball covariance. now, only ball covariance is considered.
+#' @param type Ball Correlation or Ball Covariance. now, only Ball Covariance is considered.
 #'
-#' @return ball covariance statistic
+#' @return Ball Covariance statistic
 #' @noRd
 kbcov_stat <- function(x, num, var_num, weight, type) {
   compare_list <- list()
@@ -500,44 +509,37 @@ bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, se
 }
 
 
-#' @title Ball Correlation and Covariance Statistics
+#' @title Ball Covariance and Correlation Statistics
 #' @description Computes Ball Covariance and Ball Correlation statistics, 
 #' which are generic dependence measures in Banach spaces.
 #' @inheritParams bcov.test
 #' @rdname bcov
 #' 
 #' @details 
-#' \code{bcov} and \code{bcor} compute Ball Covariance and ball correlation statistics.
-#' 
-#' The sample sizes (number of rows or length of the vector) of the two variables must agree, 
-#' and samples must not contain missing values. 
+#' The sample sizes of the two variables must agree,  and samples must not contain missing and infinite values. 
 #' If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
-#' symmetric numeric matrix recording distance between samples; 
-#' otherwise, these arguments are treated as data.
+#' symmetric numeric matrix recording distance between samples; otherwise, these arguments are treated as data.
 #' 
-#' Ball Covariance is a generic non-parametric dependence measure in Banach spaces, introduced by Pan et al (2018). 
-#' It is noteworthy that ball covariance enjoys the following properties: 
+#' \code{bcov} and \code{bcor} compute Ball Covariance and Ball Correlation statistics.
 #' 
-#' (i) It is nonnegative, and holds the Cauchy-Schwartz type inequality; 
+#' Ball Covariance statistics is a generic dependence measure in Banach spaces. It enjoys the following properties: 
+#' \itemize{
+#' \item It is nonnegative and it is equal to zero if and only if variables are unassociated; 
+#' \item It is highly robust;   
+#' \item It is distribution-free and model-free;   
+#' \item it is interesting that the HHG is a special case of Ball Covariance statistics. 
+#' }
+#' Ball correlation statistics, a normalized version of Ball Covariance statistics, generalizes Pearson correlation in two fundamental ways: 
+#' \itemize{
+#' \item It is well-defined for random variables in arbitrary dimension in Banach spaces
+#' \item BCor is equal to zero implies random variables are unassociated.
+#' }
 #' 
-#' (ii) It is nonparametric and makes fewer restrictive data assumptions even without finite moment conditions;  
-#' 
-#' (iii) Its empirical version is feasible and can be used as a test statistic of independence with some desired test properties;  
-#' 
-#' (iv) it is interesting that the HHG dependence measure is a special case of ball covariance. 
-#' 
-#' Ball correlation, based on the normalized ball covariance, generalizes the idea of Pearson correlation in two fundamental ways: 
-#' 
-#' (i) Ball correlation, \eqn{ \mathbf{BCor}_{\omega}^{2}(X, Y) }, is defined for \eqn{X} and \eqn{Y} in arbitrary dimension in Banach spaces. 
-#' 
-#' (ii) Ball correlation satisfies \eqn{0 \le \mathbf{BCor}_{\omega}^{2}(X, Y) \le 1}, and \eqn{ \mathbf{BCor}_{\omega}^{2}(X, Y) } = 0 
-#' only if \eqn{X} and \eqn{Y} are independent.
-#' 
-#' The definitions of the sample version ball covariance and ball correlation are as follows.
+#' The definitions of the Ball Covariance and Ball Correlation statistics between two random variables are as follows.
 #' Suppose, we are given pairs of independent observations 
 #' \eqn{\{(x_1, y_1),...,(x_n,y_n)\}}, where \eqn{x_i} and \eqn{y_i} can be of any dimension 
 #' and the dimensionality of \eqn{x_i} and \eqn{y_i} need not be the same.
-#' Then, we define sample version ball covariance as:
+#' Then, we define sample version Ball Covariance as:
 #' \deqn{\mathbf{BCov}_{\omega, n}^{2}(X, Y)=\frac{1}{n^{2}}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{X,Y}-\Delta_{ij,n}^{X}\Delta_{ij,n}^{Y})^{2}} }
 #' where:
 #' \deqn{ \Delta_{ij,n}^{X,Y}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{X} \delta_{ij,k}^{Y}}, 
@@ -545,30 +547,23 @@ bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, se
 #' \Delta_{ij,n}^{Y}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{Y}} }
 #' \deqn{\delta_{ij,k}^{X} = I(x_{k} \in \bar{B}(x_{i}, \rho(x_{i}, x_{j}))), 
 #' \delta_{ij,k}^{Y} = I(y_{k} \in \bar{B}(y_{i}, \rho(y_{i}, y_{j})))}
-#' 
 #' Among them, \eqn{\bar{B}(x_{i}, \rho(x_{i}, x_{j}))} is a closed ball 
 #' with center \eqn{x_{i}} and radius \eqn{\rho(x_{i}, x_{j})}.
-#' Similarly, we can give the notations \eqn{ \mathbf{BCov}_{\omega,n}^2(\mathbf{X},\mathbf{X}) } 
-#' and \eqn{ \mathbf{BCov}_{\omega,n}^2(\mathbf{Y},\mathbf{Y}) }, 
-#' which are the sample version of \eqn{ \mathbf{BCov}_{\omega}^2(\mathbf{X},\mathbf{X}) } and 
-#' \eqn{ \mathbf{BCov}_{\omega}^2(\mathbf{Y},\mathbf{Y}) }. 
-#' We thus define the sample version ball correlation as follows.
-#' 
+#' Similarly, we can define \eqn{ \mathbf{BCov}_{\omega,n}^2(\mathbf{X},\mathbf{X}) } 
+#' and \eqn{ \mathbf{BCov}_{\omega,n}^2(\mathbf{Y},\mathbf{Y}) }. 
+#' We define Ball Correlation statistic as follows.
 #' \deqn{\mathbf{BCor}_{\omega,n}^2(\mathbf{X},\mathbf{Y})=
 #' \mathbf{BCov}_{\omega,n}^2(\mathbf{X},\mathbf{Y})/\sqrt{\mathbf{BCov}_{\omega,n}^2(\mathbf{X},\mathbf{X})\mathbf{BCov}_{\omega,n}^2(\mathbf{Y},\mathbf{Y})}
 #' }
 #' 
-#' Moreover, it is natural to extend \eqn{\mathbf{BCov}_{\omega,n}} to measure the mutual independence between \eqn{K} random variables:
+#' We can extend \eqn{\mathbf{BCov}_{\omega,n}} to measure the mutual independence between \eqn{K} random variables:
+#' \deqn{\frac{1}{n^{2}}\sum_{i,j=1}^{n}{\left[ (\Delta_{ij,n}^{X_{1}, ..., X_{K}}-\prod_{k=1}^{K}\Delta_{ij,n}^{X_{k}})^{2}\prod_{k=1}^{K}{\hat{\omega}_{k}(X_{ki},X_{kj})} \right]}}
+#' where \eqn{X_{k}(k=1,\ldots,K)} are random variables and \eqn{X_{ki}} is the \eqn{i}-th observations of \eqn{X_{k}}. 
 #' 
-#' \deqn{\frac{1}{n^{2}}\sum_{i,j=1}^{n}{\left[ (\Delta_{ij,n}^{R_{1}, ..., R_{K}}-\prod_{k=1}^{K}\Delta_{ij,n}^{R_{k}})^{2}\prod_{k=1}^{K}{\hat{\omega}_{k}(R_{ki},R_{kj})} \right]}}
-#' 
-#' where \eqn{R_{k}, k=1,...K} indicate random variables and \eqn{R_{ki}, i=1,...,n} denote \eqn{i} th random samples of \eqn{R_{k}}. 
-#' 
-#' See \code{\link{bcov.test}} for a test of multivariate independence based on the 
-#' ball covariance and ball correlation statistic.
+#' See \code{\link{bcov.test}} for a test of independence based on the Ball Covariance statistic.
 #' 
 #' @return 
-#' \item{\code{bcov }}{ sample version of ball covariance.}
+#' \item{\code{bcov }}{ Ball Covariance statistic.}
 #' @seealso
 #' \code{\link{bcov.test}}, \code{\link{bcorsis}}
 #' @export

@@ -1,21 +1,31 @@
+## Maintainer comments     
+The following NOTE occurs when checking:      
+* *Possibly mis-spelled words in DESCRIPTION: BCor (9:684)  compositional (9:349)*.     
+Explaination:       
+- **BCor** is the abbreviation of Ball Correlation (https://www.tandfonline.com/doi/full/10.1080/01621459.2018.1462709);      
+- The word, **compositional**, is not mis-spelled. In our package, we give an example to show how to analyze compositional data (https://www.wikiwand.com/en/Compositional_data).  
+
 ## Test environments
-* Ubuntu 14.04 (on travis-ci), R 3.4.2
-* Debian Linux, R-devel
-* Windows Server 2008 R2 SP1, R-devel
-* win-builder (realease)
+* Ubuntu Linux 16.04 LTS, R-release, GCC
+* Fedora Linux, R-devel, clang, gfortran
+* Debian Linux, R-devel, GCC ASAN/UBSAN
+* Windows Server 2008 R2 SP1, R-devel, 32/64 bit
+* Win-builder (devel)
 
 ## R CMD check results
-* Ubuntu 14.04 enviorment:
-0 errors | 0 warnings | 0 note
-
-* Debian Linux, R-devel:
+* **Debian Linux, R-devel, GCC ASAN/UBSAN**       
 Status: OK
 
-* Windows Server 2008 R2 SP1, R-devel:
-Status: OK
+* **The other test environments**     
+NOTE:    
+  
+```
+Maintainer: 'Jin Zhu <zhuj37@mail2.sysu.edu.cn>'
 
-* Win-builder:
-Status: OK
+Possibly mis-spelled words in DESCRIPTION:
+  BCor (9:684)
+  compositional (9:349)
+```
 
 ## Reverse dependencies
 There are no reverse dependencies.

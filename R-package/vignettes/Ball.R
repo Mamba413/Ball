@@ -61,7 +61,7 @@ data("bdvmf")
 Dmat <- nhdist(bdvmf[["x"]], method = "geodesic")
 # sample sizes in each group: 150, 150
 # Two-Sample Test based on BD :
-bd.test(x = Dmat, size = c(150, 150), R = 99, dst = TRUE)
+bd.test(x = Dmat, size = c(150, 150), R = 99, distance = TRUE)
 
 ## ------------------------------------------------------------------------
 # load data:
@@ -71,7 +71,7 @@ data("macaques")
 # calculate Riemannian shape distance matrix:
 Dmat <- nhdist(macaques[["x"]], method = "riemann")
 # hypothesis test with BD:
-bd.test(x = Dmat, R = 99, size = c(9, 9), dst = TRUE)
+bd.test(x = Dmat, R = 99, size = c(9, 9), distance = TRUE)
 
 ## ------------------------------------------------------------------------
 data("ArcticLake")
@@ -80,7 +80,7 @@ Dy <- nhdist(ArcticLake[["x"]], method = "compositional")
 # Distance matrix between x:
 Dx <- dist(ArcticLake[["depth"]])
 # hypothesis test with BCov:
-bcov.test(x = Dx, y = Dy, R = 99, dst = TRUE)
+bcov.test(x = Dx, y = Dy, R = 99, distance = TRUE)
 
 ## ------------------------------------------------------------------------
 n <- 150

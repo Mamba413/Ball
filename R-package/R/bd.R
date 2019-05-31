@@ -1,19 +1,19 @@
 #' @title Ball Divergence based Equality of Distributions Test
 #' 
-#' @description Performs the nonparametric two-sample or \eqn{K}-sample ball divergence test for
+#' @description Performs the nonparametric two-sample or \eqn{K}-sample Ball Divergence test for
 #' equality of multivariate distributions
 #' 
 #' @aliases bd.test
 #' 
 #' @author Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang, Jin Zhu
 #' 
-#' @param x a numeric vector, matrix, data.frame, or a list containing numeric vector, matrix, data.frame.
+#' @param x a numeric vector, matrix, data.frame, or a list containing at least two numeric vectors, matrices, or data.frames.
 #' @param y a numeric vector, matrix, data.frame.
-#' @param num.permutations the number of permutation replications, when \code{num.permutations} equals to 0, the function returns
-#' the sample version of ball divergence. Default: \code{num.permutations = 99}.
+#' @param num.permutations the number of permutation replications. When \code{num.permutations = 0}, the function just returns
+#' the Ball Divergence statistic. Default: \code{num.permutations = 99}.
 #' @param distance if \code{distance = TRUE}, the elements of \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}.
 #' @param size a vector recording sample size of each group.
-#' @param seed the random seed. Default \code{seet = 1}.
+#' @param seed the random seed. Default \code{seed = 1}.
 #' @param num.threads Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.
 #' @param kbd.type a character string specifying the \eqn{K}-sample Ball Divergence test statistic, 
 #' must be one of \code{"sum"}, \code{"summax"}, or \code{"max"}. Any unambiguous substring can be given. 
@@ -26,12 +26,12 @@
 ## distribution are given.
 #' 
 #' @return If \code{num.permutations > 0}, \code{bd.test} returns a \code{htest} class object containing the following components:
-#' \item{\code{statistic}}{ball divergence statistic.}            
-#' \item{\code{p.value}}{the p-value for the test.}
+#' \item{\code{statistic}}{Ball Divergence statistic.}            
+#' \item{\code{p.value}}{the \eqn{p}-value for the test.}
 #' \item{\code{replicates}}{permutation replications of the test statistic.}
 #' \item{\code{size}}{sample sizes.}
-#' \item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the ball divergence statistics 
-#' with different weights, the second is the \eqn{p}-values of weighted ball divergence tests.}
+#' \item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the Ball Divergence statistics 
+#' with different aggregation strategy, the second vector is the \eqn{p}-values of tests.}
 #' \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 #' \item{\code{method}}{a character string indicating what type of test was performed.}
 #' \item{\code{data.name}}{description of data.}
@@ -40,22 +40,33 @@
 #' @rdname bd.test
 #' 
 #' @details 
-#' \code{bd.test} are ball divergence based nonparametric tests of two-sample or 
-#' K-sample problem. If only \code{x} is given, the statistic is 
+#' \code{bd.test} is nonparametric test for the two-sample or \eqn{K}-sample problem. 
+#' It can detect distribution difference between \eqn{K(K \geq 2)} sample even though sample size are imbalanced.
+#' This test can cope well multivariate dataset or complex dataset. 
+#' 
+#' If only \code{x} is given, the statistic is 
 #' computed from the original pooled samples, stacked in 
 #' matrix where each row is a multivariate observation, or from the distance matrix 
 #' when \code{distance = TRUE}. The first \code{sizes[1]} rows of \code{x} are the first sample, the next 
 #' \code{sizes[2]} rows of \code{x} are the second sample, etc.
 #' If \code{x} is a \code{list}, its elements are taken as the samples to be compared, 
-#' and hence have to be numeric data vectors, matrix or data.frame.
+#' and hence, this \code{list} must contain at least two numeric data vectors, matrices or data.frames.
 #' 
-#' Based on sample version ball divergence (see \code{\link{bd}}), the test is implemented by 
-#' permutation with \code{num.permutations} times. The function simply returns the test statistic 
-#' when \code{num.permutations = 0}. The time complexity of \code{bd.test} is \eqn{O(R \times n^2)},
-#' where \eqn{R} is permutation replication and \eqn{n} is sample size.
+#' \code{bd.test} utilizes the Ball Divergence statistics (see \code{\link{bd}}) to measure dispersion and 
+#' derives a \eqn{p}-value via replicating the random permutation \code{num.permutations} times. 
+#' The function simply returns the test statistic 
+#' when \code{num.permutations = 0}. 
+#' 
+#' The time complexity of \code{bd.test} is around \eqn{O(R \times n^2)},
+#' where \eqn{R} = \code{num.permutations} and \eqn{n} is sample size.
+#' 
+#' @note Actually, \code{bd.test} simultaneously computing \code{"sum"}, \code{"summax"}, and \code{"max"} Ball Divergence statistics 
+#' when \eqn{K \geq 3}.
+#' Users can get other Ball Divergence statistics and their corresponding \eqn{p}-values 
+#' in the \code{complete.info} element of output. We give a quick example below to illustrate. 
 #' 
 #' @seealso
-#' \code{\link{bd}}, \code{\link{bd.gwas.test}}
+#' \code{\link{bd}}
 #' 
 #' @references Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
 #' @references Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. http://arxiv.org/abs/1811.03750
@@ -67,7 +78,6 @@
 #' y <- rnorm(50, mean = 1)
 #' # plot(density(x))
 #' # lines(density(y), col = "red")
-#' # ball divergence:
 #' bd.test(x = x, y = y)
 #' 
 #' ################# Quick Start #################
@@ -103,7 +113,12 @@
 #' bd.test(rnorm(n), size = c(40, 50, 60))
 #' # alternative input method:
 #' x <- lapply(c(40, 50, 60), rnorm)
-#' bd.test(x)
+#' res <- bd.test(x)
+#' res
+#' ## get all Ball Divergence statistics:
+#' res[["complete.info"]][["statistic"]]
+#' ## get all test result:
+#' res[["complete.info"]][["p.value"]]
 bd.test <- function(x, ...) UseMethod("bd.test")
 
 
@@ -327,63 +342,57 @@ bd.test.formula <- function(formula, data, subset, na.action, ...) {
 }
 
 
-#' @title Ball Divergence
-#' @description Compute ball divergence statistic between two-sample or K-sample.
+#' @title Ball Divergence statistic
+#' @description Compute Ball Divergence statistic, which is a generic dispersion measure in Banach spaces.
 #' @author Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang
 #' @inheritParams bd.test
 #' @rdname bd
 #' @return 
-#' \item{\code{bd }}{ sample version of ball divergence}
+#' \item{\code{bd }}{ Ball Divergence statistic}
 #' 
 #' @details 
-#' Given the samples not containing missing values, \code{bd} returns sample version of ball divergence.
+#' Given the samples not containing missing values, \code{bd} returns Ball Divergence statistics.
 #' If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
 #' symmetric numeric matrix recording distance between samples; 
 #' otherwise, these arguments are treated as data.
 #' 
-#' Ball divergence, introduced by Pan et al(2017), is a new concept to measure the difference 
-#' between two probability distributions in separable Banach space. 
-#' Ball divergence of two probability measures is proven to be zero if and only if they are identical.
+#' Ball divergence statistic measure the distribution difference of two datasets in Banach spaces. 
+#' The Ball divergence statistic is proven to be zero if and only if two datasets are identical.
 #' 
-#' The definitions of the sample version ball divergence are as follows.
-#' Given two independent samples \eqn{ \{x_{1}, ..., x_{n}\} } with the associated probability measure \eqn{\mu} and 
-#' \eqn{ \{y_{1}, ..., y_{m}\} } with \eqn{\nu}, where the observations in each sample are \emph{i.i.d}.
-#' 
-#' Also, let \eqn{\delta(x,y,z)=I(z\in \bar{B}(x, \rho(x,y)))}, 
+#' The definition of the Ball Divergence statistics is as follows.
+#' Given two independent samples \eqn{ \{x_{1}, \ldots, x_{n}\} } with the associated probability measure \eqn{\mu} and 
+#' \eqn{ \{y_{1}, \ldots, y_{m}\} } with \eqn{\nu}, where the observations in each sample are \emph{i.i.d}.
+#' Let \eqn{\delta(x,y,z)=I(z\in \bar{B}(x, \rho(x,y)))}, 
 #' where \eqn{\delta(x,y,z)} indicates whether \eqn{z} is located in the closed ball \eqn{\bar{B}(x, \rho(x,y))} 
 #' with center \eqn{x} and radius \eqn{\rho(x, y)}. 
 #' We denote:
 #' \deqn{
-#' A_{ij}^{X}=\frac{1}{n}\sum_{u=1}^{n}{\delta(X_i,X_j,X_u)}, \quad A_{ij}^{Y}=\frac{1}{m}\sum_{v=1}^{m}{\delta(X_i,X_j,Y_v)}
+#' A_{ij}^{X}=\frac{1}{n}\sum_{u=1}^{n}{\delta(X_i,X_j,X_u)}, \quad A_{ij}^{Y}=\frac{1}{m}\sum_{v=1}^{m}{\delta(X_i,X_j,Y_v)},
 #' }
 #' \deqn{
-#' C_{kl}^{X}=\frac{1}{n}\sum_{u=1}^{n}{\delta(Y_k,Y_l,X_u)}, \quad C_{kl}^{Y}=\frac{1}{m}\sum_{v=1}^{m}{\delta(Y_k,Y_l,Y_v)}
+#' C_{kl}^{X}=\frac{1}{n}\sum_{u=1}^{n}{\delta(Y_k,Y_l,X_u)}, \quad C_{kl}^{Y}=\frac{1}{m}\sum_{v=1}^{m}{\delta(Y_k,Y_l,Y_v)}.
 #' }
-#' 
-#' \eqn{A_{ij}^X} represents the proportion of samples \eqn{ \{x_{1}, ..., x_{n}\} } located in the 
-#' ball \eqn{\bar{B}(X_i,\rho(X_i,X_j))} and \eqn{A_{ij}^Y} represents the proportion of samples \eqn{ \{y_{1}, ..., y_{m}\} } 
+#' \eqn{A_{ij}^X} represents the proportion of samples \eqn{ \{x_{1}, \ldots, x_{n}\} } located in the 
+#' ball \eqn{\bar{B}(X_i,\rho(X_i,X_j))} and \eqn{A_{ij}^Y} represents the proportion of samples \eqn{ \{y_{1}, \ldots, y_{m}\} } 
 #' located in the ball \eqn{\bar{B}(X_i,\rho(X_i,X_j))}. 
-#' Meanwhile, \eqn{C_{kl}^X} and \eqn{C_{kl}^Y} 
-#' represent the corresponding proportions located in the ball \eqn{\bar{B}(Y_k,\rho(Y_k,Y_l))}.
-#' 
-#' we can define sample version ball divergence as:
+#' Meanwhile, \eqn{C_{kl}^X} and \eqn{C_{kl}^Y} represent the corresponding proportions located in the ball \eqn{\bar{B}(Y_k,\rho(Y_k,Y_l))}.
+#' The Ball Divergence statistic is defined as:
 #' \deqn{D_{n,m}=A_{n,m}+C_{n,m}}
 #' 
-#' BD can be generalized to the \emph{K}-sample problem. Suppose we 
-#' have \eqn{K} group samples, each group include \eqn{n_{k}, k=1,...,K} samples. 
-#' The definition of \eqn{K}-sample ball divergence statistic could be 
-#' to directly sum up the two-sample ball divergence statistics of all sample pairs (\code{kbd.type = "sum"})
+#' Ball Divergence can be generalized to the \emph{K}-sample test problem. Suppose we 
+#' have \eqn{K} group samples, each group include \eqn{n_{k}} samples. 
+#' The definition of \eqn{K}-sample Ball Divergence statistic could be 
+#' to directly sum up the two-sample Ball Divergence statistics of all sample pairs (\code{kbd.type = "sum"})
 #' \deqn{\sum_{1 \leq k < l \leq K}{D_{n_{k},n_{l}}},}
 #' or to find one sample with the largest difference to the others (\code{kbd.type = "maxsum"})
 #' \deqn{\max_{t}{\sum_{s=1, s \neq t}^{K}{D_{n_{s}, n_{t}}},}}
-#' to aggregate the \eqn{K-1} most significant different two-sample ball divergence statistics (\code{kbd.type = "max"})
+#' to aggregate the \eqn{K-1} most significant different two-sample Ball Divergence statistics (\code{kbd.type = "max"})
 #' \deqn{\sum_{k=1}^{K-1}{D_{(k)}},}
-#' where \eqn{D_{(1)}, \ldots, D_{(K-1)}} are the largest \eqn{K-1} two-sample ball divergence statistics among 
+#' where \eqn{D_{(1)}, \ldots, D_{(K-1)}} are the largest \eqn{K-1} two-sample Ball Divergence statistics among 
 #' \eqn{\{D_{n_s, n_t}| 1 \leq s < t \leq K\}}. When \eqn{K=2},
-#' the three types of ball divergence statistics degenerate into two-sample ball divergence statistic.
+#' the three types of Ball Divergence statistics degenerate into two-sample Ball Divergence statistic.
 #' 
-#' See \code{\link{bd.test}} for a test of multivariate independence based on the 
-#' ball divergence.
+#' See \code{\link{bd.test}} for a test of distribution equality based on the Ball Divergence.
 #' 
 #' @seealso
 #' \code{\link{bd.test}}

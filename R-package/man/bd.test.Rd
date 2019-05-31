@@ -15,20 +15,20 @@ bd.test(x, ...)
 \method{bd.test}{formula}(formula, data, subset, na.action, ...)
 }
 \arguments{
-\item{x}{a numeric vector, matrix, data.frame, or a list containing numeric vector, matrix, data.frame.}
+\item{x}{a numeric vector, matrix, data.frame, or a list containing at least two numeric vectors, matrices, or data.frames.}
 
 \item{...}{further arguments to be passed to or from methods.}
 
 \item{y}{a numeric vector, matrix, data.frame.}
 
-\item{num.permutations}{the number of permutation replications, when \code{num.permutations} equals to 0, the function returns
-the sample version of ball divergence. Default: \code{num.permutations = 99}.}
+\item{num.permutations}{the number of permutation replications. When \code{num.permutations = 0}, the function just returns
+the Ball Divergence statistic. Default: \code{num.permutations = 99}.}
 
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}.}
 
 \item{size}{a vector recording sample size of each group.}
 
-\item{seed}{the random seed. Default \code{seet = 1}.}
+\item{seed}{the random seed. Default \code{seed = 1}.}
 
 \item{num.threads}{Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
 
@@ -46,35 +46,47 @@ Default \code{kbd.type = "sum"}.}
 }
 \value{
 If \code{num.permutations > 0}, \code{bd.test} returns a \code{htest} class object containing the following components:
-\item{\code{statistic}}{ball divergence statistic.}            
-\item{\code{p.value}}{the p-value for the test.}
+\item{\code{statistic}}{Ball Divergence statistic.}            
+\item{\code{p.value}}{the \eqn{p}-value for the test.}
 \item{\code{replicates}}{permutation replications of the test statistic.}
 \item{\code{size}}{sample sizes.}
-\item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the ball divergence statistics 
-with different weights, the second is the \eqn{p}-values of weighted ball divergence tests.}
+\item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the Ball Divergence statistics 
+with different aggregation strategy, the second vector is the \eqn{p}-values of tests.}
 \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 \item{\code{method}}{a character string indicating what type of test was performed.}
 \item{\code{data.name}}{description of data.}
 If \code{num.permutations = 0}, \code{bd.test} returns a statistic value.
 }
 \description{
-Performs the nonparametric two-sample or \eqn{K}-sample ball divergence test for
+Performs the nonparametric two-sample or \eqn{K}-sample Ball Divergence test for
 equality of multivariate distributions
 }
 \details{
-\code{bd.test} are ball divergence based nonparametric tests of two-sample or 
-K-sample problem. If only \code{x} is given, the statistic is 
+\code{bd.test} is nonparametric test for the two-sample or \eqn{K}-sample problem. 
+It can detect distribution difference between \eqn{K(K \geq 2)} sample even though sample size are imbalanced.
+This test can cope well multivariate dataset or complex dataset. 
+
+If only \code{x} is given, the statistic is 
 computed from the original pooled samples, stacked in 
 matrix where each row is a multivariate observation, or from the distance matrix 
 when \code{distance = TRUE}. The first \code{sizes[1]} rows of \code{x} are the first sample, the next 
 \code{sizes[2]} rows of \code{x} are the second sample, etc.
 If \code{x} is a \code{list}, its elements are taken as the samples to be compared, 
-and hence have to be numeric data vectors, matrix or data.frame.
+and hence, this \code{list} must contain at least two numeric data vectors, matrices or data.frames.
 
-Based on sample version ball divergence (see \code{\link{bd}}), the test is implemented by 
-permutation with \code{num.permutations} times. The function simply returns the test statistic 
-when \code{num.permutations = 0}. The time complexity of \code{bd.test} is \eqn{O(R \times n^2)},
-where \eqn{R} is permutation replication and \eqn{n} is sample size.
+\code{bd.test} utilizes the Ball Divergence statistics (see \code{\link{bd}}) to measure dispersion and 
+derives a \eqn{p}-value via replicating the random permutation \code{num.permutations} times. 
+The function simply returns the test statistic 
+when \code{num.permutations = 0}. 
+
+The time complexity of \code{bd.test} is around \eqn{O(R \times n^2)},
+where \eqn{R} = \code{num.permutations} and \eqn{n} is sample size.
+}
+\note{
+Actually, \code{bd.test} simultaneously computing \code{"sum"}, \code{"summax"}, and \code{"max"} Ball Divergence statistics 
+when \eqn{K \geq 3}.
+Users can get other Ball Divergence statistics and their corresponding \eqn{p}-values 
+in the \code{complete.info} element of output. We give a quick example below to illustrate.
 }
 \examples{
 ################# Quick Start #################
@@ -82,7 +94,6 @@ x <- rnorm(50)
 y <- rnorm(50, mean = 1)
 # plot(density(x))
 # lines(density(y), col = "red")
-# ball divergence:
 bd.test(x = x, y = y)
 
 ################# Quick Start #################
@@ -118,7 +129,12 @@ n <- 150
 bd.test(rnorm(n), size = c(40, 50, 60))
 # alternative input method:
 x <- lapply(c(40, 50, 60), rnorm)
-bd.test(x)
+res <- bd.test(x)
+res
+## get all Ball Divergence statistics:
+res[["complete.info"]][["statistic"]]
+## get all test result:
+res[["complete.info"]][["p.value"]]
 
 ################  Formula interface  ################
 ## Two-sample test
@@ -133,7 +149,7 @@ Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. Ball Divergence: Nonparametr
 Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. http://arxiv.org/abs/1811.03750
 }
 \seealso{
-\code{\link{bd}}, \code{\link{bd.gwas.test}}
+\code{\link{bd}}
 }
 \author{
 Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang, Jin Zhu

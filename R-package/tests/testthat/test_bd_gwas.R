@@ -1,9 +1,9 @@
 library(testthat)
 library(Ball)
 context("bd.gwas.test function")
-skip_on_cran()
 
 test_that("Error if computation result for ball divergence is wrong! (two-sample)", {
+  skip("skip")
   set.seed(1)
   num <- 100
   snp_num <- 5
@@ -23,6 +23,7 @@ test_that("Error if computation result for ball divergence is wrong! (two-sample
 })
 
 test_that("Error if computation result for ball divergence is wrong! (K-sample)", {
+  skip("skip")
   set.seed(1)
   num <- 100
   snp_num <- 5
@@ -50,6 +51,7 @@ test_that("Error if computation result for ball divergence is wrong! (K-sample)"
 })
 
 test_that("Error if computation result for ball divergence is wrong when multi-thread computation!", {
+  skip("skip")
   set.seed(1)
   num <- 100
   snp_num <- 5

@@ -2,7 +2,7 @@
 % Please edit documentation in R/bcorsis.R
 \name{bcorsis}
 \alias{bcorsis}
-\title{Ball Correlation Sure Independence Screening}
+\title{Ball Correlation based Sure Independence Screening (BCor-SIS)}
 \usage{
 bcorsis(x, y, d = "small", weight = c("constant", "probability",
   "chisquare"), method = "standard", distance = FALSE,
@@ -12,22 +12,26 @@ bcorsis(x, y, d = "small", weight = c("constant", "probability",
 \item{x}{a numeric matirx or data.frame included \eqn{n} rows and \eqn{p} columns. 
 Each row is an observation vector and each column corresponding to a explanatory variable, generally \eqn{p >> n}.}
 
-\item{y}{a numeric vector, matirx, or data.frame.}
+\item{y}{a numeric vector, matrix, or data.frame.}
 
 \item{d}{the hard cutoff rule suggests selecting \eqn{d} variables. Setting \code{d = "large"} or 
 \code{ d = "small"} means \code{n - 1} or \code{floor(n/log(n))} 
 variables are selected. If \code{d} is a integer, \code{d} variables are selected. Default: \code{d = "small"}.}
 
-\item{weight}{a character value used to choose the form of the weight of ball correlation. 
-This must be one of "constant", "probability", or "chisquare". Any unambiguous substring can be given. Default: \code{weight = "constant"}.}
+\item{weight}{a logical or character string used to choose the weight form of Ball Covariance statistic.. 
+If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, or \code{"chisquare"}. 
+Any unambiguous substring can be given. 
+If input is a logical value, it is equivalent to \code{weight = "probability"} if \code{weight = TRUE} while 
+equivalent to \code{weight = "constant"} if \code{weight = FALSE}.
+Default: \code{weight = FALSE}.}
 
-\item{method}{method for sure independence screening procedure, include: \code{"standard"},
-\code{"lm"}, \code{"gam"}, \code{"interaction"} and \code{"survival"}.
-Setting \code{method = "standard"} means standard sure independence screening procedure 
-based on ball correlation while the options \code{"lm"} and \code{"gam"} carry out iterative BCor-SIS procedure with ordinary 
+\item{method}{specific method for the BCor-SIS procedure. It must be one of \code{"standard"},
+\code{"lm"}, \code{"gam"}, \code{"interaction"}, or \code{"survival"}.
+Setting \code{method = "standard"} means performing standard SIS procedure 
+while the options \code{"lm"} and \code{"gam"} mean carrying out iterative SIS procedure with ordinary 
 linear regression and generalized additive models, respectively.
 The options \code{"interaction"} and \code{"survival"} are designed for detecting variables 
-with potential linear interaction or associated with censored responses. 
+with potential linear interaction and associated with left censored responses, respectively. 
 Any unambiguous substring can be given. Default: \code{method = "standard"}.}
 
 \item{distance}{if \code{distance = TRUE}, \code{y} will be considered as a distance matrix. 
@@ -35,52 +39,53 @@ Arguments only available when \code{method = "standard"} and \code{method = "int
 
 \item{parms}{parameters list only available when \code{method = "lm"} or \code{"gam"}. 
 It contains three parameters: \code{d1}, \code{d2}, and \code{df}. \code{d1} is the
-number of initially selected variables, \code{d2} is the number of variables collection size added in each iteration.
-\code{df} is degree freedom of basis in generalized additive models playing a role only when \code{method = "gam"}. 
+number of initially selected variables, \code{d2} is the number of variables added in each iteration.
+\code{df} is a degree freedom of basis in generalized additive models playing a role only when \code{method = "gam"}. 
 Default: \code{parms = list(d1 = 5, d2 = 5, df = 3)}.}
 
-\item{num.threads}{Number of threads. This arguments is not available for \code{bcorsis} functions at present.}
+\item{num.threads}{Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
 }
 \value{
-\item{\code{ix }}{ the vector of indices selected by ball correlation sure independence screening procedure.} 
+\item{\code{ix }}{ the indices vector corresponding to variables selected by BCor-SIS.} 
 \item{\code{method }}{ the method used.} 
 \item{\code{weight }}{ the weight used.} 
-\item{\code{complete.info }}{ a \code{list} containing at least one \eqn{p x 3} matrix, where each row is corresponding to variable and each column is corresponding to differe ball correlation weight. If \code{method = "gam"} or \code{method = "lm"}, \code{complete.info} is empty list.}
+\item{\code{complete.info }}{ a \code{list} mainly containing a \eqn{p \times 3} matrix, 
+where each row is a variable and each column is a weight Ball Correlation statistic. 
+If \code{method = "gam"} or \code{method = "lm"}, \code{complete.info} is an empty list.}
 }
 \description{
-Generic non-parametric sure independence screening procedure based on ball correlation.
+Generic non-parametric sure independence screening (SIS) procedure based on Ball Correlation.
 Ball correlation is a generic multivariate measure of dependence in Banach space.
 }
 \details{
-\code{bcorsis} implements a model-free generic screening procedure, 
-BCor-SIS, with fewer and less restrictive assumptions. 
-The sample sizes (number of rows or length of the vector) of the 
-two variables \code{x} and \code{y} must agree, 
-and samples must not contain missing values. 
-
-BCor-SIS procedure for censored response is carried out when \code{method = "survival"}. At that time, 
-the matrix or data.frame pass to argument \code{y} must have exactly two columns and the first column is 
-event (failure) time while the second column is censored status, a dichotomous variable. 
-
-If we set \code{distance = TRUE}, arguments \code{y} is considered as distance matrix, 
-otherwise \code{y} is treated as data.
-
-BCor-SIS is based on a recently developed universal dependence measure: Ball correlation (BCor). 
-BCor efficiently measures the dependence between two random vectors, which is between 
-0 and 1, and 0 if and only if these two random vectors are independent under some mild conditions.
-(See the manual page for \code{\link{bcor}}.)
+\code{bcorsis} performs a model-free generic sure independence screening procedure, 
+BCor-SIS, to pick out variables from \code{x} which are potentially asscoiated with \code{y}. 
+BCor-SIS relies on Ball correlation, a universal dependence measure in Banach spaces.
+Ball correlation (BCor) ranges from 0 to 1. A larger BCor implies they are likely to be associated while 
+Bcor is equal to 0 implies they are unassociated. (See \code{\link{bcor}} for details.)
+Consequently, BCor-SIS pick out variables with larger Bcor values with \code{y}.
 
 Theory and numerical result indicate that BCor-SIS has following advantages:
+\itemize{
+\item BCor-SIS can retain the efficient variables even when the dimensionality (i.e., \code{ncol(x)}) is 
+an exponential order of the sample size (i.e., \code{exp(nrow(x))});
+\item It is distribution-free and model-free;
+\item It is very robust;
+\item It is works well for complex data, such as shape and survival data;
+}
 
-(i) It has a strong screening consistency property without finite sub-exponential moments of the data.
-Consequently, even when the dimensionality is an exponential order of the sample size, BCor-SIS still 
-almost surely able to retain the efficient variables.
+If \code{x} is a matrix, the sample sizes of \code{x} and \code{y} must agree.
+If \code{x} is a \code{\link{list}} object, each element of this \code{list} must with the same sample size.
+\code{x} and \code{y} must not contain missing or infinite values. 
 
-(ii) It is nonparametric and has the property of robustness.
-
-(iii) It works well for complex responses and/or predictors, such as shape or survival data
-
-(iv) It can extract important features even when the underlying model is complicated.
+When \code{method = "survival"}, the matrix or data.frame pass to \code{y} must have exactly two columns, where the first column is 
+event (failure) time while the second column is a dichotomous censored status.
+}
+\note{
+\code{bcorsis} simultaneously computing Ball Correlation statistics with 
+\code{"constant"}, \code{"probability"}, and \code{"chisquare"} weights.
+Users can get other Ball Correlation statistics with different weight in the \code{complete.info} element of output. 
+We give a quick example below to illustrate.
 }
 \examples{
 \dontrun{
@@ -94,6 +99,7 @@ error <- rnorm(n)
 y <- 3 * x[, 1] + 5 * (x[, 3])^2 + error
 res <- bcorsis(y = y, x = x)
 head(res[["ix"]])
+head(res[["complete.info"]])
 
 ############### BCor-SIS: Censored Data Example ###############
 data("genlung")

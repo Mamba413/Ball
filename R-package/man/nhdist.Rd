@@ -29,7 +29,7 @@ we give the definition of distance measures as follows.
 geodesic:
 
 The shortest route between two points on the Earth's surface, namely, a segment of a great circle.
-\deqn{\acos(x^{T}y), \|x\|_{2} = \|y\|_{2} = 1}
+\deqn{\arccos(x^{T}y), \|x\|_{2} = \|y\|_{2} = 1}
 
 compositional:
 

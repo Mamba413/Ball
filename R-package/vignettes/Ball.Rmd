@@ -39,8 +39,7 @@ Test of independence, which is designed to solve the other problem, is also very
 
 The three core functions are:       
 
-- **bd.test**: examine whether $K(K \geq 2)$ univariate or multivariate distribution
-are identical.          
+- **bd.test**: examine whether $K(K \geq 2)$ univariate or multivariate distributions are identical.          
 
 - **bcov.test**: test whether univariate or multivariate variables are related to each other.        
 
@@ -244,7 +243,7 @@ Whereas ball divergence doesn't depend on the assumptions needed in traditional 
 method, and it's able to perform two-sample test for data from Non-Hilbert space.
 We will demonstrate how to use  **Ball** package to perform statistical inference for data from Non-Hilbert space with three examples:
         
-#### Example 1: Simulated Von Mises-Fisher distribution data        
+#### Example 1: Simulated von Mises-Fisher distribution data        
 ```{r}
 # load data:
 data("bdvmf")
@@ -258,7 +257,7 @@ scatterplot3d(bdvmf[["x"]], color = bdvmf[["group"]],
 ```
 ![](./BDVmf.png)
 
-In the image, the black dots ($X$) and red dots ($Y$) respectively represent two group of simulative data with different distributions. The distributions are denoted by:
+In the image, the black dots ($X$) and red dots ($Y$) respectively represent two group of simulated data with different distributions. The distributions are denoted by:
 $$X \sim M(\mu_{X}, \kappa), Y \sim M(\mu_{Y}, \kappa)$$
 Where $M$ denotes 
 [von Mises-Fisher distribution](https://en.wikipedia.org/wiki/Von_Mises%E2%80%93Fisher_distribution),
@@ -266,22 +265,22 @@ $\mu_{X} = (1, 0, 0), \mu_{Y} = (1, 1, 1)$ are the orientation parameter of von 
 distribution, $\kappa = 3$ denotes aggregation parameter.
 
 We can tell from the image that, red dots and black dots are not identically distributed. However, it is a tough task for the traditional statistical method to distinguish distribution because it is not a conventional data in Hilbert space. 
-Fortunately, since the computation for sample version of ball divergence (ball covaiance) only involves calculate distance matrix and counting the number of samples located in a ball, we can obtain empirical ball divergence so long as we can define the distance metric between observations. Therefore, ball divergence still work for this example.
+Fortunately, since the computation for sample version of ball divergence (ball covariance) only involves calculate distance matrix and counting the number of samples located in a ball, we can obtain empirical ball divergence so long as we can define the distance metric between observations. Therefore, ball divergence still work for this example.
 
-We apply ball divergence to this data by carrying out the following step. First, we calculate the geodesic distance matrix of the data, which have been implemented in function \code{nhdist}. Later, we pass the distance matrix to arguments \code{x} and let \code{dst = TRUE}, \code{R = 99}, and \code{size = c(150, 150)}. 
+We apply ball divergence to this data by carrying out the following step. First, we calculate the geodesic distance matrix of the data, which have been implemented in function \code{nhdist}. Later, we pass the distance matrix to arguments \code{x} and let \code{distance = TRUE}, \code{num.permutations = 99}, and \code{size = c(150, 150)}. 
 The detailed solution is demonstrated below:
           
 ```{r}
 # calculate geodesic distance between samples:
-Dmat <- nhdist(bdvmf[["x"]], method = "geodesic")
+dx <- nhdist(bdvmf[["x"]], method = "geodesic")
 # sample sizes in each group: 150, 150
 # Two-Sample Test based on BD :
-bd.test(x = Dmat, size = c(150, 150), R = 99, dst = TRUE)
+bd.test(x = dx, size = c(150, 150), num.permutations = 99, distance = TRUE)
 ```
 
-In this example, we firstly calculate the geodesic distance matrix using **nhdist** function in *Ball* package. Then, pass *Dmat* to arguments *x* and 
-set *dst = TRUE* to indicate that the *x* parameter is a distance matrix.
-Meanwhile, we set the size of each sample *size = c(150, 150)* and set the replication times *R = 99*.
+In this example, we firstly calculate the geodesic distance matrix using **nhdist** function in *Ball* package. Then, pass *dx* to arguments *x* and 
+set *distance = TRUE* to indicate that the *x* parameter is a distance matrix.
+Meanwhile, we set the size of each sample *size = c(150, 150)* and set the replication times *num.permutations = 99*.
 The result is that *p*-value < 0.05, which means that red dots and black dots are not identically distributed.        
     
 #### Example 2: Macaques Data       
@@ -298,9 +297,9 @@ data("macaques")
 # number of femala and male Macaca fascicularis:
 # table(macaques[["group"]])  # f: 9; m: 9
 # calculate Riemannian shape distance matrix:
-Dmat <- nhdist(macaques[["x"]], method = "riemann")
+dx <- nhdist(macaques[["x"]], method = "riemann")
 # hypothesis test with BD:
-bd.test(x = Dmat, R = 99, size = c(9, 9), dst = TRUE)
+bd.test(x = dx, num.permutations = 99, size = c(9, 9), distance = TRUE)
 ```
               
 *p*-value is under 0.05, which means the skull shape differs between male macaques and female macaques.
@@ -316,15 +315,15 @@ To achieve the goal, we use **bcov.test** to perform the test of independence. T
 ```{r}
 data("ArcticLake")
 # Distance matrix between y:
-Dy <- nhdist(ArcticLake[["x"]], method = "compositional")
+dy <- nhdist(ArcticLake[["x"]], method = "compositional")
 # Distance matrix between x:
-Dx <- dist(ArcticLake[["depth"]])
+dx <- dist(ArcticLake[["depth"]])
 # hypothesis test with BCov:
-bcov.test(x = Dx, y = Dy, R = 99, dst = TRUE)
+bcov.test(x = dx, y = dy, num.permutations = 99, distance = TRUE)
 ```
 
-We first calculate the distance matrix *Dy* and *Dx*. Then, we pass *Dx*  to arguments *x*, *Dy* to arguments *y*, and set the replication times *R = 99*, *dst = TRUE*  to indicate that the *x* and *y* parameters are distance matrixs.       
-The result shows that *p*-value < 0.05, so we conclude that the compositions of sediment is associated with the water depth.       
+We first calculate the distance matrix *dy* and *dx*. Then, we pass *dx*  to arguments *x*, *dy* to arguments *y*, and set the replication times *num.permutations = 99*, *distance = TRUE*  to indicate that the *x* and *y* parameters are distance matrices.       
+The result shows that *p*-value is less than 0.05, an usual significance level, so we conclude that the compositions of sediment is associated with the water depth.       
 
 In the example above, we use the square root transformed data to calculate 
 the geodesic distance as a measurement of the difference between different
@@ -343,10 +342,10 @@ bd.test(rnorm(n), size = rep(50, 3))
 ```
 
 As the result shown, *p*-value>0.05, which means we can't reject the null hypothesis.                 
-We can also utilize **bd.test** to deal with $K$-Sample problem in non-Hilbert space following the aforementioned procedure. At the same time, remember to assign size vector to parameter *size* arguments and set *dst = TRUE*.
+We can also utilize **bd.test** to deal with $K$-Sample problem in non-Hilbert space following the aforementioned procedure. At the same time, remember to assign size vector to parameter *size* arguments and set *distance = TRUE*.
 
 <!-- Independent test based on ball correlation, which is a normalized coefficient of ball covariance also available now. Ball correlation statistic will be used when setting  -->
-<!-- *type = "bcor"* in **bcov.test**.          -->
+<!-- *type = "Bcor"* in **bcov.test**.          -->
 
 
 ## Weighted Ball Covariance Test        
@@ -422,7 +421,7 @@ perform well due to the statistical inaccuracy, and algorithmic instability.
         
 A new framework, sure independence screening (SIS), was proposed to tackle the challenges above. 
 SIS tries to filtering out the features that have marginal
-correlation with the response, hense effectively reducing the dimensionality $p$ to a moderate scale so 
+correlation with the response, hence effectively reducing the dimensionality $p$ to a moderate scale so 
 that performing statistical algorithm is feasible.
 
 BCor-SIS, a generic non-parametric sure independence screening procedure based on ball 

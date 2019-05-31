@@ -316,7 +316,7 @@ examine_method_arguments <- function(method) {
 examine_dst_method <- function(dst, method) {
   if(method %in% c("survival", "lm", "gam")) {
     if(dst) {
-      messages <- " methods is not available when dst = TRUE"
+      messages <- " methods is not available when distance = TRUE"
       messages <- paste0(method, messages)
       stop(messages)
     }

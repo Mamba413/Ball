@@ -14,22 +14,25 @@ bcov.test(x, ...)
 \method{bcov.test}{formula}(formula, data, subset, na.action, ...)
 }
 \arguments{
-\item{x}{a numeric vector, matirx, data.frame, or a list containing numeric vector, matrix, data.frame.}
+\item{x}{a numeric vector, matrix, data.frame, or a list containing at least two numeric vectors, matrices, or data.frames.}
 
 \item{...}{further arguments to be passed to or from methods.}
 
-\item{y}{a numeric vector, matirx, or data.frame.}
+\item{y}{a numeric vector, matrix, or data.frame.}
 
-\item{num.permutations}{the number of permutation replications, when \code{num.permutations} equals to 0, the function returns
-the sample version of ball divergence. Default: \code{num.permutations = 99}.}
+\item{num.permutations}{the number of permutation replications. When \code{num.permutations = 0}, the function just returns
+the Ball Covariance statistic. Default: \code{num.permutations = 99}.}
 
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.}
 
-\item{weight}{a logical or character string used to choose the form of the weight of Ball Covariance. 
+\item{weight}{a logical or character string used to choose the weight form of Ball Covariance statistic.. 
 If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, or \code{"chisquare"}. 
-Any unambiguous substring can be given. Default: \code{weight = FALSE}.}
+Any unambiguous substring can be given. 
+If input is a logical value, it is equivalent to \code{weight = "probability"} if \code{weight = TRUE} while 
+equivalent to \code{weight = "constant"} if \code{weight = FALSE}.
+Default: \code{weight = FALSE}.}
 
-\item{seed}{the random seed. Default \code{seet = 1}.}
+\item{seed}{the random seed. Default \code{seed = 1}.}
 
 \item{num.threads}{Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
 
@@ -43,45 +46,44 @@ Any unambiguous substring can be given. Default: \code{weight = FALSE}.}
 }
 \value{
 If \code{num.permutations > 0}, \code{bcov.test} returns a \code{htest} class object containing the following components:
-\item{\code{statistic}}{ball covariance or ball correlation statistic.}            
+\item{\code{statistic}}{Ball Covariance statistic.}            
 \item{\code{p.value}}{the p-value for the test.}  
 \item{\code{replicates}}{permutation replications of the test statistic.}
 \item{\code{size}}{sample size.} 
-\item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the ball covariance statistics 
-with different weights, the second is the \eqn{p}-values of weighted ball covariance tests.}
+\item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the Ball Covariance statistics 
+with different weights, the second is the \eqn{p}-values of weighted Ball Covariance tests.}
 \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 \item{\code{method}}{a character string indicating what type of test was performed.}
 \item{\code{data.name}}{description of data.}
 If \code{num.permutations = 0}, \code{bcov.test} returns a statistic value.
 }
 \description{
-Ball Covariance test of multivariate independence. 
-Ball covariance are generic multivariate measures of dependence in Banach spaces.
+Ball Covariance test of independence. 
+Ball covariance are generic dependence measures in Banach spaces.
 }
 \details{
-\code{bcov.test} are non-parametric tests of multivariate independence in Banach spaces. 
-The test decision is obtained via permutation, with \code{num.permutations} replicates.
+\code{bcov.test} are non-parametric tests of independence in Banach spaces. 
+It can detect the dependence between two random objects (variables) and 
+the mutual dependence among at least three random objects (variables).
 
 If two samples are pass to arguments \code{x} and \code{y}, the sample sizes (i.e. number of rows or length of the vector) 
-of the two variables must agree. If a \code{\link{list}} object is passed to \code{x}, 
-each element must with same sample sizes. Moreover, data pass to \code{x} or \code{y} 
+of the two variables must agree. If a \code{\link{list}} object is passed to \code{x}, this \code{list} must contain at least
+two numeric vectors, matrices, or data.frames, and each element of this \code{list} 
+must with the same sample size. Moreover, data pass to \code{x} or \code{y} 
 must not contain missing or infinite values. 
-If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
-symmetric numeric matrix recording distance between samples; 
-otherwise, these arguments are treated as data.
+If \code{distance = TRUE}, \code{x} is considered as a distance matrix or a list containing distance matrices, 
+and \code{y} is considered as a distance matrix; otherwise, these arguments are treated as data.
 
-The \code{bcov.test} statistic is \code{bcov} or \code{ bcor} which are dependence measure 
-in Banach spaces. The \code{bcor} test statistic is based on the normalized 
-coefficient of ball covariance. (See the manual page for \code{\link{bcov}} or \code{\link{bcor}}.)
+\code{bcov.test} utilizes the Ball Covariance statistics (see \code{\link{bcov}}) to measure dependence and 
+derives a \eqn{p}-value via replicating the random permutation \code{num.permutations} times.
 
-For the general problem of testing independence when the distributions of \eqn{X} and 
-\eqn{Y} are unknown, the test based on \code{bcov} can be implemented as a permutation test.
 See Pan et al 2018 for theoretical properties of the test, including statistical consistency.
 }
 \note{
-Actually, \code{bcov.test} simultaneously computing multiple weighted version of Ball Covariance statistics.
-Users can get other weighted ball covariance statistics and their corresponding
-\eqn{p}-values in the \code{complete.info} of output.
+Actually, \code{bcov.test} simultaneously computing Ball Covariance statistics with 
+\code{"constant"}, \code{"probability"}, and \code{"chisquare"} weights.
+Users can get other Ball Covariance statistics with different weight and their corresponding \eqn{p}-values 
+in the \code{complete.info} element of output. We give a quick example below to illustrate.
 }
 \examples{
 set.seed(1)
@@ -91,7 +93,12 @@ error <- runif(50, min = -0.3, max = 0.3)
 x <- runif(50, 0, 4*pi)
 y <- cos(x) + error
 # plot(x, y)
-bcov.test(x, y)
+res <- bcov.test(x, y)
+res
+## get all Ball Covariance statistics:
+res[["complete.info"]][["statistic"]]
+## get all test result:
+res[["complete.info"]][["p.value"]]
 
 ################# Quick Start #################
 x <- matrix(runif(50 * 2, -pi, pi), nrow = 50, ncol = 2)

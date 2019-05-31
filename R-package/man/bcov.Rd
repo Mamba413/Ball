@@ -3,64 +3,60 @@
 \name{bcor}
 \alias{bcor}
 \alias{bcov}
-\title{Ball Correlation and Covariance Statistics}
+\title{Ball Covariance and Correlation Statistics}
 \usage{
 bcor(x, y, distance = FALSE, weight = FALSE)
 
 bcov(x, y, distance = FALSE, weight = FALSE)
 }
 \arguments{
-\item{x}{a numeric vector, matirx, data.frame, or a list containing numeric vector, matrix, data.frame.}
+\item{x}{a numeric vector, matrix, data.frame, or a list containing at least two numeric vectors, matrices, or data.frames.}
 
-\item{y}{a numeric vector, matirx, or data.frame.}
+\item{y}{a numeric vector, matrix, or data.frame.}
 
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.}
 
-\item{weight}{a logical or character string used to choose the form of the weight of Ball Covariance. 
+\item{weight}{a logical or character string used to choose the weight form of Ball Covariance statistic.. 
 If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, or \code{"chisquare"}. 
-Any unambiguous substring can be given. Default: \code{weight = FALSE}.}
+Any unambiguous substring can be given. 
+If input is a logical value, it is equivalent to \code{weight = "probability"} if \code{weight = TRUE} while 
+equivalent to \code{weight = "constant"} if \code{weight = FALSE}.
+Default: \code{weight = FALSE}.}
 }
 \value{
-\item{\code{bcor }}{ sample version of ball correlation.}
+\item{\code{bcor }}{ Ball Correlation statistic.}
 
-\item{\code{bcov }}{ sample version of ball covariance.}
+\item{\code{bcov }}{ Ball Covariance statistic.}
 }
 \description{
 Computes Ball Covariance and Ball Correlation statistics, 
 which are generic dependence measures in Banach spaces.
 }
 \details{
-\code{bcov} and \code{bcor} compute Ball Covariance and ball correlation statistics.
-
-The sample sizes (number of rows or length of the vector) of the two variables must agree, 
-and samples must not contain missing values. 
+The sample sizes of the two variables must agree,  and samples must not contain missing and infinite values. 
 If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
-symmetric numeric matrix recording distance between samples; 
-otherwise, these arguments are treated as data.
+symmetric numeric matrix recording distance between samples; otherwise, these arguments are treated as data.
 
-Ball Covariance is a generic non-parametric dependence measure in Banach spaces, introduced by Pan et al (2018). 
-It is noteworthy that ball covariance enjoys the following properties: 
+\code{bcov} and \code{bcor} compute Ball Covariance and Ball Correlation statistics.
 
-(i) It is nonnegative, and holds the Cauchy-Schwartz type inequality; 
+Ball Covariance statistics is a generic dependence measure in Banach spaces. It enjoys the following properties: 
+\itemize{
+\item It is nonnegative and it is equal to zero if and only if variables are unassociated; 
+\item It is highly robust;   
+\item It is distribution-free and model-free;   
+\item it is interesting that the HHG is a special case of Ball Covariance statistics. 
+}
+Ball correlation statistics, a normalized version of Ball Covariance statistics, generalizes Pearson correlation in two fundamental ways: 
+\itemize{
+\item It is well-defined for random variables in arbitrary dimension in Banach spaces
+\item BCor is equal to zero implies random variables are unassociated.
+}
 
-(ii) It is nonparametric and makes fewer restrictive data assumptions even without finite moment conditions;  
-
-(iii) Its empirical version is feasible and can be used as a test statistic of independence with some desired test properties;  
-
-(iv) it is interesting that the HHG dependence measure is a special case of ball covariance. 
-
-Ball correlation, based on the normalized ball covariance, generalizes the idea of Pearson correlation in two fundamental ways: 
-
-(i) Ball correlation, \eqn{ \mathbf{BCor}_{\omega}^{2}(X, Y) }, is defined for \eqn{X} and \eqn{Y} in arbitrary dimension in Banach spaces. 
-
-(ii) Ball correlation satisfies \eqn{0 \le \mathbf{BCor}_{\omega}^{2}(X, Y) \le 1}, and \eqn{ \mathbf{BCor}_{\omega}^{2}(X, Y) } = 0 
-only if \eqn{X} and \eqn{Y} are independent.
-
-The definitions of the sample version ball covariance and ball correlation are as follows.
+The definitions of the Ball Covariance and Ball Correlation statistics between two random variables are as follows.
 Suppose, we are given pairs of independent observations 
 \eqn{\{(x_1, y_1),...,(x_n,y_n)\}}, where \eqn{x_i} and \eqn{y_i} can be of any dimension 
 and the dimensionality of \eqn{x_i} and \eqn{y_i} need not be the same.
-Then, we define sample version ball covariance as:
+Then, we define sample version Ball Covariance as:
 \deqn{\mathbf{BCov}_{\omega, n}^{2}(X, Y)=\frac{1}{n^{2}}\sum_{i,j=1}^{n}{(\Delta_{ij,n}^{X,Y}-\Delta_{ij,n}^{X}\Delta_{ij,n}^{Y})^{2}} }
 where:
 \deqn{ \Delta_{ij,n}^{X,Y}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{X} \delta_{ij,k}^{Y}}, 
@@ -68,27 +64,20 @@ where:
 \Delta_{ij,n}^{Y}=\frac{1}{n}\sum_{k=1}^{n}{\delta_{ij,k}^{Y}} }
 \deqn{\delta_{ij,k}^{X} = I(x_{k} \in \bar{B}(x_{i}, \rho(x_{i}, x_{j}))), 
 \delta_{ij,k}^{Y} = I(y_{k} \in \bar{B}(y_{i}, \rho(y_{i}, y_{j})))}
-
 Among them, \eqn{\bar{B}(x_{i}, \rho(x_{i}, x_{j}))} is a closed ball 
 with center \eqn{x_{i}} and radius \eqn{\rho(x_{i}, x_{j})}.
-Similarly, we can give the notations \eqn{ \mathbf{BCov}_{\omega,n}^2(\mathbf{X},\mathbf{X}) } 
-and \eqn{ \mathbf{BCov}_{\omega,n}^2(\mathbf{Y},\mathbf{Y}) }, 
-which are the sample version of \eqn{ \mathbf{BCov}_{\omega}^2(\mathbf{X},\mathbf{X}) } and 
-\eqn{ \mathbf{BCov}_{\omega}^2(\mathbf{Y},\mathbf{Y}) }. 
-We thus define the sample version ball correlation as follows.
-
+Similarly, we can define \eqn{ \mathbf{BCov}_{\omega,n}^2(\mathbf{X},\mathbf{X}) } 
+and \eqn{ \mathbf{BCov}_{\omega,n}^2(\mathbf{Y},\mathbf{Y}) }. 
+We define Ball Correlation statistic as follows.
 \deqn{\mathbf{BCor}_{\omega,n}^2(\mathbf{X},\mathbf{Y})=
 \mathbf{BCov}_{\omega,n}^2(\mathbf{X},\mathbf{Y})/\sqrt{\mathbf{BCov}_{\omega,n}^2(\mathbf{X},\mathbf{X})\mathbf{BCov}_{\omega,n}^2(\mathbf{Y},\mathbf{Y})}
 }
 
-Moreover, it is natural to extend \eqn{\mathbf{BCov}_{\omega,n}} to measure the mutual independence between \eqn{K} random variables:
+We can extend \eqn{\mathbf{BCov}_{\omega,n}} to measure the mutual independence between \eqn{K} random variables:
+\deqn{\frac{1}{n^{2}}\sum_{i,j=1}^{n}{\left[ (\Delta_{ij,n}^{X_{1}, ..., X_{K}}-\prod_{k=1}^{K}\Delta_{ij,n}^{X_{k}})^{2}\prod_{k=1}^{K}{\hat{\omega}_{k}(X_{ki},X_{kj})} \right]}}
+where \eqn{X_{k}(k=1,\ldots,K)} are random variables and \eqn{X_{ki}} is the \eqn{i}-th observations of \eqn{X_{k}}. 
 
-\deqn{\frac{1}{n^{2}}\sum_{i,j=1}^{n}{\left[ (\Delta_{ij,n}^{R_{1}, ..., R_{K}}-\prod_{k=1}^{K}\Delta_{ij,n}^{R_{k}})^{2}\prod_{k=1}^{K}{\hat{\omega}_{k}(R_{ki},R_{kj})} \right]}}
-
-where \eqn{R_{k}, k=1,...K} indicate random variables and \eqn{R_{ki}, i=1,...,n} denote \eqn{i} th random samples of \eqn{R_{k}}. 
-
-See \code{\link{bcov.test}} for a test of multivariate independence based on the 
-ball covariance and ball correlation statistic.
+See \code{\link{bcov.test}} for a test of independence based on the Ball Covariance statistic.
 }
 \examples{
 ############# Ball Correlation #############

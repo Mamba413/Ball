@@ -2,13 +2,13 @@
 % Please edit documentation in R/bd.R
 \name{bd}
 \alias{bd}
-\title{Ball Divergence}
+\title{Ball Divergence statistic}
 \usage{
 bd(x, y = NULL, distance = FALSE, size = NULL, num.threads = 1,
   kbd.type = c("sum", "maxsum", "max"))
 }
 \arguments{
-\item{x}{a numeric vector, matrix, data.frame, or a list containing numeric vector, matrix, data.frame.}
+\item{x}{a numeric vector, matrix, data.frame, or a list containing at least two numeric vectors, matrices, or data.frames.}
 
 \item{y}{a numeric vector, matrix, data.frame.}
 
@@ -23,60 +23,54 @@ must be one of \code{"sum"}, \code{"summax"}, or \code{"max"}. Any unambiguous s
 Default \code{kbd.type = "sum"}.}
 }
 \value{
-\item{\code{bd }}{ sample version of ball divergence}
+\item{\code{bd }}{ Ball Divergence statistic}
 }
 \description{
-Compute ball divergence statistic between two-sample or K-sample.
+Compute Ball Divergence statistic, which is a generic dispersion measure in Banach spaces.
 }
 \details{
-Given the samples not containing missing values, \code{bd} returns sample version of ball divergence.
+Given the samples not containing missing values, \code{bd} returns Ball Divergence statistics.
 If we set \code{distance = TRUE}, arguments \code{x}, \code{y} can be a \code{dist} object or a
 symmetric numeric matrix recording distance between samples; 
 otherwise, these arguments are treated as data.
 
-Ball divergence, introduced by Pan et al(2017), is a new concept to measure the difference 
-between two probability distributions in separable Banach space. 
-Ball divergence of two probability measures is proven to be zero if and only if they are identical.
+Ball divergence statistic measure the distribution difference of two datasets in Banach spaces. 
+The Ball divergence statistic is proven to be zero if and only if two datasets are identical.
 
-The definitions of the sample version ball divergence are as follows.
-Given two independent samples \eqn{ \{x_{1}, ..., x_{n}\} } with the associated probability measure \eqn{\mu} and 
-\eqn{ \{y_{1}, ..., y_{m}\} } with \eqn{\nu}, where the observations in each sample are \emph{i.i.d}.
-
-Also, let \eqn{\delta(x,y,z)=I(z\in \bar{B}(x, \rho(x,y)))}, 
+The definition of the Ball Divergence statistics is as follows.
+Given two independent samples \eqn{ \{x_{1}, \ldots, x_{n}\} } with the associated probability measure \eqn{\mu} and 
+\eqn{ \{y_{1}, \ldots, y_{m}\} } with \eqn{\nu}, where the observations in each sample are \emph{i.i.d}.
+Let \eqn{\delta(x,y,z)=I(z\in \bar{B}(x, \rho(x,y)))}, 
 where \eqn{\delta(x,y,z)} indicates whether \eqn{z} is located in the closed ball \eqn{\bar{B}(x, \rho(x,y))} 
 with center \eqn{x} and radius \eqn{\rho(x, y)}. 
 We denote:
 \deqn{
-A_{ij}^{X}=\frac{1}{n}\sum_{u=1}^{n}{\delta(X_i,X_j,X_u)}, \quad A_{ij}^{Y}=\frac{1}{m}\sum_{v=1}^{m}{\delta(X_i,X_j,Y_v)}
+A_{ij}^{X}=\frac{1}{n}\sum_{u=1}^{n}{\delta(X_i,X_j,X_u)}, \quad A_{ij}^{Y}=\frac{1}{m}\sum_{v=1}^{m}{\delta(X_i,X_j,Y_v)},
 }
 \deqn{
-C_{kl}^{X}=\frac{1}{n}\sum_{u=1}^{n}{\delta(Y_k,Y_l,X_u)}, \quad C_{kl}^{Y}=\frac{1}{m}\sum_{v=1}^{m}{\delta(Y_k,Y_l,Y_v)}
+C_{kl}^{X}=\frac{1}{n}\sum_{u=1}^{n}{\delta(Y_k,Y_l,X_u)}, \quad C_{kl}^{Y}=\frac{1}{m}\sum_{v=1}^{m}{\delta(Y_k,Y_l,Y_v)}.
 }
-
-\eqn{A_{ij}^X} represents the proportion of samples \eqn{ \{x_{1}, ..., x_{n}\} } located in the 
-ball \eqn{\bar{B}(X_i,\rho(X_i,X_j))} and \eqn{A_{ij}^Y} represents the proportion of samples \eqn{ \{y_{1}, ..., y_{m}\} } 
+\eqn{A_{ij}^X} represents the proportion of samples \eqn{ \{x_{1}, \ldots, x_{n}\} } located in the 
+ball \eqn{\bar{B}(X_i,\rho(X_i,X_j))} and \eqn{A_{ij}^Y} represents the proportion of samples \eqn{ \{y_{1}, \ldots, y_{m}\} } 
 located in the ball \eqn{\bar{B}(X_i,\rho(X_i,X_j))}. 
-Meanwhile, \eqn{C_{kl}^X} and \eqn{C_{kl}^Y} 
-represent the corresponding proportions located in the ball \eqn{\bar{B}(Y_k,\rho(Y_k,Y_l))}.
-
-we can define sample version ball divergence as:
+Meanwhile, \eqn{C_{kl}^X} and \eqn{C_{kl}^Y} represent the corresponding proportions located in the ball \eqn{\bar{B}(Y_k,\rho(Y_k,Y_l))}.
+The Ball Divergence statistic is defined as:
 \deqn{D_{n,m}=A_{n,m}+C_{n,m}}
 
-BD can be generalized to the \emph{K}-sample problem. Suppose we 
-have \eqn{K} group samples, each group include \eqn{n_{k}, k=1,...,K} samples. 
-The definition of \eqn{K}-sample ball divergence statistic could be 
-to directly sum up the two-sample ball divergence statistics of all sample pairs (\code{kbd.type = "sum"})
+Ball Divergence can be generalized to the \emph{K}-sample test problem. Suppose we 
+have \eqn{K} group samples, each group include \eqn{n_{k}} samples. 
+The definition of \eqn{K}-sample Ball Divergence statistic could be 
+to directly sum up the two-sample Ball Divergence statistics of all sample pairs (\code{kbd.type = "sum"})
 \deqn{\sum_{1 \leq k < l \leq K}{D_{n_{k},n_{l}}},}
 or to find one sample with the largest difference to the others (\code{kbd.type = "maxsum"})
 \deqn{\max_{t}{\sum_{s=1, s \neq t}^{K}{D_{n_{s}, n_{t}}},}}
-to aggregate the \eqn{K-1} most significant different two-sample ball divergence statistics (\code{kbd.type = "max"})
+to aggregate the \eqn{K-1} most significant different two-sample Ball Divergence statistics (\code{kbd.type = "max"})
 \deqn{\sum_{k=1}^{K-1}{D_{(k)}},}
-where \eqn{D_{(1)}, \ldots, D_{(K-1)}} are the largest \eqn{K-1} two-sample ball divergence statistics among 
+where \eqn{D_{(1)}, \ldots, D_{(K-1)}} are the largest \eqn{K-1} two-sample Ball Divergence statistics among 
 \eqn{\{D_{n_s, n_t}| 1 \leq s < t \leq K\}}. When \eqn{K=2},
-the three types of ball divergence statistics degenerate into two-sample ball divergence statistic.
+the three types of Ball Divergence statistics degenerate into two-sample Ball Divergence statistic.
 
-See \code{\link{bd.test}} for a test of multivariate independence based on the 
-ball divergence.
+See \code{\link{bd.test}} for a test of distribution equality based on the Ball Divergence.
 }
 \examples{
 ############# Ball Divergence #############
