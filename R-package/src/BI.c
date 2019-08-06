@@ -17,7 +17,6 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdio.h"
-#include "utilize_R.h"
 #include "utilities.h"
 #include "BI.h"
 #include "Ball_omp.h"

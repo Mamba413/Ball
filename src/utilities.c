@@ -18,7 +18,6 @@
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "utilize_R.h"
 
 #ifdef R_BUILD
 #include "R.h"
@@ -1258,12 +1257,14 @@ void resample2_matrix(int **i_perm, int *init_perm, int num_permutation, int n) 
 void resample_indicator_label(int *i_perm, int *i_perm_tmp, int n, int *n1) {
     int i, j, temp, tmp0 = 0, tmp1 = 0;
 #ifdef R_BUILD
+    GetRNGstate();
     for (i = n - 1; i > 0; --i) {
         j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
         temp = i_perm[j];
         i_perm[j] = i_perm[i];
         i_perm[i] = temp;
     }
+    PutRNGstate();
 #else
     srand((unsigned) time(NULL));
     for (i = n - 1; i > 0; --i) {
@@ -1489,50 +1490,50 @@ void beautify_time(char result[], int seconds) {
     int out_seconds = seconds % 60;
     int_to_string(out_second_str, out_seconds);
     strcat(out_second_str, second_str);
+    // minute
     int out_minutes = (seconds / 60) % 60;
     char out_minutes_str[100] = "";
     if (seconds / 60 == 0) {
-        strcat(result, out_second_str);
+        strcpy(result, out_second_str);
         return;
     } else if (out_minutes == 1) {
-        strcat(out_minutes_str, "1 minute, ");
+        strcpy(out_minutes_str, "1 minute, ");
         strcat(out_minutes_str, out_second_str);
     } else {
         char minutes[] = " minutes, ";
-        strcat(out_minutes_str, "");
         int_to_string(out_minutes_str, out_minutes);
-        strcat(minutes, out_second_str);
         strcat(out_minutes_str, minutes);
+        strcat(out_minutes_str, out_second_str);
     }
+    // hour
     int out_hours = (seconds / 3600) % 24;
     char out_hours_str[150] = "";
     if (seconds / 3600 == 0) {
-        strcat(result, out_minutes_str);
+        strcpy(result, out_minutes_str);
         return;
     } else if (out_hours == 1) {
-        strcat(out_hours_str, "1 hour, ");
+        strcpy(out_hours_str, "1 hour, ");
         strcat(out_hours_str, out_minutes_str);
     } else {
         char hours[] = " hours, ";
-        strcat(out_hours_str, "");
         int_to_string(out_hours_str, out_hours);
-        strcat(hours, out_minutes_str);
         strcat(out_hours_str, hours);
+        strcat(out_hours_str, out_minutes_str);
     }
+    // day
     int out_days = (seconds / 86400);
     char out_days_str[200] = "";
     if (out_days == 0) {
-        strcat(result, out_hours_str);
+        strcpy(result, out_hours_str);
         return;
     } else if (out_days == 1) {
-        strcat(out_days_str, "1 day, ");
+        strcpy(out_days_str, "1 day, ");
         strcat(out_days_str, out_hours_str);
     } else {
         char days[] = " days, ";
-        strcat(out_days_str, "");
         int_to_string(out_days_str, out_days);
-        strcat(days, out_hours_str);
         strcat(out_days_str, days);
+        strcat(out_days_str, out_hours_str);
     }
-    strcat(result, out_days_str);
+    strcpy(result, out_days_str);
 }

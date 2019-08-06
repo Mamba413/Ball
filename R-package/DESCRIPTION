@@ -10,7 +10,7 @@ License: GPL-3
 Packaged: 2017-12-18 19:00:00 UTC; 
 RoxygenNote: 6.1.1
 Depends: R (>= 2.10)
-Imports: utils, gam, survival, mvtnorm
+Imports: utils, gam, survival, mvtnorm, dplyr
 Suggests: knitr, rmarkdown, testthat
 VignetteBuilder: knitr
 NeedsCompilation: yes

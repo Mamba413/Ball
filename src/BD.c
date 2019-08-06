@@ -128,9 +128,6 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
         int not_parallel = *thread == 1 ? 1 : 0;
         if (not_parallel) {
             double bd_tmp[2];
-#ifdef R_BUILD
-            GetRNGstate();
-#endif
             for (i = 0; i < *R; i++) {
                 // stop permutation if user stop it manually:
                 if (pending_interrupt()) {
@@ -143,9 +140,6 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
                 permuted_bd_w0[i] = bd_tmp[0];
                 permuted_bd_w1[i] = bd_tmp[1];
             }
-#ifdef R_BUILD
-            PutRNGstate();
-#endif
             free(i_perm);
             free(i_perm_tmp);
         } else {

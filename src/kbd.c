@@ -980,7 +980,11 @@ void bd_gwas_refining_single(const double *bd_stat, double *refine_permuted_bd_s
     time_t time_end = time(NULL);
     if (*verbose_out) {
         print_pvalue(pvalue[0]);
+#ifdef R_BUILD
+        Rprintf("cost time: %d (s).\n", (int) difftime(time_end, time_start));
+#else
         print_cost_time((int) difftime(time_end, time_start));
+#endif
     }
 
     free(label);

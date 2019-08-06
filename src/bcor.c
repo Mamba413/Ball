@@ -20,7 +20,6 @@
 #include "stdio.h"
 #include "utilities.h"
 #include "bcor.h"
-#include "BI.h"
 #include "Ball_omp.h"
 
 void Ball_Correlation(double *bcor_stat, const int *n, double **Dx, double **Dy, int **xidx, int **yidx) {
