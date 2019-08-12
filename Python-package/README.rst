@@ -32,3 +32,12 @@ proved to cope well for imbalanced data, and **bcov.test** and
 responses and/or predictors, such as shape, compositional as well as
 censored data.
 
+Note
+~~~~~~
+First, you should download MinGW (https://sourceforge.net/projects/mingw/) and then
+add this path to an system environment variable "path".
+
+Anaconda3 is needed, and the version should be greater than 3.4.
+You should add the path of Anaconda3 to system environment variable "path" as above.
+
+Then you can pip install the Ball package!

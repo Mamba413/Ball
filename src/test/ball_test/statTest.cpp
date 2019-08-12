@@ -237,7 +237,7 @@ TEST(KBCOV, multivariate_kbcov_value) {
     free(dxyz_vector);
 }
 
-TEST(BCor, bcor_value) {
+TEST(BCOR, bcor_value) {
     double ball_stat_value[6];
     double x[20] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
     int x_number[2] = {1, 1};
@@ -264,11 +264,12 @@ TEST(BCor, bcor_value) {
     EXPECT_NEAR(ball_stat_value[4], 1, ABSOLUTE_ERROR);
     EXPECT_NEAR(ball_stat_value[5], 1, ABSOLUTE_ERROR);
     // Continuous case :
+    double x1[20];
     for (int i = 0; i < 10; ++i) {
-        x[i] = X2_CONTINUOUS[i];
-        x[i + 10] = X2_CONTINUOUS[i];
+        x1[i] = X2_CONTINUOUS[i];
+        x1[i + 10] = X2_CONTINUOUS[i];
     }
-    bcor_test(ball_stat_value, X2_CONTINUOUS_DST, x, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
+    bcor_test(ball_stat_value, X2_CONTINUOUS_DST, x1, x_number, &f_number, &size, &n, &p, &k, &dst_y, &dst_x, &nth);
     EXPECT_NEAR(ball_stat_value[0], 1, ABSOLUTE_ERROR);
     EXPECT_NEAR(ball_stat_value[1], 1, ABSOLUTE_ERROR);
     EXPECT_NEAR(ball_stat_value[2], 1, ABSOLUTE_ERROR);
@@ -285,7 +286,7 @@ TEST(BCor, bcor_value) {
     EXPECT_NEAR(ball_stat_value[2], 1, ABSOLUTE_ERROR);
 }
 
-TEST(BCor, bcor_zero_value) {
+TEST(BCOR, bcor_zero_value) {
     double ball_stat_value[6];
     double x[20] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
     double y[10] = {11, 12, 13, 14, 15, 16, 17, 18, 19, 20};

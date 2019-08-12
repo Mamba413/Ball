@@ -93,6 +93,13 @@ TEST(utilities, beautify_time) {
     for (int i = 0; i < strlen(result1); ++i) {
         EXPECT_EQ(true_result1[i], result1[i]);
     }
+    char result2[200] = "";
+    second = 87607;
+    char true_result2[200] = "1 day, 0 hours, 20 minutes, 7 seconds";
+    beautify_time(result2, second);
+    for (int i = 0; i < strlen(result1); ++i) {
+        EXPECT_EQ(true_result2[i], result2[i]);
+    }
 }
 
 TEST(KBD, sub_rank_finder) {

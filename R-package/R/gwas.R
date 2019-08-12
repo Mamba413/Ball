@@ -5,9 +5,12 @@
 #' @param refine a logical value. If \code{refine = TRUE}, a \eqn{p}-values refining process is applied to 
 #' the SNPs which passes the pre-screening process. Default: \code{refine = TRUE} (At present, \code{refine = FALSE} is not available).
 #' @param num.permutations the number of permutation replications. When \code{num.permutations = 0}, 
-#' the function just returns the Ball Divergence statistic. Default: \code{num.permutations = floor(snp_num / 0.05) * 5}
+#' the function just returns the Ball Divergence statistic. Default: \code{num.permutations = 100 * ncol(snp)}
 #' @param screening.method if \code{screening.method = "spectrum"}, the spectrum method is applied to 
 #' screening the candidate SNPs, or otherwise, the permutation method is applied. Default: \code{screening.method = "permute"}.
+#' @param screening.file A file preserving the pre-screening result. It works only if the pre-screening is available.
+#' Default: \code{screening.file = NULL}.
+#' @param save.screening A file name for preserving the pre-screening result. \code{save.screening = NULL}.
 #' @param alpha the significance level. Default: \code{0.05 / ncol(snp)}.
 #' @param verbose Show computation status and estimated runtime. Default: \code{verbose = FALSE}.
 #' 
@@ -34,7 +37,7 @@
 #' library(Ball)
 #' set.seed(1234)
 #' num <- 200
-#' snp_num <- 10000
+#' snp_num <- 500
 #' p <- 5
 #' x <- matrix(rnorm(num * p), nrow = num)
 #' snp <- sapply(1:snp_num, function(i) {
@@ -44,22 +47,28 @@
 #'   sample(1:2, size = num, replace = TRUE)
 #' })
 #' snp <- cbind(snp, snp1)
-#' res <- Ball::bd.gwas.test(x = x, snp = snp, num.permutations = 19999)
+#' res <- Ball::bd.gwas.test(x = x, snp = snp)
 #' mean(res[["p.value"]] < 0.05)
 #' mean(res[["p.value"]] < 0.005)
-#' mean(res[["p.value"]] < 0.0005)
+#' 
+#' ## only return the test statistics;
+#' res <- Ball::bd.gwas.test(x = x, snp = snp, num.permutation = 0)
 #' 
 #' ## save pre-screening process results:
 #' x <- matrix(rnorm(num * p), nrow = num)
 #' snp <- sapply(1:snp_num, function(i) {
 #'   sample(0:2, size = num, replace = TRUE, prob = c(1/2, 1/4, 1/4))
 #' })
-#' res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, num.permutations = 19999, save.screening = "temp.rda")
+#' res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, 
+#'                           num.permutations = 19999, 
+#'                           save.screening = "temp.rda")
 #' mean(res[["p.value"]] < 0.05)
 #' mean(res[["p.value"]] < 0.005)
 #' mean(res[["p.value"]] < 0.0005)
 #' ## refine p-value according to the pre-screening process result:
-#' res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, num.permutations = 19999, screening.file = "temp.rda")
+#' res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, 
+#'                           num.permutations = 19999, 
+#'                           screening.file = "temp.rda")
 #' }
 bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"), refine = TRUE,
                          num.permutations, distance = FALSE, alpha, 
@@ -103,12 +112,15 @@ bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"), re
   
   if (screening.method == "permute") {
     if (missing(num.permutations)) {
-      r <- floor(snp_num / 0.05) * 5
-    } else {
-      r <- num.permutations
+      num.permutations <- 100 * snp_num
     }
+    r <- num.permutations
   } else {
     r <- 0
+  }
+  
+  if (r == 0) {
+    verbose <- FALSE
   }
   
   eigenvalue <- NULL

@@ -59,7 +59,7 @@ Ball correlation is a generic multivariate measure of dependence in Banach space
 }
 \details{
 \code{bcorsis} performs a model-free generic sure independence screening procedure, 
-BCor-SIS, to pick out variables from \code{x} which are potentially asscoiated with \code{y}. 
+BCor-SIS, to pick out variables from \code{x} which are potentially associated with \code{y}. 
 BCor-SIS relies on Ball correlation, a universal dependence measure in Banach spaces.
 Ball correlation (BCor) ranges from 0 to 1. A larger BCor implies they are likely to be associated while 
 Bcor is equal to 0 implies they are unassociated. (See \code{\link{bcor}} for details.)
