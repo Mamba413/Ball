@@ -15,9 +15,9 @@
 #' If input is a logical value, it is equivalent to \code{weight = "probability"} if \code{weight = TRUE} while 
 #' equivalent to \code{weight = "constant"} if \code{weight = FALSE}.
 #' Default: \code{weight = FALSE}.
-## @param type If \code{type = 'bcor'}, Ball Correlation will be used instead of Ball Covariance.(default \code{type = 'bcov'})
-## @param method if \code{method = 'permute'}, a permutation procedure will be carried out;
-## if \code{method = 'approx'}, the p-values based on approximate Ball Covariance distribution are given.(Test arguments)
+#' @param method if \code{method = "permutation"}, a permutation procedure will be carried out;
+#' if \code{method = "limit"}, the p-values based on approximate Ball Covariance distribution are given
+#' (Only available for Independence test and \code{weight = "constant"}).
 #' 
 #' @return If \code{num.permutations > 0}, \code{bcov.test} returns a \code{htest} class object containing the following components:
 #' \item{\code{statistic}}{Ball Covariance statistic.}            
@@ -115,6 +115,16 @@
 #' ################# Mutual Independence Test for Meteorology data #################
 #' data("meteorology")
 #' bcov.test(meteorology)
+#' 
+#' ################  Testing via approximate limit distribution  #################
+#' set.seed(1)
+#' n <- 200
+#' p <- 2
+#' x <- matrix(rnorm(n * p), nrow = n)
+#' y <- matrix(rnorm(n * p), nrow = n)
+#' bcov.test(x, y, method = "limit")
+#' bcov.test(x, y)
+#' 
 bcov.test <- function(x, ...) UseMethod("bcov.test")
 
 
@@ -122,10 +132,11 @@ bcov.test <- function(x, ...) UseMethod("bcov.test")
 #' @export
 #' @method bcov.test default
 bcov.test.default <- function(x, y = NULL, num.permutations = 99, 
+                              method = c("permutation", "limit"), 
                               distance = FALSE, weight = FALSE, 
                               seed = 1, num.threads = 0, ...)
 {
-  method = 'permute'
+  method <- match.arg(method)
   data_name <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
   if (length(data_name) > 1) {
     data_name <- ""
@@ -136,7 +147,8 @@ bcov.test.default <- function(x, y = NULL, num.permutations = 99,
     data_name <- gsub(x = data_name, pattern = " and NULL", replacement = "")
   }
   weight <- examine_weight_arguments(weight)
-  result <- bcov_test_internal_wrap(x = x, y = y, num.permutations = num.permutations, distance = distance, weight = weight, 
+  result <- bcov_test_internal_wrap(x = x, y = y, num.permutations = num.permutations, 
+                                    distance = distance, weight = weight, 
                                     seed = seed, method = method, type = type, 
                                     num.threads = num.threads)
   # return result of hypothesis test:
@@ -277,7 +289,7 @@ bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, we
   ## examine test type:
   # type <- examine_type_arguments(type)
   ## examine num.permutations arguments:
-  if(method == "approx") {
+  if(method == "limit") {
     num.permutations <- 0
   } else {
     examine_R_arguments(num.permutations)
@@ -286,9 +298,10 @@ bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, we
   if(num.permutations == 0) {
     result <- bcov_test_wrap_c(x = x, y = y, n = num, num.permutations = 0, 
                                distance = distance, num.threads = num.threads)
-    if(method == "approx") {
-      pvalue <- calculatePvalue(result[["statistic"]] * result[["info"]][["N"]], 
-                                BITestNullDistribution)
+    if(method == "limit") {
+      eigenvalue <- bcov_limit_wrap_c(x, y, num, distance, num.threads)
+      result[["p.value"]] <- 1 - hbe(eigenvalue, num * result[["statistic"]][1])
+      return(result)
     } else {
       if (weight == WEIGHT_TYPE[1]) {
         return(result[[1]][1])
@@ -385,20 +398,30 @@ kbcov_test_internal <- function(x, num.permutations = 99, distance = FALSE, weig
   if (class(x[[1]]) == "dist") {
     x <- lapply(x, as.vector)
   } else {
-    x <- lapply(x, function(xx) { xx[lower.tri(xx)] })
+    x <- lapply(x, function(xx) { 
+      xx[lower.tri(xx)] 
+    })
   }
   if (length(unique(sapply(x, length))) != 1) {
     stop("sample size of variables are not match!")
   } else {
+    old_x <- x
     x <- unlist(x)
+  }
+  #
+  if(method == "limit") {
+    num.permutations <- 0
+  } else {
+    examine_R_arguments(num.permutations)
   }
   #
   if(num.permutations == 0) {
     result <- kbcov_test_wrap_c(x = x, K = var_num, n = num, num.permutations = 0, 
                                 distance = distance, num.threads = num.threads)
-    if(method == "approx") {
-      pvalue <- calculatePvalue(result[["statistic"]] * result[["info"]][["N"]], 
-                                BITestNullDistribution)
+    if(method == "limit") {
+      eigenvalue <- bcov_limit_wrap_c(old_x, NULL, num, distance, num.threads)
+      result[["p.value"]] <- 1 - hbe(eigenvalue, num * result[["statistic"]])
+      return(result)
     } else {
       if (weight == WEIGHT_TYPE[1]) {
         return(result[[1]][1])

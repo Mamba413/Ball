@@ -1,4 +1,5 @@
 # Various imports
+#' @importFrom stats pgamma
 #' @importFrom stats dist
 #' @importFrom stats runif
 #' @importFrom stats rnorm

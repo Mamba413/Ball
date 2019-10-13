@@ -18,12 +18,12 @@
 #' @param kbd.type a character string specifying the \eqn{K}-sample Ball Divergence test statistic, 
 #' must be one of \code{"sum"}, \code{"summax"}, or \code{"max"}. Any unambiguous substring can be given. 
 #' Default \code{kbd.type = "sum"}.
+#' @param method if \code{method = "permutation"}, a permutation procedure will be carried out;
+#' if \code{ method = "limit"}, the p-values based on approximate Ball Divergence distribution are given
+#' (Only available for two-sample test).
 #' @param ... further arguments to be passed to or from methods.
 #' 
 ## @param weight not available now
-## @param method if \code{method = 'permute'}, a permutation procedure will be carried out;
-## if \code{ method = 'approx'}, the p-values based on approximate Ball Divergence
-## distribution are given.
 #' 
 #' @return If \code{num.permutations > 0}, \code{bd.test} returns a \code{htest} class object containing the following components:
 #' \item{\code{statistic}}{Ball Divergence statistic.}            
@@ -119,19 +119,29 @@
 #' res[["complete.info"]][["statistic"]]
 #' ## get all test result:
 #' res[["complete.info"]][["p.value"]]
+#' 
+#' ################  Testing via approximate limit distribution  #################
+#' set.seed(1)
+#' n <- 300
+#' p <- 5
+#' x <- matrix(rnorm(n * p), nrow = n)
+#' y <- matrix(rnorm(n * p), nrow = n)
+#' bd.test(x, y, method = "limit")
+#' bd.test(x, y)
 bd.test <- function(x, ...) UseMethod("bd.test")
 
 
 #' @rdname bd.test
 #' @export
 #' @method bd.test default
-bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE,
+bd.test.default <- function(x, y = NULL, num.permutations = 99, 
+                            method = c("permutation", "limit"), distance = FALSE,
                             size = NULL, seed = 1, num.threads = 0, 
                             kbd.type = c("sum", "maxsum", "max"), ...) {
   weight <- FALSE
-  method <- 'permute'
   data_name <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
   kbd.type <- match.arg(kbd.type)
+  method <- match.arg(method)
   if (length(data_name) > 1) {
     data_name <- ""
   }
@@ -208,7 +218,7 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE
   # memoryAvailable(n = sum(size), funs = 'BD.test')
   
   ## examine num.permutations arguments:
-  if(method == "approx") {
+  if(method == "limit") {
     num.permutations <- 0
   } else {
     examine_R_arguments(num.permutations)
@@ -221,10 +231,10 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99, distance = FALSE
   if(num.permutations == 0) {
     result <- bd_test_wrap_c(xy, size, num.permutations = 0, weight, distance, num.threads)
     # approximately method:
-    if(method == "approx") {
+    if(method == "limit") {
       if(result[["info"]][["K"]] == 2) {
-        pvalue <- calculatePvalue(prod(size) * result[["statistic"]] / sum(size), 
-                                  BDTestNullDistribution)
+        eigenvalue <- bd_limit_wrap_c(xy, size, weight, distance, num.threads)
+        result[["p.value"]] <- 1 - hbe(eigenvalue, prod(size) * result[["statistic"]] / sum(size))
       } else {
         return(result[["statistic"]])
       }

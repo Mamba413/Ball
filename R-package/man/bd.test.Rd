@@ -9,8 +9,9 @@
 bd.test(x, ...)
 
 \method{bd.test}{default}(x, y = NULL, num.permutations = 99,
-  distance = FALSE, size = NULL, seed = 1, num.threads = 0,
-  kbd.type = c("sum", "maxsum", "max"), ...)
+  method = c("permutation", "limit"), distance = FALSE, size = NULL,
+  seed = 1, num.threads = 0, kbd.type = c("sum", "maxsum", "max"),
+  ...)
 
 \method{bd.test}{formula}(formula, data, subset, na.action, ...)
 }
@@ -23,6 +24,10 @@ bd.test(x, ...)
 
 \item{num.permutations}{the number of permutation replications. When \code{num.permutations = 0}, the function just returns
 the Ball Divergence statistic. Default: \code{num.permutations = 99}.}
+
+\item{method}{if \code{method = "permutation"}, a permutation procedure will be carried out;
+if \code{ method = "limit"}, the p-values based on approximate Ball Divergence distribution are given
+(Only available for two-sample test).}
 
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}.}
 
@@ -135,6 +140,15 @@ res
 res[["complete.info"]][["statistic"]]
 ## get all test result:
 res[["complete.info"]][["p.value"]]
+
+################  Testing via approximate limit distribution  #################
+set.seed(1)
+n <- 300
+p <- 5
+x <- matrix(rnorm(n * p), nrow = n)
+y <- matrix(rnorm(n * p), nrow = n)
+bd.test(x, y, method = "limit")
+bd.test(x, y)
 
 ################  Formula interface  ################
 ## Two-sample test

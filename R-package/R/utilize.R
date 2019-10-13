@@ -4,6 +4,45 @@ BCOR_WEIGHT_STATS <- c("bcor.constant", "bcor.probability", "bcor.chisquare")
 
 BCOV_WEIGHT_STATS <- c("bcov.constant", "bcov.probability", "bcov.chisquare")
 
+center_bdd_matrix <- function(bdd) {
+  num <- dim(bdd)[1]
+  bdd <- sweep(bdd, 2, colMeans(bdd)) - rowMeans(bdd) + mean(bdd)
+  bdd
+}
+
+#' Hall-Buckley-Eagleson method
+#'
+#' Computes the cdf of a positively-weighted sum of chi-squared random variables with the Hall-Buckley-Eagleson (HBE) method.
+#' @keywords distribution
+#' @references
+#' \itemize{
+#'   \item P. Hall. Chi squared approximations to the distribution of a sum of independent random variables. \emph{The Annals of Probability}, 11(4):1028-1036, 1983.
+#'   \item M. J. Buckley and G. K. Eagleson. An approximation to the distribution of quadratic forms in normal random variables. \emph{Australian Journal of Statistics}, 30(1):150-159, 1988.
+#' }
+#' @examples
+#' hbe(c(1.5, 1.5, 0.5, 0.5), 10.203)            # should give value close to 0.95
+#' @noRd
+hbe <- function(coeff, x){
+  # compute cumulants and nu
+  K_1 <- sum(coeff)
+  K_2 <- 2 * sum(coeff^2)
+  K_3 <- 8 * sum(coeff^3)
+  nu <- 8 * (K_2^3) / (K_3^2)
+  
+  # gamma parameters for chi-square
+  gamma_k <- nu/2
+  gamma_theta <- 2
+  
+  # need to transform the actual x value to x_chisqnu ~ chi^2(nu)
+  # This transformation is used to match the first three moments
+  # First x is normalised and then scaled to be x_chisqnu
+  x_chisqnu_vec <- sqrt(2 * nu / K_2) * (x - K_1) + nu
+  
+  # now this is a chi_sq(nu) variable
+  p_chisqnu_vec <- pgamma(x_chisqnu_vec, shape = gamma_k, scale = gamma_theta)
+  p_chisqnu_vec
+}
+
 #' calculate Pvalue
 #'
 #' @param statValue Statistic Value

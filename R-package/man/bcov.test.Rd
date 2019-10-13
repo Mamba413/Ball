@@ -9,7 +9,8 @@
 bcov.test(x, ...)
 
 \method{bcov.test}{default}(x, y = NULL, num.permutations = 99,
-  distance = FALSE, weight = FALSE, seed = 1, num.threads = 0, ...)
+  method = c("permutation", "limit"), distance = FALSE,
+  weight = FALSE, seed = 1, num.threads = 0, ...)
 
 \method{bcov.test}{formula}(formula, data, subset, na.action, ...)
 }
@@ -22,6 +23,10 @@ bcov.test(x, ...)
 
 \item{num.permutations}{the number of permutation replications. When \code{num.permutations = 0}, the function just returns
 the Ball Covariance statistic. Default: \code{num.permutations = 99}.}
+
+\item{method}{if \code{method = "permutation"}, a permutation procedure will be carried out;
+if \code{method = "limit"}, the p-values based on approximate Ball Covariance distribution are given
+(Only available for Independence test and \code{weight = "constant"}).}
 
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.}
 
@@ -138,6 +143,16 @@ bcov.test(data_list, distance = FALSE, weight = "chi")
 ################# Mutual Independence Test for Meteorology data #################
 data("meteorology")
 bcov.test(meteorology)
+
+################  Testing via approximate limit distribution  #################
+set.seed(1)
+n <- 200
+p <- 2
+x <- matrix(rnorm(n * p), nrow = n)
+y <- matrix(rnorm(n * p), nrow = n)
+bcov.test(x, y, method = "limit")
+bcov.test(x, y)
+
 
 ################  Formula interface  ################
 ## independence test:
