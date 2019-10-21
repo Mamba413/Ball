@@ -233,7 +233,7 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99,
     # approximately method:
     if(method == "limit") {
       if(result[["info"]][["K"]] == 2) {
-        eigenvalue <- bd_limit_wrap_c(xy, size, weight, distance, num.threads)
+        eigenvalue <- bd_limit_wrap_c(xy, size, distance, num.threads)
         result[["p.value"]] <- 1 - hbe(eigenvalue, prod(size) * result[["statistic"]] / sum(size))
       } else {
         return(result[["statistic"]])
