@@ -117,14 +117,14 @@
 #' bcov.test(meteorology)
 #' 
 #' ################  Testing via approximate limit distribution  #################
+#' \dontrun{
 #' set.seed(1)
-#' n <- 200
-#' p <- 2
-#' x <- matrix(rnorm(n * p), nrow = n)
-#' y <- matrix(rnorm(n * p), nrow = n)
+#' n <- 2000
+#' x <- rnorm(n)
+#' y <- rnorm(n)
 #' bcov.test(x, y, method = "limit")
 #' bcov.test(x, y)
-#' 
+#' }
 bcov.test <- function(x, ...) UseMethod("bcov.test")
 
 
@@ -170,11 +170,17 @@ bcov.test.default <- function(x, y = NULL, num.permutations = 99,
     } 
     
     data_name <- paste0(data_name,"\nnumber of observations = ", result[["info"]][["N"]])
-    data_name <- paste0(data_name, "\nreplicates = ", num.permutations, 
-                        ", weight: ", weight_name)
-    test_method <- "Ball Covariance test of %sindependence"
+    if (method == "limit") {
+      null_method <- "Limit Distribution"
+      data_name <- paste0(data_name, "\nreplicates = ", 0)
+    } else {
+      null_method <- "Permutation"
+      data_name <- paste0(data_name, "\nreplicates = ", num.permutations)
+    }
+    data_name <- paste0(data_name, ", weight: ", weight_name)
+    test_method <- "Ball Covariance test of %sindependence (%s)"
     test_type <- ifelse(class(x) == "list" && length(x) > 2, "mutual ", "")
-    test_method <- sprintf(test_method, test_type)
+    test_method <- sprintf(test_method, test_type, null_method)
     # if(type == "bcor") {
     #   test_method <- gsub(pattern = "Covariance", replacement = "Correlation", x = test_method)
     #   data_name <- gsub(pattern = "Covariance", replacement = "Correlation", x = data_name)
@@ -248,7 +254,7 @@ bcov.test.formula <- function(formula, data, subset, na.action, ...) {
 #'
 #' @noRd
 bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, weight = FALSE, 
-                               seed = 4, method = 'permute', num.threads)
+                               seed = 4, method = "permute", num.threads)
 {
   if (class(x) == "dist" && class(y) == "dist") {
     distance <- TRUE
@@ -273,7 +279,7 @@ bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, we
     x <- as.matrix(x)
     y <- as.matrix(y)
     num <- nrow(x)
-    if (ncol(x) != 1 || ncol(y) != 1) {
+    if ((ncol(x) != 1 || ncol(y) != 1) || (method == "limit")) {
       x <- as.vector(dist(x))
       y <- as.vector(dist(y))
       distance <- TRUE

@@ -142,13 +142,14 @@ res[["complete.info"]][["statistic"]]
 res[["complete.info"]][["p.value"]]
 
 ################  Testing via approximate limit distribution  #################
+\dontrun{
 set.seed(1)
-n <- 300
-p <- 5
-x <- matrix(rnorm(n * p), nrow = n)
-y <- matrix(rnorm(n * p), nrow = n)
+n <- 1000
+x <- rnorm(n)
+y <- rnorm(n)
 bd.test(x, y, method = "limit")
 bd.test(x, y)
+}
 
 ################  Formula interface  ################
 ## Two-sample test

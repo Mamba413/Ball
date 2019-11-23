@@ -12,9 +12,10 @@ bcov_limit_wrap_c <- function(x, y, num, distance, num.threads) {
   
   bdd_xy_eigen <- matrix(data = 1, ncol = num, nrow = num)
   for (i in 1:length(x)) {
-    xy <- x[[i]]
+    xy <- as.double(x[[i]])
     bdd_xy <- double((num + 1) * num / 2)
-    res <- .C("bdd_matrix_bias", bdd_xy, xy, N)
+    res <- .C("bdd_matrix_bias", bdd_xy, xy, N, num.threads)
+    rm(bdd_xy); gc(reset = TRUE, verbose = FALSE)
     bdd_xy <- matrix(0, nrow = num, ncol = num)
     bdd_xy[lower.tri(bdd_xy, diag = TRUE)] <- res[[1]]
     bdd_xy <- bdd_xy + t(bdd_xy)
@@ -33,22 +34,22 @@ bcov_limit_wrap_c <- function(x, y, num, distance, num.threads) {
 #' @noRd
 bd_limit_wrap_c <- function(xy, size, distance, num.threads) {
   xy <- as.double(xy)
-  N <- as.integer(sum(size))
   n1 <- as.integer(size[1])
   n2 <- as.integer(size[2])
   distance <- as.integer(distance)
   num.threads <- as.integer(num.threads)
   
-  bdd_xy <- double((N + 1) * N / 2)
-  res <- .C("bdd_matrix_bias_two_group", bdd_xy, xy, n1, n2)
-  bdd_xy <- matrix(0, nrow = N, ncol = N)
+  num <- as.integer(sum(size))
+  bdd_xy <- double((num + 1) * num / 2)
+  res <- .C("bdd_matrix_bias_two_group", bdd_xy, xy, n1, n2, num.threads)
+  bdd_xy <- matrix(0, nrow = num, ncol = num)
   bdd_xy[lower.tri(bdd_xy, diag = TRUE)] <- res[[1]]
   bdd_xy <- bdd_xy + t(bdd_xy)
   diag(bdd_xy) <- diag(bdd_xy) / 2
   
   bdd_xy <- center_bdd_matrix(bdd_xy)
   eigenvalue <- eigen(bdd_xy, only.values = TRUE, symmetric = TRUE)$values
-  eigenvalue <- eigenvalue[eigenvalue > 0] / N
+  eigenvalue <- eigenvalue[eigenvalue > 0] / num
   2 * eigenvalue
 }
 

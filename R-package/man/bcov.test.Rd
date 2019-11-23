@@ -145,14 +145,14 @@ data("meteorology")
 bcov.test(meteorology)
 
 ################  Testing via approximate limit distribution  #################
+\dontrun{
 set.seed(1)
-n <- 200
-p <- 2
-x <- matrix(rnorm(n * p), nrow = n)
-y <- matrix(rnorm(n * p), nrow = n)
+n <- 2000
+x <- rnorm(n)
+y <- rnorm(n)
 bcov.test(x, y, method = "limit")
 bcov.test(x, y)
-
+}
 
 ################  Formula interface  ################
 ## independence test:

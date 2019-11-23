@@ -3,8 +3,21 @@
 //
 
 #include "utilities.h"
+#include "Ball_omp.h"
 
-void bdd_matrix_bias_two_group(double *b_dd, double *x, int *n1_num, int *n2_num) {
+void bdd_matrix_bias_two_group(double *b_dd, double *x, int *n1_num, int *n2_num, int *nthread) {
+    int not_parallel = (*nthread == 1 ? 1 : *nthread);
+#ifdef Ball_OMP_H_
+    if (not_parallel != 1) {
+        omp_set_dynamic(0);
+        if (*nthread <= 0) {
+            omp_set_num_threads(omp_get_num_procs());
+        } else {
+            omp_set_num_threads(*nthread);
+        }
+    }
+#endif
+
     const int n1 = *n1_num;
     const int n2 = *n2_num;
     const int num = n1 + n2;
@@ -63,23 +76,55 @@ void bdd_matrix_bias_two_group(double *b_dd, double *x, int *n1_num, int *n2_num
     }
     free_matrix(Dxy, num, num);
 
-    int tmp_sum, s = 0;
     int c1 = n1 * n1 + n2 * n2;
     double c2 = 1.0 / c1;
-    for (int i = 0; i < num; i++) {
-        for (int j = i; j < num; j++) {
-            tmp_sum = 0;
-            for (int k = 0; k < num; k++) {
-                tmp_sum += MAX(x_rank[k][i], x_rank[k][j]);
+
+    if (not_parallel) {
+        int tmp_sum, s = 0;
+        for (int i = 0; i < num; i++) {
+            for (int j = i; j < num; j++) {
+                tmp_sum = 0;
+                for (int k = 0; k < num; k++) {
+                    tmp_sum += MAX(x_rank[k][i], x_rank[k][j]);
+                }
+                tmp_sum = c1 - tmp_sum;
+                b_dd[s++] = tmp_sum * c2;
             }
-            tmp_sum = c1 - tmp_sum;
-            b_dd[s++] = tmp_sum * c2;
+        }
+    } else {
+#pragma omp parallel
+        {
+            int tmp_sum, s, i, j, k;
+#pragma omp for
+            for (i = 0; i < num; i++) {
+                for (j = i; j < num; j++) {
+                    s = i * num - ((i * (i - 1)) >> 1) + j - i;
+                    tmp_sum = 0;
+                    for (k = 0; k < num; k++) {
+                        tmp_sum += MAX(x_rank[k][i], x_rank[k][j]);
+                    }
+                    tmp_sum = c1 - tmp_sum;
+                    b_dd[s] = tmp_sum * c2;
+                }
+            }
         }
     }
     free_int_matrix(x_rank, num, num);
 }
 
-void bdd_matrix_bias(double *b_dd, double *x, int *n) {
+void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread) {
+    int not_parallel = (*nthread == 1 ? 1 : *nthread);
+#ifdef Ball_OMP_H_
+    if (not_parallel != 1) {
+        omp_set_dynamic(0);
+        if (*nthread <= 0) {
+            omp_set_num_threads(omp_get_num_procs());
+        } else {
+            omp_set_num_threads(*nthread);
+        }
+    }
+#endif
+
     const int num = *n;
     double x_vec[num];
     int r_vec[num];
@@ -98,17 +143,38 @@ void bdd_matrix_bias(double *b_dd, double *x, int *n) {
     }
     free_matrix(Dxy, num, num);
 
-    int tmp_sum, s = 0;
+
     int c1 = num * (num + 1);
     double c2 = 1.0 / (num * num);
-    for (int i = 0; i < num; i++) {
-        for (int j = i; j < num; j++) {
-            tmp_sum = 0;
-            for (int k = 0; k < num; k++) {
-                tmp_sum += MAX(x_rank[k][i], x_rank[k][j]);
+
+    if (not_parallel) {
+        int tmp_sum, s = 0;
+        for (int i = 0; i < num; i++) {
+            for (int j = i; j < num; j++) {
+                tmp_sum = 0;
+                for (int k = 0; k < num; k++) {
+                    tmp_sum += MAX(x_rank[k][i], x_rank[k][j]);
+                }
+                b_dd[s++] = (c1 - tmp_sum) * c2;
             }
-            b_dd[s++] = (c1 - tmp_sum) * c2;
         }
+    } else {
+#pragma omp parallel
+        {
+            int tmp_sum, s, i, j, k;
+#pragma omp for
+            for (i = 0; i < num; i++) {
+                for (j = i; j < num; j++) {
+                    s = i * num - ((i * (i - 1)) >> 1) + j - i;
+                    tmp_sum = 0;
+                    for (k = 0; k < num; k++) {
+                        tmp_sum += MAX(x_rank[k][i], x_rank[k][j]);
+                    }
+                    b_dd[s] = (c1 - tmp_sum) * c2;
+                }
+            }
+        };
     }
+
     free_int_matrix(x_rank, num, num);
 }

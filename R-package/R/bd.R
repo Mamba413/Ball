@@ -121,13 +121,14 @@
 #' res[["complete.info"]][["p.value"]]
 #' 
 #' ################  Testing via approximate limit distribution  #################
+#' \dontrun{
 #' set.seed(1)
-#' n <- 300
-#' p <- 5
-#' x <- matrix(rnorm(n * p), nrow = n)
-#' y <- matrix(rnorm(n * p), nrow = n)
+#' n <- 1000
+#' x <- rnorm(n)
+#' y <- rnorm(n)
 #' bd.test(x, y, method = "limit")
 #' bd.test(x, y)
+#' }
 bd.test <- function(x, ...) UseMethod("bd.test")
 
 
@@ -202,7 +203,7 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99,
     y <- as.matrix(y)
     p <- examine_dimension(x, y)
     # 
-    if(p > 1) {
+    if(p > 1 || method == "limit") {
       xy <- get_vectorized_distance_matrix(x, y)
       distance <- TRUE
       size <- c(xy[[2]], xy[[3]])
@@ -285,7 +286,13 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99,
   }
   data_name <- paste(data_name, sprintf("\nnumber of observations = %s,", result[["info"]][["N"]]))
   data_name <- paste(data_name, "group sizes:", paste0(result[["info"]][["size"]], collapse = " "))
-  data_name <- paste0(data_name, "\nreplicates = ", num.permutations)
+  if (method == "limit") {
+    null_method <- "Limit Distribution"
+    data_name <- paste0(data_name, "\nreplicates = ", 0)
+  } else {
+    null_method <- "Permutation"
+    data_name <- paste0(data_name, "\nreplicates = ", num.permutations)
+  }
   if (result[["info"]][["K"]] == 3) {
     data_name <- paste0(data_name, ", kbd.type: ", stat_message)
   }
@@ -300,7 +307,7 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99,
     size = result[["info"]][["size"]],
     complete.info = result,
     alternative = alternative_message,
-    method = sprintf("%s-sample Ball Divergence Test", result[["info"]][["K"]]),
+    method = sprintf("%s-sample Ball Divergence Test (%s)", result[["info"]][["K"]], null_method),
     data.name = data_name
   )
   class(e) <- "htest"
