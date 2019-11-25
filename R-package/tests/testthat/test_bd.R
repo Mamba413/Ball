@@ -5,7 +5,7 @@ skip_on_cran()
 
 test_that("Error if computation result for ball divergence is wrong!", {
   target_value <- 2.4032
-  names(target_value) <- "kbd.sum"
+  names(target_value) <- "kbd.sum.constant"
   expect_equal(bd(1:15, size = c(5, 5, 5)), target_value)
   expect_equal(bd.test(1:15, size = c(5, 5, 5), num.permutations = 0), target_value)
 })
@@ -30,20 +30,20 @@ test_that("bd, bd.test function return unmatched ball divergence statistic", {
   res1 <- bd(dat, kbd.type = "sum")
   res2 <- bd(dat, kbd.type = "max")
   res3 <- bd(dat, kbd.type = "maxsum")
-  expect_equal(names(res1), "kbd.sum")
-  expect_equal(names(res2), "kbd.max")
-  expect_equal(names(res3), "kbd.maxsum")
+  expect_equal(names(res1), "kbd.sum.constant")
+  expect_equal(names(res2), "kbd.max.constant")
+  expect_equal(names(res3), "kbd.maxsum.constant")
   
   res1 <- bd.test(dat, kbd.type = "sum")
   res2 <- bd.test(dat, kbd.type = "max")
   res3 <- bd.test(dat, kbd.type = "maxsum")
-  expect_equal(names(res1[["statistic"]]), "kbd.sum")
-  expect_equal(names(res2[["statistic"]]), "kbd.max")
-  expect_equal(names(res3[["statistic"]]), "kbd.maxsum")
+  expect_equal(names(res1[["statistic"]]), "kbd.sum.constant")
+  expect_equal(names(res2[["statistic"]]), "kbd.max.constant")
+  expect_equal(names(res3[["statistic"]]), "kbd.maxsum.constant")
   
-  expect_equal(names(res1[["p.value"]]), "kbd.sum.pvalue")
-  expect_equal(names(res2[["p.value"]]), "kbd.max.pvalue")
-  expect_equal(names(res3[["p.value"]]), "kbd.maxsum.pvalue")
+  expect_equal(names(res1[["p.value"]]), "kbd.sum.constant.pvalue")
+  expect_equal(names(res2[["p.value"]]), "kbd.max.constant.pvalue")
+  expect_equal(names(res3[["p.value"]]), "kbd.maxsum.constant.pvalue")
 })
 
 

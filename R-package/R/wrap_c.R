@@ -100,23 +100,34 @@ bd_test_wrap_c <- function(xy, size, num.permutations, weight, distance, num.thr
   size <- as.integer(size)
   N <- as.integer(sum(size))
   res <- .C("bd_test", bd, p_value, xy, size, N, K, distance, r, num.threads)
-  #
-  stat_name_bd <- c("bd", "wbd")
-  stat_name_kbd <- c("kbd.sum", "wkbd.sum", "kbd.max", "wkbd.max", "kbd.maxsum", "wkbd.maxsum")
+
   bd <- res[[1]]
   p_value <- res[[2]]
   if (K == 2) {
-    names(bd) <- stat_name_bd
-    bd <- bd[1]
-    p_value <- p_value[1]
+    names(bd) <- BD_WEIGHT_STATS
   } else {
-    names(bd) <- stat_name_kbd
-    bd <- bd[c(1, 3, 5)]
-    p_value <- p_value[c(1, 3, 5)]
+    names(bd) <- KBD_WEIGHT_STATS
   }
   names(p_value) <- paste0(names(bd), ".pvalue")
-  list('statistic' = bd, 'p.value' = p_value, 
-       'info' = list('N' = N, 'K' = K, 'size' = size, 
+  
+  if (weight == BD_WEIGHT_TYPE[1]) {
+    if (K == 2) {
+      index <- 1
+    } else {
+      index <- c(1, 3, 5)
+    }
+  } else {
+    if (K == 2) {
+      index <- 2
+    } else {
+      index <- c(2, 4, 6)
+    }
+  }
+  return_bd <- bd[index]
+  return_p_value <- p_value[index]
+  
+  list('statistic' = return_bd, 'p.value' = return_p_value, 
+       'info' = list('statistic' = bd, "p.value" = p_value, 'N' = N, 'K' = K, 'size' = size, 
                      'weight' = as.logical(weight), 'num.permutations' = num.permutations))
 }
 

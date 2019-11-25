@@ -11,7 +11,7 @@ bd.test(x, ...)
 \method{bd.test}{default}(x, y = NULL, num.permutations = 99,
   method = c("permutation", "limit"), distance = FALSE, size = NULL,
   seed = 1, num.threads = 0, kbd.type = c("sum", "maxsum", "max"),
-  ...)
+  weight = c("constant", "variance"), ...)
 
 \method{bd.test}{formula}(formula, data, subset, na.action, ...)
 }
@@ -40,6 +40,11 @@ if \code{ method = "limit"}, the p-values based on approximate Ball Divergence d
 \item{kbd.type}{a character string specifying the \eqn{K}-sample Ball Divergence test statistic, 
 must be one of \code{"sum"}, \code{"summax"}, or \code{"max"}. Any unambiguous substring can be given. 
 Default \code{kbd.type = "sum"}.}
+
+\item{weight}{a character string used to choose the weight form of Ball Divergence statistic.
+It must be one of \code{"constant"}, or \code{"variance"}. 
+Any unambiguous substring can be given. 
+Default: \code{weight = "constant"}.}
 
 \item{formula}{a formula of the form \code{response ~ group} where \code{response} gives the data values and \code{group} a vector or factor of the corresponding groups.}
 
@@ -95,6 +100,7 @@ in the \code{complete.info} element of output. We give a quick example below to 
 }
 \examples{
 ################# Quick Start #################
+set.seed(1)
 x <- rnorm(50)
 y <- rnorm(50, mean = 1)
 # plot(density(x))

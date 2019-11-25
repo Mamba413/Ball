@@ -1,8 +1,11 @@
 WEIGHT_TYPE <- c("constant", "probability", "chisquare")
+BD_WEIGHT_TYPE <- c("constant", "variance")
 
 BCOR_WEIGHT_STATS <- c("bcor.constant", "bcor.probability", "bcor.chisquare")
-
 BCOV_WEIGHT_STATS <- c("bcov.constant", "bcov.probability", "bcov.chisquare")
+
+BD_WEIGHT_STATS <- c("bd.constant", "bd.variance")
+KBD_WEIGHT_STATS <- c("kbd.sum.constant", "kbd.sum.variance", "kbd.max.constant", "kbd.max.variance", "kbd.maxsum.constant", "kbd.maxsum.variance")
 
 center_bdd_matrix <- function(bdd) {
   num <- dim(bdd)[1]

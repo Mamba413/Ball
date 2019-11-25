@@ -21,6 +21,10 @@
 #' @param method if \code{method = "permutation"}, a permutation procedure will be carried out;
 #' if \code{ method = "limit"}, the p-values based on approximate Ball Divergence distribution are given
 #' (Only available for two-sample test).
+#' @param weight a character string used to choose the weight form of Ball Divergence statistic.
+#' It must be one of \code{"constant"}, or \code{"variance"}. 
+#' Any unambiguous substring can be given. 
+#' Default: \code{weight = "constant"}.
 #' @param ... further arguments to be passed to or from methods.
 #' 
 ## @param weight not available now
@@ -74,6 +78,7 @@
 #' @export
 #' @examples
 #' ################# Quick Start #################
+#' set.seed(1)
 #' x <- rnorm(50)
 #' y <- rnorm(50, mean = 1)
 #' # plot(density(x))
@@ -138,8 +143,9 @@ bd.test <- function(x, ...) UseMethod("bd.test")
 bd.test.default <- function(x, y = NULL, num.permutations = 99, 
                             method = c("permutation", "limit"), distance = FALSE,
                             size = NULL, seed = 1, num.threads = 0, 
-                            kbd.type = c("sum", "maxsum", "max"), ...) {
-  weight <- FALSE
+                            kbd.type = c("sum", "maxsum", "max"), 
+                            weight = c("constant", "variance"), ...) {
+  weight <- match.arg(weight)
   data_name <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
   kbd.type <- match.arg(kbd.type)
   method <- match.arg(method)
@@ -243,11 +249,7 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99,
     # return statistic when num.permutations = 0:
     else {
       if (result[["info"]][["K"]] == 2) {
-        if (weight) {
-          return_stat <- result[["statistic"]][2]
-        } else {
-          return_stat <- result[["statistic"]][1] 
-        }
+        return_stat <- result[["statistic"]][1] 
       } else {
         if (kbd.type == "sum") {
           return_stat <- result[["statistic"]][1]
@@ -293,6 +295,7 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99,
     null_method <- "Permutation"
     data_name <- paste0(data_name, "\nreplicates = ", num.permutations)
   }
+  data_name <- paste0(data_name, ", weight: ", weight)
   if (result[["info"]][["K"]] == 3) {
     data_name <- paste0(data_name, ", kbd.type: ", stat_message)
   }
