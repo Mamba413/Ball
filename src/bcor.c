@@ -22,6 +22,132 @@
 #include "bcor.h"
 #include "Ball_omp.h"
 
+/**
+ *
+ * @param sub_rank
+ * @param index_matrix
+ * @param cumsum_size : [0, 4, 9]
+ * @param label : [0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2]
+ * @param num : 13
+ * @param max_k : 2
+ */
+void Ball_Correlation_KSample_NoTies(double *bcor_stat, double **margin_prop, double **distance_matrix,
+                                     int **index_matrix, const int *label, const int *size, int num) {
+    /*
+     * g_index: indicator for group
+     * s_index: indicator for order
+     */
+    int hhg_ball_num = 0;
+    int s_index, g_index;
+    double inv_num = 1.0 / num;
+    double pxy, px, py, bcov_fixed_ball;
+    double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0;
+    double bcov_weight0_x = 0.0, bcov_weight_prob_x = 0.0, bcov_weight0_y = 0.0, bcov_weight_prob_y = 0.0;
+    for (int i = 0; i < num; ++i) {
+        int i_index = label[i];
+        int rank_value = 1;
+        px = size[i_index] * inv_num;
+        for (int j = 0; j < num; ++j) {
+            s_index = index_matrix[i][j];
+            g_index = label[s_index];
+            py = margin_prop[i][s_index];
+            if (i_index == g_index) {
+                pxy = rank_value * inv_num;
+
+                // compute BCov(X, Y)
+                bcov_fixed_ball = pxy - px * py;
+                bcov_fixed_ball *= bcov_fixed_ball;
+                bcov_weight0 += bcov_fixed_ball;
+                bcov_weight_prob += bcov_fixed_ball / (px * py);
+                if (px != 1 && py != 1) {
+                    bcov_weight_hhg += bcov_fixed_ball / ((px) * (1.0 - px) * (py) * (1.0 - py));
+                    hhg_ball_num += 1;
+                }
+                // compute BCov(X, X)
+                bcov_weight0_x += px * px * (1.0 - px) * (1.0 - px);
+                bcov_weight_prob_x += (1.0 - px) * (1.0 - px);
+                // compute BCov(Y, Y)
+                bcov_weight0_y += py * py * (1.0 - py) * (1.0 - py);
+                bcov_weight_prob_y += (1.0 - py) * (1.0 - py);
+
+                rank_value++;
+            } else {
+                // compute BCov(Y, Y)
+                bcov_weight0_y += py * py * (1.0 - py) * (1.0 - py);
+                bcov_weight_prob_y += (1.0 - py) * (1.0 - py);
+            }
+        }
+    }
+
+    if ((bcov_weight_prob_x * bcov_weight_prob_y) > 0) {
+        bcor_stat[0] = bcov_weight0 / (sqrt(bcov_weight0_x * bcov_weight0_y));
+        bcor_stat[1] = bcov_weight_prob / (sqrt(bcov_weight_prob_x * bcov_weight_prob_y));
+        bcor_stat[2] = bcov_weight_hhg / (hhg_ball_num);
+    } else {
+        bcor_stat[0] = bcor_stat[1] = bcor_stat[2] = 0;
+    }
+}
+
+void Ball_Correlation_KSample(double *bcor_stat, double **margin_prop, double **distance_matrix,
+                              int **index_matrix, const int *label, const int *size, int num) {
+    int hhg_ball_num = 0;
+    int s_index, g_index;
+    double inv_num = 1.0 / num;
+    double pxy, px, py, bcov_fixed_ball;
+    double bcov_weight0 = 0.0, bcov_weight_prob = 0.0, bcov_weight_hhg = 0.0;
+    double bcov_weight0_x = 0.0, bcov_weight_prob_x = 0.0, bcov_weight0_y = 0.0, bcov_weight_prob_y = 0.0;
+    for (int i = 0; i < num; ++i) {
+        int i_index = label[i];
+        int rank_value = size[i_index];
+        double tmp = -1;
+        int tmp_rank = 0;
+        for (int j = 0; j < num; ++j) {
+            s_index = index_matrix[i][num - j - 1];
+            g_index = label[s_index];
+            py = margin_prop[i][s_index];
+            if (i_index == g_index) {
+                if (distance_matrix[i][s_index] != tmp) {
+                    pxy = rank_value * inv_num;
+                    tmp_rank = rank_value;
+                } else {
+                    pxy = tmp_rank * inv_num;
+                }
+                tmp = distance_matrix[i][s_index];
+                rank_value--;
+
+                // Compute BCov(X, Y)
+                px = size[i_index] * inv_num;
+                bcov_fixed_ball = pxy - px * py;
+                bcov_fixed_ball *= bcov_fixed_ball;
+                bcov_weight0 += bcov_fixed_ball;
+                bcov_weight_prob += bcov_fixed_ball / (px * py);
+                if (px != 1 && py != 1) {
+                    bcov_weight_hhg += bcov_fixed_ball / ((px) * (1.0 - px) * (py) * (1.0 - py));
+                    hhg_ball_num += 1;
+                }
+                // compute BCov(X, X)
+                bcov_weight_prob_x += (1.0 - px) * (1.0 - px);
+                bcov_weight0_x += px * px * (1.0 - px) * (1.0 - px);
+                // compute BCov(Y, Y)
+                bcov_weight_prob_y += (1.0 - py) * (1.0 - py);
+                bcov_weight0_y += py * py * (1.0 - py) * (1.0 - py);
+            } else {
+                // compute BCov(Y, Y)
+                bcov_weight0_y += py * py * (1.0 - py) * (1.0 - py);
+                bcov_weight_prob_y += (1.0 - py) * (1.0 - py);
+            }
+        }
+    }
+
+    if ((bcov_weight_prob_x * bcov_weight_prob_y) > 0) {
+        bcor_stat[0] = bcov_weight0 / (sqrt(bcov_weight0_x * bcov_weight0_y));
+        bcor_stat[1] = bcov_weight_prob / (sqrt(bcov_weight_prob_x * bcov_weight_prob_y));
+        bcor_stat[2] = bcov_weight_hhg / (hhg_ball_num);
+    } else {
+        bcor_stat[0] = bcor_stat[1] = bcor_stat[2] = 0;
+    }
+}
+
 void Ball_Correlation(double *bcor_stat, const int *n, double **Dx, double **Dy, int **xidx, int **yidx) {
     int i, j, k, pi, src, lastpos, *yrank, *isource, *icount, *xy_index, *xy_temp, **xyidx;
     double pxy, px, py, lastval, *xx_cpy, *yy_cpy;
@@ -599,6 +725,115 @@ void _bcor_stat(double *bcor_stat, double *y, double *x, const int *n) {
     free_int_matrix(xyidx, *n, *n);
 }
 
+void _bcor_k_sample(double *bcor_stat, double *xy, const double *snp, const int *p, const int *n) {
+    int *snp_vector = (int *) malloc(*n * sizeof(int)), *snp_index = (int *) malloc(*n * sizeof(int));
+    int **snp_matrix = alloc_int_matrix(*p, *n);
+    int **size_list = (int **) malloc(*p * sizeof(int *));
+    int *cumsum_size_list;
+    int s = 0;
+    for (int i = 0; i < *p; ++i) {
+        for (int j = 0; j < *n; ++j) {
+            snp_vector[j] = (int) snp[s++];
+            snp_index[j] = j;
+        }
+        quicksort_int(snp_vector, snp_index, 0, *n - 1);
+        int u = 0;
+        snp_matrix[i][snp_index[0]] = u;
+        for (int j = 1; j < *n; ++j) {
+            if (snp_vector[j] != snp_vector[j - 1]) {
+                u++;
+            }
+            snp_matrix[i][snp_index[j]] = u;
+        }
+        u++;
+        size_list[i] = (int *) malloc(u * sizeof(int));
+        cumsum_size_list = (int *) malloc(u * sizeof(int));
+        cumsum_size_list[0] = 0;
+        int t = 1;
+        for (int j = 1; j < *n; ++j) {
+            if (snp_vector[j] != snp_vector[j - 1]) {
+                cumsum_size_list[t] = j;
+                size_list[i][t - 1] = j - cumsum_size_list[t - 1];
+                t++;
+            }
+        }
+        size_list[i][u - 1] = *n - cumsum_size_list[u - 1];
+        free(cumsum_size_list);
+    }
+    free(snp_vector);
+    free(snp_index);
+
+    // pre-computing marginal ball
+    double **distance_matrix = alloc_matrix(*n, *n);
+    distance2matrix(xy, distance_matrix, *n);
+    int **index_matrix = alloc_int_matrix(*n, *n);
+    for (int i = 0; i < *n; i++) {
+        for (int j = 0; j < *n; j++) {
+            index_matrix[i][j] = j;
+        }
+    }
+    double *distance_matrix_copy = (double *) malloc(*n * sizeof(double));
+    int *marginal_rank = (int *) malloc(*n * sizeof(int));
+    double **marginal_prop = alloc_matrix(*n, *n);
+    int ties = 0;
+    double inv_n = 1.0 / *n;
+    printf("\n");
+    for (int i = 0; i < *n; i++) {
+        memcpy(distance_matrix_copy, distance_matrix[i], *n * sizeof(double));
+        quicksort(distance_matrix_copy, index_matrix[i], 0, *n - 1);
+        quick_rank_max_with_index(distance_matrix[i], index_matrix[i], marginal_rank, *n);
+        for (int j = 0; j < *n; ++j) {
+            marginal_prop[i][j] = marginal_rank[j] * inv_n;
+        }
+        if (!ties) {
+            for (int j = 1; j < *n; ++j) {
+                if (distance_matrix_copy[j] == distance_matrix_copy[j - 1]) {
+                    ties = 1;
+                    break;
+                }
+            }
+        }
+    }
+    free(distance_matrix_copy);
+    free(marginal_rank);
+
+    void (*ball_correlation_value)(double *, double **, double **, int **, const int *, const int *, int);
+    if (ties) {
+        ball_correlation_value = &Ball_Correlation_KSample;
+    } else {
+        ball_correlation_value = &Ball_Correlation_KSample_NoTies;
+    }
+
+    // compute statistic:
+    double **bcor_stat_array = alloc_matrix(*p, 3);
+#pragma omp parallel
+    {
+        int i_thread;
+#pragma omp for
+        for (i_thread = 0; i_thread < *p; ++i_thread) {
+            ball_correlation_value(bcor_stat_array[i_thread], marginal_prop, distance_matrix, index_matrix,
+                                   snp_matrix[i_thread], size_list[i_thread], *n);
+        }
+    }
+
+    free_matrix(marginal_prop, *n, *n);
+    free_matrix(distance_matrix, *n, *n);
+    free_int_matrix(index_matrix, *n, *n);
+    free_int_matrix(snp_matrix, *p, *n);
+    for (int i = 0; i < *p; ++i) {
+        free(size_list[i]);
+    }
+    free(size_list);
+
+    // return result:
+    for (int i = 0; i < *p; ++i) {
+        bcor_stat[3 * i + 0] = bcor_stat_array[i][0];
+        bcor_stat[3 * i + 1] = bcor_stat_array[i][1];
+        bcor_stat[3 * i + 2] = bcor_stat_array[i][2];
+    }
+    free_matrix(bcor_stat_array, *p, 3);
+}
+
 /**
  * R API function
  * @param bcorsis_stat : bcor statistics or p-value for screening
@@ -626,24 +861,23 @@ void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f
 #endif
 
     if (*dst_y == 1) {
-        if (*dst_x == 0) {
-            _bcor_test(bcorsis_stat, y, x, x_number, f_number, n, p);
-        } else {
-            _bcor_stat(bcorsis_stat, y, x, n);
-        }
-    } else {
-        // If y is univariate, and y indicator for K classes. We can simplify the computation for ball correlation by
-        // bcor_two_sample() and bcor_k_sample() function;
-        // x may be univariate, multivariate or their combination
-        if (*k > 1) {
-            // TODO:
-            if (*k == 2) {
-                // bcor_two_sample(bcorsis_stat, x, x_number, size, n, nthread);
+        if (*k <= 1) {
+            if (*dst_x == 0) {
+                _bcor_test(bcorsis_stat, y, x, x_number, f_number, n, p);
             } else {
-                // bcor_k_sample(bcorsis_stat, x, x_number, size, n, k, nthread);
+                _bcor_stat(bcorsis_stat, y, x, n);
             }
         } else {
+            _bcor_k_sample(bcorsis_stat, y, x, f_number, n);
+        }
+
+    } else {
+        if (*k <= 1) {
             _u_bcor_test(bcorsis_stat, y, x, f_number, n);
+        } else {
+            // TODO:
+            // If y is univariate, and x are indicators for K classes.
+            // We can simplify the computation for ball correlation by designing a_ubcor_k_sample() function;
         }
     }
 }

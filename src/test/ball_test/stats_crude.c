@@ -85,6 +85,36 @@ void Ball_Covariance_Crude(double *bcov_stat, double **Dx, double **Dy, int n) {
     bcov_stat[0] = bcov_weight0;
 }
 
+void Ball_Correlation_Crude(double *bcor_stat, double **Dx, double **Dy, int n) {
+    double x_count, y_count, joint_count, bcov_weight0 = 0.0;
+    double bcov_weight0_x = 0.0, bcov_weight0_y = 0.0;
+    double px, py;
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            y_count = x_count = joint_count = 0.0;
+            for (int k = 0; k < n; ++k) {
+                if (Dx[i][k] <= Dx[i][j] && Dy[i][k] <= Dy[i][j]) {
+                    joint_count++;
+                }
+                if (Dx[i][k] <= Dx[i][j]) {
+                    x_count++;
+                }
+                if (Dy[i][k] <= Dy[i][j]) {
+                    y_count++;
+                }
+            }
+            px = x_count / n;
+            py = y_count / n;
+            bcov_weight0 += pow((joint_count / n -  px * py), 2);
+            bcov_weight0_x += px * px * (1.0 - px) * (1.0 - px);
+            bcov_weight0_y += py * py * (1.0 - py) * (1.0 - py);
+        }
+    }
+    if ((bcov_weight0_x * bcov_weight0_y) > 0) {
+        bcor_stat[0] = bcov_weight0 / (sqrt(bcov_weight0_x * bcov_weight0_y));
+    }
+}
+
 /**
  * A crude way to implement K Ball Covariance
  * @param kbcov_stat The computation result for kbcov_stat will be save in here
