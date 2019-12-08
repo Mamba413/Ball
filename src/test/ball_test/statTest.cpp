@@ -14,6 +14,7 @@ extern "C" {
 #include "BD.h"
 #include "BI.h"
 #include "bcor.h"
+#include "surv.h"
 #include "kbcov.h"
 #include "utilities.h"
 #include "Ball_omp.h"
@@ -364,6 +365,21 @@ TEST(BCOR, bcor_zero_value) {
     EXPECT_NEAR(ball_stat_value[0], 0, ABSOLUTE_ERROR);
     EXPECT_NEAR(ball_stat_value[1], 0, ABSOLUTE_ERROR);
     EXPECT_NEAR(ball_stat_value[2], 0, ABSOLUTE_ERROR);
+}
+
+TEST(BCOR, bcor_surv) {
+    double x[30] = {16, 29, 5, 22, 2, 0, 18, 10, 13, 1, 8, 20, 9, 17, 23, 14, 4, 3, 25, 24, 15, 11, 20, 26, 6, 12, 27,
+                    7, 21, 28};
+    int time_rank[30] = {0, 2, 2, 4, 4, 5, 8, 8, 8, 11, 11, 11, 14, 14, 14, 16, 16, 22, 22, 22, 22, 22, 22, 26, 26, 26,
+                         26, 29, 29, 29};
+    int delta[30] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1};
+    double km_estimator[30] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.92308, 0.92308, 0.92308, 0.92308,
+                               0.92308, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308, 0.92308};
+    int num = 30;
+    double true_RCTV = 0.001264425;
+    double est_RCTV = 0.0;
+    SRCT_new(x, time_rank, delta, km_estimator, &num, &est_RCTV);
+    EXPECT_NEAR(est_RCTV, true_RCTV, ABSOLUTE_ERROR);
 }
 
 TEST(BD, bd_gwas) {

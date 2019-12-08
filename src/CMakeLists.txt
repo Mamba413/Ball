@@ -3,7 +3,7 @@ project(ball C)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNDEBUG -fopenmp -O2 -Wall -std=gnu99 -mtune=generic")
 
-add_executable(src BD.c BI.c utilities.c bcor.c kbcov.c Ball_omp.h kbd.c kbd.h bdd_matrix.c bdd_matrix.h)
+add_executable(src BD.c BI.c utilities.c bcor.c kbcov.c Ball_omp.h kbd.c kbd.h bdd_matrix.c bdd_matrix.h surv.c surv.h)
 
 add_subdirectory(test)
 include_directories(test/lib/gtest/include test/lib/gtest)

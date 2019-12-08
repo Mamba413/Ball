@@ -333,7 +333,7 @@ bcorsis <- function(x, y, d = "small", weight = c("constant", "probability", "ch
         lastpickout_dat <- x[, Xlastpickout]
         Xnew <- sapply(ids, function(index){
           formula_one <- paste0(colnames(x)[index], "~", lastpickout_formula)
-          formula_one <- as.formula(formula_one)
+          formula_one <- stats::as.formula(formula_one)
           dat <- as.data.frame(cbind(x[, index], lastpickout_dat))
           colnames(dat)[1] <- colnames(x)[index]
           # colnames(dat) <- paste0("x",c(x,Xhavepickout))
@@ -384,7 +384,7 @@ bcorsis.surv <- function(y, x, final_d, n, p, ids, standized = TRUE){
   ord.t <- sort(time)
   ix <- order(time)
   ord.delta <- delta[ix]
-  x <- x[ix,]
+  x <- x[ix, ]
   if(standized) {
     x <- apply(x, 2, scale)
   }
