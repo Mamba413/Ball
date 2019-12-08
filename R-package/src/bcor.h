@@ -27,6 +27,6 @@ void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *fea
 void _u_bcor_test(double *bcor_stat, double *y, double *x, int *f_number, int *n);
 
 // R API function:
-void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f_number, int *size, int *n, int *p, int *k, int *dst_y, int *dst_x, int *nthread);
+void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f_number, int *n, int *p, int *k, int *dst_y, int *dst_x, int *nthread);
 
 #endif /* BCOR_H_ */

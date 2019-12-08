@@ -256,25 +256,62 @@ kbcov_test_wrap_c <- function(x, K, n, num.permutations, distance, num.threads) 
 #' @useDynLib Ball, .registration = TRUE
 #' @noRd
 #' 
-apply_bcor_wrap <- function(x, y, n, p, distance, weight, method, num.threads) {
-  bcor_stat <- as.double(numeric(3*p))
+apply_bcor_wrap <- function(x, y, n, p, distance, weight, method, num.threads, category) {
+  p_all <- ncol(x)
+  if (length(category) != 0) {
+    x_category <- x[, category, drop = FALSE]
+    x <- x[, -category, drop = FALSE]
+  } else {
+    x_category <- matrix(0, nrow = 0, ncol = 0)
+  }
+  p_continuous <- ncol(x)
+  p_category <- ncol(x_category)
+  
+  if (distance) {
+    p <- as.integer(0)
+  } else {
+    p <- as.integer(p)
+  }
   y <- as.double(y)
-  x <- as.vector(x)
-  x_number <- rep(1, p)
-  f_number <- as.integer(p)
-  size_num <- 2
   num <- as.integer(n)
-  nthread <- integer(1)
-  p <- as.integer(1)
-  k <- as.integer(1)
-  dst_y <- as.integer(distance)
   dst_x <- as.integer(0)
   nth <- as.integer(num.threads)
-  #
-  res <- .C("bcor_test", bcor_stat, y, x, x_number, f_number, size_num, num, p, k, dst_y, dst_x, nth)[[1]]
-  bcor_stat <- matrix(res, ncol = 3, byrow = TRUE)
+  dst_y <- as.integer(distance)
+  if (p_continuous != 0) {
+    bcor_stat1 <- as.double(numeric(3 * p_continuous))
+    x <- as.double(as.vector(x))
+    x_number <- as.integer(rep(1, p_continuous))
+    f_number <- as.integer(p_continuous)
+    k <- as.integer(1)
+    #
+    res <- .C("bcor_test", bcor_stat1, y, x, x_number, f_number, num, p, k, dst_y, dst_x, nth)[[1]]
+    bcor_stat1 <- matrix(res, ncol = 3, byrow = TRUE)
+  }
+  
+  if (p_category != 0) {
+    bcor_stat2 <- as.double(numeric(3 * p_category))
+    x <- as.double(as.vector(x_category))
+    x_number <- as.integer(rep(1, p_category))
+    f_number <- as.integer(p_category)
+    k <- as.integer(2)
+    #
+    res <- .C("bcor_test", bcor_stat2, y, x, x_number, f_number, num, p, k, dst_y, dst_x, nth)[[1]]
+    bcor_stat2 <- matrix(res, ncol = 3, byrow = TRUE)
+    
+    if (p_continuous == 0) {
+      bcor_stat <- bcor_stat2
+    } else {
+      bcor_stat <- matrix(nrow = p_all, ncol = 3)
+      bcor_stat[-category, ] <- bcor_stat1
+      bcor_stat[category, ] <- bcor_stat2 
+    }
+  } else {
+    bcor_stat <- bcor_stat1
+  }
+  
   colnames(bcor_stat) <- BCOR_WEIGHT_STATS
   screening_bcor_stat <- select_ball_stat(bcor_stat, weight = weight, fun_name = "bcorsis")
+  
   if (method %in% c("interaction", "standard"))
   {
     return(list(bcor_stat, screening_bcor_stat))

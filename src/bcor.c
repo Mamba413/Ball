@@ -507,6 +507,10 @@ void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *fea
             free_int_matrix(xidx, *n, *n);
         }
     }
+
+    free_matrix(Dy, *n, *n);
+    free_int_matrix(yidx, *n, *n);
+    free_int_matrix(y_within_ball, *n, *n);
 }
 
 void _u_bcor_test(double *bcor_stat, double *y, double *x, int *f_number, int *n) {
@@ -725,7 +729,8 @@ void _bcor_stat(double *bcor_stat, double *y, double *x, const int *n) {
     free_int_matrix(xyidx, *n, *n);
 }
 
-void _bcor_k_sample(double *bcor_stat, double *xy, const double *snp, const int *p, const int *n) {
+void _bcor_k_sample(double *bcor_stat, double *xy, const double *snp, const int *p,
+                    const int *n, const int *y_p) {
     int *snp_vector = (int *) malloc(*n * sizeof(int)), *snp_index = (int *) malloc(*n * sizeof(int));
     int **snp_matrix = alloc_int_matrix(*p, *n);
     int **size_list = (int **) malloc(*p * sizeof(int *));
@@ -765,7 +770,12 @@ void _bcor_k_sample(double *bcor_stat, double *xy, const double *snp, const int 
 
     // pre-computing marginal ball
     double **distance_matrix = alloc_matrix(*n, *n);
-    distance2matrix(xy, distance_matrix, *n);
+    if (*y_p == 0) {
+        distance2matrix(xy, distance_matrix, *n);
+    } else {
+        Euclidean_distance(xy, distance_matrix, *n, *y_p);
+    }
+
     int **index_matrix = alloc_int_matrix(*n, *n);
     for (int i = 0; i < *n; i++) {
         for (int j = 0; j < *n; j++) {
@@ -777,7 +787,6 @@ void _bcor_k_sample(double *bcor_stat, double *xy, const double *snp, const int 
     double **marginal_prop = alloc_matrix(*n, *n);
     int ties = 0;
     double inv_n = 1.0 / *n;
-    printf("\n");
     for (int i = 0; i < *n; i++) {
         memcpy(distance_matrix_copy, distance_matrix[i], *n * sizeof(double));
         quicksort(distance_matrix_copy, index_matrix[i], 0, *n - 1);
@@ -849,7 +858,7 @@ void _bcor_k_sample(double *bcor_stat, double *xy, const double *snp, const int 
  * @param dst_x : whether x should be recompute as distance
  * @param nthread : control the number threads used to compute statistics
  */
-void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f_number, int *size,
+void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f_number,
                int *n, int *p, int *k, int *dst_y, int *dst_x, int *nthread) {
 #ifdef Ball_OMP_H_
     omp_set_dynamic(0);
@@ -860,24 +869,18 @@ void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f
     }
 #endif
 
-    if (*dst_y == 1) {
-        if (*k <= 1) {
+    if (*k <= 1) {
+        if (*dst_y == 1) {
             if (*dst_x == 0) {
                 _bcor_test(bcorsis_stat, y, x, x_number, f_number, n, p);
             } else {
                 _bcor_stat(bcorsis_stat, y, x, n);
             }
         } else {
-            _bcor_k_sample(bcorsis_stat, y, x, f_number, n);
-        }
-
-    } else {
-        if (*k <= 1) {
             _u_bcor_test(bcorsis_stat, y, x, f_number, n);
-        } else {
-            // TODO:
-            // If y is univariate, and x are indicators for K classes.
-            // We can simplify the computation for ball correlation by designing a_ubcor_k_sample() function;
         }
+    } else {
+        _bcor_k_sample(bcorsis_stat, y, x, f_number, n, p);
     }
+
 }

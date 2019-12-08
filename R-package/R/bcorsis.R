@@ -39,12 +39,11 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
   bcor_stat <- as.double(numeric(3))
   x_number <- as.integer(1)
   f_number <- as.integer(1)
-  size_number <- as.integer(1)
   num <- as.integer(x_y_info[1])
   p <- as.integer(1)
   k <- as.integer(1)
   nth <- as.integer(1)
-  res <- .C("bcor_test", bcor_stat, y, x, x_number, f_number, size_number, num, p, k, dst_y, dst_x, nth)
+  res <- .C("bcor_test", bcor_stat, y, x, x_number, f_number, num, p, k, dst_y, dst_x, nth)
   bcor_stat <- res[[1]]
   bcor_stat <- select_ball_stat(bcor_stat, weight, type = "bcor")
   return(bcor_stat)
@@ -71,6 +70,9 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
 #' Any unambiguous substring can be given. Default: \code{method = "standard"}.
 #' @param distance if \code{distance = TRUE}, \code{y} will be considered as a distance matrix. 
 #' Arguments only available when \code{method = "standard"} and \code{method = "interaction"}. Default: \code{distance = FALSE}.
+#' @param category a logical value or integer vector indicating columns to selected to be categorical variables.
+#' If \code{category} is a integer vector, the positive/negative integers select/discard the corresponding columns;
+#' If \code{category} is a logical value, \code{categorical = TRUE} select all columns, \code{categorical = FALSE} select no columns.
 #' @param parms parameters list only available when \code{method = "lm"} or \code{"gam"}. 
 #' It contains three parameters: \code{d1}, \code{d2}, and \code{df}. \code{d1} is the
 #' number of initially selected variables, \code{d2} is the number of variables added in each iteration.
@@ -130,11 +132,11 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
 #' n <- 150
 #' p <- 3000
 #' x <- matrix(rnorm(n * p), nrow = n)
-#' error <- rnorm(n)
-#' y <- 3 * x[, 1] + 5 * (x[, 3])^2 + error
+#' eps <- rnorm(n)
+#' y <- 3 * x[, 1] + 5 * (x[, 3])^2 + eps
 #' res <- bcorsis(y = y, x = x)
 #' head(res[["ix"]])
-#' head(res[["complete.info"]])
+#' head(res[["complete.info"]][["statistic"]])
 #' 
 #' ############### BCor-SIS: Censored Data Example ###############
 #' data("genlung")
@@ -150,8 +152,8 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
 #' n <- 150
 #' p <- 3000
 #' x <- matrix(rnorm(n * p), nrow = n)
-#' error <- rnorm(n)
-#' y <- 3 * x[, 1] * x[, 5] * x[, 10] + error
+#' eps <- rnorm(n)
+#' y <- 3 * x[, 1] * x[, 5] * x[, 10] + eps
 #' res <- bcorsis(y = y, x = x, method = "interaction")
 #' head(res[["ix"]])
 #' 
@@ -163,9 +165,9 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
 #' sigma_mat <- matrix(0.5, nrow = p, ncol = p)
 #' diag(sigma_mat) <- 1
 #' x <- rmvnorm(n = n, sigma = sigma_mat)
-#' error <- rnorm(n)
+#' eps <- rnorm(n)
 #' rm(sigma_mat); gc(reset = TRUE)
-#' y <- 3 * (x[, 1])^2 + 5 * (x[, 2])^2 + 5 * x[, 8] - 8 * x[, 16] + error
+#' y <- 3 * (x[, 1])^2 + 5 * (x[, 2])^2 + 5 * x[, 8] - 8 * x[, 16] + eps
 #' res <- bcorsis(y = y, x = x, method = "lm", d = 15)
 #' res <- bcorsis(y = y, x = x, method = "gam", d = 15)
 #' res[["ix"]]
@@ -175,16 +177,38 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
 #' n <- 150
 #' p <- 3000
 #' x <- matrix(rnorm(n * p), nrow = n)
-#' error <- rnorm(n)
-#' y <- 3 * x[, 1] + 5 * (x[, 3])^2 + error
+#' eps <- rnorm(n)
+#' y <- 3 * x[, 1] + 5 * (x[, 3])^2 + eps
 #' res <- bcorsis(y = y, x = x, weight = "prob")
 #' head(res[["ix"]])
 #' # Alternative, chisq weight:
 #' res <- bcorsis(y = y, x = x, weight = "chisq")
 #' head(res[["ix"]])
+#' 
+#' ############### BCor-SIS: GWAS data ###############
+#' set.seed(1)
+#' n <- 150
+#' p <- 3000
+#' x <- sapply(1:p, function(i) {
+#'   sample(0:2, size = n, replace = TRUE)
+#' })
+#' eps <- rnorm(n)
+#' y <- 6 * x[, 1] - 7 * x[, 2] + 5 * x[, 3] + eps
+#' res <- bcorsis(x = x, y = y, category = TRUE)
+#' head(res[["ix"]])
+#' head(res[["complete.info"]][["statistic"]])
+#' 
+#' x <- cbind(matrix(rnorm(n * 2), ncol = 2), x)
+#' # remove the first two columns:
+#' res <- bcorsis(x = x, y = y, category = c(-1, -2))
+#' head(res[["ix"]])
+#' 
+#' x <- cbind(x[, 3:5], matrix(rnorm(n * p), ncol = p))
+#' res <- bcorsis(x = x, y = y, category = 1:3)
+#' head(res[["ix"]], n = 10)
 #' }
 bcorsis <- function(x, y, d = "small", weight = c("constant", "probability", "chisquare"), 
-                    method = "standard", distance = FALSE,
+                    method = "standard", distance = FALSE, category = FALSE, 
                     parms = list(d1 = 5, d2 = 5, df = 3),
                     num.threads = 0)
 {
@@ -205,6 +229,12 @@ bcorsis <- function(x, y, d = "small", weight = c("constant", "probability", "ch
   
   # decide candicate size
   final_d <- examine_candiate_size(n, d, p)
+  
+  # check category
+  category_index <- examine_category(category, p)
+  if (length(category_index) != 0 && (method %in% c("lm", "gam", "survival", "interaction"))) {
+    stop("Handling category variables is only available when method = \"standard\".")
+  }
   
   # get arguments:
   d1 <- parms$d1
@@ -239,17 +269,19 @@ bcorsis <- function(x, y, d = "small", weight = c("constant", "probability", "ch
       y <- y[lower.tri(y)]
     }
     # BCor-SIS:
-    rcory_result <- apply_bcor_wrap(x = x, y = y, n = n, p = p, 
+    rcory_result <- apply_bcor_wrap(x = x, y = y, n = n, p = y_p, 
                                     distance = distance, weight = weight, 
-                                    method = method, num.threads = num.threads)
+                                    method = method, num.threads = num.threads, 
+                                    category = category_index)
     Xhavepickout <- get_screened_vars(ids, rcory_result[[2]], final_d)
     complete_info[[1]] <- rcory_result[[1]]
     # extra method for interaction:
     Xhavepickout2 <- c()
     if(method == "interaction") {
-      rcory2_result <- apply_bcor_wrap(x = (x)^2, y = y, n = n, p = p, 
+      rcory2_result <- apply_bcor_wrap(x = (x)^2, y = y, n = n, p = y_p, 
                                        distance = distance, weight = weight, 
-                                       method = method, num.threads = num.threads)
+                                       method = method, num.threads = num.threads, 
+                                       category = c())
       Xhavepickout2 <- get_screened_vars(ids, rcory2_result[[2]], final_d)
       complete_info[[2]] <- rcory_result[[2]]
     }
@@ -258,39 +290,41 @@ bcorsis <- function(x, y, d = "small", weight = c("constant", "probability", "ch
   if(method %in% c("gam", "lm")) {
     # data prepare for screening:
     y_copy <- preprocess_bcorsis_y(y, y_p)
-    distance <- y_copy[[2]]
     y_copy <- y_copy[[1]]
+    distance <- y_copy[[2]]
     R <- 0
     # Initial screening:
-    rcory_result <- apply_bcor_wrap(x = x, y = y_copy, n = n, p = p, 
+    rcory_result <- apply_bcor_wrap(x = x, y = y_copy, n = n, p = y_p, 
                                     distance = distance, weight = weight, 
-                                    method = method, num.threads = num.threads)
+                                    method = method, num.threads = num.threads, 
+                                    category = c())
     # complete_info[[1]] <- rcory_result[[1]]
     # get d1 variables as initial variables set:
     Xhavepickout <- get_screened_vars(ids, rcory_result, d1)
     Xlastpickout <- Xhavepickout
     ids <- setdiff(ids, Xhavepickout)
     # Iterative:
-    if(method == 'lm'){
+    if (method == 'lm') {
       while(length(Xhavepickout) < final_d)
       {
         # lm fit for x
-        Xnew <- residuals(stats::lm(x[, ids] ~ x[, Xhavepickout]))
+        Xnew <- stats::residuals(stats::lm(x[, ids] ~ x[, Xhavepickout]))
         # lm fit for y
-        y <- residuals(stats::lm(y ~ x[, Xlastpickout]))
+        y <- stats::residuals(stats::lm(y ~ x[, Xlastpickout]))
         
         # BCor-screening
         y_copy <- preprocess_bcorsis_y(y, y_p)[[1]]
-        rcory_result <- apply_bcor_wrap(x = Xnew, y = y_copy, n = n, p = p, 
+        rcory_result <- apply_bcor_wrap(x = Xnew, y = y_copy, n = n, p = y_p, 
                                         distance = distance, weight = weight, 
-                                        method = method, num.threads = num.threads)
+                                        method = method, num.threads = num.threads, 
+                                        category = c())
         # get d2 variables for each iteration:
         Xlastpickout <- get_screened_vars(ids, rcory_result, d2)
         Xhavepickout <- c(Xhavepickout, Xlastpickout)
         ids <- setdiff(ids, Xlastpickout)
       }
     }
-    if(method == 'gam'){
+    if (method == 'gam') {
       while(length(Xhavepickout) < final_d)
       {
         # gam fit for x
@@ -314,9 +348,10 @@ bcorsis <- function(x, y, d = "small", weight = c("constant", "probability", "ch
         
         # BCor-screening
         y_copy <- preprocess_bcorsis_y(y, y_p)[[1]]
-        rcory_result <- apply_bcor_wrap(x = Xnew, y = y_copy, n = n, p = p, 
+        rcory_result <- apply_bcor_wrap(x = Xnew, y = y_copy, n = n, p = y_p, 
                                         distance = distance, weight = weight, 
-                                        method = method, num.threads = num.threads)
+                                        method = method, num.threads = num.threads, 
+                                        category = c())
         # get d2 variables for each iteration:
         Xlastpickout <- get_screened_vars(ids, rcory_result, d2)
         Xhavepickout <- c(Xhavepickout, Xlastpickout)
@@ -324,7 +359,11 @@ bcorsis <- function(x, y, d = "small", weight = c("constant", "probability", "ch
       }
     }
   }
+  
   # return:
+  complete_info[[2]] <- n
+  complete_info[[3]] <- p
+  names(complete_info) <- c("statistic", "n", "p")
   list("ix" = Xhavepickout, "method" = method, 
        "weight" = weight, "complete.info" = complete_info)
 }

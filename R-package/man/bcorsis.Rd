@@ -6,7 +6,8 @@
 \usage{
 bcorsis(x, y, d = "small", weight = c("constant", "probability",
   "chisquare"), method = "standard", distance = FALSE,
-  parms = list(d1 = 5, d2 = 5, df = 3), num.threads = 0)
+  category = FALSE, parms = list(d1 = 5, d2 = 5, df = 3),
+  num.threads = 0)
 }
 \arguments{
 \item{x}{a numeric matirx or data.frame included \eqn{n} rows and \eqn{p} columns. 
@@ -36,6 +37,10 @@ Any unambiguous substring can be given. Default: \code{method = "standard"}.}
 
 \item{distance}{if \code{distance = TRUE}, \code{y} will be considered as a distance matrix. 
 Arguments only available when \code{method = "standard"} and \code{method = "interaction"}. Default: \code{distance = FALSE}.}
+
+\item{category}{a logical value or integer vector indicating columns to selected to be categorical variables.
+If \code{category} is a integer vector, the positive/negative integers select/discard the corresponding columns;
+If \code{category} is a logical value, \code{categorical = TRUE} select all columns, \code{categorical = FALSE} select no columns.}
 
 \item{parms}{parameters list only available when \code{method = "lm"} or \code{"gam"}. 
 It contains three parameters: \code{d1}, \code{d2}, and \code{df}. \code{d1} is the
@@ -95,11 +100,11 @@ set.seed(1)
 n <- 150
 p <- 3000
 x <- matrix(rnorm(n * p), nrow = n)
-error <- rnorm(n)
-y <- 3 * x[, 1] + 5 * (x[, 3])^2 + error
+eps <- rnorm(n)
+y <- 3 * x[, 1] + 5 * (x[, 3])^2 + eps
 res <- bcorsis(y = y, x = x)
 head(res[["ix"]])
-head(res[["complete.info"]])
+head(res[["complete.info"]][["statistic"]])
 
 ############### BCor-SIS: Censored Data Example ###############
 data("genlung")
@@ -115,8 +120,8 @@ set.seed(1)
 n <- 150
 p <- 3000
 x <- matrix(rnorm(n * p), nrow = n)
-error <- rnorm(n)
-y <- 3 * x[, 1] * x[, 5] * x[, 10] + error
+eps <- rnorm(n)
+y <- 3 * x[, 1] * x[, 5] * x[, 10] + eps
 res <- bcorsis(y = y, x = x, method = "interaction")
 head(res[["ix"]])
 
@@ -128,9 +133,9 @@ p <- 3000
 sigma_mat <- matrix(0.5, nrow = p, ncol = p)
 diag(sigma_mat) <- 1
 x <- rmvnorm(n = n, sigma = sigma_mat)
-error <- rnorm(n)
+eps <- rnorm(n)
 rm(sigma_mat); gc(reset = TRUE)
-y <- 3 * (x[, 1])^2 + 5 * (x[, 2])^2 + 5 * x[, 8] - 8 * x[, 16] + error
+y <- 3 * (x[, 1])^2 + 5 * (x[, 2])^2 + 5 * x[, 8] - 8 * x[, 16] + eps
 res <- bcorsis(y = y, x = x, method = "lm", d = 15)
 res <- bcorsis(y = y, x = x, method = "gam", d = 15)
 res[["ix"]]
@@ -140,13 +145,35 @@ set.seed(1)
 n <- 150
 p <- 3000
 x <- matrix(rnorm(n * p), nrow = n)
-error <- rnorm(n)
-y <- 3 * x[, 1] + 5 * (x[, 3])^2 + error
+eps <- rnorm(n)
+y <- 3 * x[, 1] + 5 * (x[, 3])^2 + eps
 res <- bcorsis(y = y, x = x, weight = "prob")
 head(res[["ix"]])
 # Alternative, chisq weight:
 res <- bcorsis(y = y, x = x, weight = "chisq")
 head(res[["ix"]])
+
+############### BCor-SIS: GWAS data ###############
+set.seed(1)
+n <- 150
+p <- 3000
+x <- sapply(1:p, function(i) {
+  sample(0:2, size = n, replace = TRUE)
+})
+eps <- rnorm(n)
+y <- 6 * x[, 1] - 7 * x[, 2] + 5 * x[, 3] + eps
+res <- bcorsis(x = x, y = y, category = TRUE)
+head(res[["ix"]])
+head(res[["complete.info"]][["statistic"]])
+
+x <- cbind(matrix(rnorm(n * 2), ncol = 2), x)
+# remove the first two columns:
+res <- bcorsis(x = x, y = y, category = c(-1, -2))
+head(res[["ix"]])
+
+x <- cbind(x[, 3:5], matrix(rnorm(n * p), ncol = p))
+res <- bcorsis(x = x, y = y, category = 1:3)
+head(res[["ix"]], n = 10)
 }
 }
 \references{

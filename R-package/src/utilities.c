@@ -1048,6 +1048,14 @@ void Euclidean_distance(double *x, double **Dx, int n, int d) {
     }
 }
 
+void Category_distance(const double *x, double **Dx, int n) {
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            Dx[i][j] = x[i] == x[j] ? 0 : 1;
+        }
+    }
+}
+
 void distance(double *x, double *Dx, int *n, int *d) {
     /*
      interpret x as an n by d matrix, in row order (n vectors in R^d)
@@ -1520,6 +1528,7 @@ void beautify_time(char result[], int seconds) {
         strcat(out_hours_str, hours);
         strcat(out_hours_str, out_minutes_str);
     }
+    // day
     int out_days = (seconds / 86400);
     char out_days_str[200] = "";
     if (out_days == 0) {

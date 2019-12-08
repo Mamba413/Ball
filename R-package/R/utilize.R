@@ -167,6 +167,32 @@ examine_weight_arguments <- function(weight) {
   }
 }
 
+#' Title
+#'
+#' @param category 
+#' @param p 
+#'
+#' @noRd
+#' 
+examine_category <- function(category, p) {
+  if (is.logical(category)) {
+    if (category) {
+      category_index <- 1:p
+    } else {
+      category_index <- c()    
+    }
+  } else {
+    stopifnot(all(category < 0) || all(category > 0))
+    if (any(category > 0)) {
+      category_index <- category
+    } else {
+      category_index <- setdiff(1:p, category)
+    }
+  }
+  category_index
+}
+
+
 
 select_ball_stat <- function(ball_stat, weight, type = "bcov", fun_name = "bcov") {
   if (fun_name == "bcorsis") 
@@ -332,7 +358,7 @@ get_screened_vars <- function(ids, rcory_result, final_d) {
 
 preprocess_bcorsis_y <- function(y, y_p) {
   if(y_p != 1) {
-    y_copy <- as.vector(as.matrix(dist(y, diag = TRUE)))
+    y_copy <- as.vector(dist(y))
     dst <- TRUE
   } else {
     y_copy <- as.vector(y)
