@@ -128,7 +128,7 @@ bd_test_wrap_c <- function(xy, size, num.permutations, weight, distance, num.thr
   
   list('statistic' = return_bd, 'p.value' = return_p_value, 
        'info' = list('statistic' = bd, "p.value" = p_value, 'N' = N, 'K' = K, 'size' = size, 
-                     'weight' = as.logical(weight), 'num.permutations' = num.permutations))
+                     'weight' = weight, 'num.permutations' = num.permutations))
 }
 
 

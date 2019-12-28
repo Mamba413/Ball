@@ -1,3 +1,9 @@
+# Ball 1.3.9
+* *bcorsis* can conveniently analyze category variables (e.g., GWAS datasets).
+* Add permutation-free method for the Ball Divergence and Ball Covariance test (both only for constant weight now).
+* Add variance (chi-square) weight for Ball Divergence test.
+* Fix potential bugs in R version 4.0
+
 # Ball 1.3.8
 * Improve the reproducibility and efficiency of multi-threading and change the default number of threads as the number of CPUs available.
 * Improve the computational efficiency of the KBD test.

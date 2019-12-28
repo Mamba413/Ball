@@ -38,9 +38,10 @@ Any unambiguous substring can be given. Default: \code{method = "standard"}.}
 \item{distance}{if \code{distance = TRUE}, \code{y} will be considered as a distance matrix. 
 Arguments only available when \code{method = "standard"} and \code{method = "interaction"}. Default: \code{distance = FALSE}.}
 
-\item{category}{a logical value or integer vector indicating columns to selected to be categorical variables.
-If \code{category} is a integer vector, the positive/negative integers select/discard the corresponding columns;
-If \code{category} is a logical value, \code{categorical = TRUE} select all columns, \code{categorical = FALSE} select no columns.}
+\item{category}{a logical value or integer vector indicating columns to be selected as categorical variables.
+If \code{category} is an integer vector, the positive/negative integers select/discard the corresponding columns;
+If \code{category} is a logical value, \code{category = TRUE} select all columns, \code{category = FALSE} select none column.
+Default: \code{category = FALSE}.}
 
 \item{parms}{parameters list only available when \code{method = "lm"} or \code{"gam"}. 
 It contains three parameters: \code{d1}, \code{d2}, and \code{df}. \code{d1} is the
@@ -48,7 +49,7 @@ number of initially selected variables, \code{d2} is the number of variables add
 \code{df} is a degree freedom of basis in generalized additive models playing a role only when \code{method = "gam"}. 
 Default: \code{parms = list(d1 = 5, d2 = 5, df = 3)}.}
 
-\item{num.threads}{Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
+\item{num.threads}{number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
 }
 \value{
 \item{\code{ix }}{ the indices vector corresponding to variables selected by BCor-SIS.} 
@@ -60,7 +61,7 @@ If \code{method = "gam"} or \code{method = "lm"}, \code{complete.info} is an emp
 }
 \description{
 Generic non-parametric sure independence screening (SIS) procedure based on Ball Correlation.
-Ball correlation is a generic multivariate measure of dependence in Banach space.
+Ball correlation is a generic measure of dependence in Banach spaces.
 }
 \details{
 \code{bcorsis} performs a model-free generic sure independence screening procedure, 

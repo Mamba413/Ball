@@ -22,6 +22,58 @@
 #include "utilities.h"
 #include "Ball_omp.h"
 
+#ifdef R_BUILD
+#include "R.h"
+#include "Rinternals.h"
+#endif
+
+void Ball_Score(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
+    int i, j, n;
+    double TS_weight0 = 0.0, SS_weight0 = 0.0, TS_weight1 = 0.0, SS_weight1 = 0.0;
+    double ball_score;
+    double p1, p2, p3, ans;
+    n = *n1 + *n2;
+    double inv_n1 = 1.0 / (1.0 * *n1), inv_n2 = 1.0 / (1.0 * *n2);
+
+    // Calculate A_{ij}^{X} and A_{ij}^{Y}:
+    for (i = 0; i < *n1; i++) {
+        ball_score = 0.0;
+        for (j = 0; j < *n1; j++) {
+            p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
+            p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
+            p3 = (p1 + p2) / n;
+            if (p3 * (1 - p3) == 0) { continue; }
+            ans = p1 * inv_n1  - p2 * inv_n2;
+            ans = ans * ans;
+            TS_weight0 += ans;
+            TS_weight1 += ans / p3 / (1 - p3);
+            ball_score += ans / p3 / (1 - p3);
+        }
+#ifdef R_BUILD
+        Rprintf("%d-th Ball Score: %f\n", i, ball_score);
+#endif
+
+    }
+    // Calculate C_{kl}^{X} and C_{kl}^{Y}:
+    for (i = *n1; i < n; i++) {
+        ball_score = 0.0;
+        for (j = *n1; j < n; j++) {
+            p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
+            p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
+            p3 = (p1 + p2) / n;
+            if (p3 * (1 - p3) == 0) { continue; }
+            ans = p1 * inv_n1  - p2 * inv_n2;
+            ans = ans * ans;
+            SS_weight0 += ans;
+            SS_weight1 += ans / p3 / (1 - p3);
+            ball_score += ans / p3 / (1 - p3);
+        }
+#ifdef R_BUILD
+        Rprintf("%d-th Ball Score: %f\n", i, ball_score);
+#endif
+    }
+}
+
 /**
  * Ball Divergence statistics
  * @param bd_stat

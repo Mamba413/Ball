@@ -16,7 +16,7 @@ bd(x, y = NULL, distance = FALSE, size = NULL, num.threads = 1,
 
 \item{size}{a vector recording sample size of each group.}
 
-\item{num.threads}{Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
+\item{num.threads}{number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
 
 \item{kbd.type}{a character string specifying the \eqn{K}-sample Ball Divergence test statistic, 
 must be one of \code{"sum"}, \code{"summax"}, or \code{"max"}. Any unambiguous substring can be given. 

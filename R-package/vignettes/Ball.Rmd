@@ -118,9 +118,9 @@ We generate a dataset containing 50 samples.
 
 ```{r}
 # generate random perturbation:
-error <- runif(50, min = -0.3, max = 0.3)
+noise <- runif(50, min = -0.3, max = 0.3)
 x <- runif(50, 0, 4*pi)
-y <- cos(x) + error
+y <- cos(x) + noise
 # plot(x, y)
 ```
 
@@ -143,8 +143,8 @@ $$Y=2\sin(x_{1} + x_{2})+ \epsilon, \quad \epsilon \sim U(-0.1, 0.1)$$
 
 ```{r}
 x <- matrix(runif(50 * 2, -pi, pi), nrow = 50, ncol = 2)
-error <- runif(50, min = -0.1, max = 0.1)
-y <- 2 * sin(x[,1] + x[,2]) + error
+noise <- runif(50, min = -0.1, max = 0.1)
+y <- 2 * sin(x[,1] + x[,2]) + noise
 ```
         
 <!-- The following image shows the distribution of the data: -->
@@ -440,8 +440,8 @@ set.seed(1)
 n <- 150
 p <- 3000
 x <- matrix(rnorm(n * p), nrow = n)
-error <- rnorm(n)
-y <- 3*x[, 1] + 5*(x[, 3])^2 + error
+noise <- rnorm(n)
+y <- 3*x[, 1] + 5*(x[, 3])^2 + noise
 ```
       
 We perform BCor-SIS procedure and display the top 5 variables index selected by BCor-SIS.               

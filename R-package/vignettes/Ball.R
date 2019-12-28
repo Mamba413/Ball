@@ -31,9 +31,9 @@ bd.test(x = x, y = y)
 
 ## ------------------------------------------------------------------------
 # generate random perturbation:
-error <- runif(50, min = -0.3, max = 0.3)
+noise <- runif(50, min = -0.3, max = 0.3)
 x <- runif(50, 0, 4*pi)
-y <- cos(x) + error
+y <- cos(x) + noise
 # plot(x, y)
 
 ## ------------------------------------------------------------------------
@@ -41,8 +41,8 @@ bcov.test(x = x, y = y)
 
 ## ------------------------------------------------------------------------
 x <- matrix(runif(50 * 2, -pi, pi), nrow = 50, ncol = 2)
-error <- runif(50, min = -0.1, max = 0.1)
-y <- 2 * sin(x[,1] + x[,2]) + error
+noise <- runif(50, min = -0.1, max = 0.1)
+y <- 2 * sin(x[,1] + x[,2]) + noise
 
 ## ------------------------------------------------------------------------
 bcov.test(x = x, y = y, weight = "prob")
@@ -58,10 +58,10 @@ data("bdvmf")
 
 ## ------------------------------------------------------------------------
 # calculate geodesic distance between samples:
-Dmat <- nhdist(bdvmf[["x"]], method = "geodesic")
+dx <- nhdist(bdvmf[["x"]], method = "geodesic")
 # sample sizes in each group: 150, 150
 # Two-Sample Test based on BD :
-bd.test(x = Dmat, size = c(150, 150), R = 99, distance = TRUE)
+bd.test(x = dx, size = c(150, 150), num.permutations = 99, distance = TRUE)
 
 ## ------------------------------------------------------------------------
 # load data:
@@ -69,18 +69,18 @@ data("macaques")
 # number of femala and male Macaca fascicularis:
 # table(macaques[["group"]])  # f: 9; m: 9
 # calculate Riemannian shape distance matrix:
-Dmat <- nhdist(macaques[["x"]], method = "riemann")
+dx <- nhdist(macaques[["x"]], method = "riemann")
 # hypothesis test with BD:
-bd.test(x = Dmat, R = 99, size = c(9, 9), distance = TRUE)
+bd.test(x = dx, num.permutations = 99, size = c(9, 9), distance = TRUE)
 
 ## ------------------------------------------------------------------------
 data("ArcticLake")
 # Distance matrix between y:
-Dy <- nhdist(ArcticLake[["x"]], method = "compositional")
+dy <- nhdist(ArcticLake[["x"]], method = "compositional")
 # Distance matrix between x:
-Dx <- dist(ArcticLake[["depth"]])
+dx <- dist(ArcticLake[["depth"]])
 # hypothesis test with BCov:
-bcov.test(x = Dx, y = Dy, R = 99, distance = TRUE)
+bcov.test(x = dx, y = dy, num.permutations = 99, distance = TRUE)
 
 ## ------------------------------------------------------------------------
 n <- 150
@@ -119,8 +119,8 @@ set.seed(1)
 n <- 150
 p <- 3000
 x <- matrix(rnorm(n * p), nrow = n)
-error <- rnorm(n)
-y <- 3*x[, 1] + 5*(x[, 3])^2 + error
+noise <- rnorm(n)
+y <- 3*x[, 1] + 5*(x[, 3])^2 + noise
 
 ## ------------------------------------------------------------------------
 res <- bcorsis(y = y, x = x)

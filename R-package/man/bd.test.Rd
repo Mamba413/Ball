@@ -25,9 +25,9 @@ bd.test(x, ...)
 \item{num.permutations}{the number of permutation replications. When \code{num.permutations = 0}, the function just returns
 the Ball Divergence statistic. Default: \code{num.permutations = 99}.}
 
-\item{method}{if \code{method = "permutation"}, a permutation procedure will be carried out;
-if \code{ method = "limit"}, the p-values based on approximate Ball Divergence distribution are given
-(Only available for two-sample test).}
+\item{method}{if \code{method = "permutation"}, a permutation procedure is carried out to compute the \eqn{p}-value;
+if \code{ method = "limit"}, an approximate null distribution is used when \code{weight = "constant"}.
+Any unambiguous substring can be given. Default \code{method = "permutation"}.}
 
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}.}
 
@@ -35,16 +35,15 @@ if \code{ method = "limit"}, the p-values based on approximate Ball Divergence d
 
 \item{seed}{the random seed. Default \code{seed = 1}.}
 
-\item{num.threads}{Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
+\item{num.threads}{number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
 
 \item{kbd.type}{a character string specifying the \eqn{K}-sample Ball Divergence test statistic, 
 must be one of \code{"sum"}, \code{"summax"}, or \code{"max"}. Any unambiguous substring can be given. 
 Default \code{kbd.type = "sum"}.}
 
-\item{weight}{a character string used to choose the weight form of Ball Divergence statistic.
-It must be one of \code{"constant"}, or \code{"variance"}. 
-Any unambiguous substring can be given. 
-Default: \code{weight = "constant"}.}
+\item{weight}{a character string specifying the weight form of Ball Divergence statistic.
+It must be one of \code{"constant"} or \code{"variance"}. 
+Any unambiguous substring can be given. Default: \code{weight = "constant"}.}
 
 \item{formula}{a formula of the form \code{response ~ group} where \code{response} gives the data values and \code{group} a vector or factor of the corresponding groups.}
 
@@ -61,7 +60,7 @@ If \code{num.permutations > 0}, \code{bd.test} returns a \code{htest} class obje
 \item{\code{replicates}}{permutation replications of the test statistic.}
 \item{\code{size}}{sample sizes.}
 \item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the Ball Divergence statistics 
-with different aggregation strategy, the second vector is the \eqn{p}-values of tests.}
+with different aggregation strategy and weight, the second vector is the \eqn{p}-values of tests.}
 \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 \item{\code{method}}{a character string indicating what type of test was performed.}
 \item{\code{data.name}}{description of data.}
@@ -153,7 +152,7 @@ set.seed(1)
 n <- 1000
 x <- rnorm(n)
 y <- rnorm(n)
-bd.test(x, y, method = "limit")
+res <- bd.test(x, y, method = "limit")
 bd.test(x, y)
 }
 

@@ -14,17 +14,16 @@
 #' @param distance if \code{distance = TRUE}, the elements of \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}.
 #' @param size a vector recording sample size of each group.
 #' @param seed the random seed. Default \code{seed = 1}.
-#' @param num.threads Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.
+#' @param num.threads number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.
 #' @param kbd.type a character string specifying the \eqn{K}-sample Ball Divergence test statistic, 
 #' must be one of \code{"sum"}, \code{"summax"}, or \code{"max"}. Any unambiguous substring can be given. 
 #' Default \code{kbd.type = "sum"}.
-#' @param method if \code{method = "permutation"}, a permutation procedure will be carried out;
-#' if \code{ method = "limit"}, the p-values based on approximate Ball Divergence distribution are given
-#' (Only available for two-sample test).
-#' @param weight a character string used to choose the weight form of Ball Divergence statistic.
-#' It must be one of \code{"constant"}, or \code{"variance"}. 
-#' Any unambiguous substring can be given. 
-#' Default: \code{weight = "constant"}.
+#' @param method if \code{method = "permutation"}, a permutation procedure is carried out to compute the \eqn{p}-value;
+#' if \code{ method = "limit"}, an approximate null distribution is used when \code{weight = "constant"}.
+#' Any unambiguous substring can be given. Default \code{method = "permutation"}.
+#' @param weight a character string specifying the weight form of Ball Divergence statistic.
+#' It must be one of \code{"constant"} or \code{"variance"}. 
+#' Any unambiguous substring can be given. Default: \code{weight = "constant"}.
 #' @param ... further arguments to be passed to or from methods.
 #' 
 ## @param weight not available now
@@ -35,7 +34,7 @@
 #' \item{\code{replicates}}{permutation replications of the test statistic.}
 #' \item{\code{size}}{sample sizes.}
 #' \item{\code{complete.info}}{a \code{list} mainly containing two vectors, the first vector is the Ball Divergence statistics 
-#' with different aggregation strategy, the second vector is the \eqn{p}-values of tests.}
+#' with different aggregation strategy and weight, the second vector is the \eqn{p}-values of tests.}
 #' \item{\code{alternative}}{a character string describing the alternative hypothesis.}
 #' \item{\code{method}}{a character string indicating what type of test was performed.}
 #' \item{\code{data.name}}{description of data.}
@@ -131,7 +130,7 @@
 #' n <- 1000
 #' x <- rnorm(n)
 #' y <- rnorm(n)
-#' bd.test(x, y, method = "limit")
+#' res <- bd.test(x, y, method = "limit")
 #' bd.test(x, y)
 #' }
 bd.test <- function(x, ...) UseMethod("bd.test")
@@ -161,13 +160,13 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99,
     # modify input information:
     data_name <- gsub(x = data_name, pattern = " and NULL", replacement = "")
     
-    if (class(x) == "dist") {
+    if (class(x)[1] == "dist") {
       distance <- TRUE
     }
     if(distance) {
       examine_size_arguments(size)
       if (length(size) >= 2) {
-        if (class(x) == "dist") {
+        if (class(x)[1] == "dist") {
           if (attr(x, "Size") != sum(size)) { stop("size arguments is error!") }
           xy <- as.vector(x)
         } else {
@@ -308,7 +307,7 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99,
     p.value = pvalue,
     replicates = num.permutations,
     size = result[["info"]][["size"]],
-    complete.info = result,
+    complete.info = result[["info"]],
     alternative = alternative_message,
     method = sprintf("%s-sample Ball Divergence Test (%s)", result[["info"]][["K"]], null_method),
     data.name = data_name
@@ -429,4 +428,3 @@ bd <- function(x, y = NULL, distance = FALSE, size = NULL, num.threads = 1, kbd.
   res <- bd.test(x = x, y = y, distance = distance, size = size, num.permutations = 0, kbd.type = kbd.type)
   res
 }
-

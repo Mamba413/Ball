@@ -53,7 +53,7 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
 #' @title Ball Correlation based Sure Independence Screening (BCor-SIS)
 #' @author Wenliang Pan, Weinan Xiao, Xueqin Wang, Hongtu Zhu, Jin Zhu
 #' @description Generic non-parametric sure independence screening (SIS) procedure based on Ball Correlation.
-#' Ball correlation is a generic multivariate measure of dependence in Banach space.
+#' Ball correlation is a generic measure of dependence in Banach spaces.
 #' @inheritParams bcov.test
 #' @param x a numeric matirx or data.frame included \eqn{n} rows and \eqn{p} columns. 
 #' Each row is an observation vector and each column corresponding to a explanatory variable, generally \eqn{p >> n}.
@@ -70,9 +70,10 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
 #' Any unambiguous substring can be given. Default: \code{method = "standard"}.
 #' @param distance if \code{distance = TRUE}, \code{y} will be considered as a distance matrix. 
 #' Arguments only available when \code{method = "standard"} and \code{method = "interaction"}. Default: \code{distance = FALSE}.
-#' @param category a logical value or integer vector indicating columns to selected to be categorical variables.
-#' If \code{category} is a integer vector, the positive/negative integers select/discard the corresponding columns;
-#' If \code{category} is a logical value, \code{categorical = TRUE} select all columns, \code{categorical = FALSE} select no columns.
+#' @param category a logical value or integer vector indicating columns to be selected as categorical variables.
+#' If \code{category} is an integer vector, the positive/negative integers select/discard the corresponding columns;
+#' If \code{category} is a logical value, \code{category = TRUE} select all columns, \code{category = FALSE} select none column.
+#' Default: \code{category = FALSE}.
 #' @param parms parameters list only available when \code{method = "lm"} or \code{"gam"}. 
 #' It contains three parameters: \code{d1}, \code{d2}, and \code{df}. \code{d1} is the
 #' number of initially selected variables, \code{d2} is the number of variables added in each iteration.

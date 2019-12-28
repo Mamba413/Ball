@@ -24,9 +24,9 @@ bcov.test(x, ...)
 \item{num.permutations}{the number of permutation replications. When \code{num.permutations = 0}, the function just returns
 the Ball Covariance statistic. Default: \code{num.permutations = 99}.}
 
-\item{method}{if \code{method = "permutation"}, a permutation procedure will be carried out;
-if \code{method = "limit"}, the p-values based on approximate Ball Covariance distribution are given
-(Only available for Independence test and \code{weight = "constant"}).}
+\item{method}{if \code{method = "permutation"}, a permutation procedure is carried out to compute the \eqn{p}-value;
+if \code{ method = "limit"}, an approximate null distribution is used when \code{weight = "constant"}.
+Any unambiguous substring can be given. Default \code{method = "permutation"}.}
 
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.}
 
@@ -39,7 +39,7 @@ Default: \code{weight = FALSE}.}
 
 \item{seed}{the random seed. Default \code{seed = 1}.}
 
-\item{num.threads}{Number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
+\item{num.threads}{number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
 
 \item{formula}{a formula of the form \code{~ u + v}, where each of \code{u} and \code{v} are numeric variables giving the data values for one sample. The samples must be of the same length.}
 
@@ -67,7 +67,7 @@ Ball Covariance test of independence.
 Ball covariance are generic dependence measures in Banach spaces.
 }
 \details{
-\code{bcov.test} are non-parametric tests of independence in Banach spaces. 
+\code{bcov.test} is non-parametric tests of independence in Banach spaces. 
 It can detect the dependence between two random objects (variables) and 
 the mutual dependence among at least three random objects (variables).
 
@@ -94,9 +94,9 @@ in the \code{complete.info} element of output. We give a quick example below to 
 set.seed(1)
 
 ################# Quick Start #################
-error <- runif(50, min = -0.3, max = 0.3)
+noise <- runif(50, min = -0.3, max = 0.3)
 x <- runif(50, 0, 4*pi)
-y <- cos(x) + error
+y <- cos(x) + noise
 # plot(x, y)
 res <- bcov.test(x, y)
 res
@@ -107,8 +107,8 @@ res[["complete.info"]][["p.value"]]
 
 ################# Quick Start #################
 x <- matrix(runif(50 * 2, -pi, pi), nrow = 50, ncol = 2)
-error <- runif(50, min = -0.1, max = 0.1)
-y <- sin(x[,1] + x[,2]) + error
+noise <- runif(50, min = -0.1, max = 0.1)
+y <- sin(x[,1] + x[,2]) + noise
 bcov.test(x = x, y = y, weight = "prob")
 
 ################# Ball Covariance Test for Non-Hilbert Data #################

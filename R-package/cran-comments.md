@@ -6,10 +6,10 @@ Explaination:
 - The word, **compositional**, is not mis-spelled. In our package, we give an example to show how to analyze compositional data (https://www.wikiwand.com/en/Compositional_data).  
 
 ## Test environments
-* Ubuntu Linux 16.04 LTS, R-release, GCC
-* Fedora Linux, R-devel, clang, gfortran
 * Debian Linux, R-devel, GCC ASAN/UBSAN
+* Ubuntu Linux 16.04 LTS, R-release, GCC
 * Windows Server 2008 R2 SP1, R-devel, 32/64 bit
+* Fedora Linux, R-devel, clang, gfortran
 * Win-builder (devel)
 
 ## R CMD check results

@@ -15,9 +15,6 @@
 #' If input is a logical value, it is equivalent to \code{weight = "probability"} if \code{weight = TRUE} while 
 #' equivalent to \code{weight = "constant"} if \code{weight = FALSE}.
 #' Default: \code{weight = FALSE}.
-#' @param method if \code{method = "permutation"}, a permutation procedure will be carried out;
-#' if \code{method = "limit"}, the p-values based on approximate Ball Covariance distribution are given
-#' (Only available for Independence test and \code{weight = "constant"}).
 #' 
 #' @return If \code{num.permutations > 0}, \code{bcov.test} returns a \code{htest} class object containing the following components:
 #' \item{\code{statistic}}{Ball Covariance statistic.}            
@@ -32,7 +29,7 @@
 #' If \code{num.permutations = 0}, \code{bcov.test} returns a statistic value.
 #' 
 #' @details 
-#' \code{bcov.test} are non-parametric tests of independence in Banach spaces. 
+#' \code{bcov.test} is non-parametric tests of independence in Banach spaces. 
 #' It can detect the dependence between two random objects (variables) and 
 #' the mutual dependence among at least three random objects (variables).
 #' 
@@ -66,9 +63,9 @@
 #' set.seed(1)
 #' 
 #' ################# Quick Start #################
-#' error <- runif(50, min = -0.3, max = 0.3)
+#' noise <- runif(50, min = -0.3, max = 0.3)
 #' x <- runif(50, 0, 4*pi)
-#' y <- cos(x) + error
+#' y <- cos(x) + noise
 #' # plot(x, y)
 #' res <- bcov.test(x, y)
 #' res
@@ -79,8 +76,8 @@
 #' 
 #' ################# Quick Start #################
 #' x <- matrix(runif(50 * 2, -pi, pi), nrow = 50, ncol = 2)
-#' error <- runif(50, min = -0.1, max = 0.1)
-#' y <- sin(x[,1] + x[,2]) + error
+#' noise <- runif(50, min = -0.1, max = 0.1)
+#' y <- sin(x[,1] + x[,2]) + noise
 #' bcov.test(x = x, y = y, weight = "prob")
 #' 
 #' ################# Ball Covariance Test for Non-Hilbert Data #################
@@ -143,7 +140,7 @@ bcov.test.default <- function(x, y = NULL, num.permutations = 99,
   }
   type <- "bcov"
   # modify input information:
-  if(class(x) == "list") {
+  if(class(x)[1] == "list") {
     data_name <- gsub(x = data_name, pattern = " and NULL", replacement = "")
   }
   weight <- examine_weight_arguments(weight)
@@ -179,7 +176,7 @@ bcov.test.default <- function(x, y = NULL, num.permutations = 99,
     }
     data_name <- paste0(data_name, ", weight: ", weight_name)
     test_method <- "Ball Covariance test of %sindependence (%s)"
-    test_type <- ifelse(class(x) == "list" && length(x) > 2, "mutual ", "")
+    test_type <- ifelse(class(x)[1] == "list" && length(x) > 2, "mutual ", "")
     test_method <- sprintf(test_method, test_type, null_method)
     # if(type == "bcor") {
     #   test_method <- gsub(pattern = "Covariance", replacement = "Correlation", x = test_method)
@@ -256,15 +253,15 @@ bcov.test.formula <- function(formula, data, subset, na.action, ...) {
 bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, weight = FALSE, 
                                seed = 4, method = "permute", num.threads)
 {
-  if (class(x) == "dist" && class(y) == "dist") {
+  if (class(x)[1] == "dist" && class(y)[1] == "dist") {
     distance <- TRUE
   }
   if (distance) {
-    if (class(x) == "dist" || class(y) == "dist") {
-      if (class(x) != "dist") {
+    if (class(x)[1] == "dist" || class(y)[1] == "dist") {
+      if (class(x)[1] != "dist") {
         x <- as.dist(x)
       }
-      if (class(y) != "dist") {
+      if (class(y)[1] != "dist") {
         y <- as.dist(y)
       }
       num <- attr(x, "Size")
@@ -387,11 +384,11 @@ kbcov_test_internal <- function(x, num.permutations = 99, distance = FALSE, weig
   #################### C Version (1.2.0) #####################
   ############################################################
   var_num <- length(x)
-  if ((!distance) && all(sapply(x, class) == "dist")) {
+  if ((!distance) && all(sapply(x, function(xx) { class(xx)[1] }) == "dist")) {
     distance <- TRUE
   }
   if(distance) {
-    if (class(x[[1]]) != "dist") {
+    if (class(x[[1]])[1] != "dist") {
       if (nrow(x[[1]]) != ncol(x[[1]])) {
         stop("The elements of input list is not a distance matrix.")
       }
@@ -400,8 +397,8 @@ kbcov_test_internal <- function(x, num.permutations = 99, distance = FALSE, weig
     x <- lapply(x, dist)
   }
   distance <- TRUE
-  num <- ifelse(class(x[[1]]) == "dist", attr(x[[1]], "Size"), nrow(x[[1]]))
-  if (class(x[[1]]) == "dist") {
+  num <- ifelse(class(x[[1]])[1] == "dist", attr(x[[1]], "Size"), nrow(x[[1]]))
+  if (class(x[[1]])[1] == "dist") {
     x <- lapply(x, as.vector)
   } else {
     x <- lapply(x, function(xx) { 
@@ -517,7 +514,7 @@ kbcov_stat <- function(x, num, var_num, weight, type) {
 bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, seed, 
                                     weight, method, type, num.threads)
 {
-  if(class(x) == "list") {
+  if(class(x)[1] == "list") {
     if (length(x) > 2)
     {
       result <- kbcov_test_internal(x = x, num.permutations = num.permutations, distance = distance, weight = weight, 
