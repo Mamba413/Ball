@@ -34,11 +34,12 @@ Compared with selective R packages available for datasets in metric spaces:
 | Test of joint independence        | :x:                                                        | :x:                                                      | :x:                                                | :heavy_check_mark:                                   |
 | Feature screening / Sure Independence Screening (SIS) | :x:                                                        | :x:                                                      | :x:                                                | :heavy_check_mark:                                   |
 | Iterative Feature screening / Iterative SIS                     | :x:                                                        | :x:                                                      | :x:                                                | :heavy_check_mark:                                   |
-| Datasets in metric spaces         | :heavy_check_mark:                                         | SNT[^snt]                                    | :heavy_check_mark:                                 | :heavy_check_mark:                                   |
+| Datasets in metric spaces         | :heavy_check_mark:                                         | SNT                                   | :heavy_check_mark:                                 | :heavy_check_mark:                                   |
 | Robustness                        | :heavy_check_mark:                                         | :x:                                                      | :heavy_check_mark:                                 | :heavy_check_mark:                                   |
 | Parallel programming              | :x:                                                        | :x:                                                      | :heavy_check_mark:                                 | :heavy_check_mark:                                   |
 | Computational efficiency          | :running::running::running:                                | :running::running::running:                              | :running::running:                                 | :running::running::walking:                          |
 
+*SNT is the abbreviation of strong negative type.*
 
 See the following documents for more details about the **[Ball](https://cran.r-project.org/web/packages/Ball)** package:
 - [github page](https://github.com/Mamba413/Ball/tree/master/R-package) (short)
@@ -61,7 +62,3 @@ References
 Bug report
 ----------
 Open an [issue](https://github.com/Mamba413/Ball/issues) or send an email to Jin Zhu at zhuj37@mail2.sysu.edu.cn
-
-Footnotes
-----------
-[^snt]: strong negative type (SNT)
