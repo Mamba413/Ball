@@ -38,9 +38,7 @@ Compared with selective R packages available for datasets in metric spaces:
 | Robustness                        | :heavy_check_mark:                                         | :x:                                                      | :heavy_check_mark:                                 | :heavy_check_mark:                                   |
 | Parallel programming              | :x:                                                        | :x:                                                      | :heavy_check_mark:                                 | :heavy_check_mark:                                   |
 | Computational efficiency          | :running::running::running:                                | :running::running::running:                              | :running::running:                                 | :running::running::walking:                          |
-[^sis]: Sure Independence Screening (SIS)
-[^isis]: Iterative Sure Independence Screening (SIS)
-[^snt]: strong negative type (SNT)
+
 
 See the following documents for more details about the **[Ball](https://cran.r-project.org/web/packages/Ball)** package:
 - [github page](https://github.com/Mamba413/Ball/tree/master/R-package) (short)
@@ -66,3 +64,6 @@ Open an [issue](https://github.com/Mamba413/Ball/issues) or send an email to Jin
 
 Footnotes
 ----------
+[^sis]: Sure Independence Screening (SIS)
+[^isis]: Iterative Sure Independence Screening (SIS)
+[^snt]: strong negative type (SNT)
