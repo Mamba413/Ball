@@ -121,3 +121,5 @@ src/test2.c
 src/test.c
 Ball_1.3.8.zip
 R-package.pdf
+gwas.R
+test_bd_gwas.R
