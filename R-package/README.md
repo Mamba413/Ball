@@ -35,27 +35,27 @@ install_github("Mamba413/Ball/R-package", build_vignettes = TRUE)
 
 Overview: **Ball** package
 ----------
-
 Three most importance functions in **Ball**:		
+
 |                          |         **bd.test**         |        **bcov.test**         |        **bcorsis**        |
 | ------------------------ | :-------------------------: | :--------------------------: | :-----------------------: |
 | Feature                  |       Hypothesis test       |       Hypothesis test        |     Feature screening     |
-| Type                     | Test of equal distributions | Test of (joint) independence | SIS[^sis] and ISIS[^isis] |
+| Type                     | Test of equal distributions | Test of (joint) independence | SIS and ISIS |
 | Optional weight          |     :heavy_check_mark:      |      :heavy_check_mark:      |    :heavy_check_mark:     |
 | Parallel programming     |     :heavy_check_mark:      |      :heavy_check_mark:      |    :heavy_check_mark:     |
 | p-value                  |     :heavy_check_mark:      |      :heavy_check_mark:      |            :x:            |
 | Limit distribution       |    Two-sample test only     |    Independence test only    |            :x:            |
 | Censored data            |             :x:             |             :x:              |    :heavy_check_mark:     |
 | Interaction screening    |             :x:             |             :x:              |    :heavy_check_mark:     |
-| GWAS[^gwas] optimization |             :x:             |             :x:              |    :heavy_check_mark:     |
-[^sis]: Sure Independence Screening (SIS)
-[^isis]: Iterative Sure Independence Screening (SIS)
-[^gwas]: Genome-Wide Association Study (GWAS)
+| GWAS optimization |             :x:             |             :x:              |    :heavy_check_mark:     |
+
+- *SIS: Sure Independence Screening*
+- *ISIS: Iterative Sure Independence Screening (SIS)*
+- *GWAS: Genome-Wide Association Study*
 
 Quick examples
 ----------
-Take *iris* dataset as an example to illustrate how to use **bd.test** and **bcov.test** to 
-deal with the fundamental problems mentioned above.
+Take *iris* dataset as an example to illustrate how to use **bd.test** and **bcov.test** to deal with the fundamental problems mentioned above.
 
 #### **bd.test**              
 ```R
@@ -90,9 +90,7 @@ petal <- iris[, c("Petal.Width", "Petal.Length")]
 bcov.test(sepal, petal)
 ```
 
-In this example, **bcov.test** investigates whether width or length of petal is associated with width and length of sepal. If the dependency really exists, the *p*-value of the **bcov.test** will be under 0.05.
-
-In this example, the result is:
+In this example, **bcov.test** investigates whether width or length of petal is associated with width and length of sepal. If the dependency really exists, the *p*-value of the **bcov.test** will be under 0.05. In this example, the result is show to be:
 
 ```
 	Ball Covariance test of independence (Permutation)
@@ -106,7 +104,6 @@ alternative hypothesis: random variables are dependent
 Therefore, the relationship between width and length of sepal and petal exists.
 
 #### **bcorsis**                   
-
 We generate a dataset and demonstrate the usage of **bcorsis** function as follow.
 
 ```{r}
@@ -122,11 +119,10 @@ y <- 3 * x[, 1] + 5 * (x[, 3])^2 + error
 res <- bcorsis(y = y, x = x)
 head(res[["ix"]], n = 5)
 ```
-In this example, the result is :
-```
+In this example, the result is:
+```{r}
 # [1]    3    1 1601   20  429
 ```
-          
 The **bcorsis** result shows that the first and the third variable are the two most 
 important variables in 3000 explanatory variables which is consistent to the simulation settings.
 
@@ -149,7 +145,4 @@ Reference
 
 Bug report
 ----------
-If you find any bugs, or if you experience any crashes, please report to us. If you have any questions just ask, we won't bite. 
-
-Footnotes
-----------
+If you find any bugs, or if you experience any crashes, please report to us. If you have any questions just ask, we won't bite. Open an [issue](https://github.com/Mamba413/Ball/issues) or send an email to Jin Zhu at zhuj37@mail2.sysu.edu.cn
