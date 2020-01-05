@@ -32,8 +32,8 @@ Compared with selective R packages available for datasets in metric spaces:
 | Test of equal distributions       | :x:                                                        | :heavy_check_mark:                                       | :heavy_check_mark:                                 | :heavy_check_mark:                                   |
 | Test of independence              | :heavy_check_mark:                                         | :heavy_check_mark:                                       | :heavy_check_mark:                                 | :heavy_check_mark:                                   |
 | Test of joint independence        | :x:                                                        | :x:                                                      | :x:                                                | :heavy_check_mark:                                   |
-| Feature screening/SIS[^sis] | :x:                                                        | :x:                                                      | :x:                                                | :heavy_check_mark:                                   |
-| Iterative Feature screening/ISIS[^isis]                     | :x:                                                        | :x:                                                      | :x:                                                | :heavy_check_mark:                                   |
+| Feature screening / Sure Independence Screening (SIS) | :x:                                                        | :x:                                                      | :x:                                                | :heavy_check_mark:                                   |
+| Iterative Feature screening / Iterative SIS                     | :x:                                                        | :x:                                                      | :x:                                                | :heavy_check_mark:                                   |
 | Datasets in metric spaces         | :heavy_check_mark:                                         | SNT[^snt]                                    | :heavy_check_mark:                                 | :heavy_check_mark:                                   |
 | Robustness                        | :heavy_check_mark:                                         | :x:                                                      | :heavy_check_mark:                                 | :heavy_check_mark:                                   |
 | Parallel programming              | :x:                                                        | :x:                                                      | :heavy_check_mark:                                 | :heavy_check_mark:                                   |
@@ -64,6 +64,4 @@ Open an [issue](https://github.com/Mamba413/Ball/issues) or send an email to Jin
 
 Footnotes
 ----------
-[^sis]: Sure Independence Screening (SIS)
-[^isis]: Iterative Sure Independence Screening (SIS)
 [^snt]: strong negative type (SNT)
