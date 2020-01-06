@@ -29,17 +29,17 @@ Overview: **Ball** package
 ----------
 Three most importance functions in **Ball**:		
 
-|                          |         **bd.test**         |        **bcov.test**         |        **bcorsis**        |
-| ------------------------ | :-------------------------: | :--------------------------: | :-----------------------: |
-| Feature                  |       Hypothesis test       |       Hypothesis test        |     Feature screening     |
-| Type                     | Test of equal distributions | Test of (joint) independence | SIS and ISIS |
-| Optional weight          |     :heavy_check_mark:      |      :heavy_check_mark:      |    :heavy_check_mark:     |
-| Parallel programming     |     :heavy_check_mark:      |      :heavy_check_mark:      |    :heavy_check_mark:     |
-| p-value                  |     :heavy_check_mark:      |      :heavy_check_mark:      |            :x:            |
-| Limit distribution       |    Two-sample test only     |    Independence test only    |            :x:            |
-| Censored data            |             :x:             |             :x:              |    Comming soon     |
-| Interaction screening    |             :x:             |             :x:              |    :heavy_check_mark:     |
-| GWAS optimization |             :x:             |             :x:              |    Comming soon     |
+|                       |         **bd.test**         |     **bcov.test**      |    **bcorsis**     |
+| --------------------- | :-------------------------: | :--------------------: | :----------------: |
+| Feature               |       Hypothesis test       |    Hypothesis test     | Feature screening  |
+| Type                  | Test of equal distributions |  Test of independence  |    SIS and ISIS    |
+| Optional weight       |     :heavy_check_mark:      |   :heavy_check_mark:   | :heavy_check_mark: |
+| Parallel programming  |     :heavy_check_mark:      |   :heavy_check_mark:   | :heavy_check_mark: |
+| p-value               |     :heavy_check_mark:      |   :heavy_check_mark:   |        :x:         |
+| Limit distribution    |    Two-sample test only     | Independence test only |        :x:         |
+| Censored data         |             :x:             |          :x:           |    Comming soon    |
+| Interaction screening |             :x:             |          :x:           | :heavy_check_mark: |
+| GWAS optimization     |             :x:             |          :x:           |    Comming soon    |
 
 - *SIS: Sure Independence Screening*
 - *ISIS: Iterative Sure Independence Screening (SIS)*

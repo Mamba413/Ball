@@ -123,3 +123,7 @@ Ball_1.3.8.zip
 R-package.pdf
 gwas.R
 test_bd_gwas.R
+*.pyd
+Python-package/dist/Ball-0.2.1-cp35-cp35m-win_amd64.whl
+Python-package/dist/
+Python-package/configure.sh
