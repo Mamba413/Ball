@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2018/2/5 20:26
-# @Author  : Jin Zhu
-# @Mail    : zhuj37@mail2.sysu.edu.cn
+# @Time    : 2019/7/24 20:26
+# @Author  : Yanhang Zhang
+# @Mail    : zhangyh93@mail2.sysu.edu.cn
 # @File    : wrap_c.py
 
 from numpy import alen as npalen
@@ -10,9 +10,8 @@ from numpy import sum as npsum
 from numpy import array as nparray
 from numpy import column_stack
 from numpy import double
-from Ball.cball import bd_test, bcor_test, bcov_test, kbcov_test 
+from Ball.cball import bd_test, bcor_test, bcov_test, kbcov_test
 from Ball.cball import doubleArray, intArray
-
 
 
 def bd_test_wrap_c(xy, size, R, distance, nthread=1):
@@ -20,7 +19,7 @@ def bd_test_wrap_c(xy, size, R, distance, nthread=1):
     pvalue = doubleArray(6)
     xy = nparray(xy, dtype=double)
     num = npalen(xy)
-    
+
     xy_copy = doubleArray(num)
     num = npalen(size)
     size_copy = intArray(num)
@@ -52,10 +51,10 @@ def bd_test_wrap_c(xy, size, R, distance, nthread=1):
 
 
 def bcor_test_wrap_c(y, x, x_num, f_num, n, dst_y, nthread):
-    bcor_stat = doubleArray(3*f_num)
+    bcor_stat = doubleArray(3 * f_num)
     y = nparray(y, dtype=double)
     x = nparray(x, dtype=double)
-    
+
     y_copy = doubleArray(len(y))
     x_copy = doubleArray(len(x))
     x_num_copy = intArray(len(x_num))
@@ -74,7 +73,7 @@ def bcor_test_wrap_c(y, x, x_num, f_num, n, dst_y, nthread):
     for i, x_value in enumerate(x):
         x_copy[i] = x_value
         pass
-    for i,x_num_value in enumerate(x_num):
+    for i, x_num_value in enumerate(x_num):
         x_num_copy[i] = x_num_value
     f_num_copy[0] = f_num
     size[0] = 0
@@ -84,10 +83,10 @@ def bcor_test_wrap_c(y, x, x_num, f_num, n, dst_y, nthread):
     dst_y_copy[0] = dst_y
     dst_x[0] = 0
     nthread_copy[0] = nthread
-    
+
     bcor_test(bcor_stat, y_copy, x_copy, x_num_copy, f_num_copy, size, n_copy, p, k, dst_y_copy, dst_x, nthread_copy)
     # convert doubleArray to list:    
-    bcor_stat_list = [bcor_stat[j] for j in range(3*f_num)]
+    bcor_stat_list = [bcor_stat[j] for j in range(3 * f_num)]
     bcor_stat_list = column_stack(nparray(bcor_stat_list).reshape(f_num, 3))
     return bcor_stat_list
 
@@ -97,7 +96,7 @@ def bcov_test_wrap_c(x, y, n, R, distance, nthread):
     pvalue = doubleArray(3)
     y = nparray(y, dtype=double)
     x = nparray(x, dtype=double)
-    
+
     y_copy = doubleArray(len(y))
     x_copy = doubleArray(len(x))
     n_copy = intArray(1)
@@ -113,18 +112,19 @@ def bcov_test_wrap_c(x, y, n, R, distance, nthread):
     distance_copy[0] = int(distance)
     R_copy[0] = int(R)
     nthread_copy[0] = int(nthread)
-    
+
     bcov_test(bcov_stat, pvalue, x_copy, y_copy, n_copy, R_copy, distance_copy, nthread_copy)
     # convert doubleArray to list:    
     bcov_stat_list = [bcov_stat[0], bcov_stat[1], bcov_stat[2]]
     pvalue_list = [pvalue[0], pvalue[1], pvalue[2]]
     return bcov_stat_list, pvalue_list
 
+
 def kbcov_test_wrap_c(x, k, n, R, nthread):
     kbcov_stat = doubleArray(3)
     pvalue = doubleArray(3)
     x = nparray(x, dtype=double)
-    
+
     x_copy = doubleArray(len(x))
     k_copy = intArray(1)
     n_copy = intArray(1)
@@ -138,10 +138,10 @@ def kbcov_test_wrap_c(x, k, n, R, nthread):
     n_copy[0] = int(n)
     distance[0] = int(1)
     R_copy[0] = int(R)
-    nthread_copy[0] = int(nthread)    
-    
+    nthread_copy[0] = int(nthread)
+
     kbcov_test(kbcov_stat, pvalue, x_copy, k_copy, n_copy, R_copy, distance, nthread_copy)
     # convert doubleArray to list:    
     kbcov_stat_list = [kbcov_stat[0], kbcov_stat[1], kbcov_stat[2]]
     pvalue_list = [pvalue[0], pvalue[1], pvalue[2]]
-    return kbcov_stat_list, pvalue_list    
+    return kbcov_stat_list, pvalue_list

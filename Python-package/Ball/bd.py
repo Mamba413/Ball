@@ -2,7 +2,7 @@
 """
 Created on Tue Jul 30 10:21:13 2019
 
-@author: zhangyanhang
+@author: Yanhang Zhang
 """
 
 from collections import namedtuple
@@ -11,6 +11,7 @@ from Ball.utilize import *
 
 bd_testResult = namedtuple('bd_testResult', ('statistic', 'pvalue'))
 bd_Result = namedtuple('bd_Result', ('statistic'))
+
 
 def bd_test(*args, **kwargs):
     """
@@ -111,7 +112,7 @@ def bd_test(*args, **kwargs):
         if key.lower() == "num_permutations" or key.lower() == "permutations":
             num_permutations = value
         elif key == "num_thread" or key.lower() == "nthread" or key.lower() == "thread":
-            num_thread = value               
+            num_thread = value
         elif key.lower() == "size":
             size = value
         elif key.lower() == "distance" or key.lower() == "dst":
@@ -120,20 +121,20 @@ def bd_test(*args, **kwargs):
             weight = value
         else:
             raise ValueError("input arguments is invalid")
-            
+
     examine_permutations_arguments(num_permutations)
     examine_thread_arguments(num_thread)
-    if len(args) == 1 and np.alen(args[0]) != 1 and distance == False and len(size) == 0:
+    if len(args) == 1 and np.alen(args[0]) != 1 and not distance and len(size) == 0:
         num_groups = len(args[0])
         args = args[0]
         map(examine_None, args)
     elif len(size) > 1:
-        num_groups = len(size)        
+        num_groups = len(size)
     else:
         num_groups = len(args)
         map(examine_None, args)
-        
-    args = list(map(np.array, args))    
+
+    args = list(map(np.array, args))
     if num_groups > 1:
         # return the dimension of samples
         p = examine_dimension(args)
@@ -155,11 +156,11 @@ def bd_test(*args, **kwargs):
         else:
             examine_distance_matrix(x)
             examine_size_arguments(x, size)
-            x = [x[i][j] for i in range(x.shape[0]) for j in range(x.shape[0]) if i<j]
+            x = [x[i][j] for i in range(x.shape[0]) for j in range(x.shape[0]) if i < j]
             distance = True
-        
+
     bd_stat, bd_pvalue = bd_test_wrap_c(x, size, num_permutations, distance, num_thread)
-    
+
     if num_groups > 2:
         weight = weight.lower()
         if weight == "sum":
@@ -167,15 +168,15 @@ def bd_test(*args, **kwargs):
             bd_pvalue = bd_pvalue[0]
         elif weight == "max":
             bd_stat = bd_stat[1]
-            bd_pvalue = bd_pvalue[1] 
+            bd_pvalue = bd_pvalue[1]
         elif weight == "maxsum":
             bd_stat = bd_stat[2]
             bd_pvalue = bd_pvalue[2]
         else:
-            raise ValueError("weight arguments is invalid!")        
+            raise ValueError("weight arguments is invalid!")
     return bd_testResult(bd_stat, bd_pvalue)
-                 
-                 
+
+
 def bd(*args, **kwargs):
     """
 
@@ -240,7 +241,7 @@ def bd(*args, **kwargs):
     >>> bd(x=dx, size=data_size, dst=True)
     bd_Result(statistic=[0.059688799999])
 
-    """    
+    """
     for key in kwargs.keys():
         if key.lower() == "num_permutations" or key.lower() == "permutations":
             kwargs[key] = 0

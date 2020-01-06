@@ -2,17 +2,15 @@
 """
 Created on Fri Jul 26 10:24:01 2019
 
-@author: zhangyanhang
+@author:Yanhang zhang
 """
 
-from Ball.wrap_c import *
 from Ball.utilize import *
-from collections import namedtuple
 from sklearn import linear_model
 from pygam import LinearGAM
 
 
-def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=False, params=[5, 5], num_thread=0): 
+def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=False, params=(5, 5), num_thread=0):
     """
     
     Generic non-parametric sure independence screening (SIS) procedure based on Ball Correlation. 
@@ -71,7 +69,7 @@ def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=
     >>> error = np.random.normal(0, 1, n)
     >>> y = 3 * x[:, 1] * x[:, 5] * x[:, 10] + error
     >>> result = bcorsis(y, x, x_num, method = "interaction", d=10)
-    [1, 10, 567, 5, 992, 1973, 2334, 1661, 841, 751]
+    [1, 10, 567, 5, 1661]
     
     >>> np.random.seed(1000)
     >>> n = 150
@@ -90,33 +88,33 @@ def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=
     """
     examine_None(x)
     examine_None(y)
-    x = np.array(x).T.flatten()  
+    x = np.array(x).T.flatten()
     examine_x_num_arguments(x, x_num)
     examine_method_arguments(method)
-    
+
     f_num = len(x_num)
     if type(x_num) == np.ndarray:
         x_num = x_num.astype(int).tolist()
-    n = int(len(x)/(np.sum(x_num)))
-    d = select_d_arguments(n, d) 
+    n = int(len(x) / (np.sum(x_num)))
+    d = select_d_arguments(n, d)
     if len(y.shape) > 1 and dst_y == True:
         examine_distance_matrix(y)
         y = [y[i][j] for i in range(np.alen(y)) for j in range(np.alen(y)) if i < j]
     else:
-        y = np.array(y).T.flatten() 
-    
+        y = np.array(y).T.flatten()
+
     method = method.lower()
-    if method == "standard":        
+    if method == "standard":
         bcor_stat = select_bcor_stat(y, x, x_num, f_num, n, dst_y, num_thread, weight)
         ind = []
         for i in range(d):
             ind.append(np.argmax(bcor_stat))
             bcor_stat[ind[i]] = -1
-            
+
     elif method == "interaction":
         x_square = np.square(x)
         bcor_stat = select_bcor_stat(y, x, x_num, f_num, n, dst_y, num_thread, weight)
-        bcor_square_stat = select_bcor_stat(y, x, x_num, f_num, n, dst_y, num_thread, weight)
+        bcor_square_stat = select_bcor_stat(y, x_square, x_num, f_num, n, dst_y, num_thread, weight)
         ind1 = []
         ind2 = []
         for i in range(d):
@@ -124,9 +122,9 @@ def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=
             ind2.append(np.argmax(bcor_square_stat))
             bcor_stat[ind1[i]] = -1
             bcor_square_stat[ind2[i]] = -1
-        
+
         ind = [index for index in ind1 if index in ind2]
-        
+
     else:
         examine_params_arguments(params)
         d1 = params[0]
@@ -137,23 +135,23 @@ def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=
             ind_have.append(np.argmax(bcor_stat))
             bcor_stat[ind_have[i]] = -1
         ind_last = ind_have
-        
+
         x = x.reshape((np.sum(x_num), n)).T
-        y = y.reshape((int(len(y)/n), n)).T
+        y = y.reshape((int(len(y) / n), n)).T
         ind_rest = [i for i in range(f_num) if i not in ind_have]
-        
+
         if method == "lm":
             regr = linear_model.LinearRegression()
             while len(ind_have) < d:
                 ind1 = get_x_index(ind_have, x_num)
                 ind2 = get_x_index(ind_last, x_num)
                 ind3 = get_x_index(ind_rest, x_num)
-                
-                regr.fit(x[:,ind1], x[:,ind3])
-                x_new = x[:,ind3] - regr.predict(x[:,ind1])
-                regr.fit(x[:,ind2], y)
-                y = y - regr.predict(x[:,ind2])
-                
+
+                regr.fit(x[:, ind1], x[:, ind3])
+                x_new = x[:, ind3] - regr.predict(x[:, ind1])
+                regr.fit(x[:, ind2], y)
+                y = y - regr.predict(x[:, ind2])
+
                 x_new = np.array(x_new).T.flatten()
                 y = np.array(y).T.flatten()
                 temp_x_num = [x_num[i] for i in ind_rest]
@@ -163,32 +161,30 @@ def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=
                     temp_ind = np.argmax(bcor_stat)
                     ind_last.append(ind_rest[temp_ind])
                     bcor_stat[temp_ind] = -1
-                ind_have = ind_have+ind_last
+                ind_have = ind_have + ind_last
                 ind_rest = [i for i in ind_rest if i not in ind_have]
-                
+
             ind = ind_have
-            
-            
         else:
             while len(ind_have) < d:
                 ind1 = get_x_index(ind_have, x_num)
                 ind2 = get_x_index(ind_last, x_num)
                 ind3 = get_x_index(ind_rest, x_num)
-                
+
                 gam = LinearGAM().fit(x[:, ind1], x[:, ind3[0]])
                 x_new = gam.deviance_residuals(x[:, ind1], x[:, ind3[0]])
                 for i in range(len(ind3)):
                     if i == 0: continue
                     gam = LinearGAM().fit(x[:, ind1], x[:, ind3[i]])
                     x_new = np.hstack((x_new, gam.deviance_residuals(x[:, ind1], x[:, ind3[i]])))
-                
+
                 gam = LinearGAM().fit(x[:, ind2], y[:, 0])
                 y = gam.deviance_residuals(x[:, ind2], y[:, 0])
                 for i in range(y.shape[1]):
                     if i == 0: continue
                     gam = LinearGAM().fit(x[:, ind2], y[:, i])
                     y = np.hstack((y, gam.deviance_residuals(x[:, ind2], y[:, i])))
-                 
+
                 temp_x_num = [x_num[i] for i in ind_rest]
                 bcor_stat = select_bcor_stat(y, x_new, temp_x_num, len(ind_rest), n, dst_y, num_thread, weight)
                 ind_last = []
@@ -196,11 +192,11 @@ def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=
                     temp_ind = np.argmax(bcor_stat)
                     ind_last.append(ind_rest[temp_ind])
                     bcor_stat[temp_ind] = -1
-                ind_have = ind_have+ind_last
+                ind_have = ind_have + ind_last
                 ind_rest = [i for i in ind_rest if i not in ind_have]
-                
+
             ind = ind_have
-            
+
     return ind
 
 
@@ -241,25 +237,25 @@ def bcor(y, x, x_num, weight="constant", dst_y=False, num_thread=0):
     >>> x = np.random.multivariate_normal(mean, cov, n)
     >>> error = np.random.normal(0, 1, n)
     >>> y = 4*np.square(x[:, 2])+6*np.square(x[:, 1])+8*x[:, 3]-10*x[:,4]+error
-    >>> x_num = np.ones(3000)
     >>> target = [4, 1, 924, 2, 692, 3, 400, 2241, 2839, 2194, 170]
+    >>> x_num = np.ones(3000)
     >>> result = bcor(y, x, x_num)
     
     """
     examine_None(x)
     examine_None(y)
-    x = np.array(x).T.flatten()  
+    x = np.array(x).T.flatten()
     examine_x_num_arguments(x, x_num)
-    
+
     f_num = len(x_num)
     if type(x_num) == np.ndarray:
         x_num = x_num.astype(int).tolist()
-    n = int(len(x)/(np.sum(x_num)))
+    n = int(len(x) / (np.sum(x_num)))
     if len(y.shape) > 1 and dst_y == True:
         examine_distance_matrix(y)
         y = [y[i][j] for i in range(np.alen(y)) for j in range(np.alen(y)) if i < j]
     else:
-        y = np.array(y).T.flatten() 
-  
-    bcor_stat = select_bcor_stat(y, x, x_num, f_num, n, dst_y, num_thread, weight)        
-    return bcor_stat   
+        y = np.array(y).T.flatten()
+
+    bcor_stat = select_bcor_stat(y, x, x_num, f_num, n, dst_y, num_thread, weight)
+    return bcor_stat

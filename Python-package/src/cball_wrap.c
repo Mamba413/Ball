@@ -3017,9 +3017,10 @@ static swig_module_info swig_module = {swig_types, 5, 0, 0, 0, 0};
 #define SWIG_as_voidptrptr(a) ((void)SWIG_as_voidptr(*a),(void**)(a)) 
 
 
-#define SWIG_FILE_WITH_INIT
 #include "BD.h"
+#include "bcor.h"
 #include "BI.h"
+#include "kbcov.h"
 
 
 typedef double doubleArray;
@@ -3670,90 +3671,6 @@ SWIGINTERN PyObject *intArray_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObj
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_bd_stat(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  double *arg1 = (double *) 0 ;
-  double *arg2 = (double *) 0 ;
-  int *arg3 = (int *) 0 ;
-  int *arg4 = (int *) 0 ;
-  int *arg5 = (int *) 0 ;
-  int *arg6 = (int *) 0 ;
-  int *arg7 = (int *) 0 ;
-  int *arg8 = (int *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
-  void *argp5 = 0 ;
-  int res5 = 0 ;
-  void *argp6 = 0 ;
-  int res6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
-  void *argp8 = 0 ;
-  int res8 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  PyObject * obj5 = 0 ;
-  PyObject * obj6 = 0 ;
-  PyObject * obj7 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:bd_stat",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_double, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "bd_stat" "', argument " "1"" of type '" "double *""'"); 
-  }
-  arg1 = (double *)(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_double, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "bd_stat" "', argument " "2"" of type '" "double *""'"); 
-  }
-  arg2 = (double *)(argp2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "bd_stat" "', argument " "3"" of type '" "int *""'"); 
-  }
-  arg3 = (int *)(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "bd_stat" "', argument " "4"" of type '" "int *""'"); 
-  }
-  arg4 = (int *)(argp4);
-  res5 = SWIG_ConvertPtr(obj4, &argp5,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res5)) {
-    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "bd_stat" "', argument " "5"" of type '" "int *""'"); 
-  }
-  arg5 = (int *)(argp5);
-  res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res6)) {
-    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "bd_stat" "', argument " "6"" of type '" "int *""'"); 
-  }
-  arg6 = (int *)(argp6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "bd_stat" "', argument " "7"" of type '" "int *""'"); 
-  }
-  arg7 = (int *)(argp7);
-  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res8)) {
-    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "bd_stat" "', argument " "8"" of type '" "int *""'"); 
-  }
-  arg8 = (int *)(argp8);
-  bd_stat(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_bd_test(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   double *arg1 = (double *) 0 ;
@@ -3765,7 +3682,6 @@ SWIGINTERN PyObject *_wrap_bd_test(PyObject *SWIGUNUSEDPARM(self), PyObject *arg
   int *arg7 = (int *) 0 ;
   int *arg8 = (int *) 0 ;
   int *arg9 = (int *) 0 ;
-  int *arg10 = (int *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -3784,8 +3700,6 @@ SWIGINTERN PyObject *_wrap_bd_test(PyObject *SWIGUNUSEDPARM(self), PyObject *arg
   int res8 = 0 ;
   void *argp9 = 0 ;
   int res9 = 0 ;
-  void *argp10 = 0 ;
-  int res10 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -3795,9 +3709,8 @@ SWIGINTERN PyObject *_wrap_bd_test(PyObject *SWIGUNUSEDPARM(self), PyObject *arg
   PyObject * obj6 = 0 ;
   PyObject * obj7 = 0 ;
   PyObject * obj8 = 0 ;
-  PyObject * obj9 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOOOO:bd_test",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOOO:bd_test",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_double, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "bd_test" "', argument " "1"" of type '" "double *""'"); 
@@ -3843,12 +3756,7 @@ SWIGINTERN PyObject *_wrap_bd_test(PyObject *SWIGUNUSEDPARM(self), PyObject *arg
     SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "bd_test" "', argument " "9"" of type '" "int *""'"); 
   }
   arg9 = (int *)(argp9);
-  res10 = SWIG_ConvertPtr(obj9, &argp10,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res10)) {
-    SWIG_exception_fail(SWIG_ArgError(res10), "in method '" "bd_test" "', argument " "10"" of type '" "int *""'"); 
-  }
-  arg10 = (int *)(argp10);
-  bd_test(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10);
+  bd_test(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -3856,7 +3764,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_bcov_stat(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_bcor_test(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   double *arg1 = (double *) 0 ;
   double *arg2 = (double *) 0 ;
@@ -3866,92 +3774,9 @@ SWIGINTERN PyObject *_wrap_bcov_stat(PyObject *SWIGUNUSEDPARM(self), PyObject *a
   int *arg6 = (int *) 0 ;
   int *arg7 = (int *) 0 ;
   int *arg8 = (int *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
-  void *argp5 = 0 ;
-  int res5 = 0 ;
-  void *argp6 = 0 ;
-  int res6 = 0 ;
-  void *argp7 = 0 ;
-  int res7 = 0 ;
-  void *argp8 = 0 ;
-  int res8 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  PyObject * obj5 = 0 ;
-  PyObject * obj6 = 0 ;
-  PyObject * obj7 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:bcov_stat",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_double, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "bcov_stat" "', argument " "1"" of type '" "double *""'"); 
-  }
-  arg1 = (double *)(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_double, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "bcov_stat" "', argument " "2"" of type '" "double *""'"); 
-  }
-  arg2 = (double *)(argp2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_double, 0 |  0 );
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "bcov_stat" "', argument " "3"" of type '" "double *""'"); 
-  }
-  arg3 = (double *)(argp3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "bcov_stat" "', argument " "4"" of type '" "int *""'"); 
-  }
-  arg4 = (int *)(argp4);
-  res5 = SWIG_ConvertPtr(obj4, &argp5,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res5)) {
-    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "bcov_stat" "', argument " "5"" of type '" "int *""'"); 
-  }
-  arg5 = (int *)(argp5);
-  res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res6)) {
-    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "bcov_stat" "', argument " "6"" of type '" "int *""'"); 
-  }
-  arg6 = (int *)(argp6);
-  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res7)) {
-    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "bcov_stat" "', argument " "7"" of type '" "int *""'"); 
-  }
-  arg7 = (int *)(argp7);
-  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res8)) {
-    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "bcov_stat" "', argument " "8"" of type '" "int *""'"); 
-  }
-  arg8 = (int *)(argp8);
-  bcov_stat(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_bcov_test(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  double *arg1 = (double *) 0 ;
-  double *arg2 = (double *) 0 ;
-  double *arg3 = (double *) 0 ;
-  double *arg4 = (double *) 0 ;
-  int *arg5 = (int *) 0 ;
-  int *arg6 = (int *) 0 ;
-  int *arg7 = (int *) 0 ;
-  int *arg8 = (int *) 0 ;
   int *arg9 = (int *) 0 ;
   int *arg10 = (int *) 0 ;
+  int *arg11 = (int *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -3972,6 +3797,8 @@ SWIGINTERN PyObject *_wrap_bcov_test(PyObject *SWIGUNUSEDPARM(self), PyObject *a
   int res9 = 0 ;
   void *argp10 = 0 ;
   int res10 = 0 ;
+  void *argp11 = 0 ;
+  int res11 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -3982,8 +3809,108 @@ SWIGINTERN PyObject *_wrap_bcov_test(PyObject *SWIGUNUSEDPARM(self), PyObject *a
   PyObject * obj7 = 0 ;
   PyObject * obj8 = 0 ;
   PyObject * obj9 = 0 ;
+  PyObject * obj10 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOOOO:bcov_test",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOOOOO:bcor_test",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9,&obj10)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_double, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "bcor_test" "', argument " "1"" of type '" "double *""'"); 
+  }
+  arg1 = (double *)(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_double, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "bcor_test" "', argument " "2"" of type '" "double *""'"); 
+  }
+  arg2 = (double *)(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_double, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "bcor_test" "', argument " "3"" of type '" "double *""'"); 
+  }
+  arg3 = (double *)(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "bcor_test" "', argument " "4"" of type '" "int *""'"); 
+  }
+  arg4 = (int *)(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "bcor_test" "', argument " "5"" of type '" "int *""'"); 
+  }
+  arg5 = (int *)(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "bcor_test" "', argument " "6"" of type '" "int *""'"); 
+  }
+  arg6 = (int *)(argp6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res7)) {
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "bcor_test" "', argument " "7"" of type '" "int *""'"); 
+  }
+  arg7 = (int *)(argp7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res8)) {
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "bcor_test" "', argument " "8"" of type '" "int *""'"); 
+  }
+  arg8 = (int *)(argp8);
+  res9 = SWIG_ConvertPtr(obj8, &argp9,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res9)) {
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "bcor_test" "', argument " "9"" of type '" "int *""'"); 
+  }
+  arg9 = (int *)(argp9);
+  res10 = SWIG_ConvertPtr(obj9, &argp10,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res10)) {
+    SWIG_exception_fail(SWIG_ArgError(res10), "in method '" "bcor_test" "', argument " "10"" of type '" "int *""'"); 
+  }
+  arg10 = (int *)(argp10);
+  res11 = SWIG_ConvertPtr(obj10, &argp11,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res11)) {
+    SWIG_exception_fail(SWIG_ArgError(res11), "in method '" "bcor_test" "', argument " "11"" of type '" "int *""'"); 
+  }
+  arg11 = (int *)(argp11);
+  bcor_test(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_bcov_test(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  double *arg1 = (double *) 0 ;
+  double *arg2 = (double *) 0 ;
+  double *arg3 = (double *) 0 ;
+  double *arg4 = (double *) 0 ;
+  int *arg5 = (int *) 0 ;
+  int *arg6 = (int *) 0 ;
+  int *arg7 = (int *) 0 ;
+  int *arg8 = (int *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  void *argp7 = 0 ;
+  int res7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:bcov_test",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_double, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "bcov_test" "', argument " "1"" of type '" "double *""'"); 
@@ -4024,17 +3951,91 @@ SWIGINTERN PyObject *_wrap_bcov_test(PyObject *SWIGUNUSEDPARM(self), PyObject *a
     SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "bcov_test" "', argument " "8"" of type '" "int *""'"); 
   }
   arg8 = (int *)(argp8);
-  res9 = SWIG_ConvertPtr(obj8, &argp9,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res9)) {
-    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "bcov_test" "', argument " "9"" of type '" "int *""'"); 
+  bcov_test(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_kbcov_test(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  double *arg1 = (double *) 0 ;
+  double *arg2 = (double *) 0 ;
+  double *arg3 = (double *) 0 ;
+  int *arg4 = (int *) 0 ;
+  int *arg5 = (int *) 0 ;
+  int *arg6 = (int *) 0 ;
+  int *arg7 = (int *) 0 ;
+  int *arg8 = (int *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  void *argp7 = 0 ;
+  int res7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOOOOOO:kbcov_test",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_double, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "kbcov_test" "', argument " "1"" of type '" "double *""'"); 
   }
-  arg9 = (int *)(argp9);
-  res10 = SWIG_ConvertPtr(obj9, &argp10,SWIGTYPE_p_int, 0 |  0 );
-  if (!SWIG_IsOK(res10)) {
-    SWIG_exception_fail(SWIG_ArgError(res10), "in method '" "bcov_test" "', argument " "10"" of type '" "int *""'"); 
+  arg1 = (double *)(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_double, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "kbcov_test" "', argument " "2"" of type '" "double *""'"); 
   }
-  arg10 = (int *)(argp10);
-  bcov_test(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10);
+  arg2 = (double *)(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_double, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "kbcov_test" "', argument " "3"" of type '" "double *""'"); 
+  }
+  arg3 = (double *)(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "kbcov_test" "', argument " "4"" of type '" "int *""'"); 
+  }
+  arg4 = (int *)(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "kbcov_test" "', argument " "5"" of type '" "int *""'"); 
+  }
+  arg5 = (int *)(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "kbcov_test" "', argument " "6"" of type '" "int *""'"); 
+  }
+  arg6 = (int *)(argp6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res7)) {
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "kbcov_test" "', argument " "7"" of type '" "int *""'"); 
+  }
+  arg7 = (int *)(argp7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res8)) {
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "kbcov_test" "', argument " "8"" of type '" "int *""'"); 
+  }
+  arg8 = (int *)(argp8);
+  kbcov_test(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4058,10 +4059,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"intArray_cast", _wrap_intArray_cast, METH_VARARGS, NULL},
 	 { (char *)"intArray_frompointer", _wrap_intArray_frompointer, METH_VARARGS, NULL},
 	 { (char *)"intArray_swigregister", intArray_swigregister, METH_VARARGS, NULL},
-	 { (char *)"bd_stat", _wrap_bd_stat, METH_VARARGS, NULL},
 	 { (char *)"bd_test", _wrap_bd_test, METH_VARARGS, NULL},
-	 { (char *)"bcov_stat", _wrap_bcov_stat, METH_VARARGS, NULL},
+	 { (char *)"bcor_test", _wrap_bcor_test, METH_VARARGS, NULL},
 	 { (char *)"bcov_test", _wrap_bcov_test, METH_VARARGS, NULL},
+	 { (char *)"kbcov_test", _wrap_kbcov_test, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 

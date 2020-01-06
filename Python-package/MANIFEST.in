@@ -1,7 +1,12 @@
-include README.rst
-include LICENSE
+include *.rst
+include setup.py
+include distutils.cfg
 recursive-include Ball *
 recursive-include src *
-include pre.sh
-include cygwinccompiler.py
-include distutils.cfg
+global-exclude *.o
+global-exclude *.a
+global-exclude *.pyo
+global-exclude *.pyc
+global-exclude cygwinccompiler.py
+global-exclude configure.sh
+recursive-exclude test *

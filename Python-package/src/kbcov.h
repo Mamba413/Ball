@@ -14,3 +14,11 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
+#ifndef KBCOV_H_
+#define KBCOV_H_
+
+// R API function:
+void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread);
+
+#endif /* KBCOV_H_ */

@@ -1,43 +1,31 @@
- Ball Statistics
+Ball Statistics
 ================
 
+Introdution
+------------
+The fundamental problems for data mining, statistical analysis, and machine learning are:
+- whether several distributions are different?
+- whether random variables are dependent?
+- how to pick out useful variables/features from a high-dimensional data?
 
-Introduction
-~~~~~~~~~~~~
+These issues can be tackled by using **bd_test**, **bcov_test**, and **bcorsis** functions in the **Ball** package, respectively. They enjoy following admirable advantages:
+- available for most of datasets (e.g., traditional tabular data, brain shape, functional connectome, wind direction and so on)
+- insensitive to outliers, distribution-free and model-free;
+- theoretically guaranteed and computationally efficient.
 
-The fundamental problems for data mining and statistical analysis are:
+Installation
+------------
+- Pypi version         
 
--  Whether distributions of two samples are distinct?
+To install the **Ball** Python package from Pypi, just run:        
+```
+pip install Ball
+```
 
--  Whether two random variables are dependent?
+- Building Ball library for Python for Windows with MinGW-w64 (Advanced)
 
-**Ball** package provides solutions for these issues. Moreover, a
-variable screening (or feature screening) procedure is also implemented
-to tackle ultra high dimensional data. The core functions in **Ball**
-package are **bd.test**, **bcov.test**, and **bcorsis**.
-
-These functions based on ball statistic have several advantages:
-
--  It's applicable to univariate and multivariate data in Banach space.
-
--  There is no need for moment assumption, which means that outliers and
-   heavy-tail data are no longer a problem.
-
--  They perform well in many setting without complex adjustments for
-   parameters.
-
-Particularly, for two-sample or K-sample problem, **bd.test** has been
-proved to cope well for imbalanced data, and **bcov.test** and
-**bcorsis** work well for detecting the relationship between complex
-responses and/or predictors, such as shape, compositional as well as
-censored data.
-
-Note
-~~~~~~
-First, you should download MinGW (https://sourceforge.net/projects/mingw/) and then
-add this path to an system environment variable "path".
-
-Anaconda3 is needed, and the version should be greater than 3.4.
-You should add the path of Anaconda3 to system environment variable "path" as above.
-
-Then you can pip install the Ball package!
+You could download MinGW (https://sourceforge.net/projects/mingw/) and then
+add the path ``MinGW/bin`` to system environment variable "path".
+Anaconda3 is also in needed, and the version should be greater than 3.4. You should 
+add all the related path of Anaconda3 to system environment variable "path",
+as well as the path of ``MinGW/bin``.
