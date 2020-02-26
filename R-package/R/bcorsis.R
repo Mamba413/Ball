@@ -31,8 +31,13 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
       dst_x <- as.integer(0)
     }
   } else {
-    x <- as.double(as.vector(x))
-    y <- as.double(as.vector(y))
+    x <- x[lower.tri(x)]
+    y <- y[lower.tri(y)]
+    x <- as.double(x)
+    y <- as.double(y)
+    
+    # x <- as.double(as.vector(x))
+    # y <- as.double(as.vector(y))
     dst_y <- as.integer(1)
     dst_x <- as.integer(1)
   }

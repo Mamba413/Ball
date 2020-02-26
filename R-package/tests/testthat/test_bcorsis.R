@@ -1,4 +1,5 @@
 library(Ball)
+library(testthat)
 require(mvtnorm)
 context("bcorsis function")
 skip_on_cran()
@@ -97,4 +98,33 @@ test_that("Ball Correlation based SIS with categorical variables is unreasonable
   x <- cbind(x[, 3:5], matrix(rnorm(n * p), ncol = p))
   res <- bcorsis(x = x, y = y, category = 1:3)
   expect_true(all(c(1, 2, 3) %in% head(res[["ix"]], n = 10)))
+})
+
+test_that("(Univariate) Incoherence between bcov and bcor!", {
+  set.seed(1)
+  num <- 10
+  x <- rnorm(num)
+  y <- rnorm(num)
+  
+  bcor_value <- bcor(x, y)
+  bcov_based_value <- bcov(x, y) / sqrt(bcov(x, x) * bcov(y, y))
+  
+  names(bcor_value) <- NULL
+  names(bcov_based_value) <- NULL
+  expect_equal(bcor_value, bcov_based_value)
+})
+
+
+test_that("(Multivariate) Incoherence between bcov and bcor!", {
+  set.seed(1)
+  num <- 10
+  x <- as.matrix(dist(rnorm(num)))
+  y <- as.matrix(dist(rnorm(num)))
+  
+  bcor_value <- bcor(x, y, distance = TRUE)
+  bcov_based_value <- bcov(x, y, distance = TRUE) / sqrt(bcov(x, x, distance = TRUE) * bcov(y, y, distance = TRUE))
+  
+  names(bcor_value) <- NULL
+  names(bcov_based_value) <- NULL
+  expect_equal(bcor_value, bcov_based_value)
 })
