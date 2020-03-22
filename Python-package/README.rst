@@ -29,3 +29,7 @@ add the path ``MinGW/bin`` to system environment variable "path".
 Anaconda3 is also in needed, and the version should be greater than 3.4. You should 
 add all the related path of Anaconda3 to system environment variable "path",
 as well as the path of ``MinGW/bin``.
+
+Authorship
+-----------
+Jin Zhu (zhuj37@mail2.sysu.edu.cn), Xueqin Wang (wangxq88@mail2.sysu.edu.cn)
