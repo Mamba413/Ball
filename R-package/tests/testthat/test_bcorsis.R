@@ -128,3 +128,18 @@ test_that("(Multivariate) Incoherence between bcov and bcor!", {
   names(bcov_based_value) <- NULL
   expect_equal(bcor_value, bcov_based_value)
 })
+
+
+test_that("(Multivariate) Incoherence between bcov and bcor!", {
+  set.seed(1)
+  num <- 10
+  x <- matrix(rnorm(num * 2), nrow = num)
+  y <- matrix(rnorm(num * 2), nrow = num)
+  
+  bcor_value <- bcor(x, y)
+  bcov_based_value <- bcov(x, y) / sqrt(bcov(x, x) * bcov(y, y))
+  
+  names(bcor_value) <- NULL
+  names(bcov_based_value) <- NULL
+  expect_equal(bcor_value, bcov_based_value)
+})

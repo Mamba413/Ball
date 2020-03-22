@@ -8,9 +8,17 @@
 \usage{
 bcov.test(x, ...)
 
-\method{bcov.test}{default}(x, y = NULL, num.permutations = 99,
-  method = c("permutation", "limit"), distance = FALSE,
-  weight = FALSE, seed = 1, num.threads = 0, ...)
+\method{bcov.test}{default}(
+  x,
+  y = NULL,
+  num.permutations = 99,
+  method = c("permutation", "limit"),
+  distance = FALSE,
+  weight = FALSE,
+  seed = 1,
+  num.threads = 0,
+  ...
+)
 
 \method{bcov.test}{formula}(formula, data, subset, na.action, ...)
 }

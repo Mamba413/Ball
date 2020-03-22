@@ -8,10 +8,19 @@
 \usage{
 bd.test(x, ...)
 
-\method{bd.test}{default}(x, y = NULL, num.permutations = 99,
-  method = c("permutation", "limit"), distance = FALSE, size = NULL,
-  seed = 1, num.threads = 0, kbd.type = c("sum", "maxsum", "max"),
-  weight = c("constant", "variance"), ...)
+\method{bd.test}{default}(
+  x,
+  y = NULL,
+  num.permutations = 99,
+  method = c("permutation", "limit"),
+  distance = FALSE,
+  size = NULL,
+  seed = 1,
+  num.threads = 0,
+  kbd.type = c("sum", "maxsum", "max"),
+  weight = c("constant", "variance"),
+  ...
+)
 
 \method{bd.test}{formula}(formula, data, subset, na.action, ...)
 }

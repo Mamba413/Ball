@@ -4,10 +4,17 @@
 \alias{bcorsis}
 \title{Ball Correlation based Sure Independence Screening (BCor-SIS)}
 \usage{
-bcorsis(x, y, d = "small", weight = c("constant", "probability",
-  "chisquare"), method = "standard", distance = FALSE,
-  category = FALSE, parms = list(d1 = 5, d2 = 5, df = 3),
-  num.threads = 0)
+bcorsis(
+  x,
+  y,
+  d = "small",
+  weight = c("constant", "probability", "chisquare"),
+  method = "standard",
+  distance = FALSE,
+  category = FALSE,
+  parms = list(d1 = 5, d2 = 5, df = 3),
+  num.threads = 0
+)
 }
 \arguments{
 \item{x}{a numeric matirx or data.frame included \eqn{n} rows and \eqn{p} columns. 

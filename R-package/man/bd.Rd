@@ -4,8 +4,14 @@
 \alias{bd}
 \title{Ball Divergence statistic}
 \usage{
-bd(x, y = NULL, distance = FALSE, size = NULL, num.threads = 1,
-  kbd.type = c("sum", "maxsum", "max"))
+bd(
+  x,
+  y = NULL,
+  distance = FALSE,
+  size = NULL,
+  num.threads = 1,
+  kbd.type = c("sum", "maxsum", "max")
+)
 }
 \arguments{
 \item{x}{a numeric vector, matrix, data.frame, or a list containing at least two numeric vectors, matrices, or data.frames.}
