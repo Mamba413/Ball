@@ -85,6 +85,21 @@ def examine_size_arguments(x, size):
         raise ValueError("size arguments is invalid!")
 
 
+def select_bcor_stat2(bcor_stat, weight):
+    if type(weight) != str:
+        raise ValueError("weight arguments is invalid")
+    else:
+        weight = weight.lower()
+        if weight == "constant":
+            bcor_stat = bcor_stat[0]
+        elif weight == "probability" or weight == "prob":
+            bcor_stat = bcor_stat[1]
+        elif weight == "chisquare" or weight == "chisq":
+            bcor_stat = bcor_stat[2]
+        else:
+            raise ValueError("weight arguments is invalid")
+    return bcor_stat
+
 def select_bcor_stat(y, x, x_num, f_num, n, distance, num_thread, weight):
     bcor_stat = bcor_test_wrap_c(y, x, x_num, f_num, n, distance, num_thread)
     if type(weight) != str:

@@ -8,6 +8,9 @@ Created on Fri Jul 26 10:24:01 2019
 from Ball.utilize import *
 from sklearn import linear_model
 from pygam import LinearGAM
+import numpy as np
+from Ball.cball import bcor_test
+from Ball.cball import doubleArray, intArray
 
 
 def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=False, params=(5, 5), num_thread=0):
@@ -200,7 +203,7 @@ def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=
     return ind
 
 
-def bcor(y, x, x_num, weight="constant", dst_y=False, num_thread=0):
+def bcor(x, y, distance=False, weight="constant"):
     """
     
     calculate sample version of ball covariance
@@ -222,40 +225,73 @@ def bcor(y, x, x_num, weight="constant", dst_y=False, num_thread=0):
 
     Examples
     --------     
-    >>> np.random.seed(10)    
-    >>> x = np.random.normal(0, 1, n*p).reshape((n, p))
-    >>> error = np.random.normal(0, 1, n)
-    >>> y = 3 * x[:, 1] * x[:, 5] * x[:, 10] + error
-    >>> result = bcor(y, x, x_num)
+    >>> from Ball import bcor
+    >>> import numpy as np
+    >>> np.random.seed(1234)    
+    >>> num = 5
+    >>> x = np.random.normal(0, 1, num)
+    >>> y = np.random.normal(0, 1, num)
+    >>> bcor(x, y)
     
-    >>> np.random.seed(1000)
-    >>> n = 150
-    >>> p = 3000
-    >>> mean = np.zeros(p)
-    >>> cov = np.array([0.5]*np.square(p)).reshape((p, p))
-    >>> cov[np.diag_indices(3000)] = 1
-    >>> x = np.random.multivariate_normal(mean, cov, n)
-    >>> error = np.random.normal(0, 1, n)
-    >>> y = 4*np.square(x[:, 2])+6*np.square(x[:, 1])+8*x[:, 3]-10*x[:,4]+error
-    >>> target = [4, 1, 924, 2, 692, 3, 400, 2241, 2839, 2194, 170]
-    >>> x_num = np.ones(3000)
-    >>> result = bcor(y, x, x_num)
-    
+    >>> ## distance matrix input
+    >>> from sklearn.metrics.pairwise import euclidean_distances
+    >>> x = np.array(x, ndmin=2).T
+    >>> y = np.array(y, ndmin=2).T
+    >>> x = euclidean_distances(x, x)
+    >>> y = euclidean_distances(y, y)
+    >>> bcor(x, y, distance=True)
     """
     examine_None(x)
     examine_None(y)
-    x = np.array(x).T.flatten()
-    examine_x_num_arguments(x, x_num)
-
-    f_num = len(x_num)
-    if type(x_num) == np.ndarray:
-        x_num = x_num.astype(int).tolist()
-    n = int(len(x) / (np.sum(x_num)))
-    if len(y.shape) > 1 and dst_y == True:
-        examine_distance_matrix(y)
-        y = [y[i][j] for i in range(np.alen(y)) for j in range(np.alen(y)) if i < j]
+    x = np.array(x, ndmin=2)
+    y = np.array(y, ndmin=2)
+    p = max(np.size(x, 0), np.size(y, 0))
+    n = np.size(x, 1)
+    
+    dst_y = intArray(1)
+    dst_x = intArray(1)   
+    dst_y[0] = 1
+    dst_x[0] = 1
+    if distance:
+        index = np.triu_indices(p, 1)
+        x = x[index]
+        y = y[index]
     else:
-        y = np.array(y).T.flatten()
+        if p != 1:
+            y = get_vectorized_distance_matrix(y)
+            x = get_vectorized_distance_matrix(x)
+        else:
+            dst_y[0] = 0
+            dst_x[0] = 0  
+            x = x[0]
+            y = y[0]
+            pass
+        pass
+    
+    bcor_stat = doubleArray(3)
+    y_copy = doubleArray(len(y))
+    x_copy = doubleArray(len(x))
+    for i, y_value in enumerate(y):
+        y_copy[i] = y_value
+        pass
+    for i, x_value in enumerate(x):
+        x_copy[i] = x_value
+        pass
+    x_number = intArray(1)
+    x_number[0] = 1
+    f_number = intArray(1)
+    f_number[0] = 1
+    num = intArray(1)
+    num[0] = n
+    p_copy = intArray(1)
+    p_copy[0] = p
+    k = intArray(1)
+    k[0] = 1
+    nth = intArray(1)
+    nth[0] = 1
 
-    bcor_stat = select_bcor_stat(y, x, x_num, f_num, n, dst_y, num_thread, weight)
+    bcor_test(bcor_stat, y_copy, x_copy, x_number, f_number, 
+              num, p_copy, k, dst_y, dst_x, nth)
+    bcor_stat_list = [bcor_stat[j] for j in range(3)]
+    bcor_stat = select_bcor_stat2(bcor_stat_list, weight)
     return bcor_stat

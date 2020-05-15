@@ -84,7 +84,8 @@ def bcor_test_wrap_c(y, x, x_num, f_num, n, dst_y, nthread):
     dst_x[0] = 0
     nthread_copy[0] = nthread
 
-    bcor_test(bcor_stat, y_copy, x_copy, x_num_copy, f_num_copy, size, n_copy, p, k, dst_y_copy, dst_x, nthread_copy)
+    bcor_test(bcor_stat, y_copy, x_copy, x_num_copy, f_num_copy, 
+              n_copy, p, k, dst_y_copy, dst_x, nthread_copy)
     # convert doubleArray to list:    
     bcor_stat_list = [bcor_stat[j] for j in range(3 * f_num)]
     bcor_stat_list = column_stack(nparray(bcor_stat_list).reshape(f_num, 3))

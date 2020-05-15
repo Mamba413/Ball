@@ -33,7 +33,7 @@ if is_windows:
       pass
 
 cball_module = Extension('Ball._cball',
-                         sources=['src/cball_wrap.c', 'src/BD.c', 'src/utilities.c', 'src/kbd.c', 'src/bcor.c', 'src/BI.c', 'src/kbcov.c'],
+                         sources=['src/cball.i', 'src/BD.c', 'src/utilities.c', 'src/kbd.c', 'src/bcor.c', 'src/BI.c', 'src/kbcov.c'],
                          extra_compile_args= default_compile_args,
                          extra_link_args=['-lgomp'],
                          libraries=ext_libraries,
@@ -46,7 +46,7 @@ with open(os.path.join(this_directory, 'README.rst'), encoding='utf-8') as f:
       long_description = f.read()
 
 setup(name='Ball',
-      version='0.2.8',
+      version='0.2.9',
       author="Jin Zhu, Xueqin Wang",
       author_email="zhuj37@mail2.sysu.edu.cn, wangxq88@mail.sysu.edu.cn",
       maintainer="Jin Zhu",
@@ -72,6 +72,6 @@ setup(name='Ball',
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7'
       ],
-      python_requires='>=3.4',
+      python_requires='>=3.5',
       ext_modules=[cball_module],
       )

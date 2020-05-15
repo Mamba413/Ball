@@ -127,3 +127,6 @@ test_bd_gwas.R
 Python-package/dist/Ball-0.2.1-cp35-cp35m-win_amd64.whl
 Python-package/dist/
 Python-package/configure.sh
+Python-package/docs/_build/
+Python-package/docs/make.bat
+Python-package/.spyproject/
