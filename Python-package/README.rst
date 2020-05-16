@@ -15,20 +15,21 @@ These issues can be tackled by using **bd_test**, **bcov_test**, and **bcorsis**
 
 Installation
 ------------
-- Pypi version         
+- Pypi version (stable)         
 
 To install the **Ball** Python package from Pypi, just run:        
 ```
 pip install Ball
 ```
 
-- Building Ball library for Python for Windows with MinGW-w64 (Advanced)
-
-You could download MinGW (https://sourceforge.net/projects/mingw/) and then
-add the path ``MinGW/bin`` to system environment variable "path".
-Anaconda3 is also in needed, and the version should be greater than 3.4. You should 
-add all the related path of Anaconda3 to system environment variable "path",
-as well as the path of ``MinGW/bin``.
+- Git version (development)
+## Windows
+Ball support compilation with MinGW. You need to install MinGW (https://sourceforge.net/projects/mingw/).
+Next, you should clone or download the Ball repo. 
+Then run the following from the root of the Ball directory: 
+```
+sh configure.sh your_python_path your_python_version_number # e.g.  sh configure.sh C:/anaconda3 35
+```
 
 Authorship
 -----------

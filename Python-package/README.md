@@ -25,9 +25,18 @@ To install the Ball Python package from Pypi, just run:
 pip install Ball
 ```
 
+- Git version (development)
+## Windows
+Ball support compilation with MinGW. You need to install MinGW (https://sourceforge.net/projects/mingw/).
+Next, you should clone or download the Ball repo. 
+Then run the following from the root of the Ball directory: 
+```
+sh configure.sh your_python_path your_python_version_number # e.g.  sh configure.sh C:/anaconda3 35
+```
+
 Overview: **Ball** package
 ----------
-Three most importance functions in **Ball**:		
+Three most importance functions in **Ball**:        
 
 |                       |         **bd.test**         |     **bcov.test**      |    **bcorsis**     |
 | --------------------- | :-------------------------: | :--------------------: | :----------------: |
