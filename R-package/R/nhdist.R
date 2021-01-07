@@ -142,11 +142,26 @@ distsurface <- function(x) {
 #' 
 distrieman <- function(x) {
   n <- dim(x)[3]
-  sapply(1:n, function(i) {
-    sapply(1:n, function(j) {
-      riemdist(x[,,i], x[,,j])
-    })
-  })
+  
+  dist_mat <- matrix(0, nrow = n, ncol = n)
+  for (i in 1:n) {
+    for (j in i:n) {
+      if (i != j) {
+        dist_mat[i, j] <- riemdist(x[, , i], x[, , j])
+        if (dist_mat[i, j] < 10 * .Machine$double.eps) {
+          dist_mat[i, j] <- 0
+        }
+        dist_mat[j, i] <- dist_mat[i, j]
+      }
+    }
+  }
+  dist_mat
+  
+  # sapply(1:n, function(i) {
+  #   sapply(1:n, function(j) {
+  #     riemdist(x[,,i], x[,,j])
+  #   })
+  # })
 }
 
 realtocomplex<-function(x)
