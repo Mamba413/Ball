@@ -27,7 +27,7 @@
 #include "Rinternals.h"
 #endif
 
-void Ball_Score(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
+void BD_Score(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
     int i, j, n;
     double TS_weight0 = 0.0, SS_weight0 = 0.0, TS_weight1 = 0.0, SS_weight1 = 0.0;
     double ball_score;
@@ -50,7 +50,7 @@ void Ball_Score(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
             ball_score += ans / p3 / (1 - p3);
         }
 #ifdef R_BUILD
-        Rprintf("%d-th Ball Score: %f\n", i, ball_score);
+        Rprintf("%d-th BD Score: %f", i, ball_score);
 #endif
 
     }
@@ -69,7 +69,7 @@ void Ball_Score(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
             ball_score += ans / p3 / (1 - p3);
         }
 #ifdef R_BUILD
-        Rprintf("%d-th Ball Score: %f\n", i, ball_score);
+        Rprintf("%d-th BD Score: %f", i, ball_score);
 #endif
     }
 }
@@ -188,8 +188,6 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
                 permuted_bd_w0[i] = bd_tmp[0];
                 permuted_bd_w1[i] = bd_tmp[1];
             }
-            free(i_perm);
-            free(i_perm_tmp);
         } else {
             int **i_perm_matrix, **i_perm_tmp_matrix;
             i_perm_matrix = alloc_int_matrix(*R, n);
@@ -218,10 +216,12 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
 
         free(permuted_bd_w0);
         free(permuted_bd_w1);
-        free_int_matrix(Ixy, n, n);
-        free_int_matrix(Rxy, n, n);
-        free_int_matrix(Rx, n, n);
     }
+    free_int_matrix(Ixy, n, n);
+    free_int_matrix(Rxy, n, n);
+    free_int_matrix(Rx, n, n);
+    free(i_perm);
+    free(i_perm_tmp);
 }
 
 /**

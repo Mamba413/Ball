@@ -4,13 +4,15 @@
 \name{genlung}
 \alias{genlung}
 \title{Lung cancer genomic data}
-\format{\itemize{
+\format{
+\itemize{
 \code{genlung$survival}: A data.frame containing \eqn{n=123} complete observations. 
 The first column is disease-free survival time and the 
 second column is censoring status. 
 
 \code{genlung$covariate}: A data.frame containing \eqn{p=2000} covariates.
-}}
+}
+}
 \description{
 Publicly available lung cancer genomic data from the Chemores Cohort Study, containing 
 the expression levels of mRNA, miRNA, artificial noise variables as well as clinical variables and response.

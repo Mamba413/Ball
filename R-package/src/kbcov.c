@@ -2,8 +2,16 @@
 
 #include "stdio.h"
 #include "stdlib.h"
-#include "math.h"
 #include "utilities.h"
+
+#ifdef R_BUILD
+#include "R.h"
+#include "Rinternals.h"
+#else
+
+#include "time.h"
+
+#endif
 
 void K_U_Ball_Covariance(double *kbcov_stat, double **x, int **i_perm, int *n, int *k) {
     // TODO...
@@ -120,6 +128,10 @@ void KBCOV(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R
                     break;
                 }
                 resample_matrix(i_perm, k, n);
+                // for (int j = 0; j < *k; j++) {
+                //     for (int i = 0; i < *n; i++) { Rprintf("%d, ", i_perm[j][i]); }
+                //     Rprintf("\n");
+                // }
                 K_Ball_Covariance(bcov_tmp, Dx, Rx, i_perm, n, k);
                 permuted_bcov_weight0[r] = bcov_tmp[0];
                 permuted_bcov_weight_prob[r] = bcov_tmp[1];
@@ -178,9 +190,19 @@ void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, i
     }
 #endif
 
+#ifdef R_BUILD
+    GetRNGstate();
+#else
+    srand((unsigned) time(NULL));
+#endif
+
     if (*dst == 1) {
         KBCOV(kbcov_stat, pvalue, x, k, n, R, thread);
     } else {
         UKBCOV(kbcov_stat, pvalue, x, k, n, R, thread);
     }
+    
+#ifdef R_BUILD
+    PutRNGstate();
+#endif
 }

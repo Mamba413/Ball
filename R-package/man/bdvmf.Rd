@@ -4,11 +4,13 @@
 \name{bdvmf}
 \alias{bdvmf}
 \title{Simulated von Mises-Fisher Data}
-\format{\itemize{
+\format{
+\itemize{
 \code{bdvmf$x}: A \eqn{300 \times 3} numeric matrix containing simulated von Mises-Fisher data. 
 
 \code{bdvmf$group}: A group index vector.
-}}
+}
+}
 \description{
 Simulated random vectors following the von Mises-Fisher distribution 
 with mean direction \eqn{\mu_{x}=(1, 0, 0)} and \eqn{\mu_{y}=(1, 1, 1)}, 

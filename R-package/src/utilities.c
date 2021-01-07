@@ -13,17 +13,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "math.h"
+
 #include "utilities.h"
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
 
 #ifdef R_BUILD
+
+#include "Rmath.h"
 #include "R.h"
 #include "Rinternals.h"
+
+#define RAND_MAX_CONSTANT 2147483647
+
 #else
 
+#include "math.h"
 #include "time.h"
 
 #endif
@@ -1089,7 +1095,7 @@ void resample(int *i_perm, int *i_perm_inv, int *n) {
 #ifdef R_BUILD
     GetRNGstate();
     for (i = *n - 1; i > 0; --i) {
-        j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
+        j = ((int) fround(RAND_MAX_CONSTANT * unif_rand(), 0)) % (i + 1);
         temp = i_perm[j];
         i_perm[j] = i_perm[i];
         i_perm[i] = temp;
@@ -1116,7 +1122,7 @@ void shuffle_indicator_inv_matrix(int **i_perm_matrix, int **i_perm_matrix_inv, 
     GetRNGstate();
     for (int i = 0; i < num_permutation; i++) {
         for (int j = num - 1; j > 0; --j) {
-            k = ((int) round(RAND_MAX * unif_rand())) % (j + 1);
+            k = ((int) fround(RAND_MAX_CONSTANT * unif_rand(), 0)) % (j + 1);
             temp = init_perm[k];
             init_perm[k] = init_perm[j];
             init_perm[j] = temp;
@@ -1148,17 +1154,18 @@ void shuffle_indicator_inv_matrix(int **i_perm_matrix, int **i_perm_matrix_inv, 
 
 void resample_matrix(int **i_perm, int *r, int *c) {
 #ifdef R_BUILD
-    GetRNGstate();
+    // GetRNGstate();
     int i, j, k, temp;
+    // Rprintf("RAND_MAX_CONSTANT: %d", RAND_MAX_CONSTANT);
     for (k = 0; k < *r; k++) {
         for (i = *c - 1; i > 0; --i) {
-            j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
+            j = ((int) fround(RAND_MAX_CONSTANT * unif_rand(), 0)) % (i + 1);
             temp = i_perm[k][j];
             i_perm[k][j] = i_perm[k][i];
             i_perm[k][i] = temp;
         }
     }
-    PutRNGstate();
+    // PutRNGstate();
 #else
     srand((unsigned) time(NULL));
     int i, j, k, temp;
@@ -1176,11 +1183,11 @@ void resample_matrix(int **i_perm, int *r, int *c) {
 void resample_matrix_3d(int ***i_perm, int **init_perm, int *h, int *r, int *c) {
     int j, temp;
 #ifdef R_BUILD
-    GetRNGstate();
+    // GetRNGstate();
     for (int l = 0; l < *h; ++l) {
         for (int k = 0; k < *r; k++) {
             for (int i = *c - 1; i > 0; --i) {
-                j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
+                j = ((int) fround(RAND_MAX_CONSTANT * unif_rand(), 0)) % (i + 1);
                 temp = init_perm[k][j];
                 init_perm[k][j] = init_perm[k][i];
                 init_perm[k][i] = temp;
@@ -1190,7 +1197,7 @@ void resample_matrix_3d(int ***i_perm, int **init_perm, int *h, int *r, int *c) 
             memcpy(i_perm[l][k], init_perm[k], (*c * sizeof(int)));
         }
     }
-    PutRNGstate();
+    // PutRNGstate();
 #else
     srand((unsigned) time(NULL));
     for (int l = 0; l < *h; ++l) {
@@ -1214,7 +1221,7 @@ void resample2(int *i_perm, int *n) {
 #ifdef R_BUILD
     GetRNGstate();
     for (i = *n - 1; i > 0; --i) {
-        j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
+        j = ((int) fround(RAND_MAX_CONSTANT * unif_rand(), 0)) % (i + 1);
         temp = i_perm[j];
         i_perm[j] = i_perm[i];
         i_perm[i] = temp;
@@ -1237,7 +1244,7 @@ void resample2_matrix(int **i_perm, int *init_perm, int num_permutation, int n) 
     GetRNGstate();
     for (int r = 0; r < num_permutation; r++) {
         for (i = n - 1; i > 0; --i) {
-            j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
+            j = ((int) fround(RAND_MAX_CONSTANT * unif_rand(), 0)) % (i + 1);
             temp = init_perm[j];
             init_perm[j] = init_perm[i];
             init_perm[i] = temp;
@@ -1267,7 +1274,7 @@ void resample_indicator_label(int *i_perm, int *i_perm_tmp, int n, int *n1) {
 #ifdef R_BUILD
     GetRNGstate();
     for (i = n - 1; i > 0; --i) {
-        j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
+        j = ((int) fround(RAND_MAX_CONSTANT * unif_rand(), 0)) % (i + 1);
         temp = i_perm[j];
         i_perm[j] = i_perm[i];
         i_perm[i] = temp;
@@ -1299,7 +1306,7 @@ void resample_indicator_label_matrix(int **i_perm_matrix, int **i_perm_tmp_matri
     GetRNGstate();
     for (int k = 0; k < num_permutation; ++k) {
         for (i = n - 1; i > 0; --i) {
-            j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
+            j = ((int) fround(RAND_MAX_CONSTANT * unif_rand(), 0)) % (i + 1);
             temp = init_perm[j];
             init_perm[j] = init_perm[i];
             init_perm[i] = temp;
@@ -1344,7 +1351,7 @@ void resample_indicator_label_matrix(int **i_perm_matrix, int **i_perm_tmp_matri
 }
 
 /* Arrange the N elements of ARRAY in random order.
- Only effective if N is much smaller than RAND_MAX;
+ Only effective if N is much smaller than RAND_MAX_CONSTANT;
  if this may not be the case, use a better random
  number generator. */
 void shuffle(int *array, int *N) {
@@ -1352,7 +1359,7 @@ void shuffle(int *array, int *N) {
 #ifdef R_BUILD
     GetRNGstate();
     for (int i = *N - 1; i > 0; --i) {
-        j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
+        j = ((int) fround(RAND_MAX_CONSTANT * unif_rand(), 0)) % (i + 1);
         tmp = array[j];
         array[j] = array[i];
         array[i] = tmp;
@@ -1361,7 +1368,7 @@ void shuffle(int *array, int *N) {
 #else
     srand((unsigned) time(NULL));
     for (int i = 0; i < *N - 1; i++) {
-        j = i + rand() / (RAND_MAX / (*N - i) + 1);
+        j = i + rand() / (RAND_MAX_CONSTANT / (*N - i) + 1);
         tmp = array[j];
         array[j] = array[i];
         array[i] = tmp;
@@ -1375,7 +1382,7 @@ void shuffle_value(double *array, int *N) {
 #ifdef R_BUILD
     GetRNGstate();
     for (int i = *N - 1; i > 0; --i) {
-        j = ((int) round(RAND_MAX * unif_rand())) % (i + 1);
+        j = ((int) fround(RAND_MAX_CONSTANT * unif_rand(), 0)) % (i + 1);
         tmp = array[j];
         array[j] = array[i];
         array[i] = tmp;
@@ -1384,7 +1391,7 @@ void shuffle_value(double *array, int *N) {
 #else
     srand((unsigned) time(NULL));
     for (int i = 0; i < *N - 1; i++) {
-        j = i + rand() / (RAND_MAX / (*N - i) + 1);
+        j = i + rand() / (RAND_MAX_CONSTANT / (*N - i) + 1);
         tmp = array[j];
         array[j] = array[i];
         array[i] = tmp;
@@ -1399,7 +1406,7 @@ void shuffle_value_matrix(double **value_matrix, double *init_value, int num_per
     GetRNGstate();
     for (int i = 0; i < num_permutation; i++) {
         for (int j = num - 1; j > 0; --j) {
-            k = ((int) round(RAND_MAX * unif_rand())) % (j + 1);
+            k = ((int) fround(RAND_MAX_CONSTANT * unif_rand(), 0)) % (j + 1);
             tmp = init_value[k];
             init_value[k] = init_value[j];
             init_value[j] = tmp;
@@ -1412,7 +1419,7 @@ void shuffle_value_matrix(double **value_matrix, double *init_value, int num_per
     srand((unsigned) time(NULL));
     for (k = 0; k < num_permutation; ++k) {
         for (i = 0; i < num - 1; i++) {
-            j = i + rand() / (RAND_MAX / (num - i) + 1);
+            j = i + rand() / (RAND_MAX_CONSTANT / (num - i) + 1);
             tmp = init_value[j];
             init_value[j] = init_value[i];
             init_value[i] = tmp;

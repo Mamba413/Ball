@@ -188,8 +188,6 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
                 permuted_bd_w0[i] = bd_tmp[0];
                 permuted_bd_w1[i] = bd_tmp[1];
             }
-            free(i_perm);
-            free(i_perm_tmp);
         } else {
             int **i_perm_matrix, **i_perm_tmp_matrix;
             i_perm_matrix = alloc_int_matrix(*R, n);
@@ -218,10 +216,12 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
 
         free(permuted_bd_w0);
         free(permuted_bd_w1);
-        free_int_matrix(Ixy, n, n);
-        free_int_matrix(Rxy, n, n);
-        free_int_matrix(Rx, n, n);
     }
+    free_int_matrix(Ixy, n, n);
+    free_int_matrix(Rxy, n, n);
+    free_int_matrix(Rx, n, n);
+    free(i_perm);
+    free(i_perm_tmp);
 }
 
 /**

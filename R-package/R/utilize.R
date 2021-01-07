@@ -1,3 +1,7 @@
+.onUnload <- function (libpath) {
+  library.dynam.unload("Ball", libpath)
+}
+
 WEIGHT_TYPE <- c("constant", "probability", "chisquare")
 BD_WEIGHT_TYPE <- c("constant", "variance")
 

@@ -4,11 +4,13 @@
 \name{macaques}
 \alias{macaques}
 \title{Male and Female macaque data}
-\format{\itemize{
+\format{
+\itemize{
 \code{macaques$x}: An array of dimension \eqn{7 \times 3 \times 18}
 
 \code{macaques$group}: A factor indicating the sex ('m' for male and 'f' for female)
-}}
+}
+}
 \description{
 Male and female macaque skull data. 7 landmarks in 3 dimensions, 
 18 individuals (9 males, 9 females)

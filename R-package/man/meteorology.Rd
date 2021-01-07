@@ -4,7 +4,8 @@
 \name{meteorology}
 \alias{meteorology}
 \title{meteorological data}
-\format{\itemize{
+\format{
+\itemize{
 \code{meteorology$air}: A data.frame containing 3 variables: maximum, minimum and average daily air temperature
 
 \code{meteorology$soil}: A data.frame containing 3 covariates: maximum, minimum and average daily soil temperature
@@ -14,7 +15,8 @@
 \code{meteorology$wind}: a vector object record total wind, measured in miles per day
 
 \code{meteorology$evaporation}: a vector object record evaporation
-}}
+}
+}
 \description{
 A meteorological data include 46 records about air, soil, humidity, wind and evaporation.
 }

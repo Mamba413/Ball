@@ -129,3 +129,5 @@ Python-package/dist/
 Python-package/docs/_build/
 Python-package/docs/make.bat
 Python-package/.spyproject/
+Python-package/.vscode/launch.json
+Python-package/.vscode/
