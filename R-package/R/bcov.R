@@ -316,7 +316,10 @@ bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, we
     }
   } else {
     set.seed(seed = examine_seed_arguments(seed))
-    result <- bcov_test_wrap_c(x = x, y = y, n = num, num.permutations = num.permutations, distance = distance, num.threads = num.threads)
+    result <- bcov_test_wrap_c(x = x, y = y, n = num, 
+                               num.permutations = num.permutations, 
+                               distance = distance, num.threads = num.threads)
+    set.seed(NULL)
     return(result)
   }
 }
@@ -436,8 +439,10 @@ kbcov_test_internal <- function(x, num.permutations = 99, distance = FALSE, weig
     }
   } else {
     set.seed(seed = examine_seed_arguments(seed))
-    result <- kbcov_test_wrap_c(x = x, K = var_num, n = num, num.permutations = num.permutations, 
+    result <- kbcov_test_wrap_c(x = x, K = var_num, n = num, 
+                                num.permutations = num.permutations, 
                                 distance = distance, num.threads = num.threads)
+    set.seed(NULL)
     return(result)
   }
   

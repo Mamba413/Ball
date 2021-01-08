@@ -265,8 +265,10 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99,
     ## examine seed arguments:
     set.seed(examine_seed_arguments(seed))
     ## hypothesis test:
-    result <- bd_test_wrap_c(xy, size, num.permutations, weight, distance, num.threads)
+    result <- bd_test_wrap_c(xy, size, num.permutations, 
+                             weight, distance, num.threads)
     # pvalue <- calculatePvalue(result[["statistic"]], result[["permuted_stat"]])
+    set.seed(NULL)
   }
   # output information:
   if (result[["info"]][["K"]] == 2) {
