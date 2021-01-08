@@ -14,31 +14,44 @@
 #endif
 
 void ball_divergence2(double *bd_stat, int **full_rank, int **sub_rank1, int **sub_rank2, int n1, int n2) {
-    double pxx, pxy, pyx, pyy, diff;
-    double A_nm = 0.0, C_nm = 0.0;
-    double n1_prop = 1.0 / n1, n2_prop = 1.0 / n2;
+    double pxx, pxy, pyx, pyy, diff, p_all;
+    double A_nm = 0.0, C_nm = 0.0, A_nm_w1 = 0.0, C_nm_w1 = 0.0;
+    double n1_prop = 1.0 / n1, n2_prop = 1.0 / n2, n_prop = 1.0 / (n1 + n2);
+
     for (int i = 0; i < n1; ++i) {
         for (int j = 0; j < n1; ++j) {
+            p_all = full_rank[i][j] * n_prop;
+            if (p_all * (1 - p_all) == 0) { continue; }
+
             pxx = sub_rank1[i][j] * n1_prop;
             pxy = (full_rank[i][j] - sub_rank1[i][j]) * n2_prop;
             diff = pxx - pxy;
-            A_nm += diff * diff;
-            // TODO: weighted Ball Divergence
+            diff = diff * diff;
+            A_nm += diff;
+            A_nm_w1 += diff / p_all / (1 - p_all);
         }
     }
     A_nm *= (n1_prop * n1_prop);
+    A_nm_w1 *= (n1_prop * n1_prop);
+
     for (int i = 0; i < n2; ++i) {
         for (int j = 0; j < n2; ++j) {
+            p_all = full_rank[i + n1][j + n1] * n_prop;
+            if (p_all * (1 - p_all) == 0) { continue; }
+
             pyy = sub_rank2[i][j] * n2_prop;
             pyx = (full_rank[i + n1][j + n1] - sub_rank2[i][j]) * n1_prop;
             diff = pyy - pyx;
-            C_nm += diff * diff;
-            // TODO: weighted Ball Divergence
+            diff = diff * diff;
+            C_nm += diff;
+            C_nm_w1 += diff / p_all / (1 - p_all);
         }
     }
     C_nm *= (n2_prop * n2_prop);
+    C_nm_w1 *= (n2_prop * n2_prop);
+
     bd_stat[0] = A_nm + C_nm;
-    bd_stat[1] = A_nm + C_nm;
+    bd_stat[1] = A_nm_w1 + C_nm_w1;
 }
 
 /**
@@ -320,6 +333,7 @@ void asymptotic_ball_divergence(double *asymptotic_bd_stat, int ***full_rank, in
             s++;
         }
     }
+    free_matrix(bd_stat_array, bd_stat_number, 2);
 }
 
 void compute_pairwise_size(int *pairwise_size, const int *size, const int *k) {

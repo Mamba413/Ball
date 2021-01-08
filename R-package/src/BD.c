@@ -89,14 +89,14 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
     double TS_weight0 = 0.0, SS_weight0 = 0.0, TS_weight1 = 0.0, SS_weight1 = 0.0;
     double p1, p2, p3, ans;
     n = *n1 + *n2;
-    double inv_n1 = 1.0 / (1.0 * *n1), inv_n2 = 1.0 / (1.0 * *n2);
+    double inv_n1 = 1.0 / (1.0 * *n1), inv_n2 = 1.0 / (1.0 * *n2), inv_n = 1.0 / (1.0 * n);
 
     // Calculate A_{ij}^{X} and A_{ij}^{Y}:
     for (i = 0; i < *n1; i++) {
         for (j = 0; j < *n1; j++) {
             p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
             p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
-            p3 = (p1 + p2) / n;
+            p3 = (p1 + p2) * inv_n;
             if (p3 * (1 - p3) == 0) { continue; }
             ans = p1 * inv_n1  - p2 * inv_n2;
             ans = ans * ans;
@@ -109,7 +109,7 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
         for (j = *n1; j < n; j++) {
             p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
             p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
-            p3 = (p1 + p2) / n;
+            p3 = (p1 + p2) * inv_n;
             if (p3 * (1 - p3) == 0) { continue; }
             ans = p1 * inv_n1  - p2 * inv_n2;
             ans = ans * ans;

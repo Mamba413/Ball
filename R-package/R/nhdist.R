@@ -126,6 +126,8 @@ distsurface <- function(x) {
   diag(Dmat) <- 1
   suppressWarnings(Dmat <- acos(Dmat))
   Dmat[is.na(Dmat)] <- 1
+  Dmat <- (Dmat + t(Dmat)) / 2
+  Dmat <- round(Dmat, digits = 13)
   Dmat
 }
 
