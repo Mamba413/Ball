@@ -1,3 +1,7 @@
+# Ball 1.3.10
+* Add variance (Chi-square) weight for K-sample Ball Divergence test.
+* Refine distance computation
+
 # Ball 1.3.9
 * *bcorsis* can conveniently analyze category variables (e.g., GWAS datasets).
 * Add permutation-free method for the Ball Divergence and Ball Covariance test (both only for constant weight now).
