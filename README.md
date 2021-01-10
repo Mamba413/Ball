@@ -1,7 +1,7 @@
-<img src=https://github.com/Mamba413/git_picture/blob/master/scrcss.jpg width=135/> Ball Statistics
+Ball Statistics <img src='https://raw.githubusercontent.com/Mamba413/git_picture/master/ball_logo.png' align="right" height="120" />
 ===========
 
-[![Travis Build Status](https://travis-ci.org/Mamba413/Ball.svg?branch=master)](https://travis-ci.org/Mamba413/Ball)
+<!-- [![Travis Build Status](https://travis-ci.org/Mamba413/Ball.svg?branch=master)](https://travis-ci.org/Mamba413/Ball) -->
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Mamba413/Ball?branch=master&svg=true)](https://ci.appveyor.com/project/Mamba413/Ball)
 [![CRAN Status Badge](http://www.r-pkg.org/badges/version/Ball)](https://CRAN.R-project.org/package=Ball)
 [![PyPI version](https://badge.fury.io/py/Ball.svg)](https://pypi.python.org/pypi/Ball/)
