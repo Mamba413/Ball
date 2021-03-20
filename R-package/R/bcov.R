@@ -52,7 +52,7 @@
 #' in the \code{complete.info} element of output. We give a quick example below to illustrate. 
 #' 
 #' @references Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu & Jin Zhu (2019) Ball Covariance: A Generic Measure of Dependence in Banach Space, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1543600
-#' @references Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. http://arxiv.org/abs/1811.03750
+#' @references Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2021). Ball: An R Package for Detecting Distribution Difference and Association in Metric Spaces, Journal of Statistical Software, Vol.97(6), doi: 10.18637/jss.v097.i06.
 #' 
 #' @rdname bcov.test
 #' 
@@ -601,7 +601,7 @@ bcov_test_internal_wrap <- function(x = x, y = y, num.permutations, distance, se
 #' 
 #' @references Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu & Jin Zhu (2019) Ball Covariance: A Generic Measure of Dependence in Banach Space, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1543600
 #' @references Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) A Generic Sure Independence Screening Procedure, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709
-#' @references Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. http://arxiv.org/abs/1811.03750
+#' @references Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2021). Ball: An R Package for Detecting Distribution Difference and Association in Metric Spaces, Journal of Statistical Software, Vol.97(6), doi: 10.18637/jss.v097.i06.
 #' 
 #' @examples
 #' ############# Ball Covariance #############

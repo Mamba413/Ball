@@ -124,7 +124,6 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
 #' \code{\link{bcor}}
 #' 
 #' @references Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) A Generic Sure Independence Screening Procedure, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709
-#' @references Jin, Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and association in metric spaces. arXiv preprint arXiv:1811.03750. URL http://arxiv.org/abs/1811.03750.
 #' 
 #' @export
 #' @examples 

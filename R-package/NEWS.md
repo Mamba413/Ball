@@ -1,3 +1,6 @@
+# Ball 1.3.11
+* Update citation information and reference.
+
 # Ball 1.3.10
 * Add variance (Chi-square) weight for K-sample Ball Divergence test.
 * Refine distance computation

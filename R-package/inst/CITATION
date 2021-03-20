@@ -1,0 +1,23 @@
+bibentry(bibtype = "Article",
+  title        = "{Ball}: An {R} Package for Detecting Distribution Difference and Association in Metric Spaces",
+  author       = c(person(given = "Jin",
+                          family = "Zhu",
+                          email = "zhuj37@mail2.sysu.edu.cn"),
+                   person(given = "Wenliang",
+                          family = "Pan",
+                          email = "panwliang@mail.sysu.edu.cn"),
+                   person(given = "Wei",
+                          family = "Zheng",
+                          email = "wzheng9@utk.edu"),
+                   person(given = "Xueqin",
+                          family = "Wang",
+                          email = "wangxq20@ustc.edu.cn")),
+  journal      = "Journal of Statistical Software",
+  year         = "2021",
+  volume       = "97",
+  number       = "6",
+  pages        = "1--31",
+  doi          = "10.18637/jss.v097.i06",
+
+  header       = "To cite Ball in publications use:"
+)

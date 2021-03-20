@@ -20,3 +20,4 @@ github
 ^cran-comments\.md$
 ^\.travis\.yml$
 ^appveyor\.yml$
+^..pdf$
