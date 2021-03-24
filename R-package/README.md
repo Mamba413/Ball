@@ -136,6 +136,25 @@ important variables in 3000 explanatory variables which is consistent to the sim
 }
 ``` -->
 
+Citation
+----------
+If you use Ball or reference our vignettes in a presentation or publication, we would appreciate citations of our package.
+> Zhu J, Pan W, Zheng W, Wang X (2021). “Ball: An R Package for Detecting Distribution Difference and Association in Metric Spaces.” Journal of Statistical Software, 97(6), 1–31. doi: 10.18637/jss.v097.i06.
+
+Here is the corresponding Bibtex entry
+```
+@Article{,
+  title = {{Ball}: An {R} Package for Detecting Distribution Difference and Association in Metric Spaces},
+  author = {Jin Zhu and Wenliang Pan and Wei Zheng and Xueqin Wang},
+  journal = {Journal of Statistical Software},
+  year = {2021},
+  volume = {97},
+  number = {6},
+  pages = {1--31},
+  doi = {10.18637/jss.v097.i06},
+}
+```
+
 Reference
 ----------
 - Pan, Wenliang; Tian, Yuan; Wang, Xueqin; Zhang, Heping. [Ball Divergence: Nonparametric two sample test](https://projecteuclid.org/euclid.aos/1525313077). Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. [https://projecteuclid.org/euclid.aos/1525313077](https://projecteuclid.org/euclid.aos/1525313077)
