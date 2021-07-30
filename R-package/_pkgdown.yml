@@ -3,3 +3,9 @@ destination: docs
 template:
   params:
     bootswatch: cerulean
+
+repo:
+  url:
+    home: https://github.com/Mamba413/Ball/
+    source: https://github.com/Mamba413/Ball/tree/master/R-package/
+    issue: https://github.com/Mamba413/Ball/issues/
