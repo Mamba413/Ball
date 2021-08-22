@@ -114,6 +114,15 @@ src/.idea/dictionaries/JinZhu.xml
 src/cmake-build-debug/
 note.md
 Ball_1.3.5.zip
+src/cball/cball/x64/Debug/vc140.idb
+src/cball/cball/x64/Debug/cball.tlog/CL.command.1.tlog
+src/cball/cball/ClassDiagram.cd
+src/cball/cball/x64/Debug/cball.tlog/link.write.1.tlog
+src/cball/cball/x64/Debug/cball.tlog/link.read.1.tlog
+src/cball/cball/x64/Debug/cball.tlog/link.command.1.tlog
+src/cball/cball/x64/Debug/cball.tlog/cball.lastbuildstate
+src/cball/cball/x64/Debug/cball.tlog/CL.write.1.tlog
+src/cball/cball/x64/Debug/cball.tlog/CL.read.1.tlog
 src/test/lib/
 src/.idea/.name
 src/.idea/vcs.xml
