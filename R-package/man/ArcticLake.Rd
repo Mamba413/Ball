@@ -4,11 +4,13 @@
 \name{ArcticLake}
 \alias{ArcticLake}
 \title{Arctic lake sediment samples of different water depth}
-\format{\itemize{
+\format{
+\itemize{
 \code{ArcticLake$depth}: water depth (in meters). 
 
 \code{ArcticLake$x}: compositions of three covariates: sand, silt, and clay.
-}}
+}
+}
 \source{
 Aitchison: CODA microcomputer statistical package, 1986, the file name ARCTIC.DAT, here included under the GNU Public Library Licence Version 2 or newer.
 }

@@ -5,9 +5,9 @@ skip_on_cran()
 
 test_that("Error if computation result for ball divergence is wrong!", {
   target_value <- 2.4032
-  names(target_value) <- "kbd.sum"
+  names(target_value) <- "kbd.sum.constant"
   expect_equal(bd(1:15, size = c(5, 5, 5)), target_value)
-  expect_equal(bd.test(1:15, size = c(5, 5, 5), R = 0), target_value)
+  expect_equal(bd.test(1:15, size = c(5, 5, 5), num.permutations = 0), target_value)
 })
 
 
@@ -30,47 +30,53 @@ test_that("bd, bd.test function return unmatched ball divergence statistic", {
   res1 <- bd(dat, kbd.type = "sum")
   res2 <- bd(dat, kbd.type = "max")
   res3 <- bd(dat, kbd.type = "maxsum")
-  expect_equal(names(res1), "kbd.sum")
-  expect_equal(names(res2), "kbd.max")
-  expect_equal(names(res3), "kbd.maxsum")
+  expect_equal(names(res1), "kbd.sum.constant")
+  expect_equal(names(res2), "kbd.max.constant")
+  expect_equal(names(res3), "kbd.maxsum.constant")
   
   res1 <- bd.test(dat, kbd.type = "sum")
   res2 <- bd.test(dat, kbd.type = "max")
   res3 <- bd.test(dat, kbd.type = "maxsum")
-  expect_equal(names(res1[["statistic"]]), "kbd.sum")
-  expect_equal(names(res2[["statistic"]]), "kbd.max")
-  expect_equal(names(res3[["statistic"]]), "kbd.maxsum")
+  expect_equal(names(res1[["statistic"]]), "kbd.sum.constant")
+  expect_equal(names(res2[["statistic"]]), "kbd.max.constant")
+  expect_equal(names(res3[["statistic"]]), "kbd.maxsum.constant")
   
-  expect_equal(names(res1[["p.value"]]), "kbd.sum.pvalue")
-  expect_equal(names(res2[["p.value"]]), "kbd.max.pvalue")
-  expect_equal(names(res3[["p.value"]]), "kbd.maxsum.pvalue")
+  expect_equal(names(res1[["p.value"]]), "kbd.sum.constant.pvalue")
+  expect_equal(names(res2[["p.value"]]), "kbd.max.constant.pvalue")
+  expect_equal(names(res3[["p.value"]]), "kbd.maxsum.constant.pvalue")
 })
 
 
 test_that("Multi-thread computation via permutation for univariate K-sample problem", {
-  n1 <- 200
-  n2 <- 200
-  n3 <- 200
+  set.seed(1)
+  n1 <- 100
+  n2 <- 100
+  n3 <- 100
   x <- rnorm(n1)
   y <- rnorm(n2)
   z <- rnorm(n3)
-  fit1 <- bd.test(list(x, y, z), R = 399, num.threads = 1)
-  fit2 <- bd.test(list(x, y, z), R = 399, num.threads = 2)
-  fit3 <- bd.test(list(x, y, z), R = 399, num.threads = 4)
+  fit1 <- bd.test(list(x, y, z), num.permutations = 399, num.threads = 1, seed = 1)
+  fit2 <- bd.test(list(x, y, z), num.permutations = 399, num.threads = 2, seed = 1)
+  fit3 <- bd.test(list(x, y, z), num.permutations = 399, num.threads = 4, seed = 1)
   expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
   expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
+  expect_equal(fit1[["complete.info"]][["p.value"]], fit2[["complete.info"]][["p.value"]])
+  expect_equal(fit1[["complete.info"]][["p.value"]], fit3[["complete.info"]][["p.value"]])
 })
 
 test_that("Multi-thread computation via permutation for multivariate K-sample problem", {
-  X <- matrix(rnorm(100*10), ncol = 10)
-  Y <- matrix(rnorm(100*10), ncol = 10)
-  Z <- matrix(rnorm(100*10), ncol = 10)
+  set.seed(1)
+  X <- matrix(rnorm(100 * 10), ncol = 10)
+  Y <- matrix(rnorm(100 * 10), ncol = 10)
+  Z <- matrix(rnorm(100 * 10), ncol = 10)
   
-  fit1 <- bd.test(list(X, Y, Z), R = 399, size = c(100, 100, 100), num.threads = 1)
-  fit2 <- bd.test(list(X, Y, Z), R = 399, size = c(100, 100, 100), num.threads = 2)
-  fit3 <- bd.test(list(X, Y, Z), R = 399, size = c(100, 100, 100), num.threads = 4)
+  fit1 <- bd.test(list(X, Y, Z), num.permutations = 399, num.threads = 1)
+  fit2 <- bd.test(list(X, Y, Z), num.permutations = 399, num.threads = 2)
+  fit3 <- bd.test(list(X, Y, Z), num.permutations = 399, num.threads = 4)
   expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
   expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
+  expect_equal(fit1[["complete.info"]][["p.value"]], fit2[["complete.info"]][["p.value"]])
+  expect_equal(fit1[["complete.info"]][["p.value"]], fit3[["complete.info"]][["p.value"]])
 })
 
 test_that("Multi-thread computation via permutation for univariate two-sample problem", {
@@ -78,21 +84,26 @@ test_that("Multi-thread computation via permutation for univariate two-sample pr
   n2 <- 200
   x <- rnorm(n1)
   y <- rnorm(n2)
-  fit1 <- bd.test(list(x, y), R = 399, num.threads = 1)
-  fit2 <- bd.test(list(x, y), R = 399, num.threads = 2)
-  fit3 <- bd.test(list(x, y), R = 399, num.threads = 4)
+  fit1 <- bd.test(list(x, y), num.permutations = 399, num.threads = 1)
+  fit2 <- bd.test(list(x, y), num.permutations = 399, num.threads = 2)
+  fit3 <- bd.test(list(x, y), num.permutations = 399, num.threads = 4)
   expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
   expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
+  expect_equal(fit1[["complete.info"]][["p.value"]], fit2[["complete.info"]][["p.value"]])
+  expect_equal(fit1[["complete.info"]][["p.value"]], fit3[["complete.info"]][["p.value"]])
 })
 
 test_that("Multi-thread computation via permutation for multivariate two-sample problem", {
-  Y <- matrix(rnorm(100*10), ncol = 10)
-  X <- matrix(rnorm(100*10), ncol = 10)
-  fit1 <- bd.test(list(X, Y), R = 399, size = c(100, 100, 100), num.threads = 1)
-  fit2 <- bd.test(list(X, Y), R = 399, size = c(100, 100, 100), num.threads = 2)
-  fit3 <- bd.test(list(X, Y), R = 399, size = c(100, 100, 100), num.threads = 4)
+  set.seed(1)
+  Y <- matrix(rnorm(100 * 10), ncol = 10)
+  X <- matrix(rnorm(100 * 10), ncol = 10)
+  fit1 <- bd.test(list(X, Y), num.permutations = 399, num.threads = 1)
+  fit2 <- bd.test(list(X, Y), num.permutations = 399, num.threads = 2)
+  fit3 <- bd.test(list(X, Y), num.permutations = 399, num.threads = 4)
   expect_equal(fit1[["complete.info"]][["statistic"]], fit2[["complete.info"]][["statistic"]])
   expect_equal(fit1[["complete.info"]][["statistic"]], fit3[["complete.info"]][["statistic"]])
+  expect_equal(fit1[["complete.info"]][["p.value"]], fit2[["complete.info"]][["p.value"]])
+  expect_equal(fit1[["complete.info"]][["p.value"]], fit3[["complete.info"]][["p.value"]])
 })
 
 test_that("output of formula interface is incorrect", {

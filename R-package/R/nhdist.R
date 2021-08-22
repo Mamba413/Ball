@@ -6,7 +6,7 @@
 #' 
 #' @param x a numeric matrix, data frame or numeric array of dimension \eqn{k \times m \times n} 
 #' containing \eqn{n} samples in \eqn{k \times m} dimension.
-#' @param method the distance measure to be used. This must be one of "geodesic", "compositional", "riemann". 
+#' @param method the distance measure to be used. This must be one of \code{"geodesic"}, \code{"compositional"}, or \code{"riemann"}. 
 #' Any unambiguous substring can be given.
 #'
 #' @details Available distance measures are geodesic, compositional and riemann.
@@ -16,7 +16,7 @@
 #' geodesic:
 #' 
 #' The shortest route between two points on the Earth's surface, namely, a segment of a great circle.
-#' \deqn{acos(x^{T}y), \|x\|_{2} = \|y\|_{2} = 1}
+#' \deqn{\arccos(x^{T}y), \|x\|_{2} = \|y\|_{2} = 1}
 #' 
 #' compositional:
 #' 
@@ -126,6 +126,8 @@ distsurface <- function(x) {
   diag(Dmat) <- 1
   suppressWarnings(Dmat <- acos(Dmat))
   Dmat[is.na(Dmat)] <- 1
+  Dmat <- (Dmat + t(Dmat)) / 2
+  Dmat <- round(Dmat, digits = 13)
   Dmat
 }
 
@@ -142,11 +144,26 @@ distsurface <- function(x) {
 #' 
 distrieman <- function(x) {
   n <- dim(x)[3]
-  sapply(1:n, function(i) {
-    sapply(1:n, function(j) {
-      riemdist(x[,,i], x[,,j])
-    })
-  })
+  
+  dist_mat <- matrix(0, nrow = n, ncol = n)
+  for (i in 1:n) {
+    for (j in i:n) {
+      if (i != j) {
+        dist_mat[i, j] <- riemdist(x[, , i], x[, , j])
+        if (dist_mat[i, j] < 10 * .Machine$double.eps) {
+          dist_mat[i, j] <- 0
+        }
+        dist_mat[j, i] <- dist_mat[i, j]
+      }
+    }
+  }
+  dist_mat
+  
+  # sapply(1:n, function(i) {
+  #   sapply(1:n, function(j) {
+  #     riemdist(x[,,i], x[,,j])
+  #   })
+  # })
 }
 
 realtocomplex<-function(x)

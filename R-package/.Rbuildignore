@@ -1,3 +1,5 @@
+^renv$
+^renv\.lock$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^README_CN.md$
@@ -18,3 +20,4 @@ github
 ^cran-comments\.md$
 ^\.travis\.yml$
 ^appveyor\.yml$
+^..pdf$

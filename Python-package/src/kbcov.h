@@ -13,16 +13,12 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef UTILIZE_CROSS_H_
-#define UTILIZE_CROSS_H_
-
-void print_stop_message_internal();
-void R_check_interrupt_fn(void *dummy);
-int pending_interrupt_status();
-int r_available_rand();
-int random_index(int n, int i);
-int random_index2(int i);
-int random_index_thread(int i);
 
 
-#endif /* UTILIZE_CROSS_H_ */
+#ifndef KBCOV_H_
+#define KBCOV_H_
+
+// R API function:
+void kbcov_test(double *kbcov_stat, double *pvalue, double *x, int *k, int *n, int *R, int *dst, int *thread);
+
+#endif /* KBCOV_H_ */

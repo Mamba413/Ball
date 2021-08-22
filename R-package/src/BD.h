@@ -20,23 +20,23 @@
 
 void Ball_Divergence(double *bd, int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2);
 void Ball_Divergence_parallel(double *bd, int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2, int *nthread);
-void Ball_Information_wrapper(double *bcov_stat, int *n, double **Dx, double **Dy, int **xidx, int **yidx, int *i_perm, int *i_perm_inv, int *nthread);
+void Ball_Divergence_wrapper(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2, int *nthread);
 void get_ij_dst(double *xy, double *ij_dst, int *cumulate_size, int *size, int *n, int *p, int *q);
-void compute_cumulate_size(int *cumulate_size, int *size, int *k);
+void compute_cumsum_size(int *cumsum_size, int *size, int *k);
 void permute_dst(double *xy, double *new_xy, int *index, int *N);
 void get_ij_value(double *xy, double *ij_value, int *cumulate_size, int *size, int *p, int *q);
 void bd_value(double *bd_stat, double *xy, int *n1, int *n2);
 void ubd_value(double *bd_stat, double *xy, int *n1, int *n2);
 void kbd_value(double *kbd_stat, double *xy, int *size, int *n, int *k);
 void ukbd_value(double *kbd_stat, double *xy, int *size, int *k);
-void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *p, int *R, int *nthread);
+void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *nthread);
 void BD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *p, int *R, int *nthread);
 void UBD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *nthread);
 void UBD_parallel(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *nthread);
-void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R);
+void KBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R, int *thread);
 void KBD_parallel(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R, int *nthread);
 void KBD2(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R);
-void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R);
+void UKBD(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R, int *thread);
 void UKBD_parallel(double *kbd, double *pvalue, double *xy, int *size, int *n, int *k, int *R);
 // R API function:
 //void bd_stat(double *bd, double *xy, int *size, int *n, int *k, int *weight, int *dst, int *nthread);

@@ -1,6 +1,6 @@
-# Ball 1.1.0
- * Multi-thread support for Ball covariance via permutation
- * Multi-thread support for KBD via permutation
+# Ball 1.3.10
+ * Fast bcov computation (Incompletely U-statistic, subsample for the centre of sphere)
+ * Fast bcor computation
 
 
 

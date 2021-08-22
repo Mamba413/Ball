@@ -1,4 +1,5 @@
 library(Ball)
+library(testthat)
 require(mvtnorm)
 context("bcorsis function")
 skip_on_cran()
@@ -8,7 +9,7 @@ test_that("Ball Correlation based Interaction Pursuit is unreasonable!", {
   p <- 3000
   n <- 150
   x <- matrix(rnorm(n = n * p), nrow = n, ncol = p)
-  y <- 4*x[, 1]*x[, 2]
+  y <- 4 * x[, 1] * x[, 2]
   
   res <- bcorsis(x = x, y = y, method = "interaction")
   expect_true(all(c(1, 2) %in% head(res[["ix"]], 5)))
@@ -62,7 +63,7 @@ test_that("Ball Correlation based iterative SIS with probability weight is unrea
   y <- 3*x[, 1] + 5*(x[, 3])^2 + error
   res <- bcorsis(y = y, x = x, weight = "prob")
   expect_true(all(c(1, 3) %in% head(res[["ix"]])))
-  expect_equal("prob", res[["weight"]])
+  expect_equal("probability", res[["weight"]])
 })
 
 test_that("Ball Correlation based SIS with Chi-square weight is unreasonable!", {
@@ -74,5 +75,71 @@ test_that("Ball Correlation based SIS with Chi-square weight is unreasonable!", 
   y <- 3*x[, 1] + 5*(x[, 3])^2 + error
   res <- bcorsis(y = y, x = x, weight = "chisq")
   expect_true(all(c(1, 3) %in% head(res[["ix"]])))
-  expect_equal("chisq", res[["weight"]])
+  expect_equal("chisquare", res[["weight"]])
+})
+
+
+test_that("Ball Correlation based SIS with categorical variables is unreasonable!", {
+  set.seed(1)
+  n <- 150
+  p <- 3000
+  x <- sapply(1:p, function(i) {
+    sample(0:2, size = n, replace = TRUE)
+  })
+  eps <- rnorm(n)
+  y <- 6 * x[, 1] - 7 * x[, 2] + 5 * x[, 3] + eps
+  res <- bcorsis(x = x, y = y, category = TRUE)
+  expect_true(all(c(1, 2, 3) %in% head(res[["ix"]])))
+  
+  x <- cbind(matrix(rnorm(n * 2), ncol = 2), x)
+  res <- bcorsis(x = x, y = y, category = c(-1, -2))
+  expect_true(all(c(3, 4, 5) %in% head(res[["ix"]])))
+  
+  x <- cbind(x[, 3:5], matrix(rnorm(n * p), ncol = p))
+  res <- bcorsis(x = x, y = y, category = 1:3)
+  expect_true(all(c(1, 2, 3) %in% head(res[["ix"]], n = 10)))
+})
+
+test_that("(Univariate) Incoherence between bcov and bcor!", {
+  set.seed(1)
+  num <- 10
+  x <- rnorm(num)
+  y <- rnorm(num)
+  
+  bcor_value <- bcor(x, y)
+  bcov_based_value <- bcov(x, y) / sqrt(bcov(x, x) * bcov(y, y))
+  
+  names(bcor_value) <- NULL
+  names(bcov_based_value) <- NULL
+  expect_equal(bcor_value, bcov_based_value)
+})
+
+
+test_that("(Multivariate) Incoherence between bcov and bcor!", {
+  set.seed(1)
+  num <- 10
+  x <- as.matrix(dist(rnorm(num)))
+  y <- as.matrix(dist(rnorm(num)))
+  
+  bcor_value <- bcor(x, y, distance = TRUE)
+  bcov_based_value <- bcov(x, y, distance = TRUE) / sqrt(bcov(x, x, distance = TRUE) * bcov(y, y, distance = TRUE))
+  
+  names(bcor_value) <- NULL
+  names(bcov_based_value) <- NULL
+  expect_equal(bcor_value, bcov_based_value)
+})
+
+
+test_that("(Multivariate) Incoherence between bcov and bcor!", {
+  set.seed(1)
+  num <- 10
+  x <- matrix(rnorm(num * 2), nrow = num)
+  y <- matrix(rnorm(num * 2), nrow = num)
+  
+  bcor_value <- bcor(x, y)
+  bcov_based_value <- bcov(x, y) / sqrt(bcov(x, x) * bcov(y, y))
+  
+  names(bcor_value) <- NULL
+  names(bcov_based_value) <- NULL
+  expect_equal(bcor_value, bcov_based_value)
 })

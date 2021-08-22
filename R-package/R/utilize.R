@@ -1,3 +1,55 @@
+.onUnload <- function (libpath) {
+  library.dynam.unload("Ball", libpath)
+}
+
+WEIGHT_TYPE <- c("constant", "probability", "chisquare")
+BD_WEIGHT_TYPE <- c("constant", "variance")
+
+BCOR_WEIGHT_STATS <- c("bcor.constant", "bcor.probability", "bcor.chisquare")
+BCOV_WEIGHT_STATS <- c("bcov.constant", "bcov.probability", "bcov.chisquare")
+
+BD_WEIGHT_STATS <- c("bd.constant", "bd.variance")
+KBD_WEIGHT_STATS <- c("kbd.sum.constant", "kbd.sum.variance", "kbd.max.constant", "kbd.max.variance", "kbd.maxsum.constant", "kbd.maxsum.variance")
+
+center_bdd_matrix <- function(bdd) {
+  num <- dim(bdd)[1]
+  bdd <- sweep(bdd, 2, colMeans(bdd)) - rowMeans(bdd) + mean(bdd)
+  bdd
+}
+
+#' Hall-Buckley-Eagleson method
+#'
+#' Computes the cdf of a positively-weighted sum of chi-squared random variables with the Hall-Buckley-Eagleson (HBE) method.
+#' @keywords distribution
+#' @references
+#' \itemize{
+#'   \item P. Hall. Chi squared approximations to the distribution of a sum of independent random variables. \emph{The Annals of Probability}, 11(4):1028-1036, 1983.
+#'   \item M. J. Buckley and G. K. Eagleson. An approximation to the distribution of quadratic forms in normal random variables. \emph{Australian Journal of Statistics}, 30(1):150-159, 1988.
+#' }
+#' @examples
+#' hbe(c(1.5, 1.5, 0.5, 0.5), 10.203)            # should give value close to 0.95
+#' @noRd
+hbe <- function(coeff, x){
+  # compute cumulants and nu
+  K_1 <- sum(coeff)
+  K_2 <- 2 * sum(coeff^2)
+  K_3 <- 8 * sum(coeff^3)
+  nu <- 8 * (K_2^3) / (K_3^2)
+  
+  # gamma parameters for chi-square
+  gamma_k <- nu/2
+  gamma_theta <- 2
+  
+  # need to transform the actual x value to x_chisqnu ~ chi^2(nu)
+  # This transformation is used to match the first three moments
+  # First x is normalised and then scaled to be x_chisqnu
+  x_chisqnu_vec <- sqrt(2 * nu / K_2) * (x - K_1) + nu
+  
+  # now this is a chi_sq(nu) variable
+  p_chisqnu_vec <- pgamma(x_chisqnu_vec, shape = gamma_k, scale = gamma_theta)
+  p_chisqnu_vec
+}
+
 #' calculate Pvalue
 #'
 #' @param statValue Statistic Value
@@ -79,6 +131,19 @@ examine_x_y <- function(x, y) {
   c(n, p)
 }
 
+#' Examine x, y arguments in bcov.test, bcov
+#' @inheritParams bcov.test
+#' @noRd
+#' 
+examine_x_y_bcov <- function(x, y) {
+  if (anyNA(x) || anyNA(y)) {
+    stop("Missing value exist!")
+  }
+  if (length(x) != length(y)) {
+    stop("x and y have different sample sizes!")
+  }
+}
+
 
 #' Examine seed arguments in bcov.test, bd.test
 #' @param seed A integer number
@@ -100,40 +165,66 @@ examine_seed_arguments <- function(seed) {
 #' @noRd
 #'
 examine_weight_arguments <- function(weight) {
-  WEIGHT_METHODS <- c(TRUE, FALSE, "none", "chisq", "prob")
-  method <- pmatch(weight, WEIGHT_METHODS)
-  if (is.na(method)) 
-    stop("invalid weight method")
-  if (weight == TRUE) {
-    weight <- "prob"
-  } else if (weight == FALSE) {
-    weight <- "none"
+  if (is.logical(weight) || is.character(weight)) {
+    if (is.logical(weight)) {
+      weight <- ifelse(weight, "probability", "constant")
+    } else {
+      weight <- match.arg(arg = weight, choices = WEIGHT_TYPE)
+    }
+    return(weight)
+  } else {
+    stop("The weight arguments is invalid!")
   }
-  return(weight)
 }
+
+#' Title
+#'
+#' @param category 
+#' @param p 
+#'
+#' @noRd
+#' 
+examine_category <- function(category, p) {
+  if (is.logical(category)) {
+    if (category) {
+      category_index <- 1:p
+    } else {
+      category_index <- c()    
+    }
+  } else {
+    stopifnot(all(category < 0) || all(category > 0))
+    if (any(category > 0)) {
+      category_index <- category
+    } else {
+      category_index <- setdiff(1:p, category)
+    }
+  }
+  category_index
+}
+
 
 
 select_ball_stat <- function(ball_stat, weight, type = "bcov", fun_name = "bcov") {
   if (fun_name == "bcorsis") 
   {
-    if (weight == "none") {
+    if (weight == "constant") {
       ball_stat <- ball_stat[, 1]
-    } else if (weight == "bcov") {
+    } else if (weight == "probability") {
       ball_stat <- ball_stat[, 2]
-    } else {
+    } else if (weight == "chisquare") {
       ball_stat <- ball_stat[, 3]
     }
   } else {
-    if (weight == "none")
+    if (weight == "constant")
     {
       ball_stat <- ball_stat[1]
-      names(ball_stat) <- ifelse(type == "bcov", "bcov", "bcor")
-    } else if (weight == "prob") {
+      names(ball_stat) <- ifelse(type == "bcov", BCOV_WEIGHT_STATS[1], BCOR_WEIGHT_STATS[1])
+    } else if (weight == "probability") {
       ball_stat <- ball_stat[2]
-      names(ball_stat) <- ifelse(type == "bcov", "bcov.prob", "bcor.prob")
-    } else {
+      names(ball_stat) <- ifelse(type == "bcov", BCOV_WEIGHT_STATS[2], BCOR_WEIGHT_STATS[2])
+    } else if (weight == "chisquare") {
       ball_stat <- ball_stat[3]
-      names(ball_stat) <- ifelse(type == "bcov", "bcov.chisq", "bcor.chisq")
+      names(ball_stat) <- ifelse(type == "bcov", BCOV_WEIGHT_STATS[3], BCOR_WEIGHT_STATS[3])
     }
   }
   return(ball_stat)
@@ -144,19 +235,13 @@ select_ball_stat <- function(ball_stat, weight, type = "bcov", fun_name = "bcov"
 #' @param size A integer vector
 #' @noRd
 #' 
-examine_size_arguments <- function(x, size) {
+examine_size_arguments <- function(size) {
   # self examine:
   if(is.null(size)) {
     stop("size arguments is needed")
   }
   size <- as.integer(size)
   if(any(is.na(size)) | any(size <= 0) | (length(size)==1)) {
-    stop("size arguments is invalid!")
-  }
-  # examine the consistency between x and size:
-  x_row <- nrow(x)
-  n <- sum(size)
-  if(x_row != n) {
     stop("size arguments is invalid!")
   }
 }
@@ -179,7 +264,8 @@ examine_R_arguments <- function(R) {
 #' 
 examine_threads_arguments <- function(num.threads) {
   if(is.null(num.threads) | (num.threads < 1)) {
-    stop("num.threads arguments is invalid!")
+    num.threads <<- 0;
+    # stop("num.threads arguments is invalid!")
   }
 }
 
@@ -225,12 +311,8 @@ get_vectorized_distance_matrix <- function(x, y) {
   n2 <- dim(y)[1]
   n <- n1 + n2
   xy <- rbind(x, y)
-  Dxy <- as.vector(as.matrix(dist(xy, diag = TRUE)))
-  # p <- dim(xy)[2]
-  # Dxy <- numeric(n * n)
-  # Dxy <- .C("distance", as.double(t(xy)), as.double(t(Dxy)), as.integer(n), as.integer(p))
-  # Dxy <- Dxy[[2]]
-  list(Dxy, n1, n2)
+  dxy <- as.vector(dist(xy))
+  list(dxy, n1, n2)
 }
 
 
@@ -239,9 +321,6 @@ get_vectorized_distance_matrix <- function(x, y) {
 #' @noRd
 #' 
 get_matrixed_x <- function(x, y) {
-  if(is.null(x) & is.null(y)) {
-    stop("x and y are all null!")
-  }
   if(is.null(x)) {
     x <- y
   }
@@ -289,7 +368,7 @@ get_screened_vars <- function(ids, rcory_result, final_d) {
 
 preprocess_bcorsis_y <- function(y, y_p) {
   if(y_p != 1) {
-    y_copy <- as.vector(as.matrix(dist(y, diag = TRUE)))
+    y_copy <- as.vector(dist(y))
     dst <- TRUE
   } else {
     y_copy <- as.vector(y)
@@ -315,7 +394,7 @@ examine_method_arguments <- function(method) {
 examine_dst_method <- function(dst, method) {
   if(method %in% c("survival", "lm", "gam")) {
     if(dst) {
-      messages <- " methods is not available when dst = TRUE"
+      messages <- " methods is not available when distance = TRUE"
       messages <- paste0(method, messages)
       stop(messages)
     }

@@ -1,34 +1,36 @@
- Ball Statistics
+Ball Statistics
 ================
 
+Introdution
+------------
+The fundamental problems for data mining, statistical analysis, and machine learning are:
+- whether several distributions are different?
+- whether random variables are dependent?
+- how to pick out useful variables/features from a high-dimensional data?
 
-Introduction
-~~~~~~~~~~~~
+These issues can be tackled by using **bd_test**, **bcov_test**, and **bcorsis** functions in the **Ball** package, respectively. They enjoy following admirable advantages:
+- available for most of datasets (e.g., traditional tabular data, brain shape, functional connectome, wind direction and so on)
+- insensitive to outliers, distribution-free and model-free;
+- theoretically guaranteed and computationally efficient.
 
-The fundamental problems for data mining and statistical analysis are:
+Installation
+------------
+- Pypi version (stable)         
 
--  Whether distributions of two samples are distinct?
+To install the **Ball** Python package from Pypi, just run:        
+```
+pip install Ball
+```
 
--  Whether two random variables are dependent?
+- Git version (development)
+## Windows
+Ball support compilation with MinGW. You need to install MinGW (https://sourceforge.net/projects/mingw/).
+Next, you should clone or download the Ball repo. 
+Then run the following from the root of the Ball directory: 
+```
+sh configure.sh your_python_path your_python_version_number # e.g.  sh configure.sh C:/anaconda3 35
+```
 
-**Ball** package provides solutions for these issues. Moreover, a
-variable screening (or feature screening) procedure is also implemented
-to tackle ultra high dimensional data. The core functions in **Ball**
-package are **bd.test**, **bcov.test**, and **bcorsis**.
-
-These functions based on ball statistic have several advantages:
-
--  It's applicable to univariate and multivariate data in Banach space.
-
--  There is no need for moment assumption, which means that outliers and
-   heavy-tail data are no longer a problem.
-
--  They perform well in many setting without complex adjustments for
-   parameters.
-
-Particularly, for two-sample or K-sample problem, **bd.test** has been
-proved to cope well for imbalanced data, and **bcov.test** and
-**bcorsis** work well for detecting the relationship between complex
-responses and/or predictors, such as shape, compositional as well as
-censored data.
-
+Authorship
+-----------
+Jin Zhu (zhuj37@mail2.sysu.edu.cn), Xueqin Wang (wangxq88@mail2.sysu.edu.cn)

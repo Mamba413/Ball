@@ -1,3 +1,28 @@
+# Ball 1.3.11
+* Update citation information and reference.
+
+# Ball 1.3.10
+* Add variance (Chi-square) weight for K-sample Ball Divergence test.
+* Refine distance computation
+
+# Ball 1.3.9
+* *bcorsis* can conveniently analyze category variables (e.g., GWAS datasets).
+* Add permutation-free method for the Ball Divergence and Ball Covariance test (both only for constant weight now).
+* Add variance (chi-square) weight for Ball Divergence test.
+* Fix potential bugs in R version 4.0
+
+# Ball 1.3.8
+* Improve the reproducibility and efficiency of multi-threading and change the default number of threads as the number of CPUs available.
+* Improve the computational efficiency of the KBD test.
+
+# Ball 1.3.7
+* Modify ambiguous arguments of bcov.test, bd.test, bcorsis
+* Modify document
+
+# Ball 1.3.6
+* Formula interface for bd.test and bcov.test
+* Optimize the package dependency
+
 # Ball 1.3.5
 * Faster implementation of mutual independence test
 * Multi-thread support for the test of mutual independence
@@ -18,7 +43,7 @@
 * Bug fix
 * OPENMP based Multi-thread support for *bd.test* and *bcov.test*
 * Speed up feature screening for survival data
-* Implement Angular metric for compostional data 
+* Implement Angular metric for compositional data 
 
 # Ball 1.0.0
 * Initial CRAN version

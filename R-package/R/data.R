@@ -1,3 +1,26 @@
+# Various imports
+#' @importFrom stats pgamma
+#' @importFrom stats dist
+#' @importFrom stats runif
+#' @importFrom stats rnorm
+#' @importFrom stats as.formula
+#' @importFrom stats rnorm
+#' @importFrom stats model.frame
+#' @importFrom stats setNames
+#' @importFrom stats terms
+#' @importFrom stats as.dist
+#' @importFrom stats lm
+#' @importFrom stats residuals
+#' @importFrom utils data
+#' @importFrom utils head
+#' @importFrom utils memory.limit
+#' @importFrom survival survfit
+#' @importFrom survival Surv
+#' @importFrom gam gam
+#' @importFrom gam s
+#' @importFrom mvtnorm rmvnorm
+NULL
+
 #' @title meteorological data
 #' @name meteorology
 #' @docType data
@@ -149,29 +172,6 @@ NULL
 #' @description Distribution of BCor when Null hypothesis is correct.
 #' @noRd
 NULL
-
-
-# Various imports
-#' @importFrom stats dist
-#' @importFrom stats runif
-#' @importFrom stats rnorm
-#' @importFrom stats as.formula
-#' @importFrom stats rnorm
-#' @importFrom stats model.frame
-#' @importFrom stats setNames
-#' @importFrom stats terms
-#' @importFrom utils data
-#' @importFrom utils head
-#' @importFrom utils memory.limit
-#' @importFrom survival survfit
-#' @importFrom survival Surv
-#' @importFrom stats lm
-#' @importFrom gam gam
-#' @importFrom gam s
-#' @importFrom stats residuals
-#' @importFrom mvtnorm rmvnorm
-NULL
-
 
 
 #' @title Generate example demostarted data in vignettes

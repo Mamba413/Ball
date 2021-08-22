@@ -1,16 +1,24 @@
-Thanks you so much for your correction! I have replaced the invalid URL http://cran.r-project.org/web/packages/Ball to canonical URL https://CRAN.R-project.org/package=Ball.
+## Maintainer comments     
+The DOI in the CITATION/DESCRIPTION is for a new JSS publication that will be registered after publication on CRAN. 
 
 ## Test environments
-* Ubuntu 14.04 (on travis-ci), R 3.4.2
-* win-builder (realease)
+* Windows Server 2008 R2 SP1, R-devel, 32/64 bit
+* Win-builder (devel)
+* Ubuntu Linux 20.04.1 LTS, R-release, GCC
+* Fedora Linux, R-devel, clang, gfortran
+* Debian Linux, R-devel, GCC ASAN/UBSAN
 
 ## R CMD check results
-* Ubuntu 14.04 enviorment:
-0 errors | 0 warnings | 0 note
+NOTE: 
 
-## Win-builder:
-Status: OK
+```
+Found the following (possibly) invalid DOIs:
+  DOI: 10.18637/jss.v097.i06
+    From: DESCRIPTION
+          inst/CITATION
+    Status: Not Found
+    Message: 404
+```
 
 ## Reverse dependencies
-
 There are no reverse dependencies.

@@ -13,8 +13,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UTILIZE_R_H_
-#define UTILIZE_R_H_
 
+#ifndef SURV_H_
+#define SURV_H_
 
-#endif /* UTILIZE_R_H_ */
+void SRCT_new(double *x, int *t, int *delta, double *Sc, int *n, double *RCTV);
+
+#endif /* SURV_H_ */
