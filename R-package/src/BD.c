@@ -96,6 +96,7 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
         for (j = 0; j < *n1; j++) {
             p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
             p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
+            // Rprintf("(pxx: %f, pxy: %f) ", p1 * inv_n1, p2 * inv_n2);
             p3 = (p1 + p2) * inv_n;
             if (p3 * (1 - p3) == 0) { continue; }
             ans = p1 * inv_n1  - p2 * inv_n2;
@@ -103,6 +104,7 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
             TS_weight0 += ans;
             TS_weight1 += ans / p3 / (1 - p3);
         }
+        // Rprintf("\n");
     }
     // Calculate C_{kl}^{X} and C_{kl}^{Y}:
     for (i = *n1; i < n; i++) {
@@ -117,6 +119,7 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
             SS_weight1 += ans / p3 / (1 - p3);
         }
     }
+    // Rprintf("A: %f, C: %f \n", TS_weight0 / (1.0 * (*n1) * (*n1)), SS_weight0 / (1.0 * (*n2) * (*n2)));
     bd_stat[0] = TS_weight0 / (1.0 * (*n1) * (*n1)) + SS_weight0 / (1.0 * (*n2) * (*n2));
     bd_stat[1] = TS_weight1 / (1.0 * (*n1) * (*n1)) + SS_weight1 / (1.0 * (*n2) * (*n2));
 }

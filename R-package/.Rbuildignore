@@ -21,3 +21,4 @@ github
 ^\.travis\.yml$
 ^appveyor\.yml$
 ^..pdf$
+^note\.md$

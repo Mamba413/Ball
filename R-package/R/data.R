@@ -19,6 +19,7 @@
 #' @importFrom gam gam
 #' @importFrom gam s
 #' @importFrom mvtnorm rmvnorm
+#' @importFrom Rcpp sourceCpp
 NULL
 
 #' @title meteorological data

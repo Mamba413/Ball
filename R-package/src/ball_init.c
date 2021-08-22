@@ -1,3 +1,5 @@
+#include <R.h>
+#include <Rinternals.h>
 #include <stdlib.h> // for NULL
 #include <R_ext/Rdynload.h>
 
@@ -13,6 +15,10 @@ extern void bd_test(double *, double *, double *, int *, int *, int *, int *, in
 extern void SRCT_new(double *, int *, int *, double *, int *, double *);
 extern void bdd_matrix_bias(double *, double *, int *, int *);
 extern void bdd_matrix_bias_two_group(double *, double *, int *, int *, int *);
+extern void sbd_C(double *, double *, int *, int *, int *, int *);
+
+/* .Call calls */
+extern SEXP _Ball_sbd_cpp(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
   {"bcor_test", (DL_FUNC) &bcor_test, 11},
@@ -22,11 +28,17 @@ static const R_CMethodDef CEntries[] = {
   {"SRCT_new",  (DL_FUNC) &SRCT_new,  6},
   {"bdd_matrix_bias",           (DL_FUNC) &bdd_matrix_bias,           4},
   {"bdd_matrix_bias_two_group", (DL_FUNC) &bdd_matrix_bias_two_group, 5},
+  // {"sbd_C", (DL_FUNC) &sbd_C, 6},
   {NULL, NULL, 0}
+};
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_Ball_sbd_cpp", (DL_FUNC) &_Ball_sbd_cpp, 5},
+    {NULL, NULL, 0}
 };
 
 void R_init_Ball(DllInfo *dll)
 {
-  R_registerRoutines(dll, CEntries, NULL, NULL, NULL);
+  R_registerRoutines(dll, CEntries, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
 }
