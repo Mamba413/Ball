@@ -2,48 +2,115 @@
 % Please edit documentation in R/bd.gaws.R
 \name{bd.gwas.test}
 \alias{bd.gwas.test}
-\title{Fast Two Ball Divergence test for gwas data}
+\title{Fast K-sample Ball Divergence Test for GWAS Data}
 \usage{
-bd.gwas.test(x, snp, dst = FALSE, seed = 4, num.threads = 2, ...)
+bd.gwas.test(
+  x,
+  snp,
+  screening.method = c("permute", "spectrum"),
+  refine = TRUE,
+  num.permutations,
+  distance = FALSE,
+  alpha,
+  save.screening = NULL,
+  screening.file = NULL,
+  verbose = TRUE,
+  seed = 1,
+  num.threads = 0,
+  ...
+)
 }
 \arguments{
-\item{x}{a numeric vector, matrix, data.frame, dist object}
+\item{x}{a numeric vector, matrix, data.frame, dist object.}
 
-\item{snp}{SNP data}
+\item{snp}{a SNP dataset. Each column must be an integer vector.}
 
-\item{dst}{if \code{dst = TRUE}, x will be considered as a distance matrix. Default: \code{dst = FALSE}}
+\item{screening.method}{if \code{screening.method = "spectrum"}, the spectrum method is applied to 
+screening the candidate SNPs, or otherwise, the permutation method is applied. Default: \code{screening.method = "permute"}.}
 
-\item{seed}{the random seed.}
+\item{refine}{a logical value. If \code{refine = TRUE}, a \eqn{p}-values refining process is applied to 
+the SNPs which passes the pre-screening process. Default: \code{refine = TRUE} (At present, \code{refine = FALSE} is not available).}
 
-\item{num.threads}{Number of threads. Default \code{num.threads = 2}.}
+\item{num.permutations}{the number of permutation replications. When \code{num.permutations = 0}, 
+the function just returns the Ball Divergence statistic. Default: \code{num.permutations = 100 * ncol(snp)}}
+
+\item{distance}{if \code{distance = TRUE}, the elements of \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}.}
+
+\item{alpha}{the significance level. Default: \code{0.05 / ncol(snp)}.}
+
+\item{save.screening}{A file name for preserving the pre-screening result. \code{save.screening = NULL}.}
+
+\item{screening.file}{A file preserving the pre-screening result. 
+It works only if the pre-screening is available.
+Default: \code{screening.file = NULL}.}
+
+\item{verbose}{Show computation status and estimated runtimes. Default: \code{verbose = FALSE}.}
+
+\item{seed}{the random seed. Default \code{seed = 1}.}
+
+\item{num.threads}{number of threads. If \code{num.threads = 0}, then all of available cores will be used. Default \code{num.threads = 0}.}
 
 \item{...}{further arguments to be passed to or from methods.}
 }
 \value{
 bd.gwas.test returns a list containing the following components:
-\item{\code{statistic}}{ball divergence statistic.}            
-\item{\code{permuted_statistic}}{a data.frame containing permuted ball divergence statistic.}            
-\item{\code{p.value}}{the p-value for the test.}
+\item{\code{statistic}}{ball divergence statistics vector.}            
+\item{\code{permuted.statistic}}{a data.frame containing permuted ball divergence statistic for pre-screening SNPs. 
+If \code{refine = FALSE}, it takes value \code{NULL}.}            
+\item{\code{eigenvalue}}{the eigenvalue of spectrum decomposition. If \code{refine = TRUE}, it takes value \code{NULL}.}
+\item{\code{p.value}}{the p-values of ball divergence test.}
+\item{\code{refined.snp}}{the SNPs have been refined.}
+\item{\code{refined.p.value}}{the refined \eqn{p}-value of significant snp.}
+\item{\code{refined.permuted.statistic}}{a data.frame containing permuted ball divergence statistics for refining \eqn{p}-values.}
 }
 \description{
-Fast Two Ball Divergence test for gwas data
+Fast K-sample Ball Divergence Test for GWAS Data
 }
 \examples{
-set.seed(1)
-num <- 60
-snp_num <- 100
-p <- 10
-x1 <- matrix(rnorm(num * p / 2), nrow = num/2)
-x2 <- matrix(rnorm(num * p / 2, 3), nrow = num/2)
-x <- rbind(x1, x2)
-snp <- sapply(1:snp_num, function(i) { 
-  set.seed(i)
-  sample(c(0, 1), size = num, replace = TRUE)
+\donttest{
+library(Ball)
+set.seed(1234)
+num <- 200
+snp_num <- 500
+p <- 5
+x <- matrix(rnorm(num * p), nrow = num)
+snp <- sapply(1:snp_num, function(i) {
+  sample(0:2, size = num, replace = TRUE)
 })
-snp[, 1] <- rep(c(0, 1), each = num/2)
-snp[, 2] <- c(rep(0, num/2 - 1), rep(1, num/2 + 1))
-snp[, 3] <- c(rep(0, num/2 - 2), rep(1, num/2 + 2))
-snp[, 4] <- c(rep(0, num/2 - 4), rep(1, num/2 + 4))
-res <- bd.gwas.test(x = x, snp = snp, num.threads = 2)
-head(res[["p.value"]], n = 8)
+snp1 <- sapply(1:snp_num, function(i) {
+  sample(1:2, size = num, replace = TRUE)
+})
+snp <- cbind(snp, snp1)
+res <- Ball::bd.gwas.test(x = x, snp = snp)
+mean(res[["p.value"]] < 0.05)
+mean(res[["p.value"]] < 0.005)
+
+## only return the test statistics;
+res <- Ball::bd.gwas.test(x = x, snp = snp, num.permutation = 0)
+
+## save pre-screening process results:
+x <- matrix(rnorm(num * p), nrow = num)
+snp <- sapply(1:snp_num, function(i) {
+  sample(0:2, size = num, replace = TRUE, prob = c(1/2, 1/4, 1/4))
+})
+res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, 
+                          num.permutations = 19999, 
+                          save.screening = "temp.rda")
+mean(res[["p.value"]] < 0.05)
+mean(res[["p.value"]] < 0.005)
+mean(res[["p.value"]] < 0.0005)
+## refine p-value according to the pre-screening process result:
+res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, 
+                          num.permutations = 19999, 
+                          screening.file = "temp.rda")
+}
+}
+\references{
+Hu, Y., Tan, H., Li, C., & Zhang, H. (2021). Identifying genetic risk variants associated with brain volumetric phenotypes via K‐sample Ball Divergence method. Genetic Epidemiology, 1–11. https://doi.org/10.1002/gepi.22423
+}
+\seealso{
+\code{\link{bd}}, \code{\link{bd.test}}
+}
+\author{
+Jin Zhu
 }

@@ -79,6 +79,7 @@ Python-package/_cball.cp35-win_amd64.pyd
 *.pyc
 Python-package/.idea/markdown-navigator.xml
 *.obj
+*.so
 *.lib
 *.exp
 *.gz
@@ -141,3 +142,9 @@ Python-package/.spyproject/
 Python-package/.vscode/launch.json
 Python-package/.vscode/
 R-package/..pdf
+
+Ball
+Ball.Rcheck
+R-package/src/tmp/
+.DS_Store
+R-package/temp.rda

@@ -1,78 +1,69 @@
 library(testthat)
 library(Ball)
 context("bd.gwas.test function")
-skip_on_cran()
 
-test_that("The statistic value of bd.gwas.test is different to bd.test", {
+test_that("Error if computation result for ball divergence is wrong! (two-sample)", {
+  # skip("skip")
   set.seed(1)
-  num <- 50
-  snp_num <- 100
-  p <- 10
-  x <- matrix(rnorm(num * p), nrow = num)
-  snp <- sapply(1:snp_num, function(i) { 
-    set.seed(i)
-    sample(c(0, 1), size = num, replace = TRUE)
+  num <- 100
+  snp_num <- 5
+  x <- rnorm(num)
+  snp <- sapply(1:snp_num, function(i) {
+    sample(0:1, size = num, replace = TRUE)
   })
-  # gwas mode:
-  res <- bd.gwas.test(x = x, snp = snp, seed = 4)
-  # original mode:
-  statistic_vec <- c()
-  for (i in 1:snp_num) {
-    statistic_vec[i] <- bd.test(x[order(snp[, i]), ], size = as.vector(table(snp[, i])), R = 0)
+  res <- bd.gwas.test(x = x, snp = snp, num.threads = 1, num.permutations = 0, verbose = FALSE)
+  bd_gwas_stats <- res[["statistic"]]
+  for(i in 1:snp_num) {
+    label <- snp[, i]
+    new_x <- x[order(label)]
+    size <- as.vector(table(label))
+    bd_value <- prod(size) * bd(x = new_x, size = size) / sum(size)
+    expect_equal(bd_gwas_stats[i], as.double(bd_value))
   }
-  expect_equal(res[["statistic"]], expected = statistic_vec)
 })
 
-test_that("p-value is unreasonable", {
+test_that("Error if computation result for ball divergence is wrong! (K-sample)", {
   set.seed(1)
-  num <- 50
-  snp_num <- 100
-  p <- 10
-  x1 <- matrix(rnorm(num * p), nrow = num/2)
-  x2 <- matrix(rnorm(num * p, mean = 2), nrow = num/2)
-  x <- rbind(x1, x2)
-  snp <- sapply(1:snp_num, function(i) { 
-    set.seed(i)
-    sample(c(0, 1), size = num, replace = TRUE)
+  num <- 100
+  snp_num <- 5
+  x <- as.matrix(rnorm(num))
+  snp <- sapply(1:snp_num, function(i) {
+    sample(0:2, size = num, replace = TRUE)
   })
-  snp[, 1] <- rep(c(0, 1), each = num/2)
-  res <- bd.gwas.test(x = x, snp = snp, seed = 2)
-  # detect first SNP
-  expect_true(res[["p.value"]][1] < 0.0005)
-  # check with average p-value 
-  mean_pvalue <- mean(res[["p.value"]][-1])
-  expect_true(mean_pvalue > 0.47 && mean_pvalue < 0.53)
-  # check with ks test
-  suppressWarnings(unif_test_pvalue <- stats::ks.test(res[["p.value"]][-1], "punif", 0, 1)[["p.value"]])
-  expect_true(unif_test_pvalue > 0.05)
+  res <- bd.gwas.test(x = x, snp = snp, num.threads = 1, num.permutations = 0, verbose = FALSE)
+  bd_gwas_stats <- res[["statistic"]]
+  for(i in 1:snp_num) {
+    label <- snp[, i]
+    ulabel <- sort(unique(label))
+    bd_value <- 0
+    for (ulabel1 in ulabel) {
+      for (ulabel2 in setdiff(ulabel, ulabel1)) {
+        x1 <- x[label == ulabel1, , drop = FALSE]
+        x2 <- x[label == ulabel2, , drop = FALSE]
+        size <- c(nrow(x1), nrow(x2))
+        bd_value <- bd_value + (prod(size) * bd(x1, x2) / sum(size))
+      }
+    }
+    bd_value <- bd_value / 2
+    expect_equal(bd_gwas_stats[i], as.double(bd_value))
+  }
 })
 
-test_that("Result is irreproducible", {
+test_that("Error if computation result for ball divergence is wrong when multi-thread computation!", {
+  skip("skip")
+  skip_on_mac()
   set.seed(1)
-  num <- 50
-  snp_num <- 100
-  p <- 10
-  x <- matrix(rnorm(num * p), nrow = num)
-  snp <- sapply(1:snp_num, function(i) { 
-    set.seed(i)
-    sample(c(0, 1), size = num, replace = TRUE)
+  num <- 100
+  snp_num <- 5
+  x <- rnorm(num)
+  snp <- sapply(1:snp_num, function(i) {
+    sample(0:2, size = num, replace = TRUE)
   })
-  res1 <- bd.gwas.test(x = x, snp = snp, seed = 4)
-  res2 <- bd.gwas.test(x = x, snp = snp, seed = 4)
-  expect_equal(res1, res2)
-})
-
-test_that("Result with different num.thread is irreproducible", {
-  set.seed(1)
-  num <- 50
-  snp_num <- 100
-  p <- 10
-  x <- matrix(rnorm(num * p), nrow = num)
-  snp <- sapply(1:snp_num, function(i) { 
-    set.seed(i)
-    sample(c(0, 1), size = num, replace = TRUE)
-  })
-  res1 <- bd.gwas.test(x = x, snp = snp, seed = 4)
-  res2 <- bd.gwas.test(x = x, snp = snp, seed = 4, num.threads = 2)
-  expect_equal(res1, res2)
+  res <- bd.gwas.test(x = x, snp = snp, num.threads = 1, 
+                      num.permutations = 29999, verbose = FALSE)
+  res1 <- bd.gwas.test(x = x, snp = snp, num.threads = 2, 
+                       num.permutations = 29999, verbose = FALSE)
+  expect_equal(res[["statistic"]], res1[["statistic"]])
+  expect_equal(res[["permuted_statistic"]], res1[["permuted_statistic"]])
+  expect_equal(res[["p.value"]], res1[["p.value"]])
 })

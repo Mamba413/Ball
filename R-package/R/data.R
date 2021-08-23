@@ -19,6 +19,8 @@
 #' @importFrom gam gam
 #' @importFrom gam s
 #' @importFrom mvtnorm rmvnorm
+# @importFrom dplyr n_distinct
+#' @importFrom stats na.fail
 NULL
 
 #' @title meteorological data

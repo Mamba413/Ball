@@ -1,0 +1,96 @@
+---
+title: "`bd.gwas.test`: Fast Ball Divergence Test for Multiple Hypothesis Tests"
+author: "Yue Hu, Jin Zhu"
+date: "2021/8/15"
+output:
+  html_document:
+    df_print: paged
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Fast Ball Divergence Test for Multiple Hypothesis Tests}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Description
+
+The K-sample Ball Divergence is a nonparametric method to test the differences between K probability distributions. It is specially designed for multivariate and imbalanced data, which is consistent with the characteristics of the GWAS data. It is computationally intensive for a large GWAS dataset because of the ultrahigh dimensionality of the data. Therefore, fast K-sample Ball Divergence Test for GWAS data is developed to accelerate the computational speed. It uses a two-step algorithm for KBD. The algorithm first computes an empirical p-value for each SNP using a modest number of permutations which gives precise enough estimates of the p-values above a threshold. Then, the SNPs with first stage p-values being less than the threshold are moved to the second stage for a far greater number of permutations.
+
+
+## Faster implementation for multiple testing  
+
+We implement `bd.test.gwas` in Ball package for handling multiple $K$-sample test. The key technique in `bd.test.gwas` is reusing the empirical KBD's distribution under the null hypothesis. This technique is particularly helpful for decreasing computational burden when the number of factors $p$ is very large and $K$ is a single digit. A typical case is the GWAS study, in which $p \approx 10^4$ or $10^5$ but $K = 3$. 
+
+## Details       
+
+According to the simulations, the empirical type I errors of KBD are reasonably controlled around $10^-5$ and the power of KBD increases as either the sample size or the difference between means or covariance matrices increases. The empirical power is close to 1 when the difference between distributions is large enough. 
+
+Furthermore, correlated responses may slightly decrease the power of the test compared to the case of independent responses. Moreover, KBD performs better when the data are not extremely imbalanced and it maintains reasonable power for the imbalanced setting. 
+
+Overall, KBD is a powerful method that can detect the significant variants with a controllable type I error regardless if the data are balanced or not. There is an inverse relationship between minor allele frequency and the desired sample sizes to obtain enough power. 
+
+Compared to other methods, KBD performs better in most of the scenarios, especially when the simulation setting is close to the real data. Moreover, KBD is more computationally efficient in identifying significant variants.
+
+
+## Examples       
+
+### Example 1:
+```{r, eval=FALSE}
+library(MASS)
+library(CVTuningCov)
+library(dplyr)
+library(Ball)
+
+num <- 1000
+snp_num <- 1000
+k<-100
+rho<-0.5
+freq0<-0.75
+d<-2
+
+set.seed(2021)
+
+mean0<-rep(0,k)
+mean1<-rep(0.1*d,k)
+mean2<-rep(-0.1*d,k)
+
+cov0<-AR1(p=k,rho=rho)
+cov1<-AR1(p=k,rho=rho-0.1*d)
+cov2<-AR1(p=k,rho=rho+0.1*d)
+
+x0<-mvrnorm(ceiling(num*freq0^2),mu=mean0,Sigma = cov0)
+x1<-mvrnorm(round(num*2*freq0*(1-freq0)),mu=mean1,Sigma = cov1)
+x2<-mvrnorm(num-ceiling(num*freq0^2)-round(num*2*freq0*(1-freq0)),mu=mean2,Sigma = cov2)
+x<-rbind(x0,x1,x2)
+
+snp<-c(rep(0,ceiling(num*freq0^2)),
+         rep(1,round(num*2*freq0*(1-freq0))),
+         rep(2,num-ceiling(num*freq0^2)-round(num*2*freq0*(1-freq0))))
+snp <- cbind(snp,sapply(2:snp_num, function(j) {
+        sample(0:2, size = num, replace = TRUE, 
+               prob = c(freq0^2, 2*freq0*(1-freq0), (1-freq0)^2))}))
+
+res <- bd.gwas.test(x = x, snp = snp)
+print(which(res$p.value<5*10^-5))
+```
+
+### Example 2:        
+```{r, eval=FALSE}
+d<-0
+
+set.seed(2021)
+
+mean<-rep(0,k)
+
+cov<-AR1(p=k,rho=rho)
+
+x<-mvrnorm(num,mu=mean,Sigma = cov)
+
+snp <- sapply(1:snp_num, function(j) {
+        sample(0:2, size = num, replace = TRUE, 
+               prob = c(freq0^2, 2*freq0*(1-freq0), (1-freq0)^2))})
+
+res <- bd.gwas.test(x = x, snp = snp)
+print(sum(res$p.value<5*10^-5)/1000)
+```
+
