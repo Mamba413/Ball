@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fast Two Ball Divergence test for gwas data — bd.gwas.test • Ball</title>
+<title>Fast K-sample Ball Divergence Test for GWAS Data — bd.gwas.test • Ball</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Fast Two Ball Divergence test for gwas data — bd.gwas.test" />
-<meta property="og:description" content="Fast Two Ball Divergence test for gwas data" />
+<meta property="og:title" content="Fast K-sample Ball Divergence Test for GWAS Data — bd.gwas.test" />
+<meta property="og:description" content="Fast K-sample Ball Divergence Test for GWAS Data" />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">Ball</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.11</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.12</span>
       </span>
     </div>
 
@@ -89,6 +89,18 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/bd_gwas.html">`bd.gwas.test`: Fast Ball Divergence Test for Multiple Hypothesis Tests</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -114,39 +126,86 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fast Two Ball Divergence test for gwas data</h1>
+    <h1>Fast K-sample Ball Divergence Test for GWAS Data</h1>
     <small class="dont-index">Source: <a href='https://github.com/Mamba413/Ball/tree/master/R-package/R/bd.gaws.R'><code>R/bd.gaws.R</code></a></small>
     <div class="hidden name"><code>bd.gwas.test.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Fast Two Ball Divergence test for gwas data</p>
+    <p>Fast K-sample Ball Divergence Test for GWAS Data</p>
     </div>
 
-    <pre class="usage"><span class='fu'>bd.gwas.test</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>snp</span>, dst <span class='op'>=</span> <span class='cn'>FALSE</span>, seed <span class='op'>=</span> <span class='fl'>4</span>, num.threads <span class='op'>=</span> <span class='fl'>2</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>bd.gwas.test</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>snp</span>,
+  screening.method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"permute"</span>, <span class='st'>"spectrum"</span><span class='op'>)</span>,
+  refine <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>num.permutations</span>,
+  distance <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>alpha</span>,
+  save.screening <span class='op'>=</span> <span class='cn'>NULL</span>,
+  screening.file <span class='op'>=</span> <span class='cn'>NULL</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  seed <span class='op'>=</span> <span class='fl'>1</span>,
+  num.threads <span class='op'>=</span> <span class='fl'>0</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>a numeric vector, matrix, data.frame, dist object</p></td>
+      <td><p>a numeric vector, matrix, data.frame, dist object.</p></td>
     </tr>
     <tr>
       <th>snp</th>
-      <td><p>SNP data</p></td>
+      <td><p>a SNP dataset. Each column must be an integer vector.</p></td>
     </tr>
     <tr>
-      <th>dst</th>
-      <td><p>if <code>dst = TRUE</code>, x will be considered as a distance matrix. Default: <code>dst = FALSE</code></p></td>
+      <th>screening.method</th>
+      <td><p>if <code>screening.method = "spectrum"</code>, the spectrum method is applied to 
+screening the candidate SNPs, or otherwise, the permutation method is applied. Default: <code>screening.method = "permute"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>refine</th>
+      <td><p>a logical value. If <code>refine = TRUE</code>, a \(p\)-values refining process is applied to 
+the SNPs which passes the pre-screening process. Default: <code>refine = TRUE</code> (At present, <code>refine = FALSE</code> is not available).</p></td>
+    </tr>
+    <tr>
+      <th>num.permutations</th>
+      <td><p>the number of permutation replications. When <code>num.permutations = 0</code>, 
+the function just returns the Ball Divergence statistic. Default: <code>num.permutations = 100 * ncol(snp)</code></p></td>
+    </tr>
+    <tr>
+      <th>distance</th>
+      <td><p>if <code>distance = TRUE</code>, the elements of <code>x</code> will be considered as a distance matrix. Default: <code>distance = FALSE</code>.</p></td>
+    </tr>
+    <tr>
+      <th>alpha</th>
+      <td><p>the significance level. Default: <code>0.05 / ncol(snp)</code>.</p></td>
+    </tr>
+    <tr>
+      <th>save.screening</th>
+      <td><p>A file name for preserving the pre-screening result. <code>save.screening = NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>screening.file</th>
+      <td><p>A file preserving the pre-screening result. 
+It works only if the pre-screening is available.
+Default: <code>screening.file = NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>Show computation status and estimated runtimes. Default: <code>verbose = FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>seed</th>
-      <td><p>the random seed.</p></td>
+      <td><p>the random seed. Default <code>seed = 1</code>.</p></td>
     </tr>
     <tr>
       <th>num.threads</th>
-      <td><p>Number of threads. Default <code>num.threads = 2</code>.</p></td>
+      <td><p>number of threads. If <code>num.threads = 0</code>, then all of available cores will be used. Default <code>num.threads = 0</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -157,31 +216,66 @@
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>bd.gwas.test returns a list containing the following components:</p>
-<dt><code>statistic</code></dt><dd><p>ball divergence statistic.</p></dd>            
-<dt><code>permuted_statistic</code></dt><dd><p>a data.frame containing permuted ball divergence statistic.</p></dd>            
-<dt><code>p.value</code></dt><dd><p>the p-value for the test.</p></dd>
+<dt><code>statistic</code></dt><dd><p>ball divergence statistics vector.</p></dd>            
+<dt><code>permuted.statistic</code></dt><dd><p>a data.frame containing permuted ball divergence statistic for pre-screening SNPs. 
+If <code>refine = FALSE</code>, it takes value <code>NULL</code>.</p></dd>            
+<dt><code>eigenvalue</code></dt><dd><p>the eigenvalue of spectrum decomposition. If <code>refine = TRUE</code>, it takes value <code>NULL</code>.</p></dd>
+<dt><code>p.value</code></dt><dd><p>the p-values of ball divergence test.</p></dd>
+<dt><code>refined.snp</code></dt><dd><p>the SNPs have been refined.</p></dd>
+<dt><code>refined.p.value</code></dt><dd><p>the refined \(p\)-value of significant snp.</p></dd>
+<dt><code>refined.permuted.statistic</code></dt><dd><p>a data.frame containing permuted ball divergence statistics for refining \(p\)-values.</p></dd>
 
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>Hu, Y., Tan, H., Li, C., &amp; Zhang, H. (2021). Identifying genetic risk variants associated with brain volumetric phenotypes via K‐sample Ball Divergence method. Genetic Epidemiology, 1–11. https://doi.org/10.1002/gepi.22423</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='bd.html'>bd</a></code>, <code><a href='bd.test.html'>bd.test</a></code></p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Jin Zhu</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
-<span class='va'>num</span> <span class='op'>&lt;-</span> <span class='fl'>60</span>
-<span class='va'>snp_num</span> <span class='op'>&lt;-</span> <span class='fl'>100</span>
-<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fl'>10</span>
-<span class='va'>x1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>num</span> <span class='op'>*</span> <span class='va'>p</span> <span class='op'>/</span> <span class='fl'>2</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>num</span><span class='op'>/</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='va'>x2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>num</span> <span class='op'>*</span> <span class='va'>p</span> <span class='op'>/</span> <span class='fl'>2</span>, <span class='fl'>3</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>num</span><span class='op'>/</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span><span class='op'>(</span><span class='va'>x1</span>, <span class='va'>x2</span><span class='op'>)</span>
-<span class='va'>snp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>sapply</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>snp_num</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span> <span class='op'>{</span> 
-  <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span>
-  <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span>, size <span class='op'>=</span> <span class='va'>num</span>, replace <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://mamba413.github.io/ball'>Ball</a></span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1234</span><span class='op'>)</span>
+<span class='va'>num</span> <span class='op'>&lt;-</span> <span class='fl'>200</span>
+<span class='va'>snp_num</span> <span class='op'>&lt;-</span> <span class='fl'>500</span>
+<span class='va'>p</span> <span class='op'>&lt;-</span> <span class='fl'>5</span>
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>num</span> <span class='op'>*</span> <span class='va'>p</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>num</span><span class='op'>)</span>
+<span class='va'>snp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>sapply</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>snp_num</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>2</span>, size <span class='op'>=</span> <span class='va'>num</span>, replace <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='op'>}</span><span class='op'>)</span>
-<span class='va'>snp</span><span class='op'>[</span>, <span class='fl'>1</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span>, each <span class='op'>=</span> <span class='va'>num</span><span class='op'>/</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='va'>snp</span><span class='op'>[</span>, <span class='fl'>2</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='va'>num</span><span class='op'>/</span><span class='fl'>2</span> <span class='op'>-</span> <span class='fl'>1</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='va'>num</span><span class='op'>/</span><span class='fl'>2</span> <span class='op'>+</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>snp</span><span class='op'>[</span>, <span class='fl'>3</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='va'>num</span><span class='op'>/</span><span class='fl'>2</span> <span class='op'>-</span> <span class='fl'>2</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='va'>num</span><span class='op'>/</span><span class='fl'>2</span> <span class='op'>+</span> <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>snp</span><span class='op'>[</span>, <span class='fl'>4</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='va'>num</span><span class='op'>/</span><span class='fl'>2</span> <span class='op'>-</span> <span class='fl'>4</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='va'>num</span><span class='op'>/</span><span class='fl'>2</span> <span class='op'>+</span> <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>bd.gwas.test</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, snp <span class='op'>=</span> <span class='va'>snp</span>, num.threads <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span>, n <span class='op'>=</span> <span class='fl'>8</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 0.0000499975 0.0000499975 0.0000499975 0.0000499975 0.0147992600
-#&gt; [6] 0.4876256187 0.1746412679 0.1628918554</div></pre>
+<span class='va'>snp1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>sapply</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>snp_num</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, size <span class='op'>=</span> <span class='va'>num</span>, replace <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
+<span class='va'>snp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>snp</span>, <span class='va'>snp1</span><span class='op'>)</span>
+<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>Ball</span><span class='fu'>::</span><span class='fu'>bd.gwas.test</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, snp <span class='op'>=</span> <span class='va'>snp</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; =========== Pre-screening SNPs ===========
+#&gt; [1] "None of SNP pass the pre-screening process!"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0.039</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;</span> <span class='fl'>0.005</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0.005</div><div class='input'>
+<span class='co'>## only return the test statistics;</span>
+<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>Ball</span><span class='fu'>::</span><span class='fu'>bd.gwas.test</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, snp <span class='op'>=</span> <span class='va'>snp</span>, num.permutation <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>
+
+<span class='co'>## save pre-screening process results:</span>
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>num</span> <span class='op'>*</span> <span class='va'>p</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>num</span><span class='op'>)</span>
+<span class='va'>snp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>sapply</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>snp_num</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>2</span>, size <span class='op'>=</span> <span class='va'>num</span>, replace <span class='op'>=</span> <span class='cn'>TRUE</span>, prob <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>/</span><span class='fl'>2</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>4</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
+<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>Ball</span><span class='fu'>::</span><span class='fu'>bd.gwas.test</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, snp <span class='op'>=</span> <span class='va'>snp</span>, alpha <span class='op'>=</span> <span class='fl'>5</span><span class='op'>*</span><span class='fl'>10</span><span class='op'>^</span><span class='op'>-</span><span class='fl'>4</span>, 
+                          num.permutations <span class='op'>=</span> <span class='fl'>19999</span>, 
+                          save.screening <span class='op'>=</span> <span class='st'>"temp.rda"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; =========== Pre-screening SNPs ===========
+#&gt; [1] "None of SNP pass the pre-screening process!"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0.046</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;</span> <span class='fl'>0.005</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0.002</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;</span> <span class='fl'>0.0005</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0</div><div class='input'><span class='co'>## refine p-value according to the pre-screening process result:</span>
+<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>Ball</span><span class='fu'>::</span><span class='fu'>bd.gwas.test</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, snp <span class='op'>=</span> <span class='va'>snp</span>, alpha <span class='op'>=</span> <span class='fl'>5</span><span class='op'>*</span><span class='fl'>10</span><span class='op'>^</span><span class='op'>-</span><span class='fl'>4</span>, 
+                          num.permutations <span class='op'>=</span> <span class='fl'>19999</span>, 
+                          screening.file <span class='op'>=</span> <span class='st'>"temp.rda"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "None of SNP pass the pre-screening process!"</div><div class='input'><span class='co'># }</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -193,7 +287,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jin Zhu, Wenliang Pan, Heping Zhang, Hongtu Zhu, Yuan Tian, Weinan Xiao, Chengfeng Liu, Ruihuang Liu, Xueqin Wang.</p>
+  <p>Developed by Jin Zhu, Wenliang Pan, Yuan Tian, Weinan Xiao, Chengfeng Liu, Ruihuang Liu, Yue Hu, Hongtu Zhu, Heping Zhang, Xueqin Wang.</p>
 </div>
 
 <div class="pkgdown">
