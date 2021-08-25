@@ -85,7 +85,7 @@ head(snp[, 1:6])
 ```
 
 Given the synthetic dataset `x` and `snp`, multiple KBD tests is conducted by:
-```{r, cache=TRUE}
+```{r}
 library(Ball)
 res <- bd.gwas.test(x = x, snp = snp)
 ```
