@@ -120,8 +120,13 @@ Compared to other methods, KBD performs better in most of the scenarios, especia
 
 From Figures 1 and 3, we can notice that the power curves are similar after sample size of 500, when the minor allele frequency is not small. On the other hand, when the minor allele is rare, a larger sample size can lead to a higher power from Figures 2 and 4. The four figures show how sample size could affect the power of the KBD method, indicating that there is an inverse relationship between minor allele frequency and the sample sizes in order to get sufficient power.
 
+<!-- ![](./kbd_gwas.png) -->
+
+<p align="center">
+  <img src="./kbd_gwas.png" width="500" height="500">
+</p>
 <!-- ### Summary plots of simulation results of heterogeneous settings of the KBD method             -->
-```{r, echo=FALSE, fig.align='center'}
+```{r, echo=FALSE, fig.align='center', eval=FALSE}
 library(ggplot2)
 library(ggpubr)
 size_15 <- 9
@@ -222,8 +227,9 @@ p4 <- ggplot(data=df_2_95, aes(x=d, y=power, colour=group,linetype=group)) +
         legend.text = element_text(size=size_15),
         legend.position = "bottom")
 
-ggarrange(p1, p2, p3, p4, nrow = 2, widths = 8, heights = 8, 
-          common.legend = TRUE, ncol = 2, legend = "bottom")
+p <- ggarrange(p1, p2, p3, p4, nrow = 2, widths = 8, heights = 8, 
+               common.legend = TRUE, ncol = 2, legend = "bottom")
+ggexport(p, filename = "kbd_gwas.png")
 ```
 
 
