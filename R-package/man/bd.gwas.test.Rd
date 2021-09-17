@@ -22,23 +22,23 @@ bd.gwas.test(
 \arguments{
 \item{x}{a numeric vector, matrix, data.frame, dist object.}
 
-\item{snp}{a SNP dataset. Each column must be an integer vector.}
+\item{snp}{a numeric matrix recording the values of single nucleotide polymorphism (SNP). Each column must be an integer vector.}
 
-\item{screening.method}{if \code{screening.method = "spectrum"}, the spectrum method is applied to 
+\item{screening.method}{if \code{screening.method = "spectrum"}, the spectrum method is applied to
 screening the candidate SNPs, or otherwise, the permutation method is applied. Default: \code{screening.method = "permute"}.}
 
-\item{refine}{a logical value. If \code{refine = TRUE}, a \eqn{p}-values refining process is applied to 
+\item{refine}{a logical value. If \code{refine = TRUE}, a \eqn{p}-values refining process is applied to
 the SNPs which passes the pre-screening process. Default: \code{refine = TRUE} (At present, \code{refine = FALSE} is not available).}
 
-\item{num.permutations}{the number of permutation replications. When \code{num.permutations = 0}, 
+\item{num.permutations}{the number of permutation replications. When \code{num.permutations = 0},
 the function just returns the Ball Divergence statistic. Default: \code{num.permutations = 100 * ncol(snp)}}
 
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} will be considered as a distance matrix. Default: \code{distance = FALSE}.}
 
 \item{alpha}{the significance level. Default: \code{0.05 / ncol(snp)}.}
 
-\item{screening.result}{A object return by \code{bd.gwas.test} that 
-preserving the pre-screening result. 
+\item{screening.result}{A object return by \code{bd.gwas.test} that
+preserving the pre-screening result.
 It works only if the pre-screening is available.
 Default: \code{screening.result = NULL}.}
 
@@ -52,14 +52,15 @@ Default: \code{screening.result = NULL}.}
 }
 \value{
 bd.gwas.test returns a list containing the following components:
-\item{\code{statistic}}{ball divergence statistics vector.}            
-\item{\code{permuted.statistic}}{a data.frame containing permuted ball divergence statistic for pre-screening SNPs. 
-If \code{refine = FALSE}, it takes value \code{NULL}.}            
+\item{\code{statistic}}{ball divergence statistics vector.}
+\item{\code{permuted.statistic}}{a data.frame containing permuted ball divergence statistic for pre-screening SNPs.
+If \code{refine = FALSE}, it takes value \code{NULL}.}
 \item{\code{eigenvalue}}{the eigenvalue of spectrum decomposition. If \code{refine = TRUE}, it takes value \code{NULL}.}
 \item{\code{p.value}}{the p-values of ball divergence test.}
 \item{\code{refined.snp}}{the SNPs have been refined.}
 \item{\code{refined.p.value}}{the refined \eqn{p}-value of significant snp.}
 \item{\code{refined.permuted.statistic}}{a data.frame containing permuted ball divergence statistics for refining \eqn{p}-values.}
+\item{\code{screening.result}{a list containing the result of screening.}}
 }
 \description{
 Fast K-sample Ball Divergence Test for GWAS Data
@@ -91,15 +92,15 @@ x <- matrix(rnorm(num * p), nrow = num)
 snp <- sapply(1:snp_num, function(i) {
   sample(0:2, size = num, replace = TRUE, prob = c(1/2, 1/4, 1/4))
 })
-snp_screening <- Ball::bd.gwas.test(x = x, snp = snp, 
+snp_screening <- Ball::bd.gwas.test(x = x, snp = snp,
                                     alpha = 5*10^-4, refine = FALSE,
                                     num.permutations = 19999)
 mean(res[["p.value"]] < 0.05)
 mean(res[["p.value"]] < 0.005)
 mean(res[["p.value"]] < 0.0005)
 ## refine p-value according to the pre-screening process result:
-res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, 
-                          num.permutations = 19999, 
+res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4,
+                          num.permutations = 19999,
                           screening.result = snp_screening[["screening.result"]])
 }
 }

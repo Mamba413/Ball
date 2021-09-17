@@ -17,7 +17,7 @@ bcorsis(
 )
 }
 \arguments{
-\item{x}{a numeric matirx or data.frame included \eqn{n} rows and \eqn{p} columns. 
+\item{x}{a numeric matrix or data.frame included \eqn{n} rows and \eqn{p} columns. 
 Each row is an observation vector and each column corresponding to a explanatory variable, generally \eqn{p >> n}.}
 
 \item{y}{a numeric vector, matrix, or data.frame.}

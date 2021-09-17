@@ -57,7 +57,7 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
 #' @description Generic non-parametric sure independence screening (SIS) procedure based on Ball Correlation.
 #' Ball correlation is a generic measure of dependence in Banach spaces.
 #' @inheritParams bcov.test
-#' @param x a numeric matirx or data.frame included \eqn{n} rows and \eqn{p} columns. 
+#' @param x a numeric matrix or data.frame included \eqn{n} rows and \eqn{p} columns. 
 #' Each row is an observation vector and each column corresponding to a explanatory variable, generally \eqn{p >> n}.
 #' @param d the hard cutoff rule suggests selecting \eqn{d} variables. Setting \code{d = "large"} or 
 #' \code{ d = "small"} means \code{n - 1} or \code{floor(n/log(n))} 

@@ -173,7 +173,7 @@ bd.test(Sepal.Width ~ Species, data = iris)
 bd.test(Sepal.Width ~ Species, data = iris, kbd.type = "max")
 }
 \references{
-Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
+Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. Ball Divergence: Nonparametric two sample test. Annals of Statistics. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077
 
 Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2021). Ball: An R Package for Detecting Distribution Difference and Association in Metric Spaces, Journal of Statistical Software, Vol.97(6), doi: 10.18637/jss.v097.i06.
 }
