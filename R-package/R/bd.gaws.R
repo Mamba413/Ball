@@ -24,7 +24,7 @@
 #' \item{\code{refined.snp}}{the SNPs have been refined.}
 #' \item{\code{refined.p.value}}{the refined \eqn{p}-value of significant snp.}
 #' \item{\code{refined.permuted.statistic}}{a data.frame containing permuted ball divergence statistics for refining \eqn{p}-values.}
-#' \item{\code{screening.result}{a list containing the result of screening.}}
+#' \item{\code{screening.result}}{a list containing the result of screening.}
 #'
 #' @export
 #'

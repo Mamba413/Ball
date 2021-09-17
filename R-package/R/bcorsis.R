@@ -60,7 +60,7 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
 #' @param x a numeric matrix or data.frame included \eqn{n} rows and \eqn{p} columns. 
 #' Each row is an observation vector and each column corresponding to a explanatory variable, generally \eqn{p >> n}.
 #' @param d the hard cutoff rule suggests selecting \eqn{d} variables. Setting \code{d = "large"} or 
-#' \code{ d = "small"} means \code{n - 1} or \code{floor(n/log(n))} 
+#' \code{d = "small"} means \code{n - 1} or \code{floor(n/log(n))} 
 #' variables are selected. If \code{d} is a integer, \code{d} variables are selected. Default: \code{d = "small"}.
 #' @param method specific method for the BCor-SIS procedure. It must be one of \code{"standard"},
 #' \code{"lm"}, \code{"gam"}, \code{"interaction"}, or \code{"survival"}.
