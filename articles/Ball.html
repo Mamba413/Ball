@@ -181,7 +181,7 @@
 # data:  x and y 
 # number of observations = 100, group sizes: 50 50
 # replicates = 99, weight: constant
-# bd.constant = 0.59468, p-value = 0.01
+# bd.constant = 0.57396, p-value = 0.01
 # alternative hypothesis: distributions of samples are distinct</code></pre>
 <p>The result of <strong>bd.test</strong> is that <em>p</em>-value &lt; 0.05, so we conclude that two samples are not identically distributed.</p>
 </div>
@@ -206,7 +206,7 @@
 # data:  x and y
 # number of observations = 50
 # replicates = 99, weight: constant
-# bcov.constant = 0.0024765, p-value = 0.01
+# bcov.constant = 0.002092, p-value = 0.01
 # alternative hypothesis: random variables are dependent</code></pre>
 <p>The result of <strong>bcov.test</strong> is that <em>p</em>-value &lt; 0.05, so we conclude that <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are not independent, which means there is some kind of correlation between X and Y.</p>
 </div>
@@ -229,7 +229,7 @@
 # data:  x and y
 # number of observations = 50
 # replicates = 99, weight: probability
-# bcov.probability = 0.036731, p-value = 0.01
+# bcov.probability = 0.044515, p-value = 0.01
 # alternative hypothesis: random variables are dependent</code></pre>
 <p>The result of <strong>bcov.test</strong> is that <em>p</em>-value &lt; 0.05, so we conclude that multivariate random variable <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are associated.</p>
 <!-- *** -->
@@ -381,7 +381,7 @@ The result shows that <em>p</em>-value is less than 0.05, an usual significance 
 # data:  rnorm(n) 
 # number of observations = 150, group sizes: 50 50 50
 # replicates = 99, weight: constant, kbd.type: sum
-# kbd.sum.constant = 0.022785, p-value = 0.87
+# kbd.sum.constant = 0.039233, p-value = 0.46
 # alternative hypothesis: distributions of samples are distinct</code></pre>
 <p>As the result shown, <em>p</em>-value&gt;0.05, which means we can’t reject the null hypothesis.<br>
 We can also utilize <strong>bd.test</strong> to deal with <span class="math inline">\(K\)</span>-Sample problem in non-Hilbert space following the aforementioned procedure. At the same time, remember to assign size vector to parameter <em>size</em> arguments and set <em>distance = TRUE</em>.</p>
@@ -443,7 +443,7 @@ We can also utilize <strong>bd.test</strong> to deal with <span class="math inli
 # data:  example1
 # number of observations = 50
 # replicates = 199, weight: constant
-# bcov.constant = 0.0021317, p-value = 0.005
+# bcov.constant = 0.0019292, p-value = 0.005
 # alternative hypothesis: random variables are dependent</code></pre>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/bcov.test.html">bcov.test</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">example2</span>, num.permutations <span class="op">=</span> <span class="fl">199</span><span class="op">)</span></code></pre></div>
@@ -453,7 +453,7 @@ We can also utilize <strong>bd.test</strong> to deal with <span class="math inli
 # data:  example2
 # number of observations = 50
 # replicates = 199, weight: constant
-# bcov.constant = 0.039344, p-value = 0.005
+# bcov.constant = 0.037263, p-value = 0.005
 # alternative hypothesis: random variables are dependent</code></pre>
 <p>The hypothesis test result for two examples show that <em>p</em>-value &lt; 0.05, coinciding with the simulation setting.</p>
 </div>

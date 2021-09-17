@@ -143,8 +143,7 @@
   <span class='va'>num.permutations</span>,
   distance <span class='op'>=</span> <span class='cn'>FALSE</span>,
   <span class='va'>alpha</span>,
-  save.screening <span class='op'>=</span> <span class='cn'>NULL</span>,
-  screening.file <span class='op'>=</span> <span class='cn'>NULL</span>,
+  screening.result <span class='op'>=</span> <span class='cn'>NULL</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>,
   seed <span class='op'>=</span> <span class='fl'>1</span>,
   num.threads <span class='op'>=</span> <span class='fl'>0</span>,
@@ -160,21 +159,21 @@
     </tr>
     <tr>
       <th>snp</th>
-      <td><p>a SNP dataset. Each column must be an integer vector.</p></td>
+      <td><p>a numeric matrix recording the values of single nucleotide polymorphism (SNP). Each column must be an integer vector.</p></td>
     </tr>
     <tr>
       <th>screening.method</th>
-      <td><p>if <code>screening.method = "spectrum"</code>, the spectrum method is applied to 
+      <td><p>if <code>screening.method = "spectrum"</code>, the spectrum method is applied to
 screening the candidate SNPs, or otherwise, the permutation method is applied. Default: <code>screening.method = "permute"</code>.</p></td>
     </tr>
     <tr>
       <th>refine</th>
-      <td><p>a logical value. If <code>refine = TRUE</code>, a \(p\)-values refining process is applied to 
+      <td><p>a logical value. If <code>refine = TRUE</code>, a \(p\)-values refining process is applied to
 the SNPs which passes the pre-screening process. Default: <code>refine = TRUE</code> (At present, <code>refine = FALSE</code> is not available).</p></td>
     </tr>
     <tr>
       <th>num.permutations</th>
-      <td><p>the number of permutation replications. When <code>num.permutations = 0</code>, 
+      <td><p>the number of permutation replications. When <code>num.permutations = 0</code>,
 the function just returns the Ball Divergence statistic. Default: <code>num.permutations = 100 * ncol(snp)</code></p></td>
     </tr>
     <tr>
@@ -186,14 +185,11 @@ the function just returns the Ball Divergence statistic. Default: <code>num.perm
       <td><p>the significance level. Default: <code>0.05 / ncol(snp)</code>.</p></td>
     </tr>
     <tr>
-      <th>save.screening</th>
-      <td><p>A file name for preserving the pre-screening result. <code>save.screening = NULL</code>.</p></td>
-    </tr>
-    <tr>
-      <th>screening.file</th>
-      <td><p>A file preserving the pre-screening result. 
+      <th>screening.result</th>
+      <td><p>A object return by <code>bd.gwas.test</code> that
+preserving the pre-screening result.
 It works only if the pre-screening is available.
-Default: <code>screening.file = NULL</code>.</p></td>
+Default: <code>screening.result = NULL</code>.</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -216,14 +212,15 @@ Default: <code>screening.file = NULL</code>.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>bd.gwas.test returns a list containing the following components:</p>
-<dt><code>statistic</code></dt><dd><p>ball divergence statistics vector.</p></dd>            
-<dt><code>permuted.statistic</code></dt><dd><p>a data.frame containing permuted ball divergence statistic for pre-screening SNPs. 
-If <code>refine = FALSE</code>, it takes value <code>NULL</code>.</p></dd>            
+<dt><code>statistic</code></dt><dd><p>ball divergence statistics vector.</p></dd>
+<dt><code>permuted.statistic</code></dt><dd><p>a data.frame containing permuted ball divergence statistic for pre-screening SNPs.
+If <code>refine = FALSE</code>, it takes value <code>NULL</code>.</p></dd>
 <dt><code>eigenvalue</code></dt><dd><p>the eigenvalue of spectrum decomposition. If <code>refine = TRUE</code>, it takes value <code>NULL</code>.</p></dd>
 <dt><code>p.value</code></dt><dd><p>the p-values of ball divergence test.</p></dd>
 <dt><code>refined.snp</code></dt><dd><p>the SNPs have been refined.</p></dd>
 <dt><code>refined.p.value</code></dt><dd><p>the refined \(p\)-value of significant snp.</p></dd>
 <dt><code>refined.permuted.statistic</code></dt><dd><p>a data.frame containing permuted ball divergence statistics for refining \(p\)-values.</p></dd>
+<dt><code>screening.result</code></dt><dd><p>a list containing the result of screening.</p></dd>
 
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -263,18 +260,17 @@ If <code>refine = FALSE</code>, it takes value <code>NULL</code>.</p></dd>
 <span class='va'>snp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>sapply</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>snp_num</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>i</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>2</span>, size <span class='op'>=</span> <span class='va'>num</span>, replace <span class='op'>=</span> <span class='cn'>TRUE</span>, prob <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>/</span><span class='fl'>2</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>4</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span><span class='op'>)</span>
-<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>Ball</span><span class='fu'>::</span><span class='fu'>bd.gwas.test</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, snp <span class='op'>=</span> <span class='va'>snp</span>, alpha <span class='op'>=</span> <span class='fl'>5</span><span class='op'>*</span><span class='fl'>10</span><span class='op'>^</span><span class='op'>-</span><span class='fl'>4</span>, 
-                          num.permutations <span class='op'>=</span> <span class='fl'>19999</span>, 
-                          save.screening <span class='op'>=</span> <span class='st'>"temp.rda"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; =========== Pre-screening SNPs ===========
-#&gt; [1] "None of SNP pass the pre-screening process!"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 0.046</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;</span> <span class='fl'>0.005</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 0.002</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;</span> <span class='fl'>0.0005</span><span class='op'>)</span>
+<span class='va'>snp_screening</span> <span class='op'>&lt;-</span> <span class='fu'>Ball</span><span class='fu'>::</span><span class='fu'>bd.gwas.test</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, snp <span class='op'>=</span> <span class='va'>snp</span>,
+                                    alpha <span class='op'>=</span> <span class='fl'>5</span><span class='op'>*</span><span class='fl'>10</span><span class='op'>^</span><span class='op'>-</span><span class='fl'>4</span>, refine <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                    num.permutations <span class='op'>=</span> <span class='fl'>19999</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; =========== Pre-screening SNPs ===========</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;</span> <span class='fl'>0.005</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;</span> <span class='fl'>0.0005</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 0</div><div class='input'><span class='co'>## refine p-value according to the pre-screening process result:</span>
-<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>Ball</span><span class='fu'>::</span><span class='fu'>bd.gwas.test</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, snp <span class='op'>=</span> <span class='va'>snp</span>, alpha <span class='op'>=</span> <span class='fl'>5</span><span class='op'>*</span><span class='fl'>10</span><span class='op'>^</span><span class='op'>-</span><span class='fl'>4</span>, 
-                          num.permutations <span class='op'>=</span> <span class='fl'>19999</span>, 
-                          screening.file <span class='op'>=</span> <span class='st'>"temp.rda"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "None of SNP pass the pre-screening process!"</div><div class='input'><span class='co'># }</span>
+<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>Ball</span><span class='fu'>::</span><span class='fu'>bd.gwas.test</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, snp <span class='op'>=</span> <span class='va'>snp</span>, alpha <span class='op'>=</span> <span class='fl'>5</span><span class='op'>*</span><span class='fl'>10</span><span class='op'>^</span><span class='op'>-</span><span class='fl'>4</span>,
+                          num.permutations <span class='op'>=</span> <span class='fl'>19999</span>,
+                          screening.result <span class='op'>=</span> <span class='va'>snp_screening</span><span class='op'>[[</span><span class='st'>"screening.result"</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
+<span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

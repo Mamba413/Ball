@@ -269,7 +269,7 @@ Users can get other Ball Divergence statistics and their corresponding \(p\)-val
 in the <code>complete.info</code> element of output. We give a quick example below to illustrate.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. Ball Divergence: Nonparametric two sample test. Ann. Statist. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077</p>
+    <p>Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. Ball Divergence: Nonparametric two sample test. Annals of Statistics. 46 (2018), no. 3, 1109--1137. doi:10.1214/17-AOS1579. https://projecteuclid.org/euclid.aos/1525313077</p>
 <p>Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2021). Ball: An R Package for Detecting Distribution Difference and Association in Metric Spaces, Journal of Statistical Software, Vol.97(6), doi: 10.18637/jss.v097.i06.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
@@ -306,7 +306,7 @@ in the <code>complete.info</code> element of output. We give a quick example bel
 #&gt; data:  x and y 
 #&gt; number of observations = 100, group sizes: 50 50
 #&gt; replicates = 99, weight: constant
-#&gt; bd.constant = 0.61937, p-value = 0.01
+#&gt; bd.constant = 0.53792, p-value = 0.01
 #&gt; alternative hypothesis: distributions of samples are distinct
 #&gt; </div><div class='input'>
 <span class='co'>################# Simlated Non-Hilbert data #################</span>
@@ -358,7 +358,7 @@ in the <code>complete.info</code> element of output. We give a quick example bel
 #&gt; data:  rnorm(n) 
 #&gt; number of observations = 150, group sizes: 40 50 60
 #&gt; replicates = 99, weight: constant, kbd.type: sum
-#&gt; kbd.sum.constant = 0.033023, p-value = 0.73
+#&gt; kbd.sum.constant = 0.052645, p-value = 0.27
 #&gt; alternative hypothesis: distributions of samples are distinct
 #&gt; </div><div class='input'><span class='co'># alternative input method:</span>
 <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>40</span>, <span class='fl'>50</span>, <span class='fl'>60</span><span class='op'>)</span>, <span class='va'>rnorm</span><span class='op'>)</span>
@@ -370,21 +370,21 @@ in the <code>complete.info</code> element of output. We give a quick example bel
 #&gt; data:  x 
 #&gt; number of observations = 150, group sizes: 40 50 60
 #&gt; replicates = 99, weight: constant, kbd.type: sum
-#&gt; kbd.sum.constant = 0.028548, p-value = 0.81
+#&gt; kbd.sum.constant = 0.050267, p-value = 0.32
 #&gt; alternative hypothesis: distributions of samples are distinct
 #&gt; </div><div class='input'><span class='co'>## get all Ball Divergence statistics:</span>
 <span class='va'>res</span><span class='op'>[[</span><span class='st'>"complete.info"</span><span class='op'>]</span><span class='op'>]</span><span class='op'>[[</span><span class='st'>"statistic"</span><span class='op'>]</span><span class='op'>]</span>
 </div><div class='output co'>#&gt;    kbd.sum.constant    kbd.sum.variance    kbd.max.constant    kbd.max.variance 
-#&gt;          0.02854808          0.02854808          0.02383632          0.02383632 
+#&gt;          0.05026687          0.05026687          0.04011630          0.04011630 
 #&gt; kbd.maxsum.constant kbd.maxsum.variance 
-#&gt;          0.02383632          0.02383632 </div><div class='input'><span class='co'>## get all test result:</span>
+#&gt;          0.04011630          0.04011630 </div><div class='input'><span class='co'>## get all test result:</span>
 <span class='va'>res</span><span class='op'>[[</span><span class='st'>"complete.info"</span><span class='op'>]</span><span class='op'>]</span><span class='op'>[[</span><span class='st'>"p.value"</span><span class='op'>]</span><span class='op'>]</span>
 </div><div class='output co'>#&gt;    kbd.sum.constant.pvalue    kbd.sum.variance.pvalue 
-#&gt;                       0.81                       0.81 
+#&gt;                       0.32                       0.32 
 #&gt;    kbd.max.constant.pvalue    kbd.max.variance.pvalue 
-#&gt;                       0.78                       0.78 
+#&gt;                       0.34                       0.34 
 #&gt; kbd.maxsum.constant.pvalue kbd.maxsum.variance.pvalue 
-#&gt;                       0.78                       0.78 </div><div class='input'>
+#&gt;                       0.34                       0.34 </div><div class='input'>
 <span class='co'>################  Testing via approximate limit distribution  #################</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
