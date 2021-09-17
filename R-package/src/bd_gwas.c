@@ -3,7 +3,10 @@
 #include "stdlib.h"
 #include "math.h"
 #include "utilities.h"
+
+#ifdef R_BUILD
 #include "R.h"
+#endif
 
 double Ball_Divergence_Value(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
   int i, j, n;

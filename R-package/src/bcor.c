@@ -21,7 +21,11 @@
 #include "utilities.h"
 #include "bcor.h"
 #include "Ball_omp.h"
+
+#ifdef R_BUILD
 #include "R.h"
+#endif
+
 /**
  *
  * @param sub_rank
