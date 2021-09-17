@@ -2,7 +2,7 @@ Package: Ball
 Type: Package
 Title: Statistical Inference and Sure Independence Screening via Ball Statistics
 Version: 1.3.12
-Date: 2021-08-23
+Date: 2021-09-17
 Authors@R: c(
   person(given = "Jin", family = "Zhu", email = "zhuj37@mail2.sysu.edu.cn", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8550-5822")),
   person(given = "Wenliang", family = "Pan", role = c("aut")),
@@ -27,5 +27,5 @@ VignetteBuilder: knitr
 NeedsCompilation: yes
 Encoding: UTF-8
 LazyData: true
-URL: https://mamba413.github.io/ball, https://github.com/Mamba413/Ball
+URL: https://mamba413.github.io/Ball, https://github.com/Mamba413/Ball
 BugReports: https://github.com/Mamba413/Ball/issues
