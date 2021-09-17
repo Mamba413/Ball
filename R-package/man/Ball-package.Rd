@@ -22,7 +22,7 @@ Yue Hu, Haizhu Tan, Cai Li, Heping Zhang. (2021). Identifying genetic risk varia
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://mamba413.github.io/ball}
+  \item \url{https://mamba413.github.io/Ball}
   \item \url{https://github.com/Mamba413/Ball}
   \item Report bugs at \url{https://github.com/Mamba413/Ball/issues}
 }
