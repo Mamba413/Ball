@@ -3,6 +3,7 @@
 #include "stdlib.h"
 #include "math.h"
 #include "utilities.h"
+#include "bd_gwas.h"
 
 #ifdef R_BUILD
 #include "R.h"
