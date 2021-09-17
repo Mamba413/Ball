@@ -12,8 +12,7 @@ bd.gwas.test(
   num.permutations,
   distance = FALSE,
   alpha,
-  save.screening = NULL,
-  screening.file = NULL,
+  screening.result = NULL,
   verbose = TRUE,
   seed = 1,
   num.threads = 0,
@@ -38,11 +37,10 @@ the function just returns the Ball Divergence statistic. Default: \code{num.perm
 
 \item{alpha}{the significance level. Default: \code{0.05 / ncol(snp)}.}
 
-\item{save.screening}{A file name for preserving the pre-screening result. \code{save.screening = NULL}.}
-
-\item{screening.file}{A file preserving the pre-screening result. 
+\item{screening.result}{A object return by \code{bd.gwas.test} that 
+preserving the pre-screening result. 
 It works only if the pre-screening is available.
-Default: \code{screening.file = NULL}.}
+Default: \code{screening.result = NULL}.}
 
 \item{verbose}{Show computation status and estimated runtimes. Default: \code{verbose = FALSE}.}
 
@@ -93,16 +91,16 @@ x <- matrix(rnorm(num * p), nrow = num)
 snp <- sapply(1:snp_num, function(i) {
   sample(0:2, size = num, replace = TRUE, prob = c(1/2, 1/4, 1/4))
 })
-res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, 
-                          num.permutations = 19999, 
-                          save.screening = "temp.rda")
+snp_screening <- Ball::bd.gwas.test(x = x, snp = snp, 
+                                    alpha = 5*10^-4, refine = FALSE,
+                                    num.permutations = 19999)
 mean(res[["p.value"]] < 0.05)
 mean(res[["p.value"]] < 0.005)
 mean(res[["p.value"]] < 0.0005)
 ## refine p-value according to the pre-screening process result:
 res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, 
                           num.permutations = 19999, 
-                          screening.file = "temp.rda")
+                          screening.result = snp_screening[["screening.result"]])
 }
 }
 \references{

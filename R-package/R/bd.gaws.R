@@ -8,10 +8,10 @@
 #' the function just returns the Ball Divergence statistic. Default: \code{num.permutations = 100 * ncol(snp)}
 #' @param screening.method if \code{screening.method = "spectrum"}, the spectrum method is applied to 
 #' screening the candidate SNPs, or otherwise, the permutation method is applied. Default: \code{screening.method = "permute"}.
-#' @param screening.file A file preserving the pre-screening result. 
+#' @param screening.result A object return by \code{bd.gwas.test} that 
+#' preserving the pre-screening result. 
 #' It works only if the pre-screening is available.
-#' Default: \code{screening.file = NULL}.
-#' @param save.screening A file name for preserving the pre-screening result. \code{save.screening = NULL}.
+#' Default: \code{screening.result = NULL}.
 #' @param alpha the significance level. Default: \code{0.05 / ncol(snp)}.
 #' @param verbose Show computation status and estimated runtimes. Default: \code{verbose = FALSE}.
 #' 
@@ -61,21 +61,21 @@
 #' snp <- sapply(1:snp_num, function(i) {
 #'   sample(0:2, size = num, replace = TRUE, prob = c(1/2, 1/4, 1/4))
 #' })
-#' res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, 
-#'                           num.permutations = 19999, 
-#'                           save.screening = "temp.rda")
+#' snp_screening <- Ball::bd.gwas.test(x = x, snp = snp, 
+#'                                     alpha = 5*10^-4, refine = FALSE,
+#'                                     num.permutations = 19999)
 #' mean(res[["p.value"]] < 0.05)
 #' mean(res[["p.value"]] < 0.005)
 #' mean(res[["p.value"]] < 0.0005)
 #' ## refine p-value according to the pre-screening process result:
 #' res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4, 
 #'                           num.permutations = 19999, 
-#'                           screening.file = "temp.rda")
+#'                           screening.result = snp_screening[["screening.result"]])
 #' }
 bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"), 
                          refine = TRUE,
                          num.permutations, distance = FALSE, alpha, 
-                         save.screening = NULL, screening.file = NULL, 
+                         screening.result = NULL, 
                          verbose = TRUE, seed = 1, num.threads = 0, ...) 
 {
   snp <- as.matrix(snp)
@@ -130,7 +130,7 @@ bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"),
   
   eigenvalue <- NULL
   p_value <- NULL
-  if (is.null(screening.file)) {
+  if (is.null(screening.result)) {
     set.seed(seed)
     statistic <- as.double(numeric(snp_num * 2))
     permuted_statistic <- as.double(numeric(r * 2 * unique_class_num))
@@ -167,15 +167,15 @@ bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"),
       eigenvalue <- NULL
       p_value <- NULL
     }
-    if (!is.null(save.screening)) {
-      save(statistic, permuted_statistic, p_value, x_index, ties, file = save.screening)
-    }
+    screening_result <- list(statistic, permuted_statistic, 
+                             p_value, x_index, ties)
   } else {
-    if (file.exists(screening.file)) {
-      load(screening.file)
-    } else {
-      stop("the screening file not exists!")
-    }
+    statistic <- screening.result[["statistic"]]
+    permuted_statistic <- screening.result[["permuted_statistic"]]
+    p_value <- screening.result[["p_value"]]
+    x_index <- screening.result[["x_index"]]
+    ties <- screening.result[["ties"]]
+    screening_result <- screening.result
   }
   
   significant_snp <- NULL
@@ -238,5 +238,6 @@ bd.gwas.test <- function(x, snp, screening.method = c("permute", "spectrum"),
               "p.value" = p_value, 
               "refined.snp" = refine_snp_index, 
               "refined.p.value" = refine_p_value_vector,
-              "refined.permuted.statistic" = refine_permuted_statistic_matirx))
+              "refined.permuted.statistic" = refine_permuted_statistic_matirx, 
+              "screening.result" = screening_result))
 }
