@@ -8,7 +8,9 @@ output:
   pdf_document:
     toc: yes
 vignette: |
-  %\VignetteIndexEntry{Fast Ball Divergence Test for Multiple Hypothesis Tests} %\VignetteEncoding{UTF-8} %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Fast Ball Divergence Test for Multiple Hypothesis Tests}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ## Introduction        
