@@ -17,7 +17,7 @@ Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu & Jin Zhu (2019) Ball Covari
 
 Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2021). Ball: An R Package for Detecting Distribution Difference and Association in Metric Spaces, Journal of Statistical Software, Vol.97(6), doi: 10.18637/jss.v097.i06
 
-Yue Hu, Haizhu Tan, Cai Li, Heping Zhang. (2021). Identifying genetic risk variants associated with brain volumetric phenotypes via K‐sample Ball Divergence method. Genetic Epidemiology, 1–11. https://doi.org/10.1002/gepi.22423
+Yue Hu, Haizhu Tan, Cai Li, Heping Zhang. (2021). Identifying genetic risk variants associated with brain volumetric phenotypes via K-sample Ball Divergence method. Genetic Epidemiology, 1–11. https://doi.org/10.1002/gepi.22423
 }
 \seealso{
 Useful links:

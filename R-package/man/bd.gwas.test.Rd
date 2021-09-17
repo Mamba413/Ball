@@ -93,7 +93,7 @@ snp <- sapply(1:snp_num, function(i) {
   sample(0:2, size = num, replace = TRUE, prob = c(1/2, 1/4, 1/4))
 })
 snp_screening <- Ball::bd.gwas.test(x = x, snp = snp,
-                                    alpha = 5*10^-4, refine = FALSE,
+                                    alpha = 5*10^-4, 
                                     num.permutations = 19999)
 mean(res[["p.value"]] < 0.05)
 mean(res[["p.value"]] < 0.005)
@@ -105,7 +105,7 @@ res <- Ball::bd.gwas.test(x = x, snp = snp, alpha = 5*10^-4,
 }
 }
 \references{
-Hu, Y., Tan, H., Li, C., & Zhang, H. (2021). Identifying genetic risk variants associated with brain volumetric phenotypes via K‐sample Ball Divergence method. Genetic Epidemiology, 1–11. https://doi.org/10.1002/gepi.22423
+Yue Hu, Haizhu Tan, Cai Li, and Heping Zhang. (2021). Identifying genetic risk variants associated with brain volumetric phenotypes via K-sample Ball Divergence method. Genetic Epidemiology, 1–11. https://doi.org/10.1002/gepi.22423
 }
 \seealso{
 \code{\link{bd}}, \code{\link{bd.test}}
