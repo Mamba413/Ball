@@ -1,6 +1,6 @@
 ## Maintainer comments    
 
-- We have removed the warning message appearing when compiling on MacOS.
+- We have removed the warning message when compiling C code on MacOS.
 
 - The DOI and URL in the DESCRIPTION/README.md correspond to an AOS publication. 
 Actually, the DOI and URL are definitely right. People can search the DOI through  search.crossref.org, and visit the website according to the URL. 
