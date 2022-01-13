@@ -153,3 +153,5 @@ R-package/vignettes/bd_gwas_cache
 R-package/vignettes/*.html
 .vscode/c_cpp_properties.json
 .vscode/settings.json
+
+bug_tofix/*
