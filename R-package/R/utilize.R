@@ -58,7 +58,13 @@ hbe <- function(coeff, x){
 #' @return p-value
 #'
 calculatePvalue <- function(statValue, NullDistribution) {
-  (sum(statValue < NullDistribution) + 1) / (length(NullDistribution) + 1)
+  surpass_number <- sum(statValue < NullDistribution)
+  if (surpass_number == 0) {
+    p.value <- (surpass_number + 1) / (length(NullDistribution) + 1)
+  } else {
+    p.value <- surpass_number / length(NullDistribution)
+  }
+  p.value
 }
 
 
@@ -94,6 +100,31 @@ memoryAvailable <- function(n, funs) {
       warning("You may suffer from memory insufficient!")
     }
   }
+}
+
+#' Examine x, y arguments in bcov.test, bcov
+#' @inheritParams bcov.test
+#' @noRd
+#' 
+examine_x_y_bcor <- function(x, y) {
+  dim_x <- dim(x)
+  dim_y <- dim(y)
+  if(is.null(dim_x) | is.null(dim_y)) {
+    stop("x or y is NULL!")
+  }
+  n <- dim_x[1]
+  if(n != dim_y[1]) {
+    stop("x and y have different sample sizes!")
+  }
+  if(any(apply(y, 2, anyNA))) {
+    stop("Missing data in y!")
+  }
+  if((dim_x[2] == 1) & (dim_y[2] == 1)) {
+    p <- 1
+  } else {
+    p <- -1
+  }
+  c(n, p)
 }
 
 

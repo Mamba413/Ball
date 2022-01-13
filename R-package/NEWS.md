@@ -1,3 +1,6 @@
+# Ball 1.3.12
+* Add a fast K-sample BD test procedure for category variables, especially the GWAS datasets. 
+
 # Ball 1.3.11
 * Update citation information and reference.
 

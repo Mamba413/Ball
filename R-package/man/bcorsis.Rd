@@ -17,13 +17,13 @@ bcorsis(
 )
 }
 \arguments{
-\item{x}{a numeric matirx or data.frame included \eqn{n} rows and \eqn{p} columns. 
+\item{x}{a numeric matrix or data.frame included \eqn{n} rows and \eqn{p} columns. 
 Each row is an observation vector and each column corresponding to a explanatory variable, generally \eqn{p >> n}.}
 
 \item{y}{a numeric vector, matrix, or data.frame.}
 
 \item{d}{the hard cutoff rule suggests selecting \eqn{d} variables. Setting \code{d = "large"} or 
-\code{ d = "small"} means \code{n - 1} or \code{floor(n/log(n))} 
+\code{d = "small"} means \code{n - 1} or \code{floor(n/log(n))} 
 variables are selected. If \code{d} is a integer, \code{d} variables are selected. Default: \code{d = "small"}.}
 
 \item{weight}{a logical or character string used to choose the weight form of Ball Covariance statistic.. 

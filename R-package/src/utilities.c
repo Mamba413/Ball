@@ -40,6 +40,58 @@ void swap(double *x, double *y) {
     *y = t;
 }
 
+void remove_missing_index(int *sub_idx, int *idx, int *remove_idx, int n, int missing_n) 
+{
+    int k = 0;
+    for (int i = 0; i < n; i++)
+    {
+        int subtract_num = 0;
+        int retain = 1;
+        for (int j = 0; j < missing_n; j++)
+        {
+            if (retain) {
+                if (idx[i] > remove_idx[j]) {
+                    subtract_num++;
+                } else if (idx[i] == remove_idx[j]) {
+                    retain *= 0;   
+                }
+            }
+        }
+        if (retain) {
+            sub_idx[k] = idx[i] - subtract_num;
+            k++;
+        }
+    }
+}
+
+void search_complete_row(int *complete_row_flag, int *complete_flag, int n, int p) 
+{
+    for (int i = 0; i < n; i++)
+    {
+        int complete_row = 1;
+        for (int j = 0; j < p; j++)
+        {
+            complete_row *= complete_flag[j * n + i];
+        }
+        complete_row_flag[i] = complete_row;
+    }
+}
+
+void extract_complete_matrix(double* complete_x, int *complete_row_flag, double *x, int n, int p)
+{
+    int k = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (complete_row_flag[i] == 1) {
+            for (int j = 0; j < p; j++)
+            {
+                complete_x[j * n + k] = x[j * n + i];
+            }
+            k++;
+        }
+    }
+}
+
 /**
  *
  * @param group_relative_location : [0, 2, 4, 1, 3, 5]

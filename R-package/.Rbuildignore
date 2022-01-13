@@ -21,4 +21,7 @@ github
 ^\.travis\.yml$
 ^appveyor\.yml$
 ^..pdf$
+^_pkgdown\.yml$
+^docs$
 ^note\.md$
+^src\tmp$

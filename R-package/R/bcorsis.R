@@ -15,7 +15,7 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
   weight <- examine_weight_arguments(weight)
   x <- as.matrix(x)
   y <- as.matrix(y)
-  x_y_info <- examine_x_y(x, y)
+  x_y_info <- examine_x_y_bcor(x, y)
   p <- x_y_info[2]
   #
   if(distance == FALSE) {
@@ -57,10 +57,10 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
 #' @description Generic non-parametric sure independence screening (SIS) procedure based on Ball Correlation.
 #' Ball correlation is a generic measure of dependence in Banach spaces.
 #' @inheritParams bcov.test
-#' @param x a numeric matirx or data.frame included \eqn{n} rows and \eqn{p} columns. 
+#' @param x a numeric matrix or data.frame included \eqn{n} rows and \eqn{p} columns. 
 #' Each row is an observation vector and each column corresponding to a explanatory variable, generally \eqn{p >> n}.
 #' @param d the hard cutoff rule suggests selecting \eqn{d} variables. Setting \code{d = "large"} or 
-#' \code{ d = "small"} means \code{n - 1} or \code{floor(n/log(n))} 
+#' \code{d = "small"} means \code{n - 1} or \code{floor(n/log(n))} 
 #' variables are selected. If \code{d} is a integer, \code{d} variables are selected. Default: \code{d = "small"}.
 #' @param method specific method for the BCor-SIS procedure. It must be one of \code{"standard"},
 #' \code{"lm"}, \code{"gam"}, \code{"interaction"}, or \code{"survival"}.
@@ -217,7 +217,7 @@ bcorsis <- function(x, y, d = "small", weight = c("constant", "probability", "ch
   seed <- 1
   y <- as.matrix(y)
   x <- as.matrix(x)
-  n <- examine_x_y(x, y)[1]
+  n <- examine_x_y_bcor(x, y)[1]
   p <- dim(x)[2]
   y_p <- dim(y)[2]
   colnames(x) <- paste0("x", 1:p)
