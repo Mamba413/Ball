@@ -163,3 +163,4 @@ R-package/vignettes/*.html
 .vscode/settings.json
 
 bug_tofix/*
+test.RData
