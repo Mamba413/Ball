@@ -151,24 +151,27 @@ where \(X_{k}(k=1,\ldots,K)\) are random variables and \(X_{ki}\) is the \(i\)-t
 <span class="r-in"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="va">num</span></span>
 <span class="r-in"><span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="va">num</span></span>
 <span class="r-in"><span class="fu">bcor</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .C("bcor_test", bcor_stat, y, x, x_number, f_number, num, p,     k, dst_y, dst_x, nth):</span> Incorrect number of arguments (11), expecting 12 for 'bcor_test'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcor.constant </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             1 </span>
 <span class="r-in"><span class="fu">bcor</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, weight <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .C("bcor_test", bcor_stat, y, x, x_number, f_number, num, p,     k, dst_y, dst_x, nth):</span> Incorrect number of arguments (11), expecting 12 for 'bcor_test'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcor.probability </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                1 </span>
 <span class="r-in"><span class="fu">bcor</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, weight <span class="op">=</span> <span class="st">"chisq"</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .C("bcor_test", bcor_stat, y, x, x_number, f_number, num, p,     k, dst_y, dst_x, nth):</span> Incorrect number of arguments (11), expecting 12 for 'bcor_test'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcor.chisquare </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              1 </span>
 <span class="r-in"><span class="co">############# Ball Covariance #############</span></span>
 <span class="r-in"><span class="va">num</span> <span class="op">&lt;-</span> <span class="fl">50</span></span>
 <span class="r-in"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">num</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">num</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu">bcov</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bcov.constant </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0005500985 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0005716833 </span>
 <span class="r-in"><span class="fu">bcov</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, weight <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bcov.probability </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       0.02898652 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       0.02801657 </span>
 <span class="r-in"><span class="fu">bcov</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, weight <span class="op">=</span> <span class="st">"chisq"</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bcov.chisquare </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     0.04636856 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     0.05282778 </span>
 </code></pre></div>
     </div>
   </div>

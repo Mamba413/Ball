@@ -221,7 +221,7 @@ in the <code>complete.info</code> element of output. We give a quick example bel
 <span class="r-out co"><span class="r-pr">#&gt;</span> data:  x and y </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> number of observations = 100, group sizes: 50 50</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> replicates = 99, weight: constant</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bd.constant = 0.58276, p-value = 0.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bd.constant = 0.54533, p-value = 0.01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> alternative hypothesis: distributions of samples are distinct</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"></span>
@@ -277,7 +277,7 @@ in the <code>complete.info</code> element of output. We give a quick example bel
 <span class="r-out co"><span class="r-pr">#&gt;</span> data:  rnorm(n) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> number of observations = 150, group sizes: 40 50 60</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> replicates = 99, weight: constant, kbd.type: sum</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> kbd.sum.constant = 0.014069, p-value = 0.99</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> kbd.sum.constant = 0.031322, p-value = 0.58</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> alternative hypothesis: distributions of samples are distinct</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span class="co"># alternative input method:</span></span>
@@ -290,23 +290,23 @@ in the <code>complete.info</code> element of output. We give a quick example bel
 <span class="r-out co"><span class="r-pr">#&gt;</span> data:  x </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> number of observations = 150, group sizes: 40 50 60</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> replicates = 99, weight: constant, kbd.type: sum</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> kbd.sum.constant = 0.076424, p-value = 0.14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> kbd.sum.constant = 0.021076, p-value = 0.91</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> alternative hypothesis: distributions of samples are distinct</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span class="co">## get all Ball Divergence statistics:</span></span>
 <span class="r-in"><span class="va">res</span><span class="op">[[</span><span class="st">"complete.info"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"statistic"</span><span class="op">]</span><span class="op">]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    kbd.sum.constant    kbd.sum.variance    kbd.max.constant    kbd.max.variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.07642373          0.07642373          0.06193756          0.06193756 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          0.02107627          0.02107627          0.01503796          0.01503796 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> kbd.maxsum.constant kbd.maxsum.variance </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.06193756          0.06193756 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          0.01503796          0.01503796 </span>
 <span class="r-in"><span class="co">## get all test result:</span></span>
 <span class="r-in"><span class="va">res</span><span class="op">[[</span><span class="st">"complete.info"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"p.value"</span><span class="op">]</span><span class="op">]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    kbd.sum.constant.pvalue    kbd.sum.variance.pvalue </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       0.14                       0.14 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       0.91                       0.91 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    kbd.max.constant.pvalue    kbd.max.variance.pvalue </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       0.17                       0.17 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       0.92                       0.92 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> kbd.maxsum.constant.pvalue kbd.maxsum.variance.pvalue </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       0.17                       0.17 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       0.92                       0.92 </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">################  Testing via approximate limit distribution  #################</span></span>
 <span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
