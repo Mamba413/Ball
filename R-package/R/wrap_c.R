@@ -296,8 +296,10 @@ apply_bcor_wrap <- function(x, y, n, p, distance, weight, method, num.threads, c
     x_number <- as.integer(rep(1, p_category))
     f_number <- as.integer(p_category)
     k <- as.integer(2)
+    # not support for categorical data now: 
+    missing_flag <- as.integer(rep(1, length(x)))
     #
-    res <- .C("bcor_test", bcor_stat2, y, x, x_number, f_number, num, p, k, dst_y, dst_x, nth)[[1]]
+    res <- .C("bcor_test", bcor_stat2, y, x, x_number, f_number, num, p, k, dst_y, dst_x, nth, missing_flag)[[1]]
     bcor_stat2 <- matrix(res, ncol = 3, byrow = TRUE)
     
     if (p_continuous == 0) {

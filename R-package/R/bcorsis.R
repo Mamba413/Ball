@@ -45,7 +45,8 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
   p <- as.integer(1)
   k <- as.integer(1)
   nth <- as.integer(1)
-  res <- .C("bcor_test", bcor_stat, y, x, x_number, f_number, num, p, k, dst_y, dst_x, nth)
+  missing_flag <- as.integer(rep(1, length(x)))
+  res <- .C("bcor_test", bcor_stat, y, x, x_number, f_number, num, p, k, dst_y, dst_x, nth, missing_flag)
   bcor_stat <- res[[1]]
   bcor_stat <- select_ball_stat(bcor_stat, weight, type = "bcor")
   return(bcor_stat)
