@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">Ball</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.12</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.13</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="articles/Ball.html">Get started</a>
 </li>
@@ -67,7 +63,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/Mamba413/Ball/">
+  <a href="https://github.com/Mamba413/Ball/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -84,51 +80,40 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="ball-statistics-in-r-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#ball-statistics-in-r-" class="anchor"></a>Ball Statistics in R <img src="https://raw.githubusercontent.com/Mamba413/git_picture/master/ball_logo.png" align="right" height="120">
+<div class="section level1">
+<div class="page-header"><h1 id="ball-statistics-in-r-">Ball Statistics in R <img src="https://raw.githubusercontent.com/Mamba413/git_picture/master/ball_logo.png" align="right" height="120"><a class="anchor" aria-label="anchor" href="#ball-statistics-in-r-"></a>
 </h1></div>
 <!-- [![Travis Build Status](https://travis-ci.org/Mamba413/Ball.svg?branch=master)](https://travis-ci.org/Mamba413/Ball) -->
 
-<div id="introduction" class="section level2">
-<h2 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h2>
-<p>The fundamental problems for data mining, statistical analysis, and machine learning are:</p>
-<ul>
-<li>whether several distributions are different?</li>
-<li>whether random variables are dependent?</li>
-<li>how to pick out useful variables/features from a high-dimensional data?</li>
-</ul>
-<p>These issues can be tackled by using <strong>bd.test</strong>, <strong>bcov.test</strong>, and <strong>bcorsis</strong> functions in the <strong>Ball</strong> package, respectively. They enjoy following admirable advantages:</p>
-<ul>
-<li>available for most of datasets (e.g., traditional tabular data, brain shape, functional connectome, wind direction and so on)</li>
-<li>insensitive to outliers, distribution-free and model-free;</li>
-<li>theoretically guaranteed and computationally efficient.</li>
-</ul>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>The fundamental problems for data mining, statistical analysis, and machine learning are: - whether several distributions are different? - whether random variables are dependent? - how to pick out useful variables/features from a high-dimensional data?</p>
+<p>These issues can be tackled by using <strong>bd.test</strong>, <strong>bcov.test</strong>, and <strong>bcorsis</strong> functions in the <strong>Ball</strong> package, respectively. They enjoy following admirable advantages: - available for most of datasets (e.g., traditional tabular data, brain shape, functional connectome, wind direction and so on) - insensitive to outliers, distribution-free and model-free; - theoretically guaranteed and computationally efficient.</p>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<div id="cran-version" class="section level3">
-<h3 class="hasAnchor">
-<a href="#cran-version" class="anchor"></a>CRAN version</h3>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<div class="section level3">
+<h3 id="cran-version">CRAN version<a class="anchor" aria-label="anchor" href="#cran-version"></a>
+</h3>
 <p>To install the Ball R package from CRAN, just run:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"Ball"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"Ball"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="github-version" class="section level3">
-<h3 class="hasAnchor">
-<a href="#github-version" class="anchor"></a>Github version</h3>
+<div class="section level3">
+<h3 id="github-version">Github version<a class="anchor" aria-label="anchor" href="#github-version"></a>
+</h3>
 <p>To install the development version from GitHub, run:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">devtools</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span>
 <span class="fu">install_github</span><span class="op">(</span><span class="st">"Mamba413/Ball/R-package"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><em>Windows</em> user will need to install <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a> first.</p>
+<p><em>Windows</em> user will need to install <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">Rtools</a> first.</p>
 </div>
 </div>
-<div id="overview-ball-package" class="section level2">
-<h2 class="hasAnchor">
-<a href="#overview-ball-package" class="anchor"></a>Overview: <strong>Ball</strong> package</h2>
+<div class="section level2">
+<h2 id="overview-ball-package">Overview: <strong>Ball</strong> package<a class="anchor" aria-label="anchor" href="#overview-ball-package"></a>
+</h2>
 <p>Three most importance functions in <strong>Ball</strong>:</p>
 <table class="table">
 <thead><tr class="header">
@@ -200,13 +185,13 @@
 <li><em>GWAS: Genome-Wide Association Study</em></li>
 </ul>
 </div>
-<div id="quick-examples" class="section level2">
-<h2 class="hasAnchor">
-<a href="#quick-examples" class="anchor"></a>Quick examples</h2>
+<div class="section level2">
+<h2 id="quick-examples">Quick examples<a class="anchor" aria-label="anchor" href="#quick-examples"></a>
+</h2>
 <p>Take <em>iris</em> dataset as an example to illustrate how to use <strong>bd.test</strong> and <strong>bcov.test</strong> to deal with the fundamental problems mentioned above.</p>
-<div id="bdtest" class="section level4">
-<h4 class="hasAnchor">
-<a href="#bdtest" class="anchor"></a><strong>bd.test</strong>
+<div class="section level4">
+<h4 id="bdtest">
+<strong>bd.test</strong><a class="anchor" aria-label="anchor" href="#bdtest"></a>
 </h4>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">virginica</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span><span class="va">iris</span><span class="op">$</span><span class="va">Species</span> <span class="op">==</span> <span class="st">"virginica"</span>, <span class="st">"Sepal.Length"</span><span class="op">]</span>
@@ -224,13 +209,13 @@ bd.constant = 0.11171, p-value = 0.01
 alternative hypothesis: distributions of samples are distinct</code></pre>
 <p>The R output shows that <em>p</em>-value is under 0.05. Consequently, we can conclude that the Sepal.Length distribution of versicolor and virginica are distinct.</p>
 </div>
-<div id="bcovtest" class="section level4">
-<h4 class="hasAnchor">
-<a href="#bcovtest" class="anchor"></a><strong>bcov.test</strong>
+<div class="section level4">
+<h4 id="bcovtest">
+<strong>bcov.test</strong><a class="anchor" aria-label="anchor" href="#bcovtest"></a>
 </h4>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sepal</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Sepal.Width"</span>, <span class="st">"Sepal.Length"</span><span class="op">)</span><span class="op">]</span>
-<span class="va">petal</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Petal.Width"</span>, <span class="st">"Petal.Length"</span><span class="op">)</span><span class="op">]</span>
+<code class="sourceCode R"><span class="va">sepal</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sepal.Width"</span>, <span class="st">"Sepal.Length"</span><span class="op">)</span><span class="op">]</span>
+<span class="va">petal</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Petal.Width"</span>, <span class="st">"Petal.Length"</span><span class="op">)</span><span class="op">]</span>
 <span class="fu"><a href="reference/bcov.test.html">bcov.test</a></span><span class="op">(</span><span class="va">sepal</span>, <span class="va">petal</span><span class="op">)</span></code></pre></div>
 <p>In this example, <strong>bcov.test</strong> investigates whether width or length of petal is associated with width and length of sepal. If the dependency really exists, the <em>p</em>-value of the <strong>bcov.test</strong> will be under 0.05. In this example, the result is show to be:</p>
 <pre><code>    Ball Covariance test of independence (Permutation)
@@ -242,24 +227,24 @@ bcov.constant = 0.0081472, p-value = 0.01
 alternative hypothesis: random variables are dependent</code></pre>
 <p>Therefore, the relationship between width and length of sepal and petal exists.</p>
 </div>
-<div id="bcorsis" class="section level4">
-<h4 class="hasAnchor">
-<a href="#bcorsis" class="anchor"></a><strong>bcorsis</strong>
+<div class="section level4">
+<h4 id="bcorsis">
+<strong>bcorsis</strong><a class="anchor" aria-label="anchor" href="#bcorsis"></a>
 </h4>
 <p>We generate a dataset and demonstrate the usage of <strong>bcorsis</strong> function as follow.</p>
-<pre class="{r}"><code><a href="https://rdrr.io/r/base/Random.html">## simulate a ultra high dimensional dataset:
-set.seed(1)
-n &lt;- 150
-p &lt;- 3000
-x &lt;- matrix(rnorm(n * p), nrow = n)
-error &lt;- rnorm(n)
-y &lt;- 3 * x[, 1] + 5 * (x[, 3])^2 + error
+<pre class="{r}"><code><span class="co">## simulate a ultra high dimensional dataset:</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+<span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">150</span>
+<span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">3000</span>
+<span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">n</span><span class="op">)</span>
+<span class="va">error</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>
+<span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">3</span> <span class="op">*</span> <span class="va">x</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="fl">5</span> <span class="op">*</span> <span class="op">(</span><span class="va">x</span><span class="op">[</span>, <span class="fl">3</span><span class="op">]</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">error</span>
 
-## BCor-SIS procedure:
-res &lt;- bcorsis(y = y, x = x)
-head(res[["ix"]], n = 5)</a></code></pre>
+<span class="co">## BCor-SIS procedure:</span>
+<span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bcorsis.html">bcorsis</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res</span><span class="op">[[</span><span class="st">"ix"</span><span class="op">]</span><span class="op">]</span>, n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre>
 <p>In this example, the result is:</p>
-<pre class="{r}"><code># [1]    3    1 1601   20  429</code></pre>
+<pre class="{r}"><code><span class="co"># [1]    3    1 1601   20  429</span></code></pre>
 <p>The <strong>bcorsis</strong> result shows that the first and the third variable are the two most important variables in 3000 explanatory variables which is consistent to the simulation settings.</p>
 <!-- If you use **Ball** or reference our blog post in a presentation or publication, we would appreciate citations of our package. Here is the corresponding Bibtex entry:
 ```
@@ -272,13 +257,10 @@ head(res[["ix"]], n = 5)</a></code></pre>
 ``` -->
 </div>
 </div>
-<div id="citation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#citation" class="anchor"></a>Citation</h2>
-<p>If you use Ball or reference our vignettes in a presentation or publication, we would appreciate citations of our package.</p>
-<blockquote>
-<p>Zhu J, Pan W, Zheng W, Wang X (2021). “Ball: An R Package for Detecting Distribution Difference and Association in Metric Spaces.” Journal of Statistical Software, 97(6), 1–31. doi: 10.18637/jss.v097.i06.</p>
-</blockquote>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>If you use Ball or reference our vignettes in a presentation or publication, we would appreciate citations of our package. &gt; Zhu J, Pan W, Zheng W, Wang X (2021). “Ball: An R Package for Detecting Distribution Difference and Association in Metric Spaces.” Journal of Statistical Software, 97(6), 1–31. doi: 10.18637/jss.v097.i06.</p>
 <p>Here is the corresponding Bibtex entry</p>
 <pre><code>@Article{,
   title = {{Ball}: An {R} Package for Detecting Distribution Difference and Association in Metric Spaces},
@@ -291,53 +273,54 @@ head(res[["ix"]], n = 5)</a></code></pre>
   doi = {10.18637/jss.v097.i06},
 }</code></pre>
 </div>
-<div id="reference" class="section level2">
-<h2 class="hasAnchor">
-<a href="#reference" class="anchor"></a>Reference</h2>
+<div class="section level2">
+<h2 id="reference">Reference<a class="anchor" aria-label="anchor" href="#reference"></a>
+</h2>
 <ul>
-<li>Pan, Wenliang; Tian, Yuan; Wang, Xueqin; Zhang, Heping. <a href="https://projecteuclid.org/euclid.aos/1525313077">Ball Divergence: Nonparametric two sample test</a>. Annals of Statistics. 46 (2018), no. 3, 1109–1137. <a href="doi:10.1214/17-AOS1579" class="uri">doi:10.1214/17-AOS1579</a>. <a href="https://projecteuclid.org/euclid.aos/1525313077">https://projecteuclid.org/euclid.aos/1525313077</a>
+<li>Pan, Wenliang; Tian, Yuan; Wang, Xueqin; Zhang, Heping. <a href="https://projecteuclid.org/euclid.aos/1525313077" class="external-link">Ball Divergence: Nonparametric two sample test</a>. Annals of Statistics. 46 (2018), no. 3, 1109–1137. <a href="doi:10.1214/17-AOS1579" class="uri">doi:10.1214/17-AOS1579</a>. <a href="https://projecteuclid.org/euclid.aos/1525313077" class="external-link">https://projecteuclid.org/euclid.aos/1525313077</a>
 </li>
-<li>Wenliang Pan, Xueqin Wang, Weinan Xiao &amp; Hongtu Zhu (2018) <a href="https://amstat.tandfonline.com/doi/full/10.1080/01621459.2018.1462709#.WupWaoiFM2x">A Generic Sure Independence Screening Procedure</a>, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709</li>
-<li>Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu &amp; Jin Zhu (2019) <a href="https://doi.org/10.1080/01621459.2018.1543600">Ball Covariance: A Generic Measure of Dependence in Banach Space</a>, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1543600</li>
-<li>Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2021). <a href="https://www.jstatsoft.org/article/view/v097i06">Ball: An R Package for Detecting Distribution Difference and Association in Metric Spaces</a>, Journal of Statistical Software, Vol.97(6), doi: 10.18637/jss.v097.i06.</li>
+<li>Wenliang Pan, Xueqin Wang, Weinan Xiao &amp; Hongtu Zhu (2018) <a href="https://amstat.tandfonline.com/doi/full/10.1080/01621459.2018.1462709#.WupWaoiFM2x" class="external-link">A Generic Sure Independence Screening Procedure</a>, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709</li>
+<li>Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu &amp; Jin Zhu (2019) <a href="https://doi.org/10.1080/01621459.2018.1543600" class="external-link">Ball Covariance: A Generic Measure of Dependence in Banach Space</a>, Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1543600</li>
+<li>Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2021). <a href="https://www.jstatsoft.org/article/view/v097i06" class="external-link">Ball: An R Package for Detecting Distribution Difference and Association in Metric Spaces</a>, Journal of Statistical Software, Vol.97(6), doi: 10.18637/jss.v097.i06.</li>
 </ul>
 </div>
-<div id="bug-report" class="section level2">
-<h2 class="hasAnchor">
-<a href="#bug-report" class="anchor"></a>Bug report</h2>
-<p>If you find any bugs, or if you experience any crashes, please report to us. If you have any questions just ask, we won’t bite. Open an <a href="https://github.com/Mamba413/Ball/issues">issue</a> or send an email to Jin Zhu at <a href="mailto:zhuj37@mail2.sysu.edu.cn" class="email">zhuj37@mail2.sysu.edu.cn</a></p>
+<div class="section level2">
+<h2 id="bug-report">Bug report<a class="anchor" aria-label="anchor" href="#bug-report"></a>
+</h2>
+<p>If you find any bugs, or if you experience any crashes, please report to us. If you have any questions just ask, we won’t bite. Open an <a href="https://github.com/Mamba413/Ball/issues" class="external-link">issue</a> or send an email to Jin Zhu at <a href="mailto:zhuj37@mail2.sysu.edu.cn" class="email">zhuj37@mail2.sysu.edu.cn</a></p>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=Ball">https://​cloud.r-project.org/​package=Ball</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/Mamba413/Ball/">https://​github.com/​Mamba413/​Ball/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/Mamba413/Ball/issues">https://​github.com/​Mamba413/​Ball/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=Ball" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/Mamba413/Ball/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/Mamba413/Ball/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></li>
+<li><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></li>
 </ul>
 </div>
+
+
 <div class="citation">
-<h2>Citation</h2>
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html">Citing Ball</a></li>
+<li><a href="authors.html#citation">Citing Ball</a></li>
 </ul>
 </div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Jin Zhu <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-8550-5822" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Jin Zhu <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-8550-5822" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Wenliang Pan <br><small class="roles"> Author </small>  </li>
 <li>Yuan Tian <br><small class="roles"> Author </small>  </li>
 <li>Weinan Xiao <br><small class="roles"> Author </small>  </li>
@@ -346,27 +329,30 @@ head(res[["ix"]], n = 5)</a></code></pre>
 <li>Yue Hu <br><small class="roles"> Author </small>  </li>
 <li>Hongtu Zhu <br><small class="roles"> Author </small>  </li>
 <li>Heping Zhang <br><small class="roles"> Author </small>  </li>
-<li>Xueqin Wang <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-5205-9950" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Xueqin Wang <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-5205-9950" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://ci.appveyor.com/project/Mamba413/Ball"><img src="https://ci.appveyor.com/api/projects/status/github/Mamba413/Ball?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a></li>
-<li><a href="https://CRAN.R-project.org/package=Ball"><img src="http://www.r-pkg.org/badges/version/Ball" alt="CRAN Status Badge"></a></li>
+<li><a href="https://ci.appveyor.com/project/Mamba413/Ball" class="external-link"><img src="https://ci.appveyor.com/api/projects/status/github/Mamba413/Ball?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a></li>
+<li><a href="https://CRAN.R-project.org/package=Ball" class="external-link"><img src="http://www.r-pkg.org/badges/version/Ball" alt="CRAN Status Badge"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Jin Zhu, Wenliang Pan, Yuan Tian, Weinan Xiao, Chengfeng Liu, Ruihuang Liu, Yue Hu, Hongtu Zhu, Heping Zhang, Xueqin Wang.</p>
+  <p></p>
+<p>Developed by Jin Zhu, Wenliang Pan, Yuan Tian, Weinan Xiao, Chengfeng Liu, Ruihuang Liu, Yue Hu, Hongtu Zhu, Heping Zhang, Xueqin Wang.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -374,6 +360,8 @@ head(res[["ix"]], n = 5)</a></code></pre>
 
   
 
+
+  
 
   </body>
 </html>

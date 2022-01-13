@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">Ball</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.12</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.13</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../articles/Ball.html">Get started</a>
 </li>
@@ -67,7 +63,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/Mamba413/Ball/">
+  <a href="https://github.com/Mamba413/Ball/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -87,28 +83,28 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>
 <code>bd.gwas.test</code>: Fast Ball Divergence Test for Multiple Hypothesis Tests</h1>
-                        <h4 class="author">Yue Hu, Jin Zhu</h4>
+                        <h4 data-toc-skip class="author">Yue Hu, Jin Zhu</h4>
             
-            <h4 class="date">2021/8/25</h4>
+            <h4 data-toc-skip class="date">2021/8/25</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/Mamba413/Ball/tree/master/R-package/../vignettes/bd_gwas.Rmd"><code>../vignettes/bd_gwas.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Mamba413/Ball/tree/master/R-package/../vignettes/bd_gwas.Rmd" class="external-link"><code>../vignettes/bd_gwas.Rmd</code></a></small>
       <div class="hidden name"><code>bd_gwas.Rmd</code></div>
 
     </div>
 
     
     
-<div id="introduction" class="section level2">
-<h2 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h2>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
 <p>The <span class="math inline">\(K\)</span>-sample Ball Divergence (KBD) is a nonparametric method to test the differences between <span class="math inline">\(K\)</span> probability distributions. It is specially designed for metric-valued and imbalanced data, which is consistent with the characteristics of the GWAS data. It is computationally intensive for a large GWAS dataset because of the ultra-high dimensionality of the data. Therefore, a fast KBD Test for GWAS data implemented in function <code>bd.gwas.test</code> is developed and programmed to accelerate the computational speed.</p>
 </div>
-<div id="faster-implementation-quick-start" class="section level2">
-<h2 class="hasAnchor">
-<a href="#faster-implementation-quick-start" class="anchor"></a>Faster implementation: quick start</h2>
+<div class="section level2">
+<h2 id="faster-implementation-quick-start">Faster implementation: quick start<a class="anchor" aria-label="anchor" href="#faster-implementation-quick-start"></a>
+</h2>
 <p>We use a synthetic data to demonstrate the usage of <code>bd.gwas.test</code>. In this example, phenotype data are generated from three multivariate normal distributions with the same dimension but heterogeneous mean and covariance matrix. The three multivariate normal distributions are: (i). <span class="math inline">\(N\sim(\mu, \Sigma^{(1)})\)</span>, (ii) <span class="math inline">\(N \sim (\mu + 0.1 \times d, \Sigma^{(2)})\)</span>, and (iii) <span class="math inline">\(N \sim (\mu + 0.1 \times d, \Sigma^{(3)})\)</span>. Here, the mean <span class="math inline">\(\mu\)</span> is set to <span class="math inline">\(\textbf{0}\)</span> and the covariance matrix covariance matrices follow the auto-regressive structure with some perturbations: <span class="math display">\[\Sigma_{ij}^{(1)}=\rho^{|i-j|}, ~~ \Sigma^{(2)}_{ij}=(\rho-0.1 \times d)^{|i-j|}, ~~ \Sigma^{3}_{ij}=(\rho+0.1 \times d)^{|i-j|}.\]</span> The dimension of phenotype <span class="math inline">\(k\)</span> is fixed as 100.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://mvtnorm.R-forge.R-project.org">mvtnorm</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://mvtnorm.R-forge.R-project.org" class="external-link">mvtnorm</a></span><span class="op">)</span>
 
 <span class="va">num</span> <span class="op">&lt;-</span> <span class="fl">100</span>
 <span class="va">snp_num</span> <span class="op">&lt;-</span> <span class="fl">200</span>
@@ -117,22 +113,22 @@
 <span class="va">freq0</span> <span class="op">&lt;-</span> <span class="fl">0.75</span>
 <span class="va">d</span> <span class="op">&lt;-</span> <span class="fl">3</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">)</span>
 
 <span class="va">ar1</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">p</span>, <span class="va">rho</span> <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> 
 <span class="op">{</span>
-    <span class="va">Sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span>, <span class="va">p</span><span class="op">)</span>
+    <span class="va">Sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span>, <span class="va">p</span><span class="op">)</span>
     <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">p</span><span class="op">)</span> <span class="op">{</span>
         <span class="kw">for</span> <span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">p</span><span class="op">)</span> <span class="op">{</span>
-            <span class="va">Sigma</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">rho</span><span class="op">^</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">i</span> <span class="op">-</span> <span class="va">j</span><span class="op">)</span><span class="op">)</span>
+            <span class="va">Sigma</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">rho</span><span class="op">^</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">i</span> <span class="op">-</span> <span class="va">j</span><span class="op">)</span><span class="op">)</span>
         <span class="op">}</span>
     <span class="op">}</span>
-    <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">Sigma</span><span class="op">)</span>
+    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">Sigma</span><span class="op">)</span>
 <span class="op">}</span>
 
-<span class="va">mean0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">k</span><span class="op">)</span>
-<span class="va">mean1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0.1</span> <span class="op">*</span> <span class="va">d</span>, <span class="va">k</span><span class="op">)</span>
-<span class="va">mean2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.1</span> <span class="op">*</span> <span class="va">d</span>, <span class="va">k</span><span class="op">)</span>
+<span class="va">mean0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">k</span><span class="op">)</span>
+<span class="va">mean1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.1</span> <span class="op">*</span> <span class="va">d</span>, <span class="va">k</span><span class="op">)</span>
+<span class="va">mean2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.1</span> <span class="op">*</span> <span class="va">d</span>, <span class="va">k</span><span class="op">)</span>
 
 <span class="va">cov0</span> <span class="op">&lt;-</span> <span class="fu">ar1</span><span class="op">(</span>p <span class="op">=</span> <span class="va">k</span>, rho <span class="op">=</span> <span class="va">rho</span><span class="op">)</span>
 <span class="va">cov1</span> <span class="op">&lt;-</span> <span class="fu">ar1</span><span class="op">(</span>p <span class="op">=</span> <span class="va">k</span>, rho <span class="op">=</span> <span class="va">rho</span> <span class="op">-</span> <span class="fl">0.1</span> <span class="op">*</span> <span class="va">d</span><span class="op">)</span>
@@ -140,90 +136,90 @@
 
 <span class="va">p1</span> <span class="op">&lt;-</span> <span class="va">freq0</span> <span class="op">^</span> <span class="fl">2</span>
 <span class="va">p2</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">freq0</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">freq0</span><span class="op">)</span>
-<span class="va">n1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">num</span> <span class="op">*</span> <span class="va">p1</span><span class="op">)</span>
-<span class="va">n2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">num</span> <span class="op">*</span> <span class="va">p2</span><span class="op">)</span>
+<span class="va">n1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">num</span> <span class="op">*</span> <span class="va">p1</span><span class="op">)</span>
+<span class="va">n2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">num</span> <span class="op">*</span> <span class="va">p2</span><span class="op">)</span>
 <span class="va">n3</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">-</span> <span class="va">n1</span> <span class="op">-</span> <span class="va">n2</span>
-<span class="va">x0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">rmvnorm</a></span><span class="op">(</span><span class="va">n1</span>, mean <span class="op">=</span> <span class="va">mean0</span>, sigma <span class="op">=</span> <span class="va">cov0</span><span class="op">)</span>
-<span class="va">x1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">rmvnorm</a></span><span class="op">(</span><span class="va">n2</span>, mean <span class="op">=</span> <span class="va">mean1</span>, sigma <span class="op">=</span> <span class="va">cov1</span><span class="op">)</span>
-<span class="va">x2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html">rmvnorm</a></span><span class="op">(</span><span class="va">n3</span>, mean <span class="op">=</span> <span class="va">mean2</span>, sigma <span class="op">=</span> <span class="va">cov2</span><span class="op">)</span>
-<span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span><span class="va">x0</span>, <span class="va">x1</span>, <span class="va">x2</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span></code></pre></div>
-<pre><code>##             [,1]       [,2]       [,3]       [,4]       [,5]       [,6]
-## [1,]  0.07039579  0.6100092  0.5546911  0.5346480  0.5785020 -1.3470882
-## [2,] -0.19620313  0.2196482 -0.2968494 -0.7916355 -1.3371275 -0.5766259
-## [3,] -0.18575434 -1.4601779 -1.2635876 -0.8933793 -0.9336481 -0.5277624
-## [4,]  1.56843201  1.6330457  1.8725853  0.8344465  0.5674250 -0.3928510
-## [5,] -0.54939765  0.1602176  0.4325440 -0.1750343  0.5231533 -1.0931093
-## [6,] -0.19665796 -1.3788672 -0.6887342 -1.2731113 -0.6638883  0.0764279</code></pre>
+<span class="va">x0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="va">n1</span>, mean <span class="op">=</span> <span class="va">mean0</span>, sigma <span class="op">=</span> <span class="va">cov0</span><span class="op">)</span>
+<span class="va">x1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="va">n2</span>, mean <span class="op">=</span> <span class="va">mean1</span>, sigma <span class="op">=</span> <span class="va">cov1</span><span class="op">)</span>
+<span class="va">x2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mvtnorm/man/Mvnorm.html" class="external-link">rmvnorm</a></span><span class="op">(</span><span class="va">n3</span>, mean <span class="op">=</span> <span class="va">mean2</span>, sigma <span class="op">=</span> <span class="va">cov2</span><span class="op">)</span>
+<span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">x0</span>, <span class="va">x1</span>, <span class="va">x2</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">##             [,1]       [,2]       [,3]       [,4]       [,5]       [,6]</span>
+<span class="co">## [1,]  0.07039579  0.6100092  0.5546911  0.5346480  0.5785020 -1.3470882</span>
+<span class="co">## [2,] -0.19620313  0.2196482 -0.2968494 -0.7916355 -1.3371275 -0.5766259</span>
+<span class="co">## [3,] -0.18575434 -1.4601779 -1.2635876 -0.8933793 -0.9336481 -0.5277624</span>
+<span class="co">## [4,]  1.56843201  1.6330457  1.8725853  0.8344465  0.5674250 -0.3928510</span>
+<span class="co">## [5,] -0.54939765  0.1602176  0.4325440 -0.1750343  0.5231533 -1.0931093</span>
+<span class="co">## [6,] -0.19665796 -1.3788672 -0.6887342 -1.2731113 -0.6638883  0.0764279</span></code></pre>
 <p>The number of SNPs is fixed as <span class="math inline">\(200\)</span> and the sample size is set to <span class="math inline">\(100\)</span>. The sample sizes of the three groups follow the transmission ratio: <span class="math display">\[n_1:n_2:n_3 \approx p^2:2pq:q^2,(p+q=1,n_1+n_2+n_3=100).\]</span> Here, <span class="math inline">\(p\)</span> is set to be <span class="math inline">\(0.75\)</span>, representing a scenario that close to the real data. <span class="math inline">\(d\)</span> is a user-specific positive integer, indicating the differences between the three probability distributions. Here, we use <span class="math inline">\(d=3\)</span>, aiming to show that the SNP which matched with the distribution can be identified, even when the differences between distribution is small.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">effect_snp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">n2</span><span class="op">)</span>,
-                <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">n3</span><span class="op">)</span><span class="op">)</span>
-<span class="va">noise_snp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="va">snp_num</span>, <span class="kw">function</span><span class="op">(</span><span class="va">j</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">effect_snp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">n2</span><span class="op">)</span>,
+                <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">n3</span><span class="op">)</span><span class="op">)</span>
+<span class="va">noise_snp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="va">snp_num</span>, <span class="kw">function</span><span class="op">(</span><span class="va">j</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span>
     <span class="fl">0</span><span class="op">:</span><span class="fl">2</span>,
     size <span class="op">=</span> <span class="va">num</span>,
     replace <span class="op">=</span> <span class="cn">TRUE</span>,
-    prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, <span class="fl">1</span> <span class="op">-</span> <span class="va">p1</span> <span class="op">-</span> <span class="va">p2</span><span class="op">)</span>
+    prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, <span class="fl">1</span> <span class="op">-</span> <span class="va">p1</span> <span class="op">-</span> <span class="va">p2</span><span class="op">)</span>
   <span class="op">)</span>
 <span class="op">}</span><span class="op">)</span>
-<span class="va">snp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">effect_snp</span>, <span class="va">noise_snp</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">snp</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span></code></pre></div>
-<pre><code>##      effect_snp          
-## [1,]          0 1 0 0 0 0
-## [2,]          0 1 1 1 0 0
-## [3,]          0 0 0 1 0 0
-## [4,]          0 0 1 0 2 0
-## [5,]          0 1 1 0 0 0
-## [6,]          0 1 1 1 1 0</code></pre>
+<span class="va">snp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">effect_snp</span>, <span class="va">noise_snp</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snp</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">##      effect_snp          </span>
+<span class="co">## [1,]          0 1 0 0 0 0</span>
+<span class="co">## [2,]          0 1 1 1 0 0</span>
+<span class="co">## [3,]          0 0 0 1 0 0</span>
+<span class="co">## [4,]          0 0 1 0 2 0</span>
+<span class="co">## [5,]          0 1 1 0 0 0</span>
+<span class="co">## [6,]          0 1 1 1 1 0</span></code></pre>
 <p>Given the synthetic dataset <code>x</code> and <code>snp</code>, multiple KBD tests is conducted by:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://mamba413.github.io/Ball/">Ball</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mamba413.github.io/Ball/" class="external-link">Ball</a></span><span class="op">)</span>
 <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bd.gwas.test.html">bd.gwas.test</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, snp <span class="op">=</span> <span class="va">snp</span><span class="op">)</span></code></pre></div>
-<pre><code>## =========== Pre-screening SNPs ===========
-## Refining SNP... Progress: 1/1. 
-## Refined p-value: 0.0000499975, cost time: 4 (s).</code></pre>
+<pre><code><span class="co">## =========== Pre-screening SNPs ===========</span>
+<span class="co">## Refining SNP... Progress: 1/1. </span>
+<span class="co">## Refined p-value: 0.0000499975, cost time: 5 (s).</span></code></pre>
 <p>And we present the SNPs that is significant:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></code></pre></div>
-<pre><code>## List of 8
-##  $ statistic                 : num [1:200] 4.218 0.876 1.881 1.104 1.143 ...
-##  $ permuted.statistic        :'data.frame':  20000 obs. of  1 variable:
-##   ..$ g3: num [1:20000] 0.819 1.114 1.112 1.563 0.906 ...
-##  $ eigenvalue                : NULL
-##  $ p.value                   : num [1:200] 0.00005 0.9112 0.0577 0.60847 0.55267 ...
-##  $ refined.snp               : int 1
-##  $ refined.p.value           : num 5e-05
-##  $ refined.permuted.statistic: num [1:20000, 1] 1.216 0.857 0.988 0.937 1.37 ...
-##   ..- attr(*, "dimnames")=List of 2
-##   .. ..$ : NULL
-##   .. ..$ : chr "SNP1"
-##  $ screening.result          :List of 5
-##   ..$ : num [1:200] 4.218 0.876 1.881 1.104 1.143 ...
-##   ..$ :'data.frame': 20000 obs. of  1 variable:
-##   .. ..$ g3: num [1:20000] 0.819 1.114 1.112 1.563 0.906 ...
-##   ..$ : num [1:200] 0.00005 0.9112 0.0577 0.60847 0.55267 ...
-##   ..$ : int [1:10000] 0 97 44 35 95 99 39 19 46 65 ...
-##   ..$ : int 0</code></pre>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## List of 8</span>
+<span class="co">##  $ statistic                 : num [1:200] 4.218 0.876 1.881 1.104 1.143 ...</span>
+<span class="co">##  $ permuted.statistic        :'data.frame':  20000 obs. of  1 variable:</span>
+<span class="co">##   ..$ g3: num [1:20000] 0.819 1.114 1.112 1.563 0.906 ...</span>
+<span class="co">##  $ eigenvalue                : NULL</span>
+<span class="co">##  $ p.value                   : num [1:200] 0.00005 0.9112 0.0577 0.60847 0.55267 ...</span>
+<span class="co">##  $ refined.snp               : int 1</span>
+<span class="co">##  $ refined.p.value           : num 5e-05</span>
+<span class="co">##  $ refined.permuted.statistic: num [1:20000, 1] 1.216 0.857 0.988 0.937 1.37 ...</span>
+<span class="co">##   ..- attr(*, "dimnames")=List of 2</span>
+<span class="co">##   .. ..$ : NULL</span>
+<span class="co">##   .. ..$ : chr "SNP1"</span>
+<span class="co">##  $ screening.result          :List of 5</span>
+<span class="co">##   ..$ : num [1:200] 4.218 0.876 1.881 1.104 1.143 ...</span>
+<span class="co">##   ..$ :'data.frame': 20000 obs. of  1 variable:</span>
+<span class="co">##   .. ..$ g3: num [1:20000] 0.819 1.114 1.112 1.563 0.906 ...</span>
+<span class="co">##   ..$ : num [1:200] 0.00005 0.9112 0.0577 0.60847 0.55267 ...</span>
+<span class="co">##   ..$ : int [1:10000] 0 97 44 35 95 99 39 19 46 65 ...</span>
+<span class="co">##   ..$ : int 0</span></code></pre>
 </div>
-<div id="why-bd-gwas-test-is-faster" class="section level2">
-<h2 class="hasAnchor">
-<a href="#why-bd-gwas-test-is-faster" class="anchor"></a>Why <code>bd.gwas.test</code> is faster?</h2>
+<div class="section level2">
+<h2 id="why-bd-gwas-test-is-faster">Why <code>bd.gwas.test</code> is faster?<a class="anchor" aria-label="anchor" href="#why-bd-gwas-test-is-faster"></a>
+</h2>
 <p>Our faster implementation for multiple testing significantly speeds up the KBD test in two aspects.</p>
-<div id="two-step-algorithm" class="section level3">
-<h3 class="hasAnchor">
-<a href="#two-step-algorithm" class="anchor"></a>Two-step algorithm</h3>
+<div class="section level3">
+<h3 id="two-step-algorithm">Two-step algorithm<a class="anchor" aria-label="anchor" href="#two-step-algorithm"></a>
+</h3>
 <p>First, it uses a two-step algorithm for KBD. The algorithm first computes an empirical <span class="math inline">\(p\)</span>-value for each SNP using a modest number of permutations which gives precise enough estimates of the <span class="math inline">\(p\)</span>-values above a threshold. Then, the SNPs with first stage <span class="math inline">\(p\)</span>-values being less than the threshold are moved to the second stage for a far greater number of permutations.</p>
 </div>
-<div id="recycle-permutation-result" class="section level3">
-<h3 class="hasAnchor">
-<a href="#recycle-permutation-result" class="anchor"></a>Recycle permutation result</h3>
+<div class="section level3">
+<h3 id="recycle-permutation-result">Recycle permutation result<a class="anchor" aria-label="anchor" href="#recycle-permutation-result"></a>
+</h3>
 <p>Another key technique in <code>bd.test.gwas</code> is reusing the empirical KBD’s distribution under the null hypothesis. This technique is particularly helpful for decreasing computational burden when the number of factors <span class="math inline">\(p\)</span> is very large and <span class="math inline">\(K\)</span> is a single digit. A typical case is the GWAS study, in which <span class="math inline">\(p \approx 10^4\)</span> or <span class="math inline">\(10^5\)</span> but <span class="math inline">\(K = 3\)</span>.</p>
 </div>
 </div>
-<div id="power-evaluation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#power-evaluation" class="anchor"></a>Power evaluation</h2>
+<div class="section level2">
+<h2 id="power-evaluation">Power evaluation<a class="anchor" aria-label="anchor" href="#power-evaluation"></a>
+</h2>
 <p>According to the simulations:</p>
 <ul>
 <li><p>the empirical type I errors of KBD are reasonably controlled around <span class="math inline">\(10^{-5}\)</span>;</p></li>
@@ -237,15 +233,15 @@
 <img src="kbd_gwas.png" width="500" height="500"></p>
 <!-- ### Summary plots of simulation results of heterogeneous settings of the KBD method             -->
 </div>
-<div id="conclusion" class="section level2">
-<h2 class="hasAnchor">
-<a href="#conclusion" class="anchor"></a>Conclusion</h2>
+<div class="section level2">
+<h2 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
+</h2>
 <p>We implement <code>bd.test.gwas</code> in Ball package for handling multiple KBD test. KBD is a powerful method that can detect the significant variants with a controllable type I error regardless if the data are balanced or not.</p>
 </div>
-<div id="reference" class="section level2">
-<h2 class="hasAnchor">
-<a href="#reference" class="anchor"></a>Reference</h2>
-<p>Yue Hu, Haizhu Tan, Cai Li, Heping Zhang. (2021). Identifying genetic risk variants associated with brain volumetric phenotypes via K-sample Ball Divergence method. Genetic Epidemiology, 1–11. <a href="https://doi.org/10.1002/gepi.22423" class="uri">https://doi.org/10.1002/gepi.22423</a></p>
+<div class="section level2">
+<h2 id="reference">Reference<a class="anchor" aria-label="anchor" href="#reference"></a>
+</h2>
+<p>Yue Hu, Haizhu Tan, Cai Li, Heping Zhang. (2021). Identifying genetic risk variants associated with brain volumetric phenotypes via K-sample Ball Divergence method. Genetic Epidemiology, 1–11. <a href="https://doi.org/10.1002/gepi.22423" class="external-link uri">https://doi.org/10.1002/gepi.22423</a></p>
 </div>
   </div>
 
@@ -260,11 +256,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Jin Zhu, Wenliang Pan, Yuan Tian, Weinan Xiao, Chengfeng Liu, Ruihuang Liu, Yue Hu, Hongtu Zhu, Heping Zhang, Xueqin Wang.</p>
+  <p></p>
+<p>Developed by Jin Zhu, Wenliang Pan, Yuan Tian, Weinan Xiao, Chengfeng Liu, Ruihuang Liu, Yue Hu, Hongtu Zhu, Heping Zhang, Xueqin Wang.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -272,6 +270,8 @@
 
   
 
+
+  
 
   </body>
 </html>
