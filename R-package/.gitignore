@@ -1,3 +1,4 @@
 docs
 vignettes/*.R
 vignettes/*.html
+tests/testthat/*.RData
