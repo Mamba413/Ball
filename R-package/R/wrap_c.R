@@ -280,11 +280,13 @@ apply_bcor_wrap <- function(x, y, n, p, distance, weight, method, num.threads, c
   if (p_continuous != 0) {
     bcor_stat1 <- as.double(numeric(3 * p_continuous))
     x <- as.double(as.vector(x))
+    missing_flag <- as.integer(as.vector(!is.na(x)))
+    x[missing_flag == 0] <- -9999.99
     x_number <- as.integer(rep(1, p_continuous))
     f_number <- as.integer(p_continuous)
     k <- as.integer(1)
-    #
-    res <- .C("bcor_test", bcor_stat1, y, x, x_number, f_number, num, p, k, dst_y, dst_x, nth)[[1]]
+    res <- .C("bcor_test", bcor_stat1, y, x, x_number, 
+              f_number, num, p, k, dst_y, dst_x, nth, missing_flag)[[1]]
     bcor_stat1 <- matrix(res, ncol = 3, byrow = TRUE)
   }
   

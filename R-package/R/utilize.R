@@ -102,6 +102,31 @@ memoryAvailable <- function(n, funs) {
   }
 }
 
+#' Examine x, y arguments in bcov.test, bcov
+#' @inheritParams bcov.test
+#' @noRd
+#' 
+examine_x_y_bcor <- function(x, y) {
+  dim_x <- dim(x)
+  dim_y <- dim(y)
+  if(is.null(dim_x) | is.null(dim_y)) {
+    stop("x or y is NULL!")
+  }
+  n <- dim_x[1]
+  if(n != dim_y[1]) {
+    stop("x and y have different sample sizes!")
+  }
+  if(any(apply(y, 2, anyNA))) {
+    stop("Missing data in y!")
+  }
+  if((dim_x[2] == 1) & (dim_y[2] == 1)) {
+    p <- 1
+  } else {
+    p <- -1
+  }
+  c(n, p)
+}
+
 
 #' Examine x, y arguments in bcov.test, bcov
 #' @inheritParams bcov.test

@@ -409,7 +409,7 @@ void U_Ball_Correlation(double *bcor_stat, int *n, double *x, int *yrank, int **
 }
 
 void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *feature_number,
-                int *n, int *p) {
+                int *n, int *p, int *x_complete_flag) {
     int i, j, y_ties = 0;
     double **Dy = alloc_matrix(*n, *n);
     if (*p == 0) {
@@ -432,13 +432,12 @@ void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *fea
         memcpy(y_cpy, Dy[i], *n * sizeof(double));
         quicksort(y_cpy, yidx[i], 0, *n - 1);
         if (!y_ties) {
-            for (j = 1; j < *n; ++j) {
-                if (y_cpy[j] == y_cpy[j - 1]) {
-                    y_ties = 1;
-                }
+            if (y_cpy[1] == 0.0) {
+                y_ties = 1;
             }
         }
     }
+    // Rprintf("y_ties: %d \n", y_ties); 
     free(y_cpy);
     if (y_ties) {
         for (i = 0; i < *n; ++i) {
@@ -450,8 +449,9 @@ void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *fea
     {
         int i_feature_thread, i_thread, j_thread, k_thread, stop_index_thread, x_size_thread, x_ties = 0;
         double bcorsis_stat_tmp[3];
-        int **y_within_ball_thread, **xidx;
+        int **x_within_ball_thread, **xidx;
         double **Dx, *x_cpy, *x_thread;
+        int *complete_flag_thread;
         // main loop for calculate bcor statistic
 #pragma omp for
         for (i_feature_thread = 0; i_feature_thread < *feature_number; i_feature_thread++) {
@@ -459,56 +459,116 @@ void _bcor_test(double *bcor_stat, double *y, double *x, int *x_number, int *fea
             k_thread = 0;
             i_thread = (i_feature_thread) * (*n);
             x_size_thread = x_number[i_feature_thread] * (*n);
-            stop_index_thread = (i_feature_thread) * (*n) + x_size_thread;
+            stop_index_thread = i_thread + x_size_thread;
             x_thread = (double *) malloc(x_size_thread * sizeof(double));
+            complete_flag_thread = (int *) malloc(x_size_thread * sizeof(int));
             while (i_thread < stop_index_thread) {
                 x_thread[k_thread] = x[i_thread];
+                complete_flag_thread[k_thread] = x_complete_flag[i_thread];
                 k_thread++;
                 i_thread++;
             }
 
-            Dx = alloc_matrix(*n, *n);
-            x_cpy = (double *) malloc(*n * sizeof(double));
-            xidx = alloc_int_matrix(*n, *n);
-            Euclidean_distance(x_thread, Dx, *n, x_number[i_feature_thread]);
-            for (i_thread = 0; i_thread < *n; i_thread++) {
-                for (j_thread = 0; j_thread < *n; j_thread++) {
+            // extract complete x:
+            int *complete_row_flag = (int*) malloc(*n * sizeof(int));
+            search_complete_row(complete_row_flag, complete_flag_thread, *n, x_number[i_feature_thread]);
+            int complete_n = 0;
+            for (i_thread = 0; i_thread < *n; i_thread++)
+            {
+                if (complete_row_flag[i_thread] == 1) {
+                    complete_n++;
+                }
+            }
+            double *x_complete = (double *) malloc((complete_n * x_number[i_feature_thread]) * sizeof(double));
+            extract_complete_matrix(x_complete, complete_row_flag, x_thread, *n, x_number[i_feature_thread]); 
+            // if (i_feature_thread == 0) {
+            //     Rprintf("The first column: ");
+            //     for (int i_thread = 0; i_thread < complete_n; i_thread++)
+            //     {
+            //         Rprintf("%f ", x_complete[i_thread]);
+            //     }
+            //     Rprintf("\n");
+            // }
+            // Rprintf("Extract complete matrix done!\n");
+
+            Dx = alloc_matrix(complete_n, complete_n);
+            x_cpy = (double *) malloc(complete_n * sizeof(double));
+            xidx = alloc_int_matrix(complete_n, complete_n);
+            Euclidean_distance(x_complete, Dx, complete_n, x_number[i_feature_thread]);
+            // Rprintf("Compute Euclidean distance done!\n");
+            for (i_thread = 0; i_thread < complete_n; i_thread++) {
+                for (j_thread = 0; j_thread < complete_n; j_thread++) {
                     xidx[i_thread][j_thread] = j_thread;
                 }
             }
-            for (i_thread = 0; i_thread < (*n); i_thread++) {
-                memcpy(x_cpy, Dx[i_thread], *n * sizeof(double));
-                quicksort(x_cpy, xidx[i_thread], 0, *n - 1);
+            for (i_thread = 0; i_thread < complete_n; i_thread++) {
+                memcpy(x_cpy, Dx[i_thread], complete_n * sizeof(double));
+                quicksort(x_cpy, xidx[i_thread], 0, complete_n - 1);
                 if (!x_ties) {
-                    for (j_thread = 1; j_thread < *n; ++j_thread) {
+                    for (j_thread = 1; j_thread < complete_n; ++j_thread) {
                         if (x_cpy[j_thread] == x_cpy[j_thread - 1]) {
                             x_ties = 1;
                         }
                     }
                 }
             }
+            // Rprintf("Row-wise quick sort done!\n");
             free(x_thread);
+            free(complete_flag_thread);
+            free(x_complete);
             free(x_cpy);
 
             if (y_ties) {
+                // Rprintf("Y has ties!\n");
                 if (x_ties) {
                     Ball_Correlation(bcorsis_stat_tmp, n, Dx, Dy, xidx, yidx);
                 } else {
                     Ball_Correlation_NoTies(bcorsis_stat_tmp, n, y_within_ball, xidx, Dy);
                 }
             } else {
-                y_within_ball_thread = alloc_int_matrix(*n, *n);
-                for (i_thread = 0; i_thread < *n; ++i_thread) {
-                    quick_rank_max_with_index(Dx[i_thread], xidx[i_thread], y_within_ball_thread[i_thread], *n);
+                x_within_ball_thread = alloc_int_matrix(complete_n, complete_n);
+                // Rprintf("Quick rank begin!\n");
+                for (i_thread = 0; i_thread < complete_n; ++i_thread) {
+                    quick_rank_max_with_index(Dx[i_thread], xidx[i_thread], x_within_ball_thread[i_thread], complete_n);
                 }
-                Ball_Correlation_NoTies(bcorsis_stat_tmp, n, y_within_ball_thread, yidx, Dx);
-                free_int_matrix(y_within_ball_thread, *n, *n);
+                // Rprintf("Quick rank done!\n");
+                if (complete_n != *n) {
+                    int **sub_yidx = alloc_int_matrix(complete_n, complete_n);
+                    int missing_n = *n - complete_n;
+                    int *missing_idx = (int *) malloc(missing_n * sizeof(int));
+                    k_thread = 0;
+                    for (i_thread = 0; i_thread < *n; i_thread++)
+                    {
+                        if (complete_row_flag[i_thread] == 0) {
+                            missing_idx[k_thread] = i_thread;
+                            k_thread++;
+                        }
+                    }
+                    k_thread = 0;
+                    // Rprintf("Pick out index to be removed!\n");
+                    for (i_thread = 0; i_thread < *n; i_thread++)
+                    {
+                        if (complete_row_flag[i_thread] == 1) {
+                            remove_missing_index(sub_yidx[k_thread], yidx[i_thread], missing_idx, *n, missing_n);
+                            k_thread++;
+                        }
+                    }
+                    // Rprintf("Incomplete data, bcor: \n");
+                    Ball_Correlation_NoTies(bcorsis_stat_tmp, &complete_n, x_within_ball_thread, sub_yidx, Dx);
+                    free_int_matrix(sub_yidx, complete_n, complete_n);
+                    free(missing_idx);
+                } else {
+                    // Rprintf("Complete data, bcor: \n");
+                    Ball_Correlation_NoTies(bcorsis_stat_tmp, n, x_within_ball_thread, yidx, Dx);
+                }
+                free_int_matrix(x_within_ball_thread, complete_n, complete_n);
             }
             bcor_stat[3 * i_feature_thread + 0] = bcorsis_stat_tmp[0];
             bcor_stat[3 * i_feature_thread + 1] = bcorsis_stat_tmp[1];
             bcor_stat[3 * i_feature_thread + 2] = bcorsis_stat_tmp[2];
-            free_matrix(Dx, *n, *n);
-            free_int_matrix(xidx, *n, *n);
+            free(complete_row_flag);
+            free_matrix(Dx, complete_n, complete_n);
+            free_int_matrix(xidx, complete_n, complete_n);
         }
     }
 
@@ -863,7 +923,7 @@ void _bcor_k_sample(double *bcor_stat, double *xy, const double *snp, const int 
  * @param nthread : control the number threads used to compute statistics
  */
 void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f_number,
-               int *n, int *p, int *k, int *dst_y, int *dst_x, int *nthread) {
+               int *n, int *p, int *k, int *dst_y, int *dst_x, int *nthread, int *missing_flag) {
 #ifdef Ball_OMP_H_
     omp_set_dynamic(0);
     if (*nthread <= 0) {
@@ -875,7 +935,7 @@ void bcor_test(double *bcorsis_stat, double *y, double *x, int *x_number, int *f
     if (*k <= 1) {
         if (*dst_y == 1) {
             if (*dst_x == 0) {
-                _bcor_test(bcorsis_stat, y, x, x_number, f_number, n, p);
+                _bcor_test(bcorsis_stat, y, x, x_number, f_number, n, p, missing_flag);
             } else {
                 _bcor_stat(bcorsis_stat, y, x, n);
             }

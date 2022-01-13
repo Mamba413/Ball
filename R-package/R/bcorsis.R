@@ -15,7 +15,7 @@ bcor <- function(x, y, distance = FALSE, weight = FALSE) {
   weight <- examine_weight_arguments(weight)
   x <- as.matrix(x)
   y <- as.matrix(y)
-  x_y_info <- examine_x_y(x, y)
+  x_y_info <- examine_x_y_bcor(x, y)
   p <- x_y_info[2]
   #
   if(distance == FALSE) {
@@ -217,7 +217,7 @@ bcorsis <- function(x, y, d = "small", weight = c("constant", "probability", "ch
   seed <- 1
   y <- as.matrix(y)
   x <- as.matrix(x)
-  n <- examine_x_y(x, y)[1]
+  n <- examine_x_y_bcor(x, y)[1]
   p <- dim(x)[2]
   y_p <- dim(y)[2]
   colnames(x) <- paste0("x", 1:p)

@@ -18,6 +18,9 @@
 
 #define MAX(a,b) (((a)>(b))?(a):(b));
 void swap(double *x, double *y);
+void remove_missing_index(int *idx, int *sub_idx, int *remove_idx, int n, int miss_n);
+void search_complete_row(int *complete_row_flag, int *complete_flag, int n, int p);
+void extract_complete_matrix(double* complete_x, int *complete_row_flag, double *x, int n, int p);
 void count_smaller_number_after_self_solution(double *vector, int *number, int num);
 void count_smaller_number_after_self_solution2(double *vector, int *index, int *number, int num);
 void find_group_relative_location(int *group_relative_location, int *group, int *cumsum_size, int num, int K);
