@@ -7,18 +7,18 @@
 using namespace Rcpp;
 #endif
 
-double sbd(std::vector<std::vector<double>> &xx, std::vector<std::vector<double>> &xy,
-           std::vector<std::vector<double>> &yx, std::vector<std::vector<double>> &yy,
+double sbd(std::vector<std::vector<double> > &xx, std::vector<std::vector<double> > &xy,
+           std::vector<std::vector<double> > &yx, std::vector<std::vector<double> > &yy,
            int n1, int n1_total, int n2, int n2_total)
 {
     BF bf_x = BF(xx, n1, n1_total);
     BF bf_y = BF(yy, n2, n2_total);
     // std::cout << "initial pass\n";
 
-    std::vector<std::vector<double>> pxx(n1, std::vector<double>(n1_total));
-    std::vector<std::vector<double>> pxy(n1, std::vector<double>(n1_total));
-    std::vector<std::vector<double>> pyx(n2, std::vector<double>(n2_total));
-    std::vector<std::vector<double>> pyy(n2, std::vector<double>(n2_total));
+    std::vector<std::vector<double> > pxx(n1, std::vector<double>(n1_total));
+    std::vector<std::vector<double> > pxy(n1, std::vector<double>(n1_total));
+    std::vector<std::vector<double> > pyx(n2, std::vector<double>(n2_total));
+    std::vector<std::vector<double> > pyy(n2, std::vector<double>(n2_total));
 
     bf_x.get_fitted(pxx);
     bf_y.get_fitted(pyy);
@@ -70,10 +70,10 @@ double sbd_cpp(Rcpp::NumericMatrix &x, int n1, int n1_total, int n2, int n2_tota
     int num = n1_total + n2_total;
     int fix_center_num = n1 + n2;
 
-    std::vector<std::vector<double>> xx(n1, std::vector<double>(n1_total));
-    std::vector<std::vector<double>> xy(n1, std::vector<double>(n2_total));
-    std::vector<std::vector<double>> yx(n2, std::vector<double>(n1_total));
-    std::vector<std::vector<double>> yy(n2, std::vector<double>(n2_total));
+    std::vector<std::vector<double> > xx(n1, std::vector<double>(n1_total));
+    std::vector<std::vector<double> > xy(n1, std::vector<double>(n2_total));
+    std::vector<std::vector<double> > yx(n2, std::vector<double>(n1_total));
+    std::vector<std::vector<double> > yy(n2, std::vector<double>(n2_total));
 
     for (int i = 0; i < n1; i++)
     {
