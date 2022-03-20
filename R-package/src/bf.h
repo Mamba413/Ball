@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <utility>
 
 #ifndef BF_H
 #define BF_H
@@ -16,7 +16,7 @@ public:
   int num;
   std::vector<double> distance_vector;
   std::vector<double> fcbf_value;
-
+  
   fixCenterBF(std::vector<double> &distance_vector, int num)
   {
     this->num = num;

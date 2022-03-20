@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // sbd_cpp
 double sbd_cpp(Rcpp::NumericMatrix& x, int n1, int n1_total, int n2, int n2_total);
 RcppExport SEXP _Ball_sbd_cpp(SEXP xSEXP, SEXP n1SEXP, SEXP n1_totalSEXP, SEXP n2SEXP, SEXP n2_totalSEXP) {
