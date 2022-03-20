@@ -30,7 +30,7 @@ public:
   void train()
   {
     int num = this->num;
-    std::vector<std::pair<double, int>> dist_index_vec(num);
+    std::vector<std::pair<double, int> > dist_index_vec(num);
     for (unsigned int i = 0; i < num; i++)
     {
       dist_index_vec[i] = std::make_pair(this->distance_vector[i], i);

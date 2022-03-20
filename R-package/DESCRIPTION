@@ -21,7 +21,7 @@ License: GPL-3
 Packaged: 2017-12-18 19:00:00 UTC; 
 RoxygenNote: 7.1.1
 Depends: R (>= 2.10)
-Imports: utils, gam, survival, mvtnorm
+Imports: utils, gam, survival, mvtnorm, Rcpp
 Suggests: knitr, rmarkdown, testthat
 VignetteBuilder: knitr
 NeedsCompilation: yes
@@ -29,3 +29,5 @@ Encoding: UTF-8
 LazyData: true
 URL: https://mamba413.github.io/Ball/, https://github.com/Mamba413/Ball
 BugReports: https://github.com/Mamba413/Ball/issues
+LinkingTo: 
+    Rcpp

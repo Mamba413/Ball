@@ -1,3 +1,5 @@
+#include <R.h>
+#include <Rinternals.h>
 #include <stdlib.h> // for NULL
 #include <R_ext/Rdynload.h>
 
@@ -18,8 +20,7 @@ extern void bdd_matrix_bias_two_group(double *, double *, int *, int *, int *);
 extern void sbd_C(double *, double *, int *, int *, int *, int *);
 
 /* .Call calls */
-extern SEXP _Ball_sbd_cpp(SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _Ball_mq_cpp(SEXP, SEXP, SEXP);
+extern SEXP _Ball_mq_cpp(SEXP, SEXP, SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
   {"bcor_test", (DL_FUNC) &bcor_test, 12},
@@ -35,13 +36,12 @@ static const R_CMethodDef CEntries[] = {
 };
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_Ball_sbd_cpp", (DL_FUNC) &_Ball_sbd_cpp, 5},
-    {"_Ball_mq_cpp", (DL_FUNC) &_Ball_mq_cpp, 3},
+    {"_Ball_mq_cpp", (DL_FUNC) &_Ball_mq_cpp, 4},
     {NULL, NULL, 0}
 };
 
 void R_init_Ball(DllInfo *dll)
 {
-  R_registerRoutines(dll, CEntries, NULL, NULL, NULL);
+  R_registerRoutines(dll, CEntries, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
 }
