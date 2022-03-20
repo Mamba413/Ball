@@ -15,6 +15,11 @@ extern void bd_gwas_screening(double *, double *, double *, int *, int *, double
 extern void bd_gwas_refining_single(double *, double *, double *, int *, int *, double *, int *, int *, int *, int *, int *, int *, int *, int *);
 extern void bdd_matrix_bias(double *, double *, int *, int *);
 extern void bdd_matrix_bias_two_group(double *, double *, int *, int *, int *);
+extern void sbd_C(double *, double *, int *, int *, int *, int *);
+
+/* .Call calls */
+extern SEXP _Ball_sbd_cpp(SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _Ball_mq_cpp(SEXP, SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
   {"bcor_test", (DL_FUNC) &bcor_test, 12},
@@ -27,6 +32,12 @@ static const R_CMethodDef CEntries[] = {
   {"bdd_matrix_bias",           (DL_FUNC) &bdd_matrix_bias,           4},
   {"bdd_matrix_bias_two_group", (DL_FUNC) &bdd_matrix_bias_two_group, 5},
   {NULL, NULL, 0}
+};
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_Ball_sbd_cpp", (DL_FUNC) &_Ball_sbd_cpp, 5},
+    {"_Ball_mq_cpp", (DL_FUNC) &_Ball_mq_cpp, 3},
+    {NULL, NULL, 0}
 };
 
 void R_init_Ball(DllInfo *dll)
