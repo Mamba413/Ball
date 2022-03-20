@@ -21,6 +21,7 @@ extern void sbd_C(double *, double *, int *, int *, int *, int *);
 
 /* .Call calls */
 extern SEXP _Ball_mq_cpp(SEXP, SEXP, SEXP, SEXP);
+extern SEXP _Ball_sbd_cpp(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
   {"bcor_test", (DL_FUNC) &bcor_test, 12},
@@ -32,11 +33,13 @@ static const R_CMethodDef CEntries[] = {
   {"bd_gwas_screening",       (DL_FUNC) &bd_gwas_screening,       14},
   {"bdd_matrix_bias",           (DL_FUNC) &bdd_matrix_bias,           4},
   {"bdd_matrix_bias_two_group", (DL_FUNC) &bdd_matrix_bias_two_group, 5},
+  // {"sbd_C", (DL_FUNC) &sbd_C, 6},
   {NULL, NULL, 0}
 };
 
 static const R_CallMethodDef CallEntries[] = {
     {"_Ball_mq_cpp", (DL_FUNC) &_Ball_mq_cpp, 4},
+    {"_Ball_sbd_cpp", (DL_FUNC) &_Ball_sbd_cpp, 5},
     {NULL, NULL, 0}
 };
 

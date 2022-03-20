@@ -142,6 +142,14 @@ Python-package/.spyproject/
 Python-package/.vscode/launch.json
 Python-package/.vscode/
 R-package/..pdf
+R-package/src/Ball.so
+.vscode/c_cpp_properties.json
+.vscode/settings.json
+.DS_Store
+R-package/src/tmp/bf_c.cpp
+R-package/src/tmp/bf_c.h
+R-package/src/tmp/sb.c
+R-package/src/utilities.c
 
 Ball
 Ball.Rcheck
@@ -155,3 +163,4 @@ R-package/vignettes/*.html
 .vscode/settings.json
 
 bug_tofix/*
+test.RData

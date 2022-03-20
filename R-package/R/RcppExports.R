@@ -4,4 +4,7 @@
 mq_cpp <- function(x, n1, n1_total, mq_res) {
     invisible(.Call(`_Ball_mq_cpp`, x, n1, n1_total, mq_res))
 }
+sbd_cpp <- function(x, n1, n1_total, n2, n2_total) {
+    .Call(`_Ball_sbd_cpp`, x, n1, n1_total, n2, n2_total)
+}
 

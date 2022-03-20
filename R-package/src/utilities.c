@@ -984,6 +984,7 @@ void free_matrix(double **matrix, int r, int c) {
         free(matrix[i]);
     }
     free(matrix);
+    matrix = NULL;
 }
 
 void free_3d_matrix(double ***arr3D, int r, int c) {
