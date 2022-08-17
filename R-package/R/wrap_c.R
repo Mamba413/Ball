@@ -94,7 +94,7 @@ bd_test_wrap_c <- function(xy, size, num.permutations, weight, distance, num.thr
   num.threads <- as.integer(num.threads)
   #
   K <- as.integer(length(size))
-  stat_num <- ifelse(K == 2, 2, 6)
+  stat_num <- ifelse(K == 2, 3, 6)
   bd <- as.double(numeric(stat_num))
   p_value <- as.double(numeric(stat_num))
   size <- as.integer(size)
@@ -116,9 +116,15 @@ bd_test_wrap_c <- function(xy, size, num.permutations, weight, distance, num.thr
     } else {
       index <- c(1, 3, 5)
     }
-  } else {
+  } else if (weight == BD_WEIGHT_TYPE[2]) {
     if (K == 2) {
       index <- 2
+    } else {
+      index <- c(2, 4, 6)
+    }
+  } else if (weight == BD_WEIGHT_TYPE[3]) {
+    if (K == 2) {
+      index <- 3
     } else {
       index <- c(2, 4, 6)
     }

@@ -143,7 +143,7 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99,
                             method = c("permutation", "limit"), distance = FALSE,
                             size = NULL, seed = 1, num.threads = 0, 
                             kbd.type = c("sum", "maxsum", "max"), 
-                            weight = c("constant", "variance"), ...) {
+                            weight = c("constant", "variance", "rbf"), ...) {
   weight <- match.arg(weight)
   data_name <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
   kbd.type <- match.arg(kbd.type)
