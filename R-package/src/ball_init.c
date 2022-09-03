@@ -13,7 +13,7 @@ extern void bd_test(double *, double *, double *, int *, int *, int *, int *, in
 extern void SRCT_new(double *, int *, int *, double *, int *, double *);
 extern void bd_gwas_screening(double *, double *, double *, int *, int *, double *, int *, int *, int *, int *, int *, int *, int *, int *);
 extern void bd_gwas_refining_single(double *, double *, double *, int *, int *, double *, int *, int *, int *, int *, int *, int *, int *, int *);
-extern void bdd_matrix_bias(double *, double *, int *, int *);
+extern void bdd_matrix_bias(double *, double *, int *, int *, int *);
 extern void bdd_matrix_bias_two_group(double *, double *, int *, int *, int *);
 
 static const R_CMethodDef CEntries[] = {
@@ -24,7 +24,7 @@ static const R_CMethodDef CEntries[] = {
   {"SRCT_new",  (DL_FUNC) &SRCT_new,  6},
   {"bd_gwas_refining_single", (DL_FUNC) &bd_gwas_refining_single, 14},
   {"bd_gwas_screening",       (DL_FUNC) &bd_gwas_screening,       14},
-  {"bdd_matrix_bias",           (DL_FUNC) &bdd_matrix_bias,           4},
+  {"bdd_matrix_bias",           (DL_FUNC) &bdd_matrix_bias,           5},
   {"bdd_matrix_bias_two_group", (DL_FUNC) &bdd_matrix_bias_two_group, 5},
   {NULL, NULL, 0}
 };

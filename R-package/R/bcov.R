@@ -158,11 +158,11 @@ bcov.test.default <- function(x, y = NULL, num.permutations = 99,
       weight_name <- "constant"
     } else if (weight == "probability") {
       stat <- result[["statistic"]][2]
-      pvalue <- result[["p.value"]][2]
+      pvalue <- result[["p.value"]][1]
       weight_name <- "probability"
     } else if (weight == "chisquare") {
       stat <- result[["statistic"]][3]
-      pvalue <- result[["p.value"]][3]
+      pvalue <- result[["p.value"]][1]
       weight_name <- "chisquare"
     } 
     
@@ -301,18 +301,14 @@ bcov_test_internal <- function(x, y, num.permutations = 99, distance = FALSE, we
   if(num.permutations == 0) {
     result <- bcov_test_wrap_c(x = x, y = y, n = num, num.permutations = 0, 
                                distance = distance, num.threads = num.threads)
+    weight_index <- which(WEIGHT_TYPE %in% weight)
     if(method == "limit") {
-      eigenvalue <- bcov_limit_wrap_c(x, y, num, distance, num.threads)
-      result[["p.value"]] <- 1 - hbe(eigenvalue, num * result[["statistic"]][1])
+      eigenvalue <- bcov_limit_wrap_c(x, y, num, distance, num.threads, weight)
+      result[["p.value"]] <- 1 - hbe(eigenvalue, 
+                                     num * result[["statistic"]][weight_index])
       return(result)
     } else {
-      if (weight == WEIGHT_TYPE[1]) {
-        return(result[[1]][1])
-      } else if (weight == WEIGHT_TYPE[2]) {
-        return(result[[1]][2])
-      } else if (weight == WEIGHT_TYPE[3]) {
-        return(result[[1]][3])
-      }
+      return(result[[1]][weight_index])
     }
   } else {
     set.seed(seed = examine_seed_arguments(seed))

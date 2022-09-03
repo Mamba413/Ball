@@ -2,26 +2,29 @@
 #' @description wrapper C function which compute Ball Divergence via limit distribution
 #' @inheritParams bd.test
 #' @noRd
-bcov_limit_wrap_c <- function(x, y, num, distance, num.threads) {
+bcov_limit_wrap_c <- function(x, y, num, distance, num.threads, weight) {
   if (!is.null(y)) {
     x <- list(x, y)
   }
   N <- as.integer(num)
   distance <- as.integer(distance)
   num.threads <- as.integer(num.threads)
+  weight_type <- as.integer(which(WEIGHT_TYPE == weight))
   
   bdd_xy_eigen <- matrix(data = 1, ncol = num, nrow = num)
   for (i in 1:length(x)) {
     xy <- as.double(x[[i]])
     bdd_xy <- double((num + 1) * num / 2)
-    res <- .C("bdd_matrix_bias", bdd_xy, xy, N, num.threads)
+    res <- .C("bdd_matrix_bias", bdd_xy, xy, N, num.threads, weight_type)
     rm(bdd_xy); gc(reset = TRUE, verbose = FALSE)
     bdd_xy <- matrix(0, nrow = num, ncol = num)
     bdd_xy[lower.tri(bdd_xy, diag = TRUE)] <- res[[1]]
     bdd_xy <- bdd_xy + t(bdd_xy)
     diag(bdd_xy) <- diag(bdd_xy) / 2
+    # bdd_xy_eigen <- bdd_xy_eigen * bdd_xy
     bdd_xy_eigen <- bdd_xy_eigen * center_bdd_matrix(bdd_xy)
   }
+  # bdd_xy_eigen <- center_bdd_matrix(bdd_xy_eigen)
   
   eigenvalue <- eigen(bdd_xy_eigen, only.values = TRUE, symmetric = TRUE)$values
   eigenvalue <- eigenvalue[eigenvalue > 0] / num
