@@ -10,7 +10,7 @@
 #' the Ball Covariance statistic. Default: \code{num.permutations = 99}.
 #' @param distance if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.
 #' @param weight a logical or character string used to choose the weight form of Ball Covariance statistic.. 
-#' If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, or \code{"chisquare"}. 
+#' If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, \code{"chisquare"}, \code{"rbf"}. 
 #' Any unambiguous substring can be given. 
 #' If input is a logical value, it is equivalent to \code{weight = "probability"} if \code{weight = TRUE} while 
 #' equivalent to \code{weight = "constant"} if \code{weight = FALSE}.
@@ -47,7 +47,7 @@
 #' See Pan et al 2018 for theoretical properties of the test, including statistical consistency.
 #' 
 #' @note Actually, \code{bcov.test} simultaneously computing Ball Covariance statistics with 
-#' \code{"constant"}, \code{"probability"}, and \code{"chisquare"} weights.
+#' \code{"constant"}, \code{"probability"}, \code{"chisquare"}, \code{"rbf"} weights.
 #' Users can get other Ball Covariance statistics with different weight and their corresponding \eqn{p}-values 
 #' in the \code{complete.info} element of output. We give a quick example below to illustrate. 
 #' 
@@ -164,6 +164,10 @@ bcov.test.default <- function(x, y = NULL, num.permutations = 99,
       stat <- result[["statistic"]][3]
       pvalue <- result[["p.value"]][1]
       weight_name <- "chisquare"
+    } else if (weight == "rbf") {
+      stat <- result[["statistic"]][4]
+      pvalue <- result[["p.value"]][1]
+      weight_name <- "rbf"
     } 
     
     data_name <- paste0(data_name,"\nnumber of observations = ", result[["info"]][["N"]])
@@ -420,18 +424,14 @@ kbcov_test_internal <- function(x, num.permutations = 99, distance = FALSE, weig
   if(num.permutations == 0) {
     result <- kbcov_test_wrap_c(x = x, K = var_num, n = num, num.permutations = 0, 
                                 distance = distance, num.threads = num.threads)
+    weight_index <- which(WEIGHT_TYPE %in% weight)
     if(method == "limit") {
-      eigenvalue <- bcov_limit_wrap_c(old_x, NULL, num, distance, num.threads)
-      result[["p.value"]] <- 1 - hbe(eigenvalue, num * result[["statistic"]])
+      eigenvalue <- bcov_limit_wrap_c(old_x, NULL, num, distance, num.threads, weight)
+      result[["p.value"]] <- 1 - hbe(eigenvalue, 
+                                     num * result[["statistic"]][weight_index])
       return(result)
     } else {
-      if (weight == WEIGHT_TYPE[1]) {
-        return(result[[1]][1])
-      } else if (weight == WEIGHT_TYPE[2]) {
-        return(result[[1]][2])
-      } else {
-        return(result[[1]][3])
-      }
+      return(result[[1]][weight_index])
     }
   } else {
     set.seed(seed = examine_seed_arguments(seed))

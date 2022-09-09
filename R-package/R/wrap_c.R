@@ -28,6 +28,7 @@ bcov_limit_wrap_c <- function(x, y, num, distance, num.threads, weight) {
   
   eigenvalue <- eigen(bdd_xy_eigen, only.values = TRUE, symmetric = TRUE)$values
   eigenvalue <- eigenvalue[eigenvalue > 0] / num
+  # eigenvalue <- eigenvalue / 120
   eigenvalue
 }
 
@@ -213,8 +214,8 @@ bcov_test_wrap_c <- function(x, y, n, num.permutations, distance, num.threads) {
   num.threads <- as.integer(num.threads)
   r <- as.integer(num.permutations)
   #
-  bcov <- as.double(numeric(3))
-  p_value <- as.double(numeric(3))
+  bcov <- as.double(numeric(length(WEIGHT_TYPE)))
+  p_value <- as.double(numeric(length(WEIGHT_TYPE)))
   res <- .C("bcov_test", bcov, p_value, x, y, n, r, distance, num.threads)
   bcov <- res[[1]]
   p_value <- res[[2]]
@@ -243,8 +244,8 @@ kbcov_test_wrap_c <- function(x, K, n, num.permutations, distance, num.threads) 
   distance <- as.integer(distance) 
   num.threads <- as.integer(num.threads)
   #
-  kbcov <- as.double(numeric(3))
-  p_value <- as.double(numeric(3))
+  kbcov <- as.double(numeric(length(BCOV_WEIGHT_STATS)))
+  p_value <- as.double(numeric(length(BCOV_WEIGHT_STATS)))
   res <- .C("kbcov_test", kbcov, p_value, x, K, n, r, distance, num.threads)
   bcov <- res[[1]]
   p_value <- res[[2]]

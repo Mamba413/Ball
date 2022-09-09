@@ -2,14 +2,17 @@
   library.dynam.unload("Ball", libpath)
 }
 
-WEIGHT_TYPE <- c("constant", "probability", "chisquare")
+WEIGHT_TYPE <- c("constant", "probability", "chisquare", "rbf")
 BD_WEIGHT_TYPE <- c("constant", "variance", "rbf")
 
 BCOR_WEIGHT_STATS <- c("bcor.constant", "bcor.probability", "bcor.chisquare")
-BCOV_WEIGHT_STATS <- c("bcov.constant", "bcov.probability", "bcov.chisquare")
+BCOV_WEIGHT_STATS <- c("bcov.constant", "bcov.probability", 
+                       "bcov.chisquare", "bcov.rbf")
 
 BD_WEIGHT_STATS <- c("bd.constant", "bd.variance", "bd.rbf")
-KBD_WEIGHT_STATS <- c("kbd.sum.constant", "kbd.sum.variance", "kbd.max.constant", "kbd.max.variance", "kbd.maxsum.constant", "kbd.maxsum.variance")
+KBD_WEIGHT_STATS <- c("kbd.sum.constant", "kbd.sum.variance", 
+                      "kbd.max.constant", "kbd.max.variance", 
+                      "kbd.maxsum.constant", "kbd.maxsum.variance")
 
 center_bdd_matrix <- function(bdd) {
   bdd <- sweep(bdd, 2, colMeans(bdd)) - rowMeans(bdd) + mean(bdd)

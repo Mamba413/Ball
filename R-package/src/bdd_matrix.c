@@ -2,6 +2,9 @@
 // Created by JinZhu on 2019/10/13.
 //
 
+#include "stdio.h"
+#include "math.h"
+#include "median.h"
 #include "utilities.h"
 #include "Ball_omp.h"
 
@@ -112,6 +115,19 @@ void bdd_matrix_bias_two_group(double *b_dd, double *x, int *n1_num, int *n2_num
     free_int_matrix(x_rank, num, num);
 }
 
+double chi_square_weight(int rank_value, int num) {
+    double weight = 0.0;
+    double num_double = (double) num;
+    double rank_double = (double) rank_value;
+    if (rank_value == num) {
+        // weight = (num_double * num_double) / (rank_double * (1.0 + num_double - rank_double));
+        weight = 0.0;
+    } else {
+        weight = (num_double * num_double) / (rank_double * (num_double - rank_double));
+    }
+    return weight;
+}
+
 void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread, int *weight_type) {
     int not_parallel = (*nthread == 1 ? 1 : *nthread);
 #ifdef Ball_OMP_H_
@@ -142,6 +158,21 @@ void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread, int *weight_
         }
     }
 
+    double median_value = 0.0;
+    if (*weight_type == 4) {
+        int s = 0;
+        const int Dxy_vec_len = (((*n) * (*n - 1)) >> 1);
+        double Dxy_vec[Dxy_vec_len];
+        for (int u = 0; u < (*n - 1); u++)
+        {
+            for (int v = u + 1; v < *n; v++)
+            {
+                Dxy_vec[s++] = Dxy[u][v];
+            }
+        }
+        median_value = find_median(Dxy_vec, (((*n) * (*n - 1)) >> 1));
+        // printf("median distance: %f\n", median_value);
+    }
     double num_double = (double) (*n);
     double **weight = alloc_matrix(num, num);
     for (int i = 0; i < num; i++) {
@@ -152,12 +183,9 @@ void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread, int *weight_
             } else if (*weight_type == 2) {
                 weight[i][j] = num_double / rank_double;
             } else if (*weight_type == 3) {
-                if (x_rank[i][j] == num) {
-                    weight[i][j] = 0.0;
-                    // weight[i][j] = (num_double * num_double) / (rank_double * (1.0 + num_double - rank_double));
-                } else {
-                    weight[i][j] = (num_double * num_double) / (rank_double * (num_double - rank_double));
-                }
+                weight[i][j] = chi_square_weight(x_rank[i][j], num);
+            } else if (*weight_type == 4) {
+                weight[i][j] = exp(-0.5 * Dxy[i][j] / median_value);
             }
         }
     }
