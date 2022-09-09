@@ -48,6 +48,7 @@ void rank_matrix_3d(double ***Dx, int n, int k, int ***Rx);
 void quick_rank_max_with_index(const double *x, const int *x_index, int *r, int n);
 void quick_rank_max(const double *x, int *r, int n);
 void quick_rank_min(const double *x, int *r, int n);
+void quick_rank_min_weight_sum(const double *x, double *w, double *ws, int n);
 void quick_rank_max_index(const double *x, int *x_index, int *r, int n);
 double **alloc_matrix(int r, int c);
 double ***alloc_3d_matrix(int r, int c, int h);

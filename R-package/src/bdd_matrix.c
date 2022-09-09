@@ -2,6 +2,9 @@
 // Created by JinZhu on 2019/10/13.
 //
 
+#include "stdio.h"
+#include "math.h"
+#include "median.h"
 #include "utilities.h"
 #include "Ball_omp.h"
 
@@ -112,7 +115,20 @@ void bdd_matrix_bias_two_group(double *b_dd, double *x, int *n1_num, int *n2_num
     free_int_matrix(x_rank, num, num);
 }
 
-void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread) {
+double chi_square_weight(int rank_value, int num) {
+    double weight = 0.0;
+    double num_double = (double) num;
+    double rank_double = (double) rank_value;
+    if (rank_value == num) {
+        // weight = (num_double * num_double) / (rank_double * (1.0 + num_double - rank_double));
+        weight = 0.0;
+    } else {
+        weight = (num_double * num_double) / (rank_double * (num_double - rank_double));
+    }
+    return weight;
+}
+
+void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread, int *weight_type) {
     int not_parallel = (*nthread == 1 ? 1 : *nthread);
 #ifdef Ball_OMP_H_
     if (not_parallel != 1) {
@@ -136,24 +152,78 @@ void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread) {
         for (int j = 0; j < num; j++) {
             x_vec[j] = Dxy[i][j];
         }
-        quick_rank_min(x_vec, r_vec, num);
+        quick_rank_max(x_vec, r_vec, num);
         for (int j = 0; j < num; j++) {
             x_rank[i][j] = r_vec[j];
         }
     }
+
+    double median_value = 0.0;
+    if (*weight_type == 4) {
+        int s = 0;
+        const int Dxy_vec_len = (((*n) * (*n - 1)) >> 1);
+        double Dxy_vec[Dxy_vec_len];
+        for (int u = 0; u < (*n - 1); u++)
+        {
+            for (int v = u + 1; v < *n; v++)
+            {
+                Dxy_vec[s++] = Dxy[u][v];
+            }
+        }
+        median_value = find_median(Dxy_vec, (((*n) * (*n - 1)) >> 1));
+        // printf("median distance: %f\n", median_value);
+    }
+    double num_double = (double) (*n);
+    double **weight = alloc_matrix(num, num);
+    for (int i = 0; i < num; i++) {
+        for (int j = 0; j < num; j++) {
+            double rank_double = (double) x_rank[i][j];
+            if (*weight_type == 1) {
+                weight[i][j] = 1.0;
+            } else if (*weight_type == 2) {
+                weight[i][j] = num_double / rank_double;
+            } else if (*weight_type == 3) {
+                weight[i][j] = chi_square_weight(x_rank[i][j], num);
+            } else if (*weight_type == 4) {
+                weight[i][j] = exp(-0.5 * Dxy[i][j] / median_value);
+            }
+        }
+    }
+
+    double w_vec[num];
+    double ws_vec[num];
+    double total_weight_sum[num];
+    double **weight_sum = alloc_matrix(num, num);
+    for (int i = 0; i < num; i++) {
+        total_weight_sum[i] = 0.0;
+        for (int j = 0; j < num; j++) {
+            x_vec[j] = Dxy[i][j];
+            w_vec[j] = weight[i][j];
+            ws_vec[j] = 0.0;
+            total_weight_sum[i] += w_vec[j];
+        }
+
+        quick_rank_min_weight_sum(x_vec, w_vec, ws_vec, num);
+        for (int j = 0; j < num; j++) {
+            weight_sum[i][j] = ws_vec[j];
+        }
+    }
     free_matrix(Dxy, num, num);
 
-
-    int c1 = num * (num + 1);
+    double c1 = 0.0;
+    for (int i = 0; i < num; i++) {
+        c1 += total_weight_sum[i];
+    }
     double c2 = 1.0 / (num * num);
 
     if (not_parallel) {
-        int tmp_sum, s = 0;
+        int s = 0;
+        double tmp_sum;
         for (int i = 0; i < num; i++) {
             for (int j = i; j < num; j++) {
-                tmp_sum = 0;
+                tmp_sum = 0.0;
                 for (int k = 0; k < num; k++) {
-                    tmp_sum += MAX(x_rank[k][i], x_rank[k][j]);
+                    tmp_sum += MAX(weight_sum[k][i], weight_sum[k][j]);
                 }
                 b_dd[s++] = (c1 - tmp_sum) * c2;
             }
@@ -161,14 +231,15 @@ void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread) {
     } else {
 #pragma omp parallel
         {
-            int tmp_sum, s, i, j, k;
+            int s, i, j, k;
+            double tmp_sum;
 #pragma omp for
             for (i = 0; i < num; i++) {
                 for (j = i; j < num; j++) {
                     s = i * num - ((i * (i - 1)) >> 1) + j - i;
-                    tmp_sum = 0;
+                    tmp_sum = 0.0;
                     for (k = 0; k < num; k++) {
-                        tmp_sum += MAX(x_rank[k][i], x_rank[k][j]);
+                        tmp_sum += MAX(weight_sum[k][i], weight_sum[k][j]);
                     }
                     b_dd[s] = (c1 - tmp_sum) * c2;
                 }
@@ -177,4 +248,6 @@ void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread) {
     }
 
     free_int_matrix(x_rank, num, num);
+    free_matrix(weight, num, num);
+    free_matrix(weight_sum, num, num);
 }

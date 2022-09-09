@@ -667,7 +667,7 @@ void quick_rank_max(const double *x, int *r, int n) {
 }
 
 /**
- * Rank a value vector in a max manner
+ * Rank a value vector in a min manner
  * @param x value vector
  * @param r save the rank result
  * @param n the size of vector
@@ -702,6 +702,48 @@ void quick_rank_min(const double *x, int *r, int n) {
     free(x_index);
     free(x_cpy);
 }
+
+/**
+ * Rank a value vector in a min manner together with weight sum
+ * @param x value vector
+ * @param w weight vector
+ * @param ws save the weight sum result
+ * @param n the size of vector
+ * @example
+ * x = {1.2, 1.3, 1.4, 1.3, 0.9};
+ * w = {1.0, 1.0, 1.0, 1.0, 1.0};
+ * r = {0.0, 0.0, 0.0, 0.0, 0.0};
+ * quick_rank_min_weight_sum(x, w, r, 5);
+ * r = {2.0, 3.0, 5.0, 3.0, 1.0};
+ */
+void quick_rank_min_weight_sum(const double *x, double *w, double *ws, int n) {
+    int *x_index, i_loc;
+    double tmp, ws_value, *x_cpy;
+    x_index = (int *) malloc(n * sizeof(int));
+    x_cpy = (double *) malloc(n * sizeof(double));
+    for (int j = 0; j < n; j++) { x_index[j] = j; }
+    for (int j = 0; j < n; j++) { x_cpy[j] = x[j]; }
+    quicksort(x_cpy, x_index, 0, n - 1);
+
+    // compute weight sum for each rank:
+    ws[x_index[0]] = 0.0;
+    ws_value = ws[x_index[0]];
+    tmp = w[x_index[0]];
+    for (int i = 1; i < n; i++) {
+        i_loc = x_index[i];
+        if (x[i_loc] == x[x_index[i - 1]]) {
+            ws[i_loc] = ws_value;
+            tmp += w[i_loc];
+        } else {
+            ws_value += tmp;
+            ws[i_loc] = ws_value;
+            tmp = w[i_loc];
+        }
+    }
+    free(x_index);
+    free(x_cpy);
+}
+
 
 /**
  * compute the rank
