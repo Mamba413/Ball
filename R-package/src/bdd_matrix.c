@@ -251,3 +251,161 @@ void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread, int *weight_
     free_matrix(weight, num, num);
     free_matrix(weight_sum, num, num);
 }
+
+void joint_kernel_matrix_bias(double *kernel, double *x, int *k, int *n, int *nthread, int *weight_type) {
+    int not_parallel = (*nthread == 1 ? 1 : *nthread);
+#ifdef Ball_OMP_H_
+    if (not_parallel != 1) {
+        omp_set_dynamic(0);
+        if (*nthread <= 0) {
+            omp_set_num_threads(omp_get_num_procs());
+        } else {
+            omp_set_num_threads(*nthread);
+        }
+    }
+#endif
+
+    double ***Dx;
+
+    // vector to matrix
+    Dx = alloc_3d_matrix(*n, *n, *k);
+
+    // convert x to 3D distance matrix:
+    distance2matrix3d(x, Dx, *n, *k);
+
+    const int num = *n;
+
+    double c1 = 1.0;
+    double c2 = 1.0 / (num * num);
+
+    if (not_parallel) {
+        int u = 0, tmp_sum, inclusion_count;
+        for (int i = 0; i < num; i++) {
+            for (int j = i; j < num; j++) {
+                inclusion_count = 0;
+                for (int s = 0; s < num; s++) {
+                    for (int t = 0; t < num; t++) {
+                        tmp_sum = 1;
+                        for (int m = 0; m < *k; m++) {
+                            // tmp_sum *= MAX(Dx[s][i][m], Dx[s][j][m]) <= Dx[s][t][m];
+                            tmp_sum *= (Dx[s][i][m] <= Dx[s][t][m]) * (Dx[s][j][m] <= Dx[s][t][m]);
+                            if (tmp_sum == 0) {
+                                continue;
+                            }
+                        }
+                        inclusion_count += tmp_sum;
+                    }
+                }
+                kernel[u++] = c1 * c2 * inclusion_count;
+            }
+        }
+    } else {
+#pragma omp parallel
+        {
+            int i, j, s, t, m;
+            int u = 0, tmp_sum, inclusion_count;
+#pragma omp for
+            for (i = 0; i < num; i++) {
+                for (j = i; j < num; j++) {
+                    u = i * num - ((i * (i - 1)) >> 1) + j - i;
+                    inclusion_count = 0;
+                    for (int s = 0; s < num; s++) {
+                        for (int t = 0; t < num; t++) {
+                            tmp_sum = 1;
+                            for (int m = 0; m < *k; m++) {
+                                tmp_sum *= (Dx[s][i][m] <= Dx[s][t][m]) * (Dx[s][j][m] <= Dx[s][t][m]);
+                                if (tmp_sum == 0) {
+                                    continue;
+                                }
+                            }
+                            inclusion_count += tmp_sum;
+                        }
+                    }
+                    kernel[u++] = c1 * c2 * inclusion_count;
+                }
+            }
+        };
+    }
+
+    free_3d_matrix(Dx, *n, *n);
+}
+
+void cross_kernel_matrix_bias_crude(double *kernel, double *x, int *k, int *n, int *nthread, int *weight_type) {
+    int not_parallel = (*nthread == 1 ? 1 : *nthread);
+#ifdef Ball_OMP_H_
+    if (not_parallel != 1) {
+        omp_set_dynamic(0);
+        if (*nthread <= 0) {
+            omp_set_num_threads(omp_get_num_procs());
+        } else {
+            omp_set_num_threads(*nthread);
+        }
+    }
+#endif
+
+    // convert x to 3D distance matrix:
+    double ***Dx;
+    Dx = alloc_3d_matrix(*n, *n, *k);
+    distance2matrix3d(x, Dx, *n, *k);
+
+    const int num = *n;
+    const int K = *k;
+    double c1 = 1.0;
+    double c2 = 1.0 / (num * num);
+    int seq_pow_num[K]; 
+    for (int k_tmp = 0; k_tmp < K; k_tmp++)
+    {
+        if (k_tmp == 0) {
+            seq_pow_num[0] = 1;
+        } else {
+            seq_pow_num[k_tmp] = seq_pow_num[k_tmp - 1] * num;
+        }
+    }
+    int combination_type_num = num * seq_pow_num[K - 1];  // num^K
+    if (not_parallel) {
+        int s = 0;
+        for (int u = 0; u < num; u++) {
+            // find the balls that include u.
+            int index1[num * num], index2[num * num];
+            int complete_inclusion_count = 0;
+            for (int i = 0; i < num; i++) {
+                for (int j = 0; j < num; j++) {
+                    int complete_inclusion = 1;
+                    for (int k_tmp = 0; k_tmp < K; k_tmp++) {
+                        if (Dx[i][u][k_tmp] > Dx[i][j][k_tmp]) {
+                            complete_inclusion = 0; 
+                            continue;
+                        }
+                    }
+                    if (complete_inclusion) {
+                        index1[complete_inclusion_count] = i;
+                        index2[complete_inclusion_count] = j;
+                        complete_inclusion_count++;
+                    }
+                }
+            }
+
+            // compute the kernel values
+            int combination_tuple[K];
+            for (int i = 0; i < combination_type_num; i++) {
+                int cross_inclusion_count = 0;
+                for (int k_tmp = 0; k_tmp < K; k_tmp++) {
+                    combination_tuple[K - k_tmp - 1] = (i / seq_pow_num[k_tmp]) % num;
+                }
+                for (int j = 0; j < complete_inclusion_count; j++) {
+                    int marginal_inclusion = 1;
+                    for (int k_tmp = 0; k_tmp < K; k_tmp++) {
+                        if (Dx[index1[j]][combination_tuple[k_tmp]][k_tmp] > Dx[index1[j]][index2[j]][k_tmp]) {
+                            marginal_inclusion = 0;
+                            continue;
+                        }
+                    }
+                    cross_inclusion_count += marginal_inclusion;
+                }
+                kernel[s++] = c2 * ((double) cross_inclusion_count); 
+            }
+        }
+    }
+
+    free_3d_matrix(Dx, *n, *n);
+}

@@ -15,6 +15,8 @@ extern void bd_gwas_screening(double *, double *, double *, int *, int *, double
 extern void bd_gwas_refining_single(double *, double *, double *, int *, int *, double *, int *, int *, int *, int *, int *, int *, int *, int *);
 extern void bdd_matrix_bias(double *, double *, int *, int *, int *);
 extern void bdd_matrix_bias_two_group(double *, double *, int *, int *, int *);
+extern void joint_kernel_matrix_bias(double *, double *, int *, int *, int *, int *);
+extern void cross_kernel_matrix_bias_crude(double *, double *, int *, int *, int *, int *);
 
 static const R_CMethodDef CEntries[] = {
   {"bcor_test", (DL_FUNC) &bcor_test, 12},
@@ -26,6 +28,8 @@ static const R_CMethodDef CEntries[] = {
   {"bd_gwas_screening",       (DL_FUNC) &bd_gwas_screening,       14},
   {"bdd_matrix_bias",           (DL_FUNC) &bdd_matrix_bias,           5},
   {"bdd_matrix_bias_two_group", (DL_FUNC) &bdd_matrix_bias_two_group, 5},
+  {"joint_kernel_matrix_bias", (DL_FUNC) &joint_kernel_matrix_bias, 6},
+  {"cross_kernel_matrix_bias_crude", (DL_FUNC) &cross_kernel_matrix_bias_crude, 6},
   {NULL, NULL, 0}
 };
 
