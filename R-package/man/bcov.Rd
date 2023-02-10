@@ -17,7 +17,7 @@ bcov(x, y, distance = FALSE, weight = FALSE)
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.}
 
 \item{weight}{a logical or character string used to choose the weight form of Ball Covariance statistic.. 
-If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, or \code{"chisquare"}. 
+If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, \code{"chisquare"}, \code{"rbf"}. 
 Any unambiguous substring can be given. 
 If input is a logical value, it is equivalent to \code{weight = "probability"} if \code{weight = TRUE} while 
 equivalent to \code{weight = "constant"} if \code{weight = FALSE}.

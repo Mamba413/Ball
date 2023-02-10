@@ -48,6 +48,8 @@ kbcov_cross_kernel_wrap_c <- function(x,
 #' @noRd
 #' @export
 #' @examples 
+#' rm(list = ls()); gc(reset = TRUE)
+#' library(Ball)
 #' set.seed(1)
 #' num <- 100
 #' x <- rnorm(num)
@@ -59,6 +61,9 @@ kbcov_cross_kernel_wrap_c <- function(x,
 #' dst_y <- as.vector(dist(y))
 #' res <- kbcov_joint_kernel_wrap_c(c(dst_x, dst_y), k = 2, num = num)
 #' dim(res)
+#' dst_z <- as.vector(dist(rnorm(num)))
+#' res <- kbcov_joint_kernel_wrap_c(c(dst_x, dst_y, dst_z), k = 3, num = num)
+#' mean(res)
 kbcov_joint_kernel_wrap_c <- function(x, 
                                       k, 
                                       num, 

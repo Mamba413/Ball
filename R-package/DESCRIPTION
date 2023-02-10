@@ -19,7 +19,7 @@ Maintainer: Jin Zhu <zhuj37@mail2.sysu.edu.cn>
 Description: Hypothesis tests and sure independence screening (SIS) procedure based on ball statistics, including ball divergence <doi:10.1214/17-AOS1579>, ball covariance <doi:10.1080/01621459.2018.1543600>, and ball correlation <doi:10.1080/01621459.2018.1462709>, are developed to analyze complex data in metric spaces, e.g, shape, directional, compositional and symmetric positive definite matrix data. The ball divergence and ball covariance based distribution-free tests are implemented to detecting distribution difference and association in metric spaces <doi:10.18637/jss.v097.i06>. Furthermore, several generic non-parametric feature selection procedures based on ball correlation, BCor-SIS and all of its variants, are implemented to tackle the challenge in the context of ultra high dimensional data. A fast implementation for large-scale multiple K-sample testing with ball divergence <doi: 10.1002/gepi.22423> is supported, which is particularly helpful for genome-wide association study.
 License: GPL-3
 Packaged: 2017-12-18 19:00:00 UTC; 
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Depends: R (>= 2.10)
 Imports: utils, gam, survival, mvtnorm
 Suggests: knitr, rmarkdown, testthat
