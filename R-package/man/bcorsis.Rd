@@ -27,7 +27,7 @@ Each row is an observation vector and each column corresponding to a explanatory
 variables are selected. If \code{d} is a integer, \code{d} variables are selected. Default: \code{d = "small"}.}
 
 \item{weight}{a logical or character string used to choose the weight form of Ball Covariance statistic.. 
-If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, \code{"chisquare"}, \code{"rbf"}. 
+If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, or \code{"chisquare"}. 
 Any unambiguous substring can be given. 
 If input is a logical value, it is equivalent to \code{weight = "probability"} if \code{weight = TRUE} while 
 equivalent to \code{weight = "constant"} if \code{weight = FALSE}.

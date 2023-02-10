@@ -40,58 +40,6 @@ void swap(double *x, double *y) {
     *y = t;
 }
 
-void remove_missing_index(int *sub_idx, int *idx, int *remove_idx, int n, int missing_n) 
-{
-    int k = 0;
-    for (int i = 0; i < n; i++)
-    {
-        int subtract_num = 0;
-        int retain = 1;
-        for (int j = 0; j < missing_n; j++)
-        {
-            if (retain) {
-                if (idx[i] > remove_idx[j]) {
-                    subtract_num++;
-                } else if (idx[i] == remove_idx[j]) {
-                    retain *= 0;   
-                }
-            }
-        }
-        if (retain) {
-            sub_idx[k] = idx[i] - subtract_num;
-            k++;
-        }
-    }
-}
-
-void search_complete_row(int *complete_row_flag, int *complete_flag, int n, int p) 
-{
-    for (int i = 0; i < n; i++)
-    {
-        int complete_row = 1;
-        for (int j = 0; j < p; j++)
-        {
-            complete_row *= complete_flag[j * n + i];
-        }
-        complete_row_flag[i] = complete_row;
-    }
-}
-
-void extract_complete_matrix(double* complete_x, int *complete_row_flag, double *x, int n, int p)
-{
-    int k = 0;
-    for (int i = 0; i < n; i++)
-    {
-        if (complete_row_flag[i] == 1) {
-            for (int j = 0; j < p; j++)
-            {
-                complete_x[j * n + k] = x[j * n + i];
-            }
-            k++;
-        }
-    }
-}
-
 /**
  *
  * @param group_relative_location : [0, 2, 4, 1, 3, 5]
@@ -667,7 +615,7 @@ void quick_rank_max(const double *x, int *r, int n) {
 }
 
 /**
- * Rank a value vector in a min manner
+ * Rank a value vector in a max manner
  * @param x value vector
  * @param r save the rank result
  * @param n the size of vector
@@ -702,48 +650,6 @@ void quick_rank_min(const double *x, int *r, int n) {
     free(x_index);
     free(x_cpy);
 }
-
-/**
- * Rank a value vector in a min manner together with weight sum
- * @param x value vector
- * @param w weight vector
- * @param ws save the weight sum result
- * @param n the size of vector
- * @example
- * x = {1.2, 1.3, 1.4, 1.3, 0.9};
- * w = {1.0, 1.0, 1.0, 1.0, 1.0};
- * r = {0.0, 0.0, 0.0, 0.0, 0.0};
- * quick_rank_min_weight_sum(x, w, r, 5);
- * r = {2.0, 3.0, 5.0, 3.0, 1.0};
- */
-void quick_rank_min_weight_sum(const double *x, double *w, double *ws, int n) {
-    int *x_index, i_loc;
-    double tmp, ws_value, *x_cpy;
-    x_index = (int *) malloc(n * sizeof(int));
-    x_cpy = (double *) malloc(n * sizeof(double));
-    for (int j = 0; j < n; j++) { x_index[j] = j; }
-    for (int j = 0; j < n; j++) { x_cpy[j] = x[j]; }
-    quicksort(x_cpy, x_index, 0, n - 1);
-
-    // compute weight sum for each rank:
-    ws[x_index[0]] = 0.0;
-    ws_value = ws[x_index[0]];
-    tmp = w[x_index[0]];
-    for (int i = 1; i < n; i++) {
-        i_loc = x_index[i];
-        if (x[i_loc] == x[x_index[i - 1]]) {
-            ws[i_loc] = ws_value;
-            tmp += w[i_loc];
-        } else {
-            ws_value += tmp;
-            ws[i_loc] = ws_value;
-            tmp = w[i_loc];
-        }
-    }
-    free(x_index);
-    free(x_cpy);
-}
-
 
 /**
  * compute the rank
@@ -1529,7 +1435,7 @@ void R_CheckUserInterrupt_fn(void *dummy) {
 }
 #endif
 
-int pending_interrupt() {
+int pending_interrupt(void) {
     int interrupt_status = 0;
 #ifdef R_BUILD
     interrupt_status = !(R_ToplevelExec(R_CheckUserInterrupt_fn, NULL));
@@ -1537,7 +1443,7 @@ int pending_interrupt() {
     return interrupt_status;
 }
 
-void print_stop_message() {
+void print_stop_message(void) {
 #ifdef R_BUILD
     Rprintf("Process stop due to user interruption! \n");
 #else
@@ -1546,7 +1452,7 @@ void print_stop_message() {
 
 }
 
-void declare_gwas_screening() {
+void declare_gwas_screening(void) {
 #ifdef R_BUILD
     Rprintf("=========== Pre-screening SNPs ===========\n");
 #else
@@ -1589,7 +1495,8 @@ void print_cost_time(int second) {
 }
 
 void int_to_string(char str[], int number) {
-    sprintf(str, "%d", number);
+    // sprintf(str, "%d", number);
+    snprintf(str, sizeof(*str), "%d", number);
 }
 
 void beautify_time(char result[], int seconds) {

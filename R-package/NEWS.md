@@ -1,3 +1,6 @@
+# Ball 1.3.13
+* Fix issues found by the CRAN check.
+
 # Ball 1.3.12
 * Add a fast K-sample BD test procedure for category variables, especially the GWAS datasets. 
 

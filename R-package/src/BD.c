@@ -27,52 +27,52 @@
 #include "Rinternals.h"
 #endif
 
-void BD_Score(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
-    int i, j, n;
-    double TS_weight0 = 0.0, SS_weight0 = 0.0, TS_weight1 = 0.0, SS_weight1 = 0.0;
-    double ball_score;
-    double p1, p2, p3, ans;
-    n = *n1 + *n2;
-    double inv_n1 = 1.0 / (1.0 * *n1), inv_n2 = 1.0 / (1.0 * *n2);
-
-    // Calculate A_{ij}^{X} and A_{ij}^{Y}:
-    for (i = 0; i < *n1; i++) {
-        ball_score = 0.0;
-        for (j = 0; j < *n1; j++) {
-            p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
-            p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
-            p3 = (p1 + p2) / n;
-            if (p3 * (1 - p3) == 0) { continue; }
-            ans = p1 * inv_n1  - p2 * inv_n2;
-            ans = ans * ans;
-            TS_weight0 += ans;
-            TS_weight1 += ans / p3 / (1 - p3);
-            ball_score += ans / p3 / (1 - p3);
-        }
-#ifdef R_BUILD
-        Rprintf("%d-th BD Score: %f", i, ball_score);
-#endif
-
-    }
-    // Calculate C_{kl}^{X} and C_{kl}^{Y}:
-    for (i = *n1; i < n; i++) {
-        ball_score = 0.0;
-        for (j = *n1; j < n; j++) {
-            p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
-            p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
-            p3 = (p1 + p2) / n;
-            if (p3 * (1 - p3) == 0) { continue; }
-            ans = p1 * inv_n1  - p2 * inv_n2;
-            ans = ans * ans;
-            SS_weight0 += ans;
-            SS_weight1 += ans / p3 / (1 - p3);
-            ball_score += ans / p3 / (1 - p3);
-        }
-#ifdef R_BUILD
-        Rprintf("%d-th BD Score: %f", i, ball_score);
-#endif
-    }
-}
+// void BD_Score(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
+//     int i, j, n;
+//     double TS_weight0 = 0.0, SS_weight0 = 0.0, TS_weight1 = 0.0, SS_weight1 = 0.0;
+//     double ball_score;
+//     double p1, p2, p3, ans;
+//     n = *n1 + *n2;
+//     double inv_n1 = 1.0 / (1.0 * *n1), inv_n2 = 1.0 / (1.0 * *n2);
+// 
+//     // Calculate A_{ij}^{X} and A_{ij}^{Y}:
+//     for (i = 0; i < *n1; i++) {
+//         ball_score = 0.0;
+//         for (j = 0; j < *n1; j++) {
+//             p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
+//             p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
+//             p3 = (p1 + p2) / n;
+//             if (p3 * (1 - p3) == 0) { continue; }
+//             ans = p1 * inv_n1  - p2 * inv_n2;
+//             ans = ans * ans;
+//             TS_weight0 += ans;
+//             TS_weight1 += ans / p3 / (1 - p3);
+//             ball_score += ans / p3 / (1 - p3);
+//         }
+// #ifdef R_BUILD
+//         Rprintf("%d-th BD Score: %f", i, ball_score);
+// #endif
+// 
+//     }
+//     // Calculate C_{kl}^{X} and C_{kl}^{Y}:
+//     for (i = *n1; i < n; i++) {
+//         ball_score = 0.0;
+//         for (j = *n1; j < n; j++) {
+//             p1 = Rx[i_perm_tmp[i]][i_perm_tmp[j]] + 1;
+//             p2 = Rxy[i_perm_tmp[i]][i_perm_tmp[j]] - p1 + 1;
+//             p3 = (p1 + p2) / n;
+//             if (p3 * (1 - p3) == 0) { continue; }
+//             ans = p1 * inv_n1  - p2 * inv_n2;
+//             ans = ans * ans;
+//             SS_weight0 += ans;
+//             SS_weight1 += ans / p3 / (1 - p3);
+//             ball_score += ans / p3 / (1 - p3);
+//         }
+// #ifdef R_BUILD
+//         Rprintf("%d-th BD Score: %f", i, ball_score);
+// #endif
+//     }
+// }
 
 /**
  * Ball Divergence statistics
@@ -86,7 +86,7 @@ void BD_Score(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
  */
 void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
     int i, j, n;
-    double TS_weight0 = 0.0, SS_weight0 = 0.0, TS_weight1 = 0.0, SS_weight1 = 0.0, TS_weight2 = 0.0, SS_weight2 = 0.0;
+    double TS_weight0 = 0.0, SS_weight0 = 0.0, TS_weight1 = 0.0, SS_weight1 = 0.0;
     double p1, p2, p3, ans;
     n = *n1 + *n2;
     double inv_n1 = 1.0 / (1.0 * *n1), inv_n2 = 1.0 / (1.0 * *n2), inv_n = 1.0 / (1.0 * n);
@@ -102,7 +102,6 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
             ans = ans * ans;
             TS_weight0 += ans;
             TS_weight1 += ans / p3 / (1 - p3);
-            TS_weight2 += exp(-(p1 * inv_n1)) * ans;
         }
     }
     // Calculate C_{kl}^{X} and C_{kl}^{Y}:
@@ -116,12 +115,10 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
             ans = ans * ans;
             SS_weight0 += ans;
             SS_weight1 += ans / p3 / (1 - p3);
-            SS_weight2 += exp(-(p2 * inv_n2)) * ans;
         }
     }
     bd_stat[0] = TS_weight0 / (1.0 * (*n1) * (*n1)) + SS_weight0 / (1.0 * (*n2) * (*n2));
     bd_stat[1] = TS_weight1 / (1.0 * (*n1) * (*n1)) + SS_weight1 / (1.0 * (*n2) * (*n2));
-    bd_stat[2] = TS_weight2 / (1.0 * (*n1) * (*n1)) + SS_weight2 / (1.0 * (*n2) * (*n2));
 }
 
 /**
@@ -173,13 +170,12 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
     free_matrix(Dxy, n, n);
 
     if (*R > 0) {
-        double *permuted_bd_w0, *permuted_bd_w1, *permuted_bd_w2;
+        double *permuted_bd_w0, *permuted_bd_w1;
         permuted_bd_w0 = (double *) malloc(*R * sizeof(double));
         permuted_bd_w1 = (double *) malloc(*R * sizeof(double));
-        permuted_bd_w2 = (double *) malloc(*R * sizeof(double));
         int not_parallel = *thread == 1 ? 1 : 0;
         if (not_parallel) {
-            double bd_tmp[3];
+            double bd_tmp[2];
             for (i = 0; i < *R; i++) {
                 // stop permutation if user stop it manually:
                 if (pending_interrupt()) {
@@ -191,7 +187,6 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
                 Ball_Divergence(bd_tmp, Rxy, Rx, i_perm_tmp, n1, n2);
                 permuted_bd_w0[i] = bd_tmp[0];
                 permuted_bd_w1[i] = bd_tmp[1];
-                permuted_bd_w2[i] = bd_tmp[2];
             }
         } else {
             int **i_perm_matrix, **i_perm_tmp_matrix;
@@ -202,14 +197,13 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
             {
                 int **Rx_thread = alloc_int_matrix(n, n);
                 int i_thread;
-                double bd_tmp[3];
+                double bd_tmp[2];
 #pragma omp for
                 for (i_thread = 0; i_thread < (*R); i_thread++) {
                     Findx(Rxy, Ixy, i_perm_matrix[i_thread], n1, n2, Rx_thread);
                     Ball_Divergence(bd_tmp, Rxy, Rx_thread, i_perm_tmp_matrix[i_thread], n1, n2);
                     permuted_bd_w0[i_thread] = bd_tmp[0];
                     permuted_bd_w1[i_thread] = bd_tmp[1];
-                    permuted_bd_w2[i_thread] = bd_tmp[2];
                 }
                 free_int_matrix(Rx_thread, n, n);
             }
@@ -219,11 +213,9 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
         }
         pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, i);
         pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, i);
-        pvalue[2] = compute_pvalue(bd[2], permuted_bd_w2, i);
 
         free(permuted_bd_w0);
         free(permuted_bd_w1);
-        free(permuted_bd_w2);
     }
     free_int_matrix(Ixy, n, n);
     free_int_matrix(Rxy, n, n);

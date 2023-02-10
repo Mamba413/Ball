@@ -257,7 +257,7 @@ void bd_gwas(double* stats_vec, double** permuted_stat_mat, double* pvalue_vec,
 }
 
 
-void ubd_gwas() {
+void ubd_gwas(void) {
   
 }
 

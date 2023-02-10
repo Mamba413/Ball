@@ -31,4 +31,4 @@ Found the following (possibly) invalid DOIs:
 ```
 
 ## Reverse dependencies
-There are no reverse dependencies.
+The 2 reverse dependencies are OK.

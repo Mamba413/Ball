@@ -2,19 +2,17 @@
   library.dynam.unload("Ball", libpath)
 }
 
-WEIGHT_TYPE <- c("constant", "probability", "chisquare", "rbf")
-BD_WEIGHT_TYPE <- c("constant", "variance", "rbf")
+WEIGHT_TYPE <- c("constant", "probability", "chisquare")
+BD_WEIGHT_TYPE <- c("constant", "variance")
 
 BCOR_WEIGHT_STATS <- c("bcor.constant", "bcor.probability", "bcor.chisquare")
-BCOV_WEIGHT_STATS <- c("bcov.constant", "bcov.probability", 
-                       "bcov.chisquare", "bcov.rbf")
+BCOV_WEIGHT_STATS <- c("bcov.constant", "bcov.probability", "bcov.chisquare")
 
-BD_WEIGHT_STATS <- c("bd.constant", "bd.variance", "bd.rbf")
-KBD_WEIGHT_STATS <- c("kbd.sum.constant", "kbd.sum.variance", 
-                      "kbd.max.constant", "kbd.max.variance", 
-                      "kbd.maxsum.constant", "kbd.maxsum.variance")
+BD_WEIGHT_STATS <- c("bd.constant", "bd.variance")
+KBD_WEIGHT_STATS <- c("kbd.sum.constant", "kbd.sum.variance", "kbd.max.constant", "kbd.max.variance", "kbd.maxsum.constant", "kbd.maxsum.variance")
 
 center_bdd_matrix <- function(bdd) {
+  num <- dim(bdd)[1]
   bdd <- sweep(bdd, 2, colMeans(bdd)) - rowMeans(bdd) + mean(bdd)
   bdd
 }
@@ -102,31 +100,6 @@ memoryAvailable <- function(n, funs) {
       warning("You may suffer from memory insufficient!")
     }
   }
-}
-
-#' Examine x, y arguments in bcov.test, bcov
-#' @inheritParams bcov.test
-#' @noRd
-#' 
-examine_x_y_bcor <- function(x, y) {
-  dim_x <- dim(x)
-  dim_y <- dim(y)
-  if(is.null(dim_x) | is.null(dim_y)) {
-    stop("x or y is NULL!")
-  }
-  n <- dim_x[1]
-  if(n != dim_y[1]) {
-    stop("x and y have different sample sizes!")
-  }
-  if(any(apply(y, 2, anyNA))) {
-    stop("Missing data in y!")
-  }
-  if((dim_x[2] == 1) & (dim_y[2] == 1)) {
-    p <- 1
-  } else {
-    p <- -1
-  }
-  c(n, p)
 }
 
 

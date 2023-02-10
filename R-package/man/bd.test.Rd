@@ -18,7 +18,7 @@ bd.test(x, ...)
   seed = 1,
   num.threads = 0,
   kbd.type = c("sum", "maxsum", "max"),
-  weight = c("constant", "variance", "rbf"),
+  weight = c("constant", "variance"),
   ...
 )
 

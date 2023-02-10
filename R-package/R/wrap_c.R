@@ -2,33 +2,29 @@
 #' @description wrapper C function which compute Ball Divergence via limit distribution
 #' @inheritParams bd.test
 #' @noRd
-bcov_limit_wrap_c <- function(x, y, num, distance, num.threads, weight) {
+bcov_limit_wrap_c <- function(x, y, num, distance, num.threads) {
   if (!is.null(y)) {
     x <- list(x, y)
   }
   N <- as.integer(num)
   distance <- as.integer(distance)
   num.threads <- as.integer(num.threads)
-  weight_type <- as.integer(which(WEIGHT_TYPE == weight))
   
   bdd_xy_eigen <- matrix(data = 1, ncol = num, nrow = num)
   for (i in 1:length(x)) {
     xy <- as.double(x[[i]])
     bdd_xy <- double((num + 1) * num / 2)
-    res <- .C("bdd_matrix_bias", bdd_xy, xy, N, num.threads, weight_type)
+    res <- .C("bdd_matrix_bias", bdd_xy, xy, N, num.threads)
     rm(bdd_xy); gc(reset = TRUE, verbose = FALSE)
     bdd_xy <- matrix(0, nrow = num, ncol = num)
     bdd_xy[lower.tri(bdd_xy, diag = TRUE)] <- res[[1]]
     bdd_xy <- bdd_xy + t(bdd_xy)
     diag(bdd_xy) <- diag(bdd_xy) / 2
-    # bdd_xy_eigen <- bdd_xy_eigen * bdd_xy
     bdd_xy_eigen <- bdd_xy_eigen * center_bdd_matrix(bdd_xy)
   }
-  # bdd_xy_eigen <- center_bdd_matrix(bdd_xy_eigen)
   
   eigenvalue <- eigen(bdd_xy_eigen, only.values = TRUE, symmetric = TRUE)$values
   eigenvalue <- eigenvalue[eigenvalue > 0] / num
-  # eigenvalue <- eigenvalue / 120
   eigenvalue
 }
 
@@ -98,7 +94,7 @@ bd_test_wrap_c <- function(xy, size, num.permutations, weight, distance, num.thr
   num.threads <- as.integer(num.threads)
   #
   K <- as.integer(length(size))
-  stat_num <- ifelse(K == 2, 3, 6)
+  stat_num <- ifelse(K == 2, 2, 6)
   bd <- as.double(numeric(stat_num))
   p_value <- as.double(numeric(stat_num))
   size <- as.integer(size)
@@ -120,15 +116,9 @@ bd_test_wrap_c <- function(xy, size, num.permutations, weight, distance, num.thr
     } else {
       index <- c(1, 3, 5)
     }
-  } else if (weight == BD_WEIGHT_TYPE[2]) {
+  } else {
     if (K == 2) {
       index <- 2
-    } else {
-      index <- c(2, 4, 6)
-    }
-  } else if (weight == BD_WEIGHT_TYPE[3]) {
-    if (K == 2) {
-      index <- 3
     } else {
       index <- c(2, 4, 6)
     }
@@ -214,8 +204,8 @@ bcov_test_wrap_c <- function(x, y, n, num.permutations, distance, num.threads) {
   num.threads <- as.integer(num.threads)
   r <- as.integer(num.permutations)
   #
-  bcov <- as.double(numeric(length(WEIGHT_TYPE)))
-  p_value <- as.double(numeric(length(WEIGHT_TYPE)))
+  bcov <- as.double(numeric(3))
+  p_value <- as.double(numeric(3))
   res <- .C("bcov_test", bcov, p_value, x, y, n, r, distance, num.threads)
   bcov <- res[[1]]
   p_value <- res[[2]]
@@ -244,8 +234,8 @@ kbcov_test_wrap_c <- function(x, K, n, num.permutations, distance, num.threads) 
   distance <- as.integer(distance) 
   num.threads <- as.integer(num.threads)
   #
-  kbcov <- as.double(numeric(length(BCOV_WEIGHT_STATS)))
-  p_value <- as.double(numeric(length(BCOV_WEIGHT_STATS)))
+  kbcov <- as.double(numeric(3))
+  p_value <- as.double(numeric(3))
   res <- .C("kbcov_test", kbcov, p_value, x, K, n, r, distance, num.threads)
   bcov <- res[[1]]
   p_value <- res[[2]]
@@ -290,13 +280,11 @@ apply_bcor_wrap <- function(x, y, n, p, distance, weight, method, num.threads, c
   if (p_continuous != 0) {
     bcor_stat1 <- as.double(numeric(3 * p_continuous))
     x <- as.double(as.vector(x))
-    missing_flag <- as.integer(as.vector(!is.na(x)))
-    x[missing_flag == 0] <- -9999.99
     x_number <- as.integer(rep(1, p_continuous))
     f_number <- as.integer(p_continuous)
     k <- as.integer(1)
-    res <- .C("bcor_test", bcor_stat1, y, x, x_number, 
-              f_number, num, p, k, dst_y, dst_x, nth, missing_flag)[[1]]
+    #
+    res <- .C("bcor_test", bcor_stat1, y, x, x_number, f_number, num, p, k, dst_y, dst_x, nth)[[1]]
     bcor_stat1 <- matrix(res, ncol = 3, byrow = TRUE)
   }
   
@@ -306,10 +294,8 @@ apply_bcor_wrap <- function(x, y, n, p, distance, weight, method, num.threads, c
     x_number <- as.integer(rep(1, p_category))
     f_number <- as.integer(p_category)
     k <- as.integer(2)
-    # not support for categorical data now: 
-    missing_flag <- as.integer(rep(1, length(x)))
     #
-    res <- .C("bcor_test", bcor_stat2, y, x, x_number, f_number, num, p, k, dst_y, dst_x, nth, missing_flag)[[1]]
+    res <- .C("bcor_test", bcor_stat2, y, x, x_number, f_number, num, p, k, dst_y, dst_x, nth)[[1]]
     bcor_stat2 <- matrix(res, ncol = 3, byrow = TRUE)
     
     if (p_continuous == 0) {

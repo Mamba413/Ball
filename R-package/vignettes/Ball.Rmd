@@ -83,8 +83,7 @@ We use **bd.test** to perform the two-sample test to determine whether two sampl
 the same distribution.       
 
 ```{r}
-## TOFIX
-# bd.test(x = x, y = y)
+bd.test(x = x, y = y)
 ```
           
 The result of **bd.test** is that *p*-value < 0.05, which means to reject the null hypothesis, and conclude that two samples are come from different distribution. Consequently, the hypothesis test result is concordant to data generation mechanism.
@@ -448,9 +447,8 @@ y <- 3*x[, 1] + 5*(x[, 3])^2 + noise
 We perform BCor-SIS procedure and display the top 5 variables index selected by BCor-SIS.               
 
 ```{r}
-## TOFIX
-# res <- bcorsis(y = y, x = x)
-# head(res[[1]], n = 5)
+res <- bcorsis(y = y, x = x)
+head(res[[1]], n = 5)
 ```
           
 The **bcorsis** result shows that the first and the third variable are the two most 
@@ -473,12 +471,11 @@ We implement BCor-SIS procedure for survival data in **Ball** package and use a 
 The data outcome was the "Disease-Free Survival Time". Patients were followed until the first relapse occurred or administrative censoring. In this genomic dataset, the expression levels of mRNA, miRNA as well as clinical variables from the 123 samples were included. Moreover, this dataset include 944 biological covariates and 1056 artificial standard gaussian variables which are independence with response. We employ extension of Bcor-SIS on this data to hunt for efficient covariates and demonstrate detailed procedure in the following.        
 
 ```{r}
-## TOFIX
-# result <- bcorsis(x = genlung[["covariate"]], 
-#                   y = genlung[["survival"]], 
-#                   d = "small", method = "survival")
-# top_gene <- colnames(genlung[["covariate"]])[result[["ix"]]]
-# head(top_gene, n = 1)
+result <- bcorsis(x = genlung[["covariate"]], 
+                  y = genlung[["survival"]], 
+                  d = "small", method = "survival")
+top_gene <- colnames(genlung[["covariate"]])[result[["ix"]]]
+head(top_gene, n = 1)
 ```
         
 We first pass covariates and censored information to arugments *x* and *y*, and set the *method = "survival"* to indicate that the *y* should be considered as a survival status containing event time and censored status. BCor-SIS asserts that *hsa.miR.564*, corresponding to gene *MIR564*, is strongly relevant to disease-free survival status. The conclusion is highly coincident with the statement in other public literature.               

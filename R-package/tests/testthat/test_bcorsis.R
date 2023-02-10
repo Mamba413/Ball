@@ -4,26 +4,26 @@ require(mvtnorm)
 context("bcorsis function")
 skip_on_cran()
 
-test_that("Ball Correlation works when missing values exist!", {
-  set.seed(1)
-  n <- 150
-  p <- 200
-  x <- matrix(rnorm(n * p), nrow = n)
-  eps <- rnorm(n)
-  y <- 3 * x[, 1] + 5 * (x[, 3])^2 + eps
-  
-  x[1:3, 1] <- NA
-  x[1:3, 3] <- NA
-  res1 <- bcorsis(y = dist(y), x = x, distance = TRUE)
-  test_res1_1 <- res1[["complete.info"]][["statistic"]][c(1, 3), ]
-  test_res1_2 <- res1[["complete.info"]][["statistic"]][2, , drop = TRUE]
-  
-  res2 <- bcorsis(y = dist(y[-(1:3)]), x = x[-(1:3), ], distance = TRUE)
-  test_res2_1 <- res2[["complete.info"]][["statistic"]][c(1, 3), ]
-  test_res2_2 <- res2[["complete.info"]][["statistic"]][2, , drop = TRUE]
-  
-  expect_true(all(test_res1_1 == test_res2_1))
-  expect_true(all(test_res1_2 != test_res2_2))
+# test_that("Ball Correlation works when missing values exist!", {
+#   set.seed(1)
+#   n <- 150
+#   p <- 200
+#   x <- matrix(rnorm(n * p), nrow = n)
+#   eps <- rnorm(n)
+#   y <- 3 * x[, 1] + 5 * (x[, 3])^2 + eps
+#   
+#   x[1:3, 1] <- NA
+#   x[1:3, 3] <- NA
+#   res1 <- bcorsis(y = dist(y), x = x, distance = TRUE)
+#   test_res1_1 <- res1[["complete.info"]][["statistic"]][c(1, 3), ]
+#   test_res1_2 <- res1[["complete.info"]][["statistic"]][2, , drop = TRUE]
+#   
+#   res2 <- bcorsis(y = dist(y[-(1:3)]), x = x[-(1:3), ], distance = TRUE)
+#   test_res2_1 <- res2[["complete.info"]][["statistic"]][c(1, 3), ]
+#   test_res2_2 <- res2[["complete.info"]][["statistic"]][2, , drop = TRUE]
+#   
+#   expect_true(all(test_res1_1 == test_res2_1))
+#   expect_true(all(test_res1_2 != test_res2_2))
   
   ### Be cautious for the distance matrix:
   # load("tests/testthat/test.RData")
@@ -33,7 +33,7 @@ test_that("Ball Correlation works when missing values exist!", {
   # min_y_dist <- min(y_dist[upper.tri(y_dist)])
   # y_dist <- y_dist + 0.01 * min_y_dist * noise_dist
   # res <- bcorsis(x = geno.use[, 1:2], y = y_dist, distance = TRUE)
-})
+# })
 
 test_that("Ball Correlation based Interaction Pursuit is unreasonable!", {
   set.seed(1)

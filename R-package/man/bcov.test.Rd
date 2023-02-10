@@ -39,7 +39,7 @@ Any unambiguous substring can be given. Default \code{method = "permutation"}.}
 \item{distance}{if \code{distance = TRUE}, the elements of \code{x} and \code{y} are considered as distance matrices.}
 
 \item{weight}{a logical or character string used to choose the weight form of Ball Covariance statistic.. 
-If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, \code{"chisquare"}, \code{"rbf"}. 
+If input is a character string, it must be one of \code{"constant"}, \code{"probability"}, or \code{"chisquare"}. 
 Any unambiguous substring can be given. 
 If input is a logical value, it is equivalent to \code{weight = "probability"} if \code{weight = TRUE} while 
 equivalent to \code{weight = "constant"} if \code{weight = FALSE}.
@@ -94,7 +94,7 @@ See Pan et al 2018 for theoretical properties of the test, including statistical
 }
 \note{
 Actually, \code{bcov.test} simultaneously computing Ball Covariance statistics with 
-\code{"constant"}, \code{"probability"}, \code{"chisquare"}, \code{"rbf"} weights.
+\code{"constant"}, \code{"probability"}, and \code{"chisquare"} weights.
 Users can get other Ball Covariance statistics with different weight and their corresponding \eqn{p}-values 
 in the \code{complete.info} element of output. We give a quick example below to illustrate.
 }
