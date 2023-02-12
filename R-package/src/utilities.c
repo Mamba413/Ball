@@ -1496,7 +1496,7 @@ void print_cost_time(int second) {
 
 void int_to_string(char str[], int number) {
     // sprintf(str, "%d", number);
-    snprintf(str, sizeof(*str), "%d", number);
+    snprintf(str, 3, "%d", number%100u);
 }
 
 void beautify_time(char result[], int seconds) {
