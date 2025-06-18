@@ -1,6 +1,5 @@
 #' @title compute joint kernel matrix
 #' @noRd
-#' @export
 #' @examples 
 #' library(Ball)
 #' set.seed(1)
@@ -46,7 +45,6 @@ kbcov_cross_kernel_wrap_c <- function(x,
 
 #' @title compute joint kernel matrix
 #' @noRd
-#' @export
 #' @examples 
 #' rm(list = ls()); gc(reset = TRUE)
 #' library(Ball)
@@ -91,7 +89,6 @@ kbcov_joint_kernel_wrap_c <- function(x,
 
 #' @title compute marginal kernel matrix
 #' @noRd
-#' @export
 kbcov_margin_kernel_wrap_c <- function(x, num, 
                                        distance = TRUE, 
                                        num.threads = 1, 

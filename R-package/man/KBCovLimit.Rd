@@ -26,10 +26,10 @@ Y <- list()
 n <- 200
 for(i in 1:K){
   Y[[i]] <- rnorm(n)
-  x[[i]] <- as.vector(dist(Y[[i]]))
+  x[[i]] <- dist(Y[[i]])
 }
-KBCovLimit(x, n)[c("statistics", "p.value")]
-summary(KBCovLimit(x, n)[["eigenvalues"]])
+kbcov_res <- KBCovLimit(x)[c("statistics", "p.value")]
+summary(kbcov_res)
 bcov.test(Y[[1]],Y[[2]], method = "limit")
 
 set.seed(1)
@@ -39,9 +39,9 @@ n <- 500
 K <- 3
 for(i in 1:K){
   Y[[i]] <- rnorm(n)
-  x[[i]] <- as.vector(dist(Y[[i]]))
+  x[[i]] <- dist(Y[[i]])
 }
-kbcov_res <- KBCovLimit(x, n)
+kbcov_res <- KBCovLimit(x)
 kbcov_res[c("statistics", "p.value")]
 summary(kbcov_res[["eigenvalues"]])
 }

@@ -633,10 +633,10 @@ bcov <- function(x, y, distance = FALSE, weight = FALSE) {
 #' n <- 200
 #' for(i in 1:K){
 #'   Y[[i]] <- rnorm(n)
-#'   x[[i]] <- as.vector(dist(Y[[i]]))
+#'   x[[i]] <- dist(Y[[i]])
 #' }
-#' KBCovLimit(x, n)[c("statistics", "p.value")]
-#' summary(KBCovLimit(x, n)[["eigenvalues"]])
+#' kbcov_res <- KBCovLimit(x)[c("statistics", "p.value")]
+#' summary(kbcov_res)
 #' bcov.test(Y[[1]],Y[[2]], method = "limit")
 #' 
 #' set.seed(1)
@@ -646,17 +646,20 @@ bcov <- function(x, y, distance = FALSE, weight = FALSE) {
 #' K <- 3
 #' for(i in 1:K){
 #'   Y[[i]] <- rnorm(n)
-#'   x[[i]] <- as.vector(dist(Y[[i]]))
+#'   x[[i]] <- dist(Y[[i]])
 #' }
-#' kbcov_res <- KBCovLimit(x, n)
+#' kbcov_res <- KBCovLimit(x)
 #' kbcov_res[c("statistics", "p.value")]
 #' summary(kbcov_res[["eigenvalues"]])
 KBCovLimit <- function(x) {
   K <- length(x)
   Kernel <- list()
   Y <- list()
-
-  n <- nrow(as.matrix(x[[1]]))
+  
+  n <- nrow(as.matrix(x[[i]]))
+  for(i in 1:K){
+    x[[i]] <- as.vector(x[[i]])
+  }
   
   for(i in 1:K){
     Kernel[[i]] <- kbcov_margin_kernel_wrap_c(x[[i]], num = n)
