@@ -614,3 +614,101 @@ bcov <- function(x, y, distance = FALSE, weight = FALSE) {
   res
 }
 
+#' A spectrum-based metric assocaition test (aka, Ball covariance test)
+#'
+#' @param x a list containing at least two numeric distance matrices.
+#'
+#' @return \code{KBCovLimit} returns a list containing the following components:
+#' \item{\code{statistic}}{Ball Covariance statistic.}            
+#' \item{\code{p.value}}{the p-value for the test.}  
+#' 
+#' @export
+#'
+#' @examples
+#' library(Ball)
+#' set.seed(1)
+#' K <- 2
+#' x <- list()
+#' Y <- list()
+#' n <- 200
+#' for(i in 1:K){
+#'   Y[[i]] <- rnorm(n)
+#'   x[[i]] <- as.vector(dist(Y[[i]]))
+#' }
+#' KBCovLimit(x, n)[c("statistics", "p.value")]
+#' summary(KBCovLimit(x, n)[["eigenvalues"]])
+#' bcov.test(Y[[1]],Y[[2]], method = "limit")
+#' 
+#' set.seed(1)
+#' x <- list()
+#' Y <- list()
+#' n <- 500
+#' K <- 3
+#' for(i in 1:K){
+#'   Y[[i]] <- rnorm(n)
+#'   x[[i]] <- as.vector(dist(Y[[i]]))
+#' }
+#' kbcov_res <- KBCovLimit(x, n)
+#' kbcov_res[c("statistics", "p.value")]
+#' summary(kbcov_res[["eigenvalues"]])
+KBCovLimit <- function(x) {
+  K <- length(x)
+  Kernel <- list()
+  Y <- list()
+
+  n <- nrow(as.matrix(x[[1]]))
+  
+  for(i in 1:K){
+    Kernel[[i]] <- kbcov_margin_kernel_wrap_c(x[[i]], num = n)
+    Y[[i]] <- matrix(0, n, n)
+    Y[[i]][lower.tri(Y[[i]],diag=FALSE)] = x[[i]]
+    Y[[i]] <- t(Y[[i]])
+    Y[[i]][lower.tri(Y[[i]],diag=FALSE)] <- x[[i]]
+  }
+  kbcov <- bcov.test(Y, num.permutations = 0, distance = TRUE)
+  
+  estimation1 <- rep(0,K)
+  estimation2 <- matrix(0,n,K)
+  for (j in 1:K) {
+    estimation1[j] <- mean(Kernel[[j]])
+    estimation2[, j] <- rowMeans(Kernel[[j]])
+  }
+  
+  estimation1_prod <- prod(estimation1)
+  estimation2_prod <- apply(estimation2, 1, prod)
+  term1 <- matrix(1, n, n)
+  term2 <- (K - 1)^2 * estimation1_prod
+  term3 <- (K - 1) * estimation2_prod
+  term5 <- matrix(0, n, n)
+  term6 <- matrix(0, n, n)
+  term8 <- matrix(0, n, n)
+  term9 <- matrix(0, n, 1)
+  for (j in 1:K) {
+    term1 <- term1 * Kernel[[j]]
+    term5 <- term5 + Kernel[[j]] * estimation1_prod/estimation1[j]
+    term6 <- term6 + Kernel[[j]] * matrix(rep(estimation2_prod/estimation2[,j], n), n, n)
+    term9 <- term9 + estimation2[, j, drop = FALSE] * estimation1_prod/estimation1[j]
+    
+    for (i in j:K) {
+      if (i != j) {
+        prod_weight_exclude_ij <- estimation1_prod/(estimation1[j] * estimation1[i]) 
+        term8 <- term8 + 
+          estimation2[, i, drop = FALSE] %*% t(estimation2[, j, drop = FALSE]) * prod_weight_exclude_ij + 
+          estimation2[, j, drop = FALSE] %*% t(estimation2[, i, drop = FALSE]) * prod_weight_exclude_ij
+      }
+    }
+  }
+  term3 <- matrix(rep(term3, n), n, n)
+  term4 <- t(term3)
+  term6 <- -term6
+  term7 <- t(term6)
+  term8 <- term8
+  term9 <- matrix(rep((1 - K) * term9, n), n, n)
+  term10 <- t(term9)
+  H2 <- 1/(K * (2 * K - 1)) * (term1 + term2 + term3 + term4 + term5 + term6 + term7 + term8 + term9 + term10)
+  eigenvalues <- eigen(H2, only.values = TRUE, symmetric = TRUE)$values/n
+  
+  p_value = 1 - hbe(K*(2*K-1)*eigenvalues[eigenvalues>0], n*kbcov)
+  return(list("statistics" = kbcov, "p.value" = p_value, 
+              "eigenvalues" = eigenvalues))
+}
