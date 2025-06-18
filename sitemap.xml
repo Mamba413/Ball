@@ -1,69 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/TODO.html</loc>
-  </url>
-  <url>
-    <loc>/articles/Ball.html</loc>
-  </url>
-  <url>
-    <loc>/articles/bd_gwas.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ArcticLake.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Ball-package.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bcorsis.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bcov.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bcov.test.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bd.gwas.test.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bd.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bd.test.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bdvmf.html</loc>
-  </url>
-  <url>
-    <loc>/reference/genlung.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/macaques.html</loc>
-  </url>
-  <url>
-    <loc>/reference/meteorology.html</loc>
-  </url>
-  <url>
-    <loc>/reference/nhdist.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://mamba413.github.io/Ball/404.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/TODO.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/articles/Ball.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/articles/bd_gwas.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/articles/index.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/authors.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/index.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/news/index.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/ArcticLake.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/Ball-package.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/KBCovLimit.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/bcorsis.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/bcov.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/bcov.test.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/bd.gwas.test.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/bd.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/bd.test.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/bdvmf.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/genlung.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/index.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/macaques.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/meteorology.html</loc></url>
+<url><loc>https://mamba413.github.io/Ball/reference/nhdist.html</loc></url>
 </urlset>
+
