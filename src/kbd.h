@@ -38,8 +38,4 @@ void bd_gwas_refining_single(const double *bd_stat, double *refine_permuted_bd_s
                              const int *refine_size, const int *refine_i_th, const int *refine_k_num,
                              const int *refine_snp_num, const int *R, const int *nthread, const int *verbose_out);
 
-void bd_gwas_refining(const double *bd_stat, double *refine_permuted_bd_stat, double *pvalue, double *xy,
-                      const int *n, const int *refine_num, const int *refine_size,
-                      const int *refine_k_num, const int *R, const int *nthread, const int *verbose_out);
-
 #endif //BALL_KBD_H

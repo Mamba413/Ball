@@ -86,7 +86,7 @@ void BD_Score(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
  */
 void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
     int i, j, n;
-    double TS_weight0 = 0.0, SS_weight0 = 0.0, TS_weight1 = 0.0, SS_weight1 = 0.0;
+    double TS_weight0 = 0.0, SS_weight0 = 0.0, TS_weight1 = 0.0, SS_weight1 = 0.0, TS_weight2 = 0.0, SS_weight2 = 0.0;
     double p1, p2, p3, ans;
     n = *n1 + *n2;
     double inv_n1 = 1.0 / (1.0 * *n1), inv_n2 = 1.0 / (1.0 * *n2), inv_n = 1.0 / (1.0 * n);
@@ -102,6 +102,7 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
             ans = ans * ans;
             TS_weight0 += ans;
             TS_weight1 += ans / p3 / (1 - p3);
+            TS_weight2 += exp(-(p1 * inv_n1)) * ans;
         }
     }
     // Calculate C_{kl}^{X} and C_{kl}^{Y}:
@@ -115,10 +116,12 @@ void Ball_Divergence(double *bd_stat, int **Rxy, int **Rx, int *i_perm_tmp, int 
             ans = ans * ans;
             SS_weight0 += ans;
             SS_weight1 += ans / p3 / (1 - p3);
+            SS_weight2 += exp(-(p2 * inv_n2)) * ans;
         }
     }
     bd_stat[0] = TS_weight0 / (1.0 * (*n1) * (*n1)) + SS_weight0 / (1.0 * (*n2) * (*n2));
     bd_stat[1] = TS_weight1 / (1.0 * (*n1) * (*n1)) + SS_weight1 / (1.0 * (*n2) * (*n2));
+    bd_stat[2] = TS_weight2 / (1.0 * (*n1) * (*n1)) + SS_weight2 / (1.0 * (*n2) * (*n2));
 }
 
 /**
@@ -170,12 +173,13 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
     free_matrix(Dxy, n, n);
 
     if (*R > 0) {
-        double *permuted_bd_w0, *permuted_bd_w1;
+        double *permuted_bd_w0, *permuted_bd_w1, *permuted_bd_w2;
         permuted_bd_w0 = (double *) malloc(*R * sizeof(double));
         permuted_bd_w1 = (double *) malloc(*R * sizeof(double));
+        permuted_bd_w2 = (double *) malloc(*R * sizeof(double));
         int not_parallel = *thread == 1 ? 1 : 0;
         if (not_parallel) {
-            double bd_tmp[2];
+            double bd_tmp[3];
             for (i = 0; i < *R; i++) {
                 // stop permutation if user stop it manually:
                 if (pending_interrupt()) {
@@ -187,6 +191,7 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
                 Ball_Divergence(bd_tmp, Rxy, Rx, i_perm_tmp, n1, n2);
                 permuted_bd_w0[i] = bd_tmp[0];
                 permuted_bd_w1[i] = bd_tmp[1];
+                permuted_bd_w2[i] = bd_tmp[2];
             }
         } else {
             int **i_perm_matrix, **i_perm_tmp_matrix;
@@ -197,13 +202,14 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
             {
                 int **Rx_thread = alloc_int_matrix(n, n);
                 int i_thread;
-                double bd_tmp[2];
+                double bd_tmp[3];
 #pragma omp for
                 for (i_thread = 0; i_thread < (*R); i_thread++) {
                     Findx(Rxy, Ixy, i_perm_matrix[i_thread], n1, n2, Rx_thread);
                     Ball_Divergence(bd_tmp, Rxy, Rx_thread, i_perm_tmp_matrix[i_thread], n1, n2);
                     permuted_bd_w0[i_thread] = bd_tmp[0];
                     permuted_bd_w1[i_thread] = bd_tmp[1];
+                    permuted_bd_w2[i_thread] = bd_tmp[2];
                 }
                 free_int_matrix(Rx_thread, n, n);
             }
@@ -213,9 +219,11 @@ void BD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *t
         }
         pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, i);
         pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, i);
+        pvalue[2] = compute_pvalue(bd[2], permuted_bd_w2, i);
 
         free(permuted_bd_w0);
         free(permuted_bd_w1);
+        free(permuted_bd_w2);
     }
     free_int_matrix(Ixy, n, n);
     free_int_matrix(Rxy, n, n);
@@ -258,13 +266,14 @@ void UBD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *
     Ball_Divergence(bd, Rxy, Rx, i_perm_tmp, n1, n2);
 
     if (*R > 0) {
-        double *permuted_bd_w0, *permuted_bd_w1;
+        double *permuted_bd_w0, *permuted_bd_w1, *permuted_bd_w2;
         permuted_bd_w0 = (double *) malloc(*R * sizeof(double));
         permuted_bd_w1 = (double *) malloc(*R * sizeof(double));
+        permuted_bd_w2 = (double *) malloc(*R * sizeof(double));
 
         int not_parallel = *thread == 1 ? 1 : 0;
         if (not_parallel) {
-            double bd_tmp[2];
+            double bd_tmp[3];
             for (i = 0; i < *R; i++) {
                 if (pending_interrupt()) {
                     print_stop_message();
@@ -275,6 +284,7 @@ void UBD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *
                 Ball_Divergence(bd_tmp, Rxy, Rx, i_perm_tmp, n1, n2);
                 permuted_bd_w0[i] = bd_tmp[0];
                 permuted_bd_w1[i] = bd_tmp[1];
+                permuted_bd_w2[i] = bd_tmp[2];
             }
         } else {
             int **i_perm_matrix, **i_perm_tmp_matrix;
@@ -285,7 +295,7 @@ void UBD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *
 #pragma omp parallel
             {
                 int i_thread, **Rx_thread;
-                double bd_tmp_thread[2];
+                double bd_tmp_thread[3];
                 Rx_thread = alloc_int_matrix(n, n);
 #pragma omp for
                 for (i_thread = 0; i_thread < (*R); i_thread++) {
@@ -293,6 +303,7 @@ void UBD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *
                     Ball_Divergence(bd_tmp_thread, Rxy, Rx_thread, i_perm_tmp_matrix[i_thread], n1, n2);
                     permuted_bd_w0[i_thread] = bd_tmp_thread[0];
                     permuted_bd_w1[i_thread] = bd_tmp_thread[1];
+                    permuted_bd_w2[i_thread] = bd_tmp_thread[2];
                 }
                 free_int_matrix(Rx_thread, n, n);
             }
@@ -303,8 +314,10 @@ void UBD(double *bd, double *pvalue, double *xy, int *n1, int *n2, int *R, int *
 
         pvalue[0] = compute_pvalue(bd[0], permuted_bd_w0, i);
         pvalue[1] = compute_pvalue(bd[1], permuted_bd_w1, i);
+        pvalue[2] = compute_pvalue(bd[2], permuted_bd_w2, i);
         free(permuted_bd_w0);
         free(permuted_bd_w1);
+        free(permuted_bd_w2);
     }
 
     free_int_matrix(Ixy, n, n);

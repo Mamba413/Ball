@@ -1,0 +1,20 @@
+@echo off
+REM Copy C sources and headers from top-level src/ into R-package/src/
+
+echo * Copying C sources into R-package\src\...
+
+REM Determine directories
+set PKGDIR=%~dp0
+set SRCDIR=%PKGDIR%..\src
+set DESTDIR=%PKGDIR%src
+
+REM Remove old sources
+del /Q "%DESTDIR%\*.c"
+del /Q "%DESTDIR%\*.h"
+
+REM Copy fresh sources and headers
+copy "%SRCDIR%\*.c" "%DESTDIR%\"
+copy "%SRCDIR%\*.h" "%DESTDIR%\"
+
+echo Done.
+exit /B 0

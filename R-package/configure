@@ -1,0 +1,24 @@
+#!/bin/sh
+# Copy C sources and headers from top-level src/ into R-package/src/
+
+echo "* Copying C sources into R-package/src/..."
+
+# Directory of this script (R-package)
+PKGDIR="$(cd "$(dirname "$0")" && pwd)"
+# Top-level src directory
+SRCDIR="$(cd "$PKGDIR/../src" && pwd)"
+# Destination in R-package
+DESTDIR="$PKGDIR/src"
+
+# Remove old copies of C sources (except ball_init.c) and headers
+find "$DESTDIR" -maxdepth 1 -type f \( -name "*.c" ! -name "ball_init.c" -o -name "*.h" \) -exec rm -f {} +
+
+# Copy fresh C sources and headers
+cp "$SRCDIR"/*.c "$SRCDIR"/*.h "$DESTDIR"
+
+# Ensure ball_init.c remains after copy if originally present only in R-package/src
+# (Optional: Overwrites only if src/ contains newer version)
+# cp "$SRCDIR/ball_init.c" "$DESTDIR"  # Uncomment if you want to override interface
+
+echo "* Copy complete."
+exit 0

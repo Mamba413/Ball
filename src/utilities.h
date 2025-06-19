@@ -18,6 +18,9 @@
 
 #define MAX(a,b) (((a)>(b))?(a):(b));
 void swap(double *x, double *y);
+void remove_missing_index(int *idx, int *sub_idx, int *remove_idx, int n, int miss_n);
+void search_complete_row(int *complete_row_flag, int *complete_flag, int n, int p);
+void extract_complete_matrix(double* complete_x, int *complete_row_flag, double *x, int n, int p);
 void count_smaller_number_after_self_solution(double *vector, int *number, int num);
 void count_smaller_number_after_self_solution2(double *vector, int *index, int *number, int num);
 void find_group_relative_location(int *group_relative_location, int *group, int *cumsum_size, int num, int K);
@@ -45,6 +48,7 @@ void rank_matrix_3d(double ***Dx, int n, int k, int ***Rx);
 void quick_rank_max_with_index(const double *x, const int *x_index, int *r, int n);
 void quick_rank_max(const double *x, int *r, int n);
 void quick_rank_min(const double *x, int *r, int n);
+void quick_rank_min_weight_sum(const double *x, double *w, double *ws, int n);
 void quick_rank_max_index(const double *x, int *x_index, int *r, int n);
 double **alloc_matrix(int r, int c);
 double ***alloc_3d_matrix(int r, int c, int h);
