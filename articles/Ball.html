@@ -216,7 +216,7 @@ and
 <span><span class="co"># data:  x and y</span></span>
 <span><span class="co"># number of observations = 50</span></span>
 <span><span class="co"># replicates = 99, weight: constant</span></span>
-<span><span class="co"># bcov.constant = 0.0021411, p-value = 0.01</span></span>
+<span><span class="co"># bcov.constant = 0.0022108, p-value = 0.01</span></span>
 <span><span class="co"># alternative hypothesis: random variables are dependent</span></span></code></pre>
 <p>The result of <strong>bcov.test</strong> is that <em>p</em>-value
 &lt; 0.05, so we conclude that
@@ -253,7 +253,7 @@ independence test:</p>
 <span><span class="co"># data:  x and y</span></span>
 <span><span class="co"># number of observations = 50</span></span>
 <span><span class="co"># replicates = 99, weight: probability</span></span>
-<span><span class="co"># bcov.probability = 0.041897, p-value = 0.02</span></span>
+<span><span class="co"># bcov.probability = 0.040526, p-value = 0.05</span></span>
 <span><span class="co"># alternative hypothesis: random variables are dependent</span></span></code></pre>
 <p>The result of <strong>bcov.test</strong> is that <em>p</em>-value
 &lt; 0.05, so we conclude that multivariate random variable
@@ -488,7 +488,7 @@ distributed.</p>
 <span><span class="co"># data:  rnorm(n) </span></span>
 <span><span class="co"># number of observations = 150, group sizes: 50 50 50</span></span>
 <span><span class="co"># replicates = 99, weight: constant, kbd.type: sum</span></span>
-<span><span class="co"># kbd.sum.constant = 0.02972, p-value = 0.75</span></span>
+<span><span class="co"># kbd.sum.constant = 0.01938, p-value = 0.9</span></span>
 <span><span class="co"># alternative hypothesis: distributions of samples are distinct</span></span></code></pre>
 <p>As the result shown, <em>p</em>-value&gt;0.05, which means we can’t
 reject the null hypothesis.<br>
@@ -586,7 +586,7 @@ carry out ball covariance mutual independence test.</p>
 <span><span class="co"># data:  example1</span></span>
 <span><span class="co"># number of observations = 50</span></span>
 <span><span class="co"># replicates = 199, weight: constant</span></span>
-<span><span class="co"># bcov.constant = 0.0014699, p-value = 0.015</span></span>
+<span><span class="co"># bcov.constant = 0.0016985, p-value = 0.015</span></span>
 <span><span class="co"># alternative hypothesis: random variables are dependent</span></span></code></pre>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bcov.test.html">bcov.test</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">example2</span>, num.permutations <span class="op">=</span> <span class="fl">199</span><span class="op">)</span></span></code></pre></div>
@@ -596,7 +596,7 @@ carry out ball covariance mutual independence test.</p>
 <span><span class="co"># data:  example2</span></span>
 <span><span class="co"># number of observations = 50</span></span>
 <span><span class="co"># replicates = 199, weight: constant</span></span>
-<span><span class="co"># bcov.constant = 0.036493, p-value = 0.005</span></span>
+<span><span class="co"># bcov.constant = 0.03354, p-value = 0.005</span></span>
 <span><span class="co"># alternative hypothesis: random variables are dependent</span></span></code></pre>
 <p>The hypothesis test result for two examples show that
 <em>p</em>-value &lt; 0.05, coinciding with the simulation setting.</p>
