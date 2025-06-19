@@ -25,14 +25,14 @@
 #include "R.h"
 #include "Rinternals.h"
 
-#define RAND_MAX_CONSTANT 2147483647
-
 #else
 
 #include "math.h"
 #include "time.h"
 
 #endif
+
+#define RAND_MAX_CONSTANT 2147483647
 
 void swap(double *x, double *y) {
     double t = *x;
