@@ -1,39 +1,44 @@
 from cffi import FFI
 import os
-import shutil
 
 # Initialize CFFI builder
 ffibuilder = FFI()
 
-# Determine paths
-here = os.path.dirname(__file__)
-# Ensure a local copy of src/ inside Python-package
-dest_src = os.path.join(here, 'src')
+# Manually declare the C function prototypes to export
+ffibuilder.cdef("""
+    void bcor_test(double *, double *, double *, int *, int *, int *, int *, int *, int *, int *, int *, int *);
+    void bcov_test(double *, double *, double *, double *, int *, int *, int *, int *);
+    void kbcov_test(double *, double *, double *, int *, int *, int *, int *, int *);
+    void bd_test(double *, double *, double *, int *, int *, int *, int *, int *, int *);
+    void SRCT_new(double *, int *, int *, double *, int *, double *);
+    void bd_gwas_screening(double *, double *, double *, int *, int *, double *, int *, int *, int *, int *, int *, int *, int *, int *);
+    void bd_gwas_refining_single(double *, double *, double *, int *, int *, double *, int *, int *, int *, int *, int *, int *, int *, int *);
+    void bdd_matrix_bias(double *, double *, int *, int *, int *);
+    void bdd_matrix_bias_two_group(double *, double *, int *, int *, int *);
+    void joint_kernel_matrix_bias(double *, double *, int *, int *, int *, int *);
+    void cross_kernel_matrix_bias_crude(double *, double *, int *, int *, int *, int *);
+""")
+
+# Locate top-level src directory
+here = os.path.dirname(os.path.abspath(__file__))
 root_src = os.path.abspath(os.path.join(here, '..', 'src'))
-# Copy top-level src to python-package/src, overwriting if exists
-if os.path.exists(dest_src):
-    shutil.rmtree(dest_src)
-shutil.copytree(root_src, dest_src)
+if not os.path.isdir(root_src):
+    raise FileNotFoundError(f"Cannot locate src directory at {root_src}")
 
-# Use the copied src for building
-src_root = dest_src
+# Collect all .c source files
+sources = [os.path.join(root_src, f) for f in os.listdir(root_src) if f.endswith('.c')]
 
-# 1) Load C function declarations from header
-hdr_path = os.path.join(src_root, 'ball.h')
-with open(hdr_path, 'r') as hdr_file:
-    ffibuilder.cdef(hdr_file.read())
+# Collect all .h header files for inclusion
+headers = [f for f in os.listdir(root_src) if f.endswith('.h')]
+include_block = '\n'.join(f'#include "{h}"' for h in headers)
 
-# 2) Automatically include all .c source files in src_root
-source_files = []
-for fname in os.listdir(src_root):
-    if fname.endswith('.c'):
-        source_files.append(os.path.join(src_root, fname))
 
+# Configure extension module
 ffibuilder.set_source(
-    'ball._cball',            # Python module name
-    '#include "ball.h"',     # Header inclusion
-    sources=source_files,
-    include_dirs=[src_root],
+    'Ball._cball',         # Python module name
+    include_block,         # Generated include directives
+    sources=sources,
+    include_dirs=[root_src],
     extra_compile_args=['-O3'],
 )
 
