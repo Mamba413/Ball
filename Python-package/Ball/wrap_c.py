@@ -1,148 +1,138 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2019/7/24 20:26
-# @Author  : Yanhang Zhang
-# @Mail    : zhangyh93@mail2.sysu.edu.cn
-# @File    : wrap_c.py
-
-from numpy import alen as npalen
-from numpy import sum as npsum
-from numpy import array as nparray
-from numpy import column_stack
-from numpy import double
-from Ball.cball import bd_test, bcor_test, bcov_test, kbcov_test
-from Ball.cball import doubleArray, intArray
+"""
+High-level Python wrappers for Ball C functions via CFFI.
+"""
+import numpy as np
+from Ball.cball import lib, ffi
 
 
 def bd_test_wrap_c(xy, size, R, distance, nthread=1):
-    bd = doubleArray(6)
-    pvalue = doubleArray(6)
-    xy = nparray(xy, dtype=double)
-    num = npalen(xy)
+    """
+    Wrapper for C function:
+      void bd_test(double *bd, double *pvalue, double *xy, int *size,
+                   int *n, int *k, int *distance, int *R, int *nthread);
+    """
+    xy = np.asarray(xy, dtype=np.double)
+    size = np.asarray(size, dtype=np.int32)
+    n = np.sum(size)
+    k = size.size
 
-    xy_copy = doubleArray(num)
-    num = npalen(size)
-    size_copy = intArray(num)
-    distance_copy = intArray(1)
-    n = intArray(1)
-    k = intArray(1)
-    R_copy = intArray(1)
-    nthread_copy = intArray(1)
-    # change the original data to doubleArray type
-    for i, xy_value in enumerate(xy):
-        xy_copy[i] = xy_value
-    for i, size_value in enumerate(size):
-        size_copy[i] = int(size_value)
-    n[0] = int(npsum(size))
-    k[0] = int(npalen(size))
-    distance_copy[0] = int(distance)
-    R_copy[0] = int(R)
-    nthread_copy[0] = int(nthread)
-    # ball divergence based test
-    bd_test(bd, pvalue, xy_copy, size_copy, n, k, distance_copy, R_copy, nthread_copy)
-    # convert doubleArray to list:
-    if k[0] > 2:
-        pvalue_list = [pvalue[0], pvalue[2], pvalue[4]]
-        bd_list = [bd[0], bd[2], bd[4]]
-    else:
-        pvalue_list = pvalue[0]
-        bd_list = bd[0]
+    # Allocate C arrays
+    bd_c     = ffi.new('double[?]', k * 3)
+    pvalue_c = ffi.new('double[?]', k * 3)
+    xy_c     = ffi.new('double[?]', xy.size)
+    size_c   = ffi.new('int[?]', size.size)
+    n_c      = ffi.new('int *', int(n))
+    k_c      = ffi.new('int *', int(k))
+    dist_c   = ffi.new('int *', int(distance))
+    R_c      = ffi.new('int *', int(R))
+    thr_c    = ffi.new('int *', int(nthread))
+
+    # Copy data
+    for i, v in enumerate(xy):
+        xy_c[i] = v
+    for i, v in enumerate(size):
+        size_c[i] = int(v)
+
+    # Call C function
+    lib.bd_test(bd_c, pvalue_c, xy_c, size_c, n_c, k_c, dist_c, R_c, thr_c)
+
+    # Extract results
+    bd_list = [bd_c[i] for i in range(k * 3)]
+    pvalue_list = [pvalue_c[i] for i in range(k * 3)]
     return bd_list, pvalue_list
 
 
-def bcor_test_wrap_c(y, x, x_num, f_num, n, dst_y, nthread):
-    bcor_stat = doubleArray(3 * f_num)
-    y = nparray(y, dtype=double)
-    x = nparray(x, dtype=double)
+def bcor_test_wrap_c(y, x, x_num, f_num, n, dst_y, nthread=1):
+    """
+    Wrapper for C function:
+      void bcor_test(double *out, double *y, double *x, int *x_num,
+                     int *f_num, int *n, int *p, int *k,
+                     int *dst_y, int *dst_x, int *nthread);
+    Returns a (f_num,3) array.
+    """
+    y = np.asarray(y, dtype=np.double)
+    x = np.asarray(x, dtype=np.double)
+    x_num = np.asarray(x_num, dtype=np.int32)
 
-    y_copy = doubleArray(len(y))
-    x_copy = doubleArray(len(x))
-    x_num_copy = intArray(len(x_num))
-    f_num_copy = intArray(1)
-    size = intArray(1)
-    n_copy = intArray(1)
-    p = intArray(1)
-    k = intArray(1)
-    dst_y_copy = intArray(1)
-    dst_x = intArray(1)
-    nthread_copy = intArray(1)
-    # change the original data to doubleArray type    
-    for i, y_value in enumerate(y):
-        y_copy[i] = y_value
-        pass
-    for i, x_value in enumerate(x):
-        x_copy[i] = x_value
-        pass
-    for i, x_num_value in enumerate(x_num):
-        x_num_copy[i] = x_num_value
-    f_num_copy[0] = f_num
-    size[0] = 0
-    n_copy[0] = n
-    p[0] = 0
-    k[0] = 0
-    dst_y_copy[0] = dst_y
-    dst_x[0] = 0
-    nthread_copy[0] = nthread
+    # Allocate
+    out_c      = ffi.new('double[?]', f_num * 3)
+    y_c        = ffi.new('double[?]', y.size)
+    x_c        = ffi.new('double[?]', x.size)
+    xnum_c     = ffi.new('int[?]', x_num.size)
+    fnum_c     = ffi.new('int *', int(f_num))
+    n_c        = ffi.new('int *', int(n))
+    p_c        = ffi.new('int *', 0)
+    k_c        = ffi.new('int *', 0)
+    dst_y_c    = ffi.new('int *', int(dst_y))
+    dst_x_c    = ffi.new('int *', 0)
+    thr_c      = ffi.new('int *', int(nthread))
 
-    bcor_test(bcor_stat, y_copy, x_copy, x_num_copy, f_num_copy, 
-              n_copy, p, k, dst_y_copy, dst_x, nthread_copy)
-    # convert doubleArray to list:    
-    bcor_stat_list = [bcor_stat[j] for j in range(3 * f_num)]
-    bcor_stat_list = column_stack(nparray(bcor_stat_list).reshape(f_num, 3))
-    return bcor_stat_list
+    # Copy
+    for i, v in enumerate(y): y_c[i] = v
+    for i, v in enumerate(x): x_c[i] = v
+    for i, v in enumerate(x_num): xnum_c[i] = int(v)
+
+    # Call
+    lib.bcor_test(out_c, y_c, x_c, xnum_c, fnum_c, n_c, p_c, k_c, dst_y_c, dst_x_c, thr_c)
+
+    # Reshape
+    arr = np.frombuffer(ffi.buffer(out_c), dtype=np.double)
+    return arr.reshape(f_num, 3)
 
 
-def bcov_test_wrap_c(x, y, n, R, distance, nthread):
-    bcov_stat = doubleArray(3)
-    pvalue = doubleArray(3)
-    y = nparray(y, dtype=double)
-    x = nparray(x, dtype=double)
+def bcov_test_wrap_c(x, y, n, R, distance, nthread=1):
+    """
+    Wrapper for C function:
+      void bcov_test(double *out, double *pvalue, double *x, double *y,
+                     int *n, int *R, int *distance, int *nthread);
+    Returns (stat_list, pvalue_list).
+    """
+    x = np.asarray(x, dtype=np.double)
+    y = np.asarray(y, dtype=np.double)
 
-    y_copy = doubleArray(len(y))
-    x_copy = doubleArray(len(x))
-    n_copy = intArray(1)
-    R_copy = intArray(1)
-    distance_copy = intArray(1)
-    nthread_copy = intArray(1)
-    # change the original data to doubleArray type
-    for i, x_value in enumerate(x):
-        x_copy[i] = x_value
-    for i, y_value in enumerate(y):
-        y_copy[i] = y_value
-    n_copy[0] = int(n)
-    distance_copy[0] = int(distance)
-    R_copy[0] = int(R)
-    nthread_copy[0] = int(nthread)
+    out_c      = ffi.new('double[3]')
+    pvalue_c   = ffi.new('double[3]')
+    x_c        = ffi.new('double[?]', x.size)
+    y_c        = ffi.new('double[?]', y.size)
+    n_c        = ffi.new('int *', int(n))
+    R_c        = ffi.new('int *', int(R))
+    dist_c     = ffi.new('int *', int(distance))
+    thr_c      = ffi.new('int *', int(nthread))
 
-    bcov_test(bcov_stat, pvalue, x_copy, y_copy, n_copy, R_copy, distance_copy, nthread_copy)
-    # convert doubleArray to list:    
-    bcov_stat_list = [bcov_stat[0], bcov_stat[1], bcov_stat[2]]
-    pvalue_list = [pvalue[0], pvalue[1], pvalue[2]]
-    return bcov_stat_list, pvalue_list
+    for i, v in enumerate(x): x_c[i] = v
+    for i, v in enumerate(y): y_c[i] = v
+
+    lib.bcov_test(out_c, pvalue_c, x_c, y_c, n_c, R_c, dist_c, thr_c)
+
+    stat_list = [out_c[i] for i in range(3)]
+    pvalue_list = [pvalue_c[i] for i in range(3)]
+    return stat_list, pvalue_list
 
 
-def kbcov_test_wrap_c(x, k, n, R, nthread):
-    kbcov_stat = doubleArray(3)
-    pvalue = doubleArray(3)
-    x = nparray(x, dtype=double)
+def kbcov_test_wrap_c(x, k, n, R, nthread=1):
+    """
+    Wrapper for C function:
+      void kbcov_test(double *out, double *pvalue, double *x,
+                      int *k, int *n, int *R, int *distance, int *nthread);
+    Returns (stat_list, pvalue_list).
+    """
+    x = np.asarray(x, dtype=np.double)
 
-    x_copy = doubleArray(len(x))
-    k_copy = intArray(1)
-    n_copy = intArray(1)
-    R_copy = intArray(1)
-    distance = intArray(1)
-    nthread_copy = intArray(1)
-    # change the original data to doubleArray type    
-    for i, x_value in enumerate(x):
-        x_copy[i] = x_value
-    k_copy[0] = int(k)
-    n_copy[0] = int(n)
-    distance[0] = int(1)
-    R_copy[0] = int(R)
-    nthread_copy[0] = int(nthread)
+    out_c      = ffi.new('double[3]')
+    pvalue_c   = ffi.new('double[3]')
+    x_c        = ffi.new('double[?]', x.size)
+    k_c        = ffi.new('int *', int(k))
+    n_c        = ffi.new('int *', int(n))
+    R_c        = ffi.new('int *', int(R))
+    dist_c     = ffi.new('int *', 1)
+    thr_c      = ffi.new('int *', int(nthread))
 
-    kbcov_test(kbcov_stat, pvalue, x_copy, k_copy, n_copy, R_copy, distance, nthread_copy)
-    # convert doubleArray to list:    
-    kbcov_stat_list = [kbcov_stat[0], kbcov_stat[1], kbcov_stat[2]]
-    pvalue_list = [pvalue[0], pvalue[1], pvalue[2]]
-    return kbcov_stat_list, pvalue_list
+    for i, v in enumerate(x): x_c[i] = v
+
+    lib.kbcov_test(out_c, pvalue_c, x_c, k_c, n_c, R_c, dist_c, thr_c)
+
+    stat_list = [out_c[i] for i in range(3)]
+    pvalue_list = [pvalue_c[i] for i in range(3)]
+    return stat_list, pvalue_list

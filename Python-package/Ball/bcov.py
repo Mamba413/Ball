@@ -6,8 +6,8 @@ Created on Tue Jul 30 16:11:32 2019
 """
 
 from collections import namedtuple
-from Ball.wrap_c import *
-from Ball.utilize import *
+from .wrap_c import *
+from .utilize import *
 
 bcov_testResult = namedtuple('bcov_testResult', ('statistic', 'pvalue'))
 bcov_Result = namedtuple('bcov_Result', ('statistic'))

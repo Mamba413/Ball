@@ -9,6 +9,8 @@
 #include "R.h"
 #endif
 
+#define RAND_MAX_CONSTANT 2147483647
+
 double Ball_Divergence_Value(int **Rxy, int **Rx, int *i_perm_tmp, int *n1, int *n2) {
   int i, j, n;
   double TS_weight0 = 0, SS_weight0 = 0;
@@ -66,9 +68,15 @@ int find_unique_group_num_index(int n1, int unique_group_num_length, int* unique
 
 void random_index_vec(int* randn_vec, int n)
 {
+#ifdef R_BUILD
   for (int i = n - 1; i > 0; --i) {
-    randn_vec[i - 1] = ((int) (RAND_MAX * unif_rand())) % (i + 1);
+    randn_vec[i - 1] = ((int)(RAND_MAX_CONSTANT * unif_rand())) % (i + 1);
   }
+#else
+  for (int i = n - 1; i > 0; --i) {
+    randn_vec[i - 1] = ((int)(RAND_MAX_CONSTANT * ((double)rand() / (RAND_MAX + 1)))) % (i + 1);
+  }
+#endif
 }
 
 void findx2_gwas(int *Rxy, int *Ixy, int *i_perm, int n1, int n, int *Rx)

@@ -35,7 +35,7 @@ include_block = '\n'.join(f'#include "{h}"' for h in headers)
 
 # Configure extension module
 ffibuilder.set_source(
-    'Ball._cball',         # Python module name
+    'Ball.cball',         # Python module name
     include_block,         # Generated include directives
     sources=sources,
     include_dirs=[root_src],

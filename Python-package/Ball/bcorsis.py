@@ -5,12 +5,10 @@ Created on Fri Jul 26 10:24:01 2019
 @author:Yanhang zhang
 """
 
-from Ball.utilize import *
 from sklearn import linear_model
 from pygam import LinearGAM
 import numpy as np
-from Ball.cball import bcor_test
-from Ball.cball import doubleArray, intArray
+from .utilize import *
 
 
 def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=False, params=(5, 5), num_thread=0):

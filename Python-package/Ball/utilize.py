@@ -9,8 +9,7 @@
 import numpy as np
 import math
 from sklearn.metrics.pairwise import euclidean_distances
-from Ball.wrap_c import bcor_test_wrap_c
-
+from .wrap_c import bcor_test_wrap_c
 
 def examine_None(x):
     if x is not None:

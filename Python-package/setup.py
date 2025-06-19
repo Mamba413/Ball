@@ -4,7 +4,13 @@ import re
 import os
 import sys
 import numpy as np
-from setuptools import setup, find_packages, Extension
+import subprocess
+from setuptools import setup, find_packages
+
+# Automatically build CFFI extension before installation
+subprocess.check_call([sys.executable,
+                       os.path.join(os.path.dirname(__file__), 'build_ffi.py')])
+
 
 this_directory = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(this_directory, 'README.rst'), encoding='utf-8') as f:
