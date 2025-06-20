@@ -4,11 +4,14 @@ AC_INIT([Ball], [0.1.0])
 AC_PROG_CC
 
 # Copy C sources and headers from top-level src into R-package/src
+cd src
 echo '*****************************************************************************************'
-if test -d src/Ball_omp.h; then
+if test -f Ball_omp.h; then
   echo "Complier code exists in src/ directory. Install R package according to the complier code."
+  cd ..
 else 
   echo "* Copying C sources and headers from top-level src into R-package/src/..."
+  cd ..
   PKGDIR="."
   SRCDIR="../src"
   DESTDIR="src"
