@@ -7,3 +7,4 @@ src/*.h
 src/*.c
 config.log
 config.status
+src/Makevars
