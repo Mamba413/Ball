@@ -2,3 +2,8 @@ docs
 vignettes/*.R
 vignettes/*.html
 tests/testthat/*.RData
+autom4te.cache
+src/*.h
+src/*.c
+config.log
+config.status
