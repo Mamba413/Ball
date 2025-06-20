@@ -1,20 +1,7 @@
-@echo off
-REM Copy C sources and headers from top-level src/ into R-package/src/
+## enter the directory with configure.win 
+## reference: http://qiushao.net/2019/01/12/Linux/get-shell-script-dir/
+SCRIPT_DIR=$(cd $(dirname ${BASH_SOURCE[0]}); pwd)
+cd $SCRIPT_DIR
 
-echo * Copying C sources into R-package\src\...
-
-REM Determine directories
-set PKGDIR=%~dp0
-set SRCDIR=%PKGDIR%..\src
-set DESTDIR=%PKGDIR%src
-
-REM Remove old sources
-del /Q "%DESTDIR%\*.c"
-del /Q "%DESTDIR%\*.h"
-
-REM Copy fresh sources and headers
-copy "%SRCDIR%\*.c" "%DESTDIR%\"
-copy "%SRCDIR%\*.h" "%DESTDIR%\"
-
-echo Done.
-exit /B 0
+## copy necessary files into R-package:
+cp -rf ../src/*.c ../src/*.h src
