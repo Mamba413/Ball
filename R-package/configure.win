@@ -4,8 +4,11 @@ SCRIPT_DIR=$(cd $(dirname ${BASH_SOURCE[0]}); pwd)
 cd $SCRIPT_DIR
 
 ## copy necessary files into R-package:
-if [ -f src/Ball_omp.h]; then
+cd src
+if test -f Ball_omp.h; then
     echo "Compiler code exists in src/ directory. Install R package according to the compiler code."
+    cd ..
 else
+    cd ..
     cp -rf ../src/*.c ../src/*.h src
 fi
