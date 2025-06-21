@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   Ball: Ball.html
   bd_gwas: bd_gwas.html
-last_built: 2025-06-20T06:27Z
+last_built: 2025-06-21T03:13Z
 urls:
   reference: https://mamba413.github.io/Ball/reference
   article: https://mamba413.github.io/Ball/articles
