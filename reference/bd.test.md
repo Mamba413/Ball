@@ -230,7 +230,7 @@ bd.test(x = x, y = y)
 #> data:  x and y 
 #> number of observations = 100, group sizes: 50 50
 #> replicates = 99, weight: constant
-#> bd.constant = 0.5653, p-value = 0.01
+#> bd.constant = 0.54741, p-value = 0.01
 #> alternative hypothesis: distributions of samples are distinct
 #> 
 
@@ -286,7 +286,7 @@ bd.test(rnorm(n), size = c(40, 50, 60))
 #> data:  rnorm(n) 
 #> number of observations = 150, group sizes: 40 50 60
 #> replicates = 99, weight: constant, kbd.type: sum
-#> kbd.sum.constant = 0.056299, p-value = 0.24
+#> kbd.sum.constant = 0.047488, p-value = 0.32
 #> alternative hypothesis: distributions of samples are distinct
 #> 
 # alternative input method:
@@ -299,23 +299,23 @@ res
 #> data:  x 
 #> number of observations = 150, group sizes: 40 50 60
 #> replicates = 99, weight: constant, kbd.type: sum
-#> kbd.sum.constant = 0.021721, p-value = 0.87
+#> kbd.sum.constant = 0.051709, p-value = 0.3
 #> alternative hypothesis: distributions of samples are distinct
 #> 
 ## get all Ball Divergence statistics:
 res[["complete.info"]][["statistic"]]
 #>    kbd.sum.constant    kbd.sum.variance    kbd.max.constant    kbd.max.variance 
-#>          0.02172147          0.02172147          0.01584354          0.01584354 
+#>          0.05170871          0.05170871          0.04233666          0.04233666 
 #> kbd.maxsum.constant kbd.maxsum.variance 
-#>          0.01584354          0.01584354 
+#>          0.04233666          0.04233666 
 ## get all test result:
 res[["complete.info"]][["p.value"]]
 #>    kbd.sum.constant.pvalue    kbd.sum.variance.pvalue 
-#>                       0.87                       0.87 
+#>                       0.30                       0.30 
 #>    kbd.max.constant.pvalue    kbd.max.variance.pvalue 
-#>                       0.89                       0.89 
+#>                       0.28                       0.28 
 #> kbd.maxsum.constant.pvalue kbd.maxsum.variance.pvalue 
-#>                       0.89                       0.89 
+#>                       0.28                       0.28 
 
 ################  Testing via approximate limit distribution  #################
 if (FALSE) { # \dontrun{
