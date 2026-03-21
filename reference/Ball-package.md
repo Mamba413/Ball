@@ -1,0 +1,65 @@
+# Ball: Statistical Inference and Sure Independence Screening via Ball Statistics
+
+Hypothesis tests and sure independence screening (SIS) procedure based
+on ball statistics, including ball divergence
+[doi:10.1214/17-AOS1579](https://doi.org/10.1214/17-AOS1579) , ball
+covariance
+[doi:10.1080/01621459.2018.1543600](https://doi.org/10.1080/01621459.2018.1543600)
+, ball correlation
+[doi:10.1080/01621459.2018.1462709](https://doi.org/10.1080/01621459.2018.1462709)
+, and the permutation free procedure for testing
+[doi:10.1080/01621459.2023.2277417](https://doi.org/10.1080/01621459.2023.2277417)
+, are developed to analyze complex data in metric spaces, e.g, shape,
+directional, compositional and symmetric positive definite matrix data.
+The ball divergence and ball covariance based distribution-free tests
+are implemented to detecting distribution difference and association in
+metric spaces
+[doi:10.18637/jss.v097.i06](https://doi.org/10.18637/jss.v097.i06) .
+Furthermore, several generic non-parametric feature selection procedures
+based on ball correlation, BCor-SIS and all of its variants, are
+implemented to tackle the challenge in the context of ultra high
+dimensional data. A fast implementation for large-scale multiple
+K-sample testing with ball divergence [doi:
+10.1002/gepi.22423](https://doi.org/%2010.1002/gepi.22423) is supported,
+which is particularly helpful for genome-wide association study.
+
+## References
+
+Wenliang Pan, Yuan Tian, Xueqin Wang, Heping Zhang. Ball Divergence:
+Nonparametric two sample test. Annals of Statistics. 46 (2018), no. 3,
+1109–1137. doi:10.1214/17-AOS1579.
+https://projecteuclid.org/euclid.aos/1525313077
+
+Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) A Generic
+Sure Independence Screening Procedure, Journal of the American
+Statistical Association, DOI: 10.1080/01621459.2018.1462709
+
+Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu & Jin Zhu (2019)
+Ball Covariance: A Generic Measure of Dependence in Banach Space,
+Journal of the American Statistical Association, DOI:
+10.1080/01621459.2018.1543600
+
+Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2021). Ball: An R
+Package for Detecting Distribution Difference and Association in Metric
+Spaces, Journal of Statistical Software, Vol.97(6), doi:
+10.18637/jss.v097.i06
+
+Yue Hu, Haizhu Tan, Cai Li, Heping Zhang. (2021). Identifying genetic
+risk variants associated with brain volumetric phenotypes via K-sample
+Ball Divergence method. Genetic Epidemiology, 1–11.
+https://doi.org/10.1002/gepi.22423
+
+## See also
+
+Useful links:
+
+- <https://mamba413.github.io/Ball/>
+
+- <https://github.com/Mamba413/Ball>
+
+- Report bugs at <https://github.com/Mamba413/Ball/issues>
+
+## Author
+
+Xueqin Wang, Wenliang Pan, Heping Zhang, Hongtu Zhu, Yuan Tian, Weinan
+Xiao, Chengfeng Liu, Jin Zhu
