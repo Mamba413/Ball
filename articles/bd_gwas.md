@@ -120,7 +120,7 @@ res <- bd.gwas.test(x = x, snp = snp)
 
     ## =========== Pre-screening SNPs ===========
     ## Refining SNP... Progress: 1/1. 
-    ## Refined p-value: 0.0000499975, cost time: 2 (s).
+    ## Refined p-value: 0.0000499975, cost time: 3 (s).
 
 And we present the SNPs that is significant:
 
