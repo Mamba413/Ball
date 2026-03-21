@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import glob
 import numpy as np
 import pybind11
 from setuptools import setup, find_packages, Extension
@@ -17,8 +16,9 @@ if not os.path.isdir(root_src):
 with open(os.path.join(this_directory, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
-# Collect C sources from top-level src/
-c_sources = glob.glob(os.path.join(root_src, '*.c'))
+# Only compile the C sources needed by the Python bindings
+c_source_names = ['BD.c', 'BI.c', 'bcor.c', 'kbcov.c', 'kbd.c', 'utilities.c', 'median.c']
+c_sources = [os.path.join(root_src, f) for f in c_source_names]
 
 
 class BuildExt(build_ext):
