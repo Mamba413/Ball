@@ -124,7 +124,7 @@ def bd_test(*args, **kwargs):
 
     examine_permutations_arguments(num_permutations)
     examine_thread_arguments(num_thread)
-    if len(args) == 1 and np.alen(args[0]) != 1 and not distance and len(size) == 0:
+    if len(args) == 1 and len(args[0]) != 1 and not distance and len(size) == 0:
         num_groups = len(args[0])
         args = args[0]
         map(examine_None, args)
@@ -139,7 +139,7 @@ def bd_test(*args, **kwargs):
         # return the dimension of samples
         p = examine_dimension(args)
         if len(size) == 0:
-            size = list(map(np.alen, args))
+            size = list(map(len, args))
         if p > 1:
             x = np.vstack(args)
             x = get_vectorized_distance_matrix(x)
@@ -161,8 +161,9 @@ def bd_test(*args, **kwargs):
 
     bd_stat, bd_pvalue = bd_test_wrap_c(x, size, num_permutations, distance, num_thread)
 
-    if num_groups > 2:
-        weight = weight.lower()
+    weight = weight.lower()
+    if num_groups <= 2:
+        # 2-sample: 3 outputs [sum, max, maxsum]
         if weight == "sum":
             bd_stat = bd_stat[0]
             bd_pvalue = bd_pvalue[0]
@@ -172,6 +173,19 @@ def bd_test(*args, **kwargs):
         elif weight == "maxsum":
             bd_stat = bd_stat[2]
             bd_pvalue = bd_pvalue[2]
+        else:
+            raise ValueError("weight arguments is invalid!")
+    else:
+        # k-sample: 6 outputs [sum_w0, sum_w1, max_w0, max_w1, maxsum_w0, maxsum_w1]
+        if weight == "sum":
+            bd_stat = bd_stat[0]
+            bd_pvalue = bd_pvalue[0]
+        elif weight == "max":
+            bd_stat = bd_stat[2]
+            bd_pvalue = bd_pvalue[2]
+        elif weight == "maxsum":
+            bd_stat = bd_stat[4]
+            bd_pvalue = bd_pvalue[4]
         else:
             raise ValueError("weight arguments is invalid!")
     return bd_testResult(bd_stat, bd_pvalue)

@@ -88,7 +88,7 @@ def bcov_test(*args, **kwargs):
     args = list(map(np.array, args))
     list(map(examine_None, args))
     num_groups = len(args)
-    n = list(map(np.alen, args))
+    n = list(map(len, args))
     if len(set(n)) != 1:
         raise ValueError("Variables with different sample size")
     else:

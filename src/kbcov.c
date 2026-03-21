@@ -1,5 +1,6 @@
 #include "Ball_omp.h"
 
+#include "math.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "utilities.h"

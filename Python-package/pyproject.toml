@@ -1,9 +1,8 @@
 [build-system]
-# Include numpy for build-time imports if setup.py uses numpy
 requires = [
   "setuptools>=42",
   "wheel",
-  "cffi>=1.0.0",
+  "pybind11>=2.10",
   "numpy"
 ]
 build-backend = "setuptools.build_meta"

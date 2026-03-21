@@ -100,7 +100,7 @@ def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=
     d = select_d_arguments(n, d)
     if len(y.shape) > 1 and dst_y == True:
         examine_distance_matrix(y)
-        y = [y[i][j] for i in range(np.alen(y)) for j in range(np.alen(y)) if i < j]
+        y = [y[i][j] for i in range(len(y)) for j in range(len(y)) if i < j]
     else:
         y = np.array(y).T.flatten()
 
@@ -203,7 +203,7 @@ def bcorsis(y, x, x_num, d="small", weight="constant", method="standard", dst_y=
 
 def bcor(x, y, distance=False, weight="constant"):
     """
-    
+
     calculate sample version of ball covariance
 
     Parameters
@@ -217,20 +217,20 @@ def bcor(x, y, distance=False, weight="constant"):
     References
     ----------
     .. [1]Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) A Generic Sure Independence Screening Procedure, Journal of the
-    American Statistical Association   
+    American Statistical Association
     .. [2]Jin, Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2018). Ball: An R package for detecting distribution difference and
     association in metric spaces.
 
     Examples
-    --------     
+    --------
     >>> from Ball import bcor
     >>> import numpy as np
-    >>> np.random.seed(1234)    
+    >>> np.random.seed(1234)
     >>> num = 5
     >>> x = np.random.normal(0, 1, num)
     >>> y = np.random.normal(0, 1, num)
     >>> bcor(x, y)
-    
+
     >>> ## distance matrix input
     >>> from sklearn.metrics.pairwise import euclidean_distances
     >>> x = np.array(x, ndmin=2).T
@@ -245,11 +245,9 @@ def bcor(x, y, distance=False, weight="constant"):
     y = np.array(y, ndmin=2)
     p = max(np.size(x, 0), np.size(y, 0))
     n = np.size(x, 1)
-    
-    dst_y = intArray(1)
-    dst_x = intArray(1)   
-    dst_y[0] = 1
-    dst_x[0] = 1
+
+    dst_y_flag = 1
+    dst_x_flag = 1
     if distance:
         index = np.triu_indices(p, 1)
         x = x[index]
@@ -259,37 +257,18 @@ def bcor(x, y, distance=False, weight="constant"):
             y = get_vectorized_distance_matrix(y)
             x = get_vectorized_distance_matrix(x)
         else:
-            dst_y[0] = 0
-            dst_x[0] = 0  
+            dst_y_flag = 0
+            dst_x_flag = 0
             x = x[0]
             y = y[0]
-            pass
-        pass
-    
-    bcor_stat = doubleArray(3)
-    y_copy = doubleArray(len(y))
-    x_copy = doubleArray(len(x))
-    for i, y_value in enumerate(y):
-        y_copy[i] = y_value
-        pass
-    for i, x_value in enumerate(x):
-        x_copy[i] = x_value
-        pass
-    x_number = intArray(1)
-    x_number[0] = 1
-    f_number = intArray(1)
-    f_number[0] = 1
-    num = intArray(1)
-    num[0] = n
-    p_copy = intArray(1)
-    p_copy[0] = p
-    k = intArray(1)
-    k[0] = 1
-    nth = intArray(1)
-    nth[0] = 1
 
-    bcor_test(bcor_stat, y_copy, x_copy, x_number, f_number, 
-              num, p_copy, k, dst_y, dst_x, nth)
-    bcor_stat_list = [bcor_stat[j] for j in range(3)]
-    bcor_stat = select_bcor_stat2(bcor_stat_list, weight)
-    return bcor_stat
+    y = np.ascontiguousarray(y, dtype=np.float64)
+    x = np.ascontiguousarray(x, dtype=np.float64)
+    x_num = np.array([1], dtype=np.int32)
+
+    from Ball._cball import py_bcor_test
+    out = py_bcor_test(y, x, x_num,
+                       1, int(n), int(p), 1,
+                       dst_y_flag, dst_x_flag, 1, 0)
+    bcor_stat_list = out.tolist()
+    return select_bcor_stat2(bcor_stat_list, weight)

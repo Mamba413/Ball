@@ -78,7 +78,7 @@ def examine_size_arguments(x, size):
         raise ValueError("size can't be None!")
     if np.any([x <= 0 for x in size]) or len(size) == 1:
         raise ValueError("size should be a list that length longer than 1, with all elements positive integer!")
-    x_row = np.alen(x)
+    x_row = len(x)
     n = np.sum(size)
     if x_row != n:
         raise ValueError("size arguments is invalid!")
