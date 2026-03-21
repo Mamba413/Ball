@@ -8,7 +8,11 @@ from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
 
 this_directory = os.path.abspath(os.path.dirname(__file__))
+
+# Look for C sources in ../src/ (development) or ./src/ (sdist / CI wheel build)
 root_src = os.path.abspath(os.path.join(this_directory, '..', 'src'))
+if not os.path.isdir(root_src):
+    root_src = os.path.abspath(os.path.join(this_directory, 'src'))
 
 with open(os.path.join(this_directory, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
@@ -18,19 +22,24 @@ c_sources = glob.glob(os.path.join(root_src, '*.c'))
 
 
 class BuildExt(build_ext):
-    """Custom build_ext that adds C++11 only for .cpp files."""
+    """Custom build_ext: adds -std=c++11 for .cpp on GCC/Clang; uses /O2 on MSVC."""
 
     def build_extensions(self):
-        original_compile = self.compiler._compile
+        if self.compiler.compiler_type == 'msvc':
+            for ext in self.extensions:
+                ext.extra_compile_args = ['/O2']
+        else:
+            original_compile = self.compiler._compile
 
-        def custom_compile(obj, src, ext, cc_args, extra_postargs, pp_opts):
-            postargs = list(extra_postargs or [])
-            if src.endswith('.cpp'):
-                postargs.append('-std=c++11')
-            return original_compile(obj, src, ext, cc_args, postargs, pp_opts)
+            def custom_compile(obj, src, ext, cc_args, extra_postargs, pp_opts):
+                postargs = list(extra_postargs or [])
+                if src.endswith('.cpp'):
+                    postargs.append('-std=c++11')
+                return original_compile(obj, src, ext, cc_args, postargs, pp_opts)
 
-        self.compiler._compile = custom_compile
+            self.compiler._compile = custom_compile
         super().build_extensions()
+
 
 ext_modules = [
     Extension(
