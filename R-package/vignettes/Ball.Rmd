@@ -1,6 +1,6 @@
 ---
 title: "Ball: Statistical Inference and Sure Independence Screening via Ball Statistics"
-author: "Jin Zhu, zhuj37@mail2.sysu.edu.cn"
+author: "Jin Zhu, zhuj1jqx@gmail.com"
 date: "December 18, 2017"
 # bibliography: reference.bib
 output: 

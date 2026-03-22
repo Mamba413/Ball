@@ -161,7 +161,8 @@ Reference
 - Wenliang Pan, Xueqin Wang, Weinan Xiao & Hongtu Zhu (2018) [A Generic Sure Independence Screening Procedure](https://amstat.tandfonline.com/doi/full/10.1080/01621459.2018.1462709#.WupWaoiFM2x), Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1462709
 - Wenliang Pan, Xueqin Wang, Heping Zhang, Hongtu Zhu & Jin Zhu (2019) [Ball Covariance: A Generic Measure of Dependence in Banach Space](https://doi.org/10.1080/01621459.2018.1543600), Journal of the American Statistical Association, DOI: 10.1080/01621459.2018.1543600
 - Jin Zhu, Wenliang Pan, Wei Zheng, and Xueqin Wang (2021). [Ball: An R Package for Detecting Distribution Difference and Association in Metric Spaces](https://www.jstatsoft.org/article/view/v097i06), Journal of Statistical Software, Vol.97(6), doi: 10.18637/jss.v097.i06.
+- Xueqin Wang, Jin Zhu, Wenliang Pan, Junhao Zhu, and Heping Zhang (2024). [Nonparametric Statistical Inference via Metric Distribution Function in Metric Spaces](https://www.tandfonline.com/doi/full/10.1080/01621459.2023.2277417). Journal of the American Statistical Association, 119(548), 2772–2784. 
 
 Bug report
 ----------
-If you find any bugs, or if you experience any crashes, please report to us. If you have any questions just ask, we won't bite. Open an [issue](https://github.com/Mamba413/Ball/issues) or send an email to Jin Zhu at zhuj37@mail2.sysu.edu.cn
+If you find any bugs, or if you experience any crashes, please report to us. If you have any questions just ask, we won't bite. Open an [issue](https://github.com/Mamba413/Ball/issues) or send email to Jin Zhu at zhuj1jqx@gmail.com

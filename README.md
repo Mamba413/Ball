@@ -82,4 +82,4 @@ References
 
 Bug report
 ----------
-Open an [issue](https://github.com/Mamba413/Ball/issues) or send email to Jin Zhu at zhuj37@mail2.sysu.edu.cn
+Open an [issue](https://github.com/Mamba413/Ball/issues) or send email to Jin Zhu at zhuj1jqx@gmail.com
