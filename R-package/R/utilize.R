@@ -196,6 +196,9 @@ examine_weight_arguments <- function(weight) {
     if (is.logical(weight)) {
       weight <- ifelse(weight, "probability", "constant")
     } else {
+      if (length(weight) > 1) {
+        weight <- weight[1]
+      }
       weight <- match.arg(arg = weight, choices = WEIGHT_TYPE)
     }
     return(weight)
