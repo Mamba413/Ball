@@ -181,13 +181,18 @@ Here is the corresponding Bibtex entry
   Metric Spaces](https://www.jstatsoft.org/article/view/v097i06),
   Journal of Statistical Software, Vol.97(6), doi:
   10.18637/jss.v097.i06.
+- Xueqin Wang, Jin Zhu, Wenliang Pan, Junhao Zhu, and Heping Zhang
+  (2024). [Nonparametric Statistical Inference via Metric Distribution
+  Function in Metric
+  Spaces](https://www.tandfonline.com/doi/full/10.1080/01621459.2023.2277417).
+  Journal of the American Statistical Association, 119(548), 2772–2784.
 
 ## Bug report
 
 If you find any bugs, or if you experience any crashes, please report to
 us. If you have any questions just ask, we won’t bite. Open an
-[issue](https://github.com/Mamba413/Ball/issues) or send an email to Jin
-Zhu at <zhuj37@mail2.sysu.edu.cn>
+[issue](https://github.com/Mamba413/Ball/issues) or send email to Jin
+Zhu at <zhuj1jqx@gmail.com>
 
 # Package index
 

@@ -235,7 +235,7 @@ bcov.test(x = x, y = y, weight = "prob")
 #> data:  x and y
 #> number of observations = 50
 #> replicates = 99, weight: probability
-#> bcov.probability = 0.035357, p-value = 0.1
+#> bcov.probability = 0.040211, p-value = 0.02
 #> alternative hypothesis: random variables are dependent
 #> 
 
@@ -286,7 +286,7 @@ bcov.test(data_list)
 #> data:  data_list
 #> number of observations = 50
 #> replicates = 99, weight: constant
-#> bcov.constant = 0.0018673, p-value = 0.01
+#> bcov.constant = 0.001549, p-value = 0.01
 #> alternative hypothesis: random variables are dependent
 #> 
 data_list <- lapply(data_list, function(x) {
@@ -299,7 +299,7 @@ bcov.test(data_list, distance = TRUE)
 #> data:  data_list
 #> number of observations = 50
 #> replicates = 99, weight: constant
-#> bcov.constant = 0.0018673, p-value = 0.01
+#> bcov.constant = 0.001549, p-value = 0.01
 #> alternative hypothesis: random variables are dependent
 #> 
 bcov.test(data_list, distance = FALSE, weight = "chi")
@@ -309,7 +309,7 @@ bcov.test(data_list, distance = FALSE, weight = "chi")
 #> data:  data_list
 #> number of observations = 50
 #> replicates = 99, weight: chisquare
-#> bcov.chisquare = 1.7707, p-value = 0.01
+#> bcov.chisquare = 1.6759, p-value = 0.01
 #> alternative hypothesis: random variables are dependent
 #> 
 
