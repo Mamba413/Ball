@@ -1,5 +1,17 @@
 # Changelog
 
+## Ball 1.3.14
+
+- Support permutation-free tests for homogeneity and association
+- Support new “RBF” weight for ball divergence and ball covariance which
+  may improve detection power in practice
+
+## Ball 1.3.13
+
+CRAN release: 2023-02-12
+
+- Fix some warning message
+
 ## Ball 1.3.12
 
 CRAN release: 2021-09-20
