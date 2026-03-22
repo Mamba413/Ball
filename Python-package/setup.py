@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import numpy as np
-import pybind11
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
 
@@ -25,6 +23,13 @@ class BuildExt(build_ext):
     """Custom build_ext: adds -std=c++11 for .cpp on GCC/Clang; uses /O2 on MSVC."""
 
     def build_extensions(self):
+        import numpy as np
+        import pybind11
+
+        for ext in self.extensions:
+            ext.include_dirs.append(np.get_include())
+            ext.include_dirs.append(pybind11.get_include())
+
         if self.compiler.compiler_type == 'msvc':
             for ext in self.extensions:
                 ext.extra_compile_args = ['/O2']
@@ -40,12 +45,11 @@ class BuildExt(build_ext):
             self.compiler._compile = custom_compile
         super().build_extensions()
 
-
 ext_modules = [
     Extension(
         'Ball._cball',
         sources=['Ball/_bindings.cpp'] + c_sources,
-        include_dirs=[root_src, np.get_include(), pybind11.get_include()],
+        include_dirs=[root_src],
         extra_compile_args=['-O3'],
     ),
 ]
