@@ -347,8 +347,7 @@ void compute_pairwise_size(int *pairwise_size, const int *size, const int *k) {
 
 void compute_optimized_permuted_size(int *permuted_size, const int *k_vector,
                                      int **size_list, int n, int p, const int target_k) {
-    double *tmp_size_vec = (double *) malloc(target_k * sizeof(double));
-    double *all_size_vec = (double *) malloc(target_k * sizeof(double));
+    double tmp_size_vec[target_k], all_size_vec[target_k];
     for (int i = 0; i < target_k; ++i) {
         all_size_vec[i] = 0.0;
     }
@@ -371,8 +370,6 @@ void compute_optimized_permuted_size(int *permuted_size, const int *k_vector,
         tmp_sum += permuted_size[i];
     }
     permuted_size[target_k - 1] = n - tmp_sum;
-    free(tmp_size_vec);
-    free(all_size_vec);
 }
 
 /* Comparison function. Receives two generic (void) pointers to the items under comparison. */

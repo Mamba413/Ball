@@ -196,10 +196,8 @@ void compute_batch_pvalue(double *ball_stat, const double *permuted_stat, double
 
 void merge(double *vector, int *index, int *number, int start, int mid, int end) {
     const int left_size = mid - start + 1, right_size = end - mid;
-    double *left = (double *) malloc(left_size * sizeof(double));
-    double *right = (double *) malloc(right_size * sizeof(double));
-    int *left_index = (int *) malloc(left_size * sizeof(int));
-    int *right_index = (int *) malloc(right_size * sizeof(int));
+    double left[left_size], right[right_size];
+    int left_index[left_size], right_index[right_size];
     int left_merged = 0, right_merged = 0, total_merged = 0;
     for (int i = start; i <= mid; ++i) {
         left[i - start] = vector[i];
@@ -236,10 +234,6 @@ void merge(double *vector, int *index, int *number, int start, int mid, int end)
         ++right_merged;
         ++total_merged;
     }
-    free(left);
-    free(right);
-    free(left_index);
-    free(right_index);
 }
 
 void merge_sort(double *vector, int *index, int *number, int start, int end) {
@@ -251,12 +245,11 @@ void merge_sort(double *vector, int *index, int *number, int start, int end) {
 }
 
 void count_smaller_number_after_self_solution(double *vector, int *number, const int num) {
-    int *index = (int *) malloc(num * sizeof(int));
+    int index[num];
     for (int i = 0; i < num; ++i) {
         index[i] = i;
     }
     merge_sort(vector, index, number, 0, num - 1);
-    free(index);
 }
 
 void count_smaller_number_after_self_solution2(double *vector, int *index, int *number, const int num) {
