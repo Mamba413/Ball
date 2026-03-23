@@ -3,6 +3,7 @@
 //
 
 #include "stdio.h"
+#include "stdlib.h"
 #include "math.h"
 #include "median.h"
 #include "utilities.h"
@@ -24,12 +25,12 @@ void bdd_matrix_bias_two_group(double *b_dd, double *x, int *n1_num, int *n2_num
     const int n1 = *n1_num;
     const int n2 = *n2_num;
     const int num = n1 + n2;
-    double x_t_vec[num];
-    double x_n1_vec[n1];
-    double x_n2_vec[n2];
-    int r_t_vec[num];
-    int r_n1_vec[n1];
-    int r_n2_vec[n2];
+    double *x_t_vec = (double *) malloc(num * sizeof(double));
+    double *x_n1_vec = (double *) malloc(n1 * sizeof(double));
+    double *x_n2_vec = (double *) malloc(n2 * sizeof(double));
+    int *r_t_vec = (int *) malloc(num * sizeof(int));
+    int *r_n1_vec = (int *) malloc(n1 * sizeof(int));
+    int *r_n2_vec = (int *) malloc(n2 * sizeof(int));
     double **Dxy = alloc_matrix(num, num);
     distance2matrix(x, Dxy, num);
 
@@ -112,6 +113,12 @@ void bdd_matrix_bias_two_group(double *b_dd, double *x, int *n1_num, int *n2_num
             }
         }
     }
+    free(x_t_vec);
+    free(x_n1_vec);
+    free(x_n2_vec);
+    free(r_t_vec);
+    free(r_n1_vec);
+    free(r_n2_vec);
     free_int_matrix(x_rank, num, num);
 }
 
@@ -142,8 +149,8 @@ void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread, int *weight_
 #endif
 
     const int num = *n;
-    double x_vec[num];
-    int r_vec[num];
+    double *x_vec = (double *) malloc(num * sizeof(double));
+    int *r_vec = (int *) malloc(num * sizeof(int));
     int **x_rank = alloc_int_matrix(num, num);
     double **Dxy = alloc_matrix(num, num);
     distance2matrix(x, Dxy, num);
@@ -162,7 +169,7 @@ void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread, int *weight_
     if (*weight_type == 4) {
         int s = 0;
         const int Dxy_vec_len = (((*n) * (*n - 1)) >> 1);
-        double Dxy_vec[Dxy_vec_len];
+        double *Dxy_vec = (double *) malloc(Dxy_vec_len * sizeof(double));
         for (int u = 0; u < (*n - 1); u++)
         {
             for (int v = u + 1; v < *n; v++)
@@ -172,6 +179,7 @@ void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread, int *weight_
         }
         median_value = find_median(Dxy_vec, (((*n) * (*n - 1)) >> 1));
         // printf("median distance: %f\n", median_value);
+        free(Dxy_vec);
     }
     double num_double = (double) (*n);
     double **weight = alloc_matrix(num, num);
@@ -190,9 +198,9 @@ void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread, int *weight_
         }
     }
 
-    double w_vec[num];
-    double ws_vec[num];
-    double total_weight_sum[num];
+    double *w_vec = (double *) malloc(num * sizeof(double));
+    double *ws_vec = (double *) malloc(num * sizeof(double));
+    double *total_weight_sum = (double *) malloc(num * sizeof(double));
     double **weight_sum = alloc_matrix(num, num);
     for (int i = 0; i < num; i++) {
         total_weight_sum[i] = 0.0;
@@ -247,6 +255,11 @@ void bdd_matrix_bias(double *b_dd, double *x, int *n, int *nthread, int *weight_
         };
     }
 
+    free(x_vec);
+    free(r_vec);
+    free(w_vec);
+    free(ws_vec);
+    free(total_weight_sum);
     free_int_matrix(x_rank, num, num);
     free_matrix(weight, num, num);
     free_matrix(weight_sum, num, num);
@@ -352,7 +365,7 @@ void cross_kernel_matrix_bias_crude(double *kernel, double *x, int *k, int *n, i
     const int K = *k;
     double c1 = 1.0;
     double c2 = 1.0 / (num * num);
-    int seq_pow_num[K]; 
+    int *seq_pow_num = (int *) malloc(K * sizeof(int));
     for (int k_tmp = 0; k_tmp < K; k_tmp++)
     {
         if (k_tmp == 0) {
@@ -366,7 +379,8 @@ void cross_kernel_matrix_bias_crude(double *kernel, double *x, int *k, int *n, i
         int s = 0;
         for (int u = 0; u < num; u++) {
             // find the balls that include u.
-            int index1[num * num], index2[num * num];
+            int *index1 = (int *) malloc(num * num * sizeof(int));
+            int *index2 = (int *) malloc(num * num * sizeof(int));
             int complete_inclusion_count = 0;
             for (int i = 0; i < num; i++) {
                 for (int j = 0; j < num; j++) {
@@ -386,7 +400,7 @@ void cross_kernel_matrix_bias_crude(double *kernel, double *x, int *k, int *n, i
             }
 
             // compute the kernel values
-            int combination_tuple[K];
+            int *combination_tuple = (int *) malloc(K * sizeof(int));
             for (int i = 0; i < combination_type_num; i++) {
                 int cross_inclusion_count = 0;
                 for (int k_tmp = 0; k_tmp < K; k_tmp++) {
@@ -402,10 +416,14 @@ void cross_kernel_matrix_bias_crude(double *kernel, double *x, int *k, int *n, i
                     }
                     cross_inclusion_count += marginal_inclusion;
                 }
-                kernel[s++] = c2 * ((double) cross_inclusion_count); 
+                kernel[s++] = c2 * ((double) cross_inclusion_count);
             }
+            free(index1);
+            free(index2);
+            free(combination_tuple);
         }
     }
 
+    free(seq_pow_num);
     free_3d_matrix(Dx, *n, *n);
 }

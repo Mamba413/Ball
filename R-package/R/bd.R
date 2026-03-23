@@ -144,10 +144,10 @@ bd.test.default <- function(x, y = NULL, num.permutations = 99,
                             size = NULL, seed = 1, num.threads = 0, 
                             kbd.type = c("sum", "maxsum", "max"), 
                             weight = c("constant", "variance", "rbf"), ...) {
-  weight <- match.arg(weight)
+  weight <- match.arg(weight, choices = BD_WEIGHT_TYPE)
   data_name <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
-  kbd.type <- match.arg(kbd.type)
-  method <- match.arg(method)
+  kbd.type <- match.arg(kbd.type, choices = c("sum", "maxsum", "max"))
+  method <- match.arg(method, choices = c("permutation", "limit"))
   if (length(data_name) > 1) {
     data_name <- ""
   }
