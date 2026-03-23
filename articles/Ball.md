@@ -159,7 +159,7 @@ bcov.test(x = x, y = y)
     # data:  x and y
     # number of observations = 50
     # replicates = 99, weight: constant
-    # bcov.constant = 0.0024935, p-value = 0.01
+    # bcov.constant = 0.0023393, p-value = 0.01
     # alternative hypothesis: random variables are dependent
 
 The result of **bcov.test** is that *p*-value \< 0.05, so we conclude
@@ -192,7 +192,7 @@ bcov.test(x = x, y = y, weight = "prob")
     # data:  x and y
     # number of observations = 50
     # replicates = 99, weight: probability
-    # bcov.probability = 0.04057, p-value = 0.01
+    # bcov.probability = 0.040732, p-value = 0.02
     # alternative hypothesis: random variables are dependent
 
 The result of **bcov.test** is that *p*-value \< 0.05, so we conclude
@@ -379,7 +379,7 @@ bd.test(rnorm(n), size = rep(50, 3))
     # data:  rnorm(n) 
     # number of observations = 150, group sizes: 50 50 50
     # replicates = 99, weight: constant, kbd.type: sum
-    # kbd.sum.constant = 0.040921, p-value = 0.53
+    # kbd.sum.constant = 0.027478, p-value = 0.82
     # alternative hypothesis: distributions of samples are distinct
 
 As the result shown, *p*-value\>0.05, which means we can’t reject the
@@ -472,7 +472,7 @@ bcov.test(x = example1, num.permutations = 199)
     # data:  example1
     # number of observations = 50
     # replicates = 199, weight: constant
-    # bcov.constant = 0.0012901, p-value = 0.095
+    # bcov.constant = 0.0023901, p-value = 0.01
     # alternative hypothesis: random variables are dependent
 
 ``` r
@@ -485,7 +485,7 @@ bcov.test(x = example2, num.permutations = 199)
     # data:  example2
     # number of observations = 50
     # replicates = 199, weight: constant
-    # bcov.constant = 0.035077, p-value = 0.005
+    # bcov.constant = 0.038188, p-value = 0.005
     # alternative hypothesis: random variables are dependent
 
 The hypothesis test result for two examples show that *p*-value \< 0.05,
