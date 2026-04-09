@@ -63,4 +63,4 @@ Reference
 
 Bug report
 ----------
-If you find any bugs, or if you experience any crashes, please report to us. If you have any questions just ask, we won't bite. Open an [issue](https://github.com/Mamba413/Ball/issues) or send an email to Jin Zhu at zhuj37@mail2.sysu.edu.cn
+If you find any bugs, or if you experience any crashes, please report to us. If you have any questions just ask, we won't bite. Open an [issue](https://github.com/Mamba413/Ball/issues) or send email to Jin Zhu at zhuj1jqx@gmail.com

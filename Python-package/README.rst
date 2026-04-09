@@ -33,4 +33,4 @@ sh configure.sh your_python_path your_python_version_number # e.g.  sh configure
 
 Authorship
 -----------
-Jin Zhu (zhuj37@mail2.sysu.edu.cn), Xueqin Wang (wangxq88@mail2.sysu.edu.cn)
+Jin Zhu (zhuj1jqx@gmail.com), Xueqin Wang (wangxq88@mail2.sysu.edu.cn)
