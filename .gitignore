@@ -151,6 +151,7 @@ R-package/src/tmp/
 R-package/temp.rda
 reference/KBDGWAS.pdf
 R-package/vignettes/bd_gwas_cache
+R-package/revdep/*
 R-package/vignettes/*.html
 .vscode/c_cpp_properties.json
 .vscode/settings.json
