@@ -11,7 +11,7 @@ root_src = os.path.abspath(os.path.join(this_directory, '..', 'src'))
 if not os.path.isdir(root_src):
     root_src = os.path.abspath(os.path.join(this_directory, 'src'))
 
-with open(os.path.join(this_directory, 'README.rst'), encoding='utf-8') as f:
+with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 # Only compile the C sources needed by the Python bindings
@@ -63,7 +63,7 @@ setup(
     maintainer_email="zhuj1jqx@gmail.com",
     description="Ball: A Python Package for Detecting Distribution Difference and Association in Metric Spaces",
     long_description=long_description,
-    long_description_content_type='text/x-rst',
+    long_description_content_type='text/markdown',
     packages=find_packages(),
     ext_modules=ext_modules,
     cmdclass={'build_ext': BuildExt},

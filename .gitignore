@@ -95,6 +95,7 @@ Python-package/build/
 *.opendb
 src/cball/cball/Debug/
 Python-package/src/cball.py
+Python-package/src/
 Python-package/.idea/
 R-package/src-i386/
 R-package/src-x64/
